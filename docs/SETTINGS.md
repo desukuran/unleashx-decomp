@@ -107,6 +107,60 @@ text; a failure to save the SYST name reports "Unable to set FTP Password".
 A full-screen editor for the visible screen area (TODO: decompile the
 editor, `0x001018DC`).
 
-## HDD, Music, System Settings
+## Harddisk Settings
 
-TODO.
+Enable Drive F / Enable Drive G (`<Preference><EnableDriveF>`,
+`<EnableDriveG>`; mapped or unmapped at once, restart), the hard disk's
+model, serial and lock status (A on the status line offers to lock or
+unlock the disk), the space on C, E, F, G, X, Y and Z (total/free), the
+SMART values, the DVD drive's model and serial, and the DVD Media Check
+(Normal / Extended, `<DVDMediaCheck>`). Drive space and SMART values refresh
+every 5 seconds. Quirk: the temperature SMART value is converted with 32.5
+instead of 32, and only when it looks like the other unit (above 90 or
+below 60).
+
+## Sounds and Audio Settings
+
+| Line | Values | Saved as |
+| --- | --- | --- |
+| Play Music | Off / Xbox / Custom / Both | `<Audio><EnableSoundTrack>` |
+| Random Music, Global | Yes / No | `<EnableSoundTrack Random Global>` |
+| Music Path | a folder (pop-up; X clears it) | `<EnableSoundTrack MusicPath>` |
+| Surround (5.1) | Yes / No; also the Xbox's Dolby Digital setting | `<EnableSoundTrack Enable_5_1>` |
+| Music Volume, Sound Volume | 0-100 with LEFT/RIGHT, drawn as bars | `<MusicVolume>`, `<SoundVolume>` |
+| Enable (sound effects) | Yes / No | `<EnableSoundEffect>` |
+| Scroll, Select, Action Complete, Ambient, Keyboard Stroke, Back, Menu Up, Menu Down, Game Save Select, Memory Slot | a .wav (pop-up; X clears it) | `<Audio><Action_Complete>file</...>` (`[None]` when empty) |
+
+Volumes, random/global and 5.1 apply to the playing music at once; sound
+files are reloaded at once.
+
+## System Settings
+
+* **Xbox Info:** dashboard version, an Xbox Info screen (TODO), and the
+  Xbox's nickname (saved to the Xbox, at most 32 characters).
+* **File Operation:** Auto Rename, Auto Patch XBE, Abort On Error, default
+  backup folder (`<Preference><AutoRename>` etc., `<DefaultFolder>`).
+* **Context Menu:** `<ContextMenu AllowUninstall AllowItemEdit
+  AllowRecentList LinkToGame LinkToSave>`.
+* **Font:** Font Scale 1.0x-3.0x (A steps 0.1, LEFT/RIGHT too); it's kept
+  per video mode in `<data>\videoset.dat`, not Config.xml. Scroll Speed
+  (`<ScrollSpeed>`, saved as e.g. `20f`).
+* **Temperature:** board and CPU temperature, Use Fahrenheit, the
+  temperature threshold (`<TempThreshold>`), and Fan Speed 1.0x-5.0x
+  (`<FanSpeed>`, applied at once; 1.0x gives the fan back to the SMC).
+* **Misc:** language file (`<LanguageFile>`, loaded at once), Auto Turn Off
+  minutes.
+* **LED Color:** the color for Default, Screen Saver, Copying, FTP Send,
+  FTP Receive, FTP Boost and Busy (`<Settings><LED><Default>Red</...>`), and
+  Test LED to try a color.
+* **Screen Saver:** wait, type (Text / Video / Slideshow), text, video,
+  path, background music (`<Preference><ScreenSaver Wait Type EnableBGM>`
+  with `<Text>`, `<Video>`, `<Path>` children).
+* **Skin:** skins path (`<Skin Path>`), current skin.
+* **RSS Newsfeed:** `<Settings><Newsfeed Enable Interval Continuous
+  Separator>`; enabling it without any `<URL>` adds xbox-scene.com and
+  xbins.org.
+
+X sets the selected line back to its default. Quirks: typed scroll speeds
+and temperature thresholds aren't range-checked; the screen saver path is
+stored in the text setting until restart.
