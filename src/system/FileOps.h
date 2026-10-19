@@ -12,6 +12,9 @@ extern BOOL g_bCancelOperation;      // 0x00277128
 extern BOOL g_bFileOperationQueued;      // 0x00277650 TODO: verify
 extern BOOL g_bFileOperationActive;      // 0x00277120
 extern BOOL g_bFileOperationPaused;      // 0x00277124 TODO: verify
+// The running (or last) operation: 0 copy, 1 move, 2 delete, 3 zip, 4 unzip,
+// 5 unrar; 6 = none (FrameMove sets it back after reporting the end).
+extern int g_nFileOperationType;         // 0x0026BC60
 extern BOOL g_bOperationFailed;          // 0x00277648
 extern DWORD g_dwOperationError;         // 0x00277600
 extern unsigned g_nOperationProgress;    // 0x00277644 items done

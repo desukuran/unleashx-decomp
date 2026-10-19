@@ -1,5 +1,5 @@
 // CUnleashX: construction, screen switching, teardown and the skin/menu
-// callbacks. Initialize/FrameMove/Render are TODO.
+// callbacks. FrameMove is in FrameMove.cpp; Initialize and Render are TODO.
 #include "UnleashX.h"
 
 #include <cstring>
@@ -22,6 +22,10 @@ CAudioGUI *g_pAudioGUI;                    // 0x00276228
 HANDLE g_hNetworkThread = INVALID_HANDLE_VALUE;   // 0x0026A630
 CXBPackedResource *g_pResource;            // 0x00276200 m_resource of the app
 int g_unknown276224;                       // 0x00276224 TODO
+BOOL g_bMenuPending;                       // 0x0027623C
+BOOL g_bMusicReady;                        // 0x00276218
+float g_fGlobeSpin;                        // 0x0027621C
+DWORD g_dwGlobeSpinTime;                   // 0x00276220
 static BOOL s_bBackgroundSoundPlaying;     // 0x00278D48
 
 // The XDK framework's resource/font teardown and DirectSound shutdown.

@@ -275,9 +275,9 @@ public:
 	BYTE m_unknownAudio[0x14BC - 0x1474];    // rest of the audio block
 	SVideoSettings m_video;                  // +0x14BC
 	std::string m_strPassword;               // +0x157C
-	int m_unknown1598;                       // +0x1598
+	int m_nPasswordFailures;                 // +0x1598 wrong passwords/passcodes so far
 	int m_nPasswordMaxTries;                 // +0x159C
-	BOOL m_bNoPassword;                      // +0x15A0 TRUE until a Password/Passcode is set
+	BOOL m_bUnlocked;                        // +0x15A0 FALSE while a Password/Passcode is set and not entered yet
 	BOOL m_bUsePasscode;                     // +0x15A4 controller-button passcode instead of text
 	SNetworkSettings m_network;              // +0x15A8
 	SFTPSettings m_ftp;                      // +0x1664

@@ -27,7 +27,7 @@ public:
 	virtual ~CUnleashX();                             // 0x0002B81C
 
 	virtual HRESULT Initialize();                     // 0x000EC94A TODO: decompile
-	virtual HRESULT FrameMove();                      // 0x000EB93B TODO: decompile
+	virtual HRESULT FrameMove();                      // 0x000EB93B (FrameMove.cpp)
 	virtual HRESULT Render();                         // 0x000F0097 TODO: decompile
 	virtual HRESULT Cleanup();                        // 0x000E1B1E TODO: decompile
 
@@ -42,6 +42,11 @@ public:
 	void PrepareHardDisk();                           // 0x000E48B4 TODO: decompile
 	// Starts the disc in the drive (games, or the DVD/CD player).
 	HRESULT LaunchDVD();                              // 0x000E99FD TODO: decompile
+	// The screen saver and the "any input" bookkeeping: starts the saver
+	// after the wait, stops it on input. (this in ebx)
+	void UpdateScreenSaver(int *action);              // 0x000EA56C TODO: decompile
+	// What to do with the launch data a title returned with. TODO: decompile
+	void HandleLaunchData();                          // 0x000E2604
 
 	// Menu callbacks; m_pApp points back here.
 	class CMenuEvent : public CMenuEventSink
@@ -89,7 +94,9 @@ public:
 	int m_nPrevMode;                          // +0x834
 	CXBStopWatch m_timers[2];                 // +0x838
 	float m_unknown878;                       // +0x878 0.2
-	BYTE m_unknown87C[0x144];                 // +0x87C view/projection matrices (+0x8C0, +0x900, +0x940)
+	DWORD m_unknown87C;                       // +0x87C
+	float m_globeMatrix[16];                  // +0x880 the globe's world transform (D3DMATRIX)
+	BYTE m_unknown8C0[0x100];                 // +0x8C0 view/projection matrices (+0x8C0, +0x900, +0x940)
 	int m_unknown9C0;                         // +0x9C0
 	float m_fSplashAlpha;                     // +0x9C4
 	BOOL m_bSplashIsVideo;                    // +0x9C8 TODO: verify
@@ -148,6 +155,16 @@ extern BYTE g_bShuttingDown;                 // 0x00276235
 extern DWORD g_dwShutdownDeadline;           // 0x00276238
 extern HANDLE g_hExitEvent;                  // 0x0027624C
 extern std::string g_strLoadingPreview;      // 0x00277F70 <Item Preview> for the GamePreview loading screen
+
+// Creates g_pMusicManager (on a thread; directly if that fails). TODO: decompile
+unsigned __stdcall MusicManagerThread(void *app);  // 0x000E85B3
+// Set (by nothing in the code) to create the menu from mode 0.
+extern BOOL g_bMenuPending;                  // 0x0027623C
+// The soundtracks are known (the music manager may be created).
+extern BOOL g_bMusicReady;                   // 0x00276218 TODO: verify
+// The globe spins this way after a menu move (+1 up, -1 down), and when.
+extern float g_fGlobeSpin;                   // 0x0027621C
+extern DWORD g_dwGlobeSpinTime;              // 0x00276220
 
 void AddRecentItem(const char *path, const char *name, int region);   // 0x000E1988
 // Shows the loading screen and starts path (an XBE); returns only on

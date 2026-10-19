@@ -231,6 +231,11 @@ public:
 	IDirect3DTexture8 *GetFileManagerBackground();    // 0x000F99A7
 	// Whether a preview video is playing (keeps the background sound off).
 	BOOL IsPreviewPlaying() const;                    // 0x000F9145
+	// The preview video between its area and full screen. (this in ecx)
+	void TogglePreviewFullScreen();                   // 0x000F90E6 TODO: decompile
+	// Pauses or resumes the preview video (and its sound). (playing in eax,
+	// this in ecx)
+	void SetPreviewPlaying(BOOL playing);             // 0x000FFDAA TODO: decompile
 	// Plays file in the <Menu><Preview> area (NULL or "" stops it).
 	void PlayPreview(const char *file);               // 0x000FD563 TODO: decompile
 	void BeginLoad(const char *path);                 // 0x00101743

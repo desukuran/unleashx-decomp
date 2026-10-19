@@ -37,6 +37,14 @@ public:
 	void SetGlobal(BOOL global);        // 0x001060B6 (this in eax)
 	void SetVolume(float volume);       // 0x0010607A (this in eax) hundredths of a dB
 	void SetSpeakerConfig(const void *config);   // 0x001087DF NULL = stereo
+	// Called by the main loop. TODO: decompile
+	HRESULT Play();                     // 0x001083B0 (this in edi) start/resume
+	HRESULT Pause();                    // 0x0010602C (this in esi) 1 if not playing
+	HRESULT PlayAudioCD();              // 0x001084E7 (this in eax)
+	HRESULT Update();                   // 0x0010896C (this in eax) next song when one ends
+	// The music keys (play/pause, stop, skip...) in the menu. (this in ecx,
+	// pad in eax)
+	BOOL HandleInput(int *action, struct SGamepadState **pad);   // 0x00108E87
 
 	BYTE m_unknown004[0x19C];
 	BOOL m_bFromHdd;                    // +0x1A0 FALSE while playing an audio CD TODO: verify

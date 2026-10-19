@@ -66,8 +66,8 @@ CAppSettings::CAppSettings()
 			MultiByteToWideChar(CP_ACP, 0, title.c_str(), (int)title.size(), m_szDiscTitle, 0x80);
 	}
 
-	m_bNoPassword = TRUE;
-	m_unknown1598 = 0;
+	m_bUnlocked = TRUE;
+	m_nPasswordFailures = 0;
 	m_nPasswordMaxTries = 0;
 	m_bUsePasscode = FALSE;
 	m_network.m_bEnable = TRUE;

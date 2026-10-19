@@ -74,8 +74,11 @@ public:
 	void OpenPath(const char *path);                      // 0x00128C01
 	void Reset();                                         // 0x0002B4C9
 	void SetBackground(IDirect3DTexture8 *texture);       // 0x0002B4A1
+	void ProcessInput(int *action, SGamepadState **pad);  // 0x0012C91D TODO: decompile
 
-	BYTE m_unknown004[0x8D8];
+	BYTE m_unknown004[0x8B0 - 0x4];
+	BOOL m_bOpen;                                         // +0x8B0
+	BYTE m_unknown8B4[0x8DC - 0x8B4];
 	BOOL m_bInitialized;                                  // +0x8DC
 	int m_unknown8E0;                                     // +0x8E0
 	BOOL m_bSafeBorder;                                   // +0x8E4
@@ -91,6 +94,10 @@ public:
 	virtual ~CGameManager();
 	HRESULT Init(CXBFontEx *font);                        // 0x0011E048
 	void Show();                                          // 0x0011BAFA
+	void ProcessInput(int *action, SGamepadState **pad);  // 0x0011E249 TODO: decompile
+
+	BYTE m_unknown04[0x74 - 0x4];
+	BOOL m_bOpen;                                         // +0x74
 };
 
 // The Control Panel: ten icons, each opening a settings page
@@ -140,9 +147,15 @@ public:
 	HRESULT Init(IDirect3DTexture8 *checked, IDirect3DTexture8 *unchecked,
 	             CXBFontEx *font);                        // 0x000F5DEC
 	void Show();                                          // 0x000F6791
+	// (this in ecx, pad in eax)
+	void ProcessInput(int *action, SGamepadState **pad);  // 0x000F67FD TODO: decompile
+	BOOL IsOpen() const { return m_bOpen && !m_bClosing; }   // 0x0002B7ED
 
 	BYTE m_unknown04[0x54];
 	std::string m_strSkinPath;                            // +0x58
+	BYTE m_unknown74[0x90 - 0x74];
+	BOOL m_bOpen;                                         // +0x90
+	BOOL m_bClosing;                                      // +0x94
 };
 
 // The text editor (mode 8). Its vtable's Init slot is 0x00024830.
@@ -332,6 +345,8 @@ public:
 	int GetResult();                                      // 0x000AFA59 MSGBOX_* (this in eax)
 	void SetSelection(int button);                        // 0x000AF8CF (this in esi, button in edi)
 	HRESULT Render();                                     // 0x000AFC64
+	// Word-wraps text into m_lines, widening the box for long words.
+	void SetText(const char *text);                       // 0x000B09A5
 	// Unused.
 	void AddLine(const wchar_t *text);                    // 0x000B0E87 (this in eax)
 	void SetLineText(int line, const wchar_t *text);      // 0x000B076A -1 = the last (line in eax, this in edi)
@@ -368,8 +383,6 @@ private:
 	// Opens it; clear also empties the text and buttons and the position.
 	// (this in edi)
 	void Reset(BOOL clear);                               // 0x000AFBFD
-	// Word-wraps text into m_lines, widening the box for long words.
-	void SetText(const char *text);                       // 0x000B09A5
 	void AddButton(const wchar_t *text);                  // 0x000B0F05 (this in edi)
 };
 
@@ -410,5 +423,7 @@ public:
 	int GetTrayState();                                   // 0x000B329C 0x10 = open
 	HRESULT CloseTray();                                  // 0x000B32AE
 	HRESULT OpenTray();                                   // 0x000B32C8
+	// Turns the Xbox off (unless the SMC refuses). TODO: decompile
+	HRESULT PowerOff();                                   // 0x000B3282
 };
 extern CTrayMonitor g_trayMonitor;                       // 0x00278658

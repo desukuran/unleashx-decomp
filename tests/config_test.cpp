@@ -20,7 +20,7 @@ int main()
 	ConfigLoaderThread(NULL);
 	printf("loaded=%d\n", g_bConfigLoaded);
 
-	S(s->m_strMSDashboard); S(s->m_strPassword); I(s->m_nPasswordMaxTries); I(s->m_bNoPassword);
+	S(s->m_strMSDashboard); S(s->m_strPassword); I(s->m_nPasswordMaxTries); I(s->m_bUnlocked);
 	I(s->m_network.m_bEnable); I(s->m_network.m_bDHCP); S(s->m_network.m_strIP); S(s->m_network.m_strSubnet);
 	S(s->m_network.m_strGateway); S(s->m_network.m_strDNS1); S(s->m_network.m_strDNS2);
 	I(s->m_ftp.m_bEnable); I(s->m_ftp.m_nPort); I(s->m_ftp.m_nMaxUsers); I(s->m_ftp.m_bAllowAnon);

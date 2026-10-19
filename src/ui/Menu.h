@@ -236,6 +236,7 @@ extern float g_fFrameRate;                           // 0x0027764C TODO: verify
 extern BOOL g_bPointerActive;                        // 0x00272144
 extern BOOL g_bPointerClicked;                       // 0x00272148
 extern BOOL g_bPointerMoved;                         // 0x00272164
+extern BOOL g_bPointerEvent;                         // 0x0027213C set by CXBApplicationEx::Run
 extern int g_nPointerX;                              // 0x0027215C
 extern int g_nPointerY;                              // 0x00272160
 // x, y, width, height

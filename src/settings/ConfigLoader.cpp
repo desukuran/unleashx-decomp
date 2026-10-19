@@ -179,7 +179,7 @@ static BOOL LoadPassword(CAppSettings *settings, CXmlElement *element)
 	settings->m_strPassword = element->GetValue();
 	if (settings->m_strPassword.size() == 0)
 		return FALSE;
-	settings->m_bNoPassword = FALSE;
+	settings->m_bUnlocked = FALSE;
 	settings->m_nPasswordMaxTries = atol(element->GetAttribute("MaxTries").c_str());
 	return TRUE;
 }
@@ -769,7 +769,7 @@ void LoadConfigSettings()
 		element = g_config.FindElement(section, "Password");
 		if (element != NULL)
 			LoadPassword(settings, element);
-		if (settings->m_bNoPassword && (element = g_config.FindElement(section, "Passcode")) != NULL)
+		if (settings->m_bUnlocked && (element = g_config.FindElement(section, "Passcode")) != NULL)
 		{
 			if (LoadPassword(settings, element))
 				settings->m_bUsePasscode = TRUE;

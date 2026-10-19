@@ -17,6 +17,7 @@ public:
 
 	void SetFullScreen(BOOL fullScreen);                  // 0x0009BDF1 TODO: decompile
 	void SetAudio(BOOL enable);                           // 0x0009BF89 TODO: decompile
+	BOOL HasAudio();                                      // 0x0009BF69 TODO: decompile (this in eax)
 	void SetRect(int top, int left, int width, int height);   // 0x0009BB70 TODO: decompile
 	BOOL Open(const char *fileName);                      // 0x0009CE46 TODO: decompile
 

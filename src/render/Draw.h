@@ -28,6 +28,11 @@ void ScaleToScreenInt(DWORD *x, DWORD *y, DWORD *width, DWORD *height);  // 0x00
 // x, y, width, height; the position rounds down, the size up.
 void ScaleRectToScreen(int *rect);                                       // 0x0009FDCC
 
+// A D3DMATRIX that scales, rotates (radians, about X, Y and Z) and
+// translates. TODO: decompile (D3DX). The original takes matrix in esi.
+void BuildWorldMatrix(float *matrix, float x, float y, float z, float scaleX, float scaleY, float scaleZ,
+                      float rotationX, float rotationY, float rotationZ);   // 0x0009F342
+
 // Flat-colored primitives (Draw.cpp). Colors are ARGB; a color of 0 skips
 // that part. alpha (0..1) replaces or scales the fill's alpha.
 HRESULT DrawRect(float x, float y, float width, float height, D3DCOLOR borderColor, D3DCOLOR fillColor,
