@@ -162,6 +162,10 @@ public class ApplySymbols extends GhidraScript {
 			if (cc != null) {
 				def.setCallingConvention(cc);
 			}
+			else if (regs.stream().anyMatch(r -> r != null)) {
+				// Custom storage; avoid __thiscall's hidden 'this' parameter.
+				def.setCallingConvention("__stdcall");
+			}
 			else if (ns instanceof GhidraClass && regs.stream().allMatch(r -> r == null)) {
 				def.setCallingConvention("__thiscall");
 			}

@@ -12,13 +12,16 @@ mkdir -p "$BUILD/ghidra" "$BUILD/export"
 python3 -I "$ROOT/tools/xbe.py" flat "$XBE" "$BUILD/default.flat"
 python3 -I "$ROOT/tools/xbe.py" layout "$XBE" "$BUILD/layout.txt"
 
+python3 -I "$ROOT/tools/gen_structs.py"
+cat "$ROOT/symbols/types.h" "$BUILD/structs.h" > "$BUILD/types_all.h"
+
 "$GHIDRA/support/analyzeHeadless" "$BUILD/ghidra" UnleashX \
 	-overwrite \
 	-import "$BUILD/default.flat" \
 	-loader BinaryLoader -loader-baseAddr 0x10000 \
 	-processor x86:LE:32:default -cspec windows \
 	-scriptPath "$ROOT/tools/ghidra_scripts" \
-	-preScript XbeSetup.java "$BUILD/layout.txt" \
-	-postScript ApplyTypes.java "$ROOT/symbols/types.h" \
+	-preScript XbeSetup.java "$BUILD/layout.txt" "$ROOT/symbols/noreturn.txt" \
+	-postScript ApplyTypes.java "$BUILD/types_all.h" \
 	-postScript ApplySymbols.java $SYMBOLS \
 	-postScript ExportAll.java "$BUILD/export"

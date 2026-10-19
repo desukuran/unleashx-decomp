@@ -2,7 +2,9 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <cctype>
 #include <cstring>
+#include <cwchar>
 #include <locale>
 #include <vector>
 
@@ -171,5 +173,140 @@ std::string &StrFormat(std::string &out, const char *fmt, ...)
 	va_end(args);
 
 	out.assign(&buf[0], len);
+	return out;
+}
+
+// 0x000191A9 / 0x000191C2
+int StrFind(const std::string &str, const char *s, int pos)
+{
+	std::string::size_type found = str.find(s, pos);
+	return found == std::string::npos ? -1 : (int)found;
+}
+
+// 0x00012AF5
+int StrReverseFind(const std::string &str, const char *s, int pos)
+{
+	std::string::size_type found = str.rfind(s, pos == -1 ? std::string::npos : (std::string::size_type)pos);
+	return found == std::string::npos ? -1 : (int)found;
+}
+
+// 0x000A41DF
+void StrAddBackslash(std::string &s)
+{
+	if (StrRight(s, 1).compare("\\") != 0)
+		s += "\\";
+}
+
+std::string StrToLower(const char *s)
+{
+	std::string out(s != NULL ? s : "");
+	for (std::string::iterator it = out.begin(); it != out.end(); ++it)
+		*it = (char)tolower((unsigned char)*it);
+	return out;
+}
+
+// _mbsicmp() in the original; ASCII is all that matters for these keywords.
+static int AsciiCompareNoCase(const char *a, const char *b)
+{
+	int ca, cb;
+	do
+	{
+		ca = tolower((unsigned char)*a++);
+		cb = tolower((unsigned char)*b++);
+	} while (ca != 0 && ca == cb);
+	return ca - cb;
+}
+
+// 0x00021E1A
+BOOL IsTrueString(const char *s)
+{
+	if (s == NULL)
+		return FALSE;
+	return AsciiCompareNoCase("Yes", s) == 0 || AsciiCompareNoCase("True", s) == 0 ||
+	       AsciiCompareNoCase("1", s) == 0;
+}
+
+// 0x0001C918
+BOOL IsFalseString(const char *s)
+{
+	if (s == NULL)
+		return FALSE;
+	return AsciiCompareNoCase("No", s) == 0 || AsciiCompareNoCase("False", s) == 0 ||
+	       AsciiCompareNoCase("0", s) == 0;
+}
+
+// 0x0009DF6F
+void StrUtf8ToWide(const char *src, wchar_t *dst, unsigned int size)
+{
+	if (dst == NULL)
+		return;
+	if (src == NULL || strlen(src) == 0)
+	{
+		memset(dst, 0, size);
+		*(char *)dst = 0;
+		return;
+	}
+
+	memset(dst, 0, size);
+	unsigned int len = (unsigned int)strlen(src);
+	if (len > size)
+		len = size;
+
+	int n = MultiByteToWideChar(CP_UTF8, 8 /* MB_ERR_INVALID_CHARS */, src, (int)len, dst, (int)size);
+	if (n > 0)
+	{
+		dst[n] = 0;
+		// Done if every character is Latin-1; otherwise redo it by hand.
+		unsigned int i = 0;
+		if (wcslen(dst) == 0)
+			return;
+		while (dst[i] < 0x100)
+		{
+			i++;
+			if (wcslen(dst) <= i)
+				return;
+		}
+	}
+
+	// Fallback: a lead byte plus continuation byte is folded into one
+	// character with the original's arithmetic (not real UTF-8 decoding);
+	// anything else is taken as Latin-1.
+	int out = 0;
+	for (unsigned int i = 0; i < len; i++)
+	{
+		signed char c = (signed char)src[i];
+		unsigned short w;
+		if (c < 0)
+		{
+			w = (unsigned short)(c + 0x100);
+			if ((signed char)src[i + 1] < -0x40)
+			{
+				unsigned short folded = (unsigned short)(c + 0x17D + (signed char)src[i + 1]);
+				if (folded < 0x101)
+				{
+					i++;
+					if (folded != 0x100)
+						w = folded;
+				}
+			}
+		}
+		else
+		{
+			w = (unsigned short)c;
+		}
+		dst[out++] = w;
+	}
+	dst[out] = 0;
+}
+
+// 0x00020B69
+// TODO: verify; the original narrows through the locale's codecvt facet.
+std::string StrFromWide(const wchar_t *s)
+{
+	std::string out;
+	if (s == NULL || wcslen(s) == 0)
+		return out;
+	for (; *s != 0; s++)
+		out += (char)*s;
 	return out;
 }

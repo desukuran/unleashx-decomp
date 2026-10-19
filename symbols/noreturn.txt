@@ -1,0 +1,4 @@
+# Functions that never return. Applied before analysis by XbeSetup.java;
+# Ghidra's own non-returning discovery is disabled because it wrongly flagged
+# Sleep (0x35DD7), truncating every function that calls it.
+0006168f _CxxThrowException

@@ -69,34 +69,34 @@
 0001ca8f CObList::FreeNode
 
 # ---- src/xml/XmlDocument.cpp ----
-0001cb7c CXmlAttribute::SetValue
-0001cc44 CXmlAttribute::GetEscapedValue
-0001ccd0 CXmlElement::RebuildAttributeText
-0001cd9d CXmlElement::CXmlElement
-0001cebc CXmlElement::DeleteAttributes
-0001cee9 CXmlElement::GetEscapedValue
-0001cf59 CXmlElement::SetAttribute
-0001cfff CXmlElement::FindFirstChild
-0001d052 CXmlElement::FindNextChild
-0001d09c CXmlElement::GetComment
-0001d0d5 CXmlElement::FindAttribute
-0001d14d CXmlElement::GetAttribute
-0001d178 CXmlElement::GetFirstChild
-0001d193 CXmlElement::RemoveAttribute
-0001d202 CXmlElement::SetValue
-0001d2ea CXmlElement::AddComment
-0001d3bd CXmlDocument::ToString
-0001d446 CXmlDocument::Parse
-0001dd1a CXmlDocument::RemoveElement
-0001dd78 CXmlDocument::Load
-0001de81 CXmlDocument::LoadFromString
-0001def4 CXmlDocument::Refresh
-0001df31 CXmlDocument::Save
-0001df5e CXmlDocument::SaveAs
-0001e041 CXmlDocument::FindElement
-0001e0aa CXmlDocument::Clear
+0001cb7c CXmlAttribute::SetValue void f(char *value@ecx, CXmlAttribute *self)
+0001cc44 CXmlAttribute::GetEscapedValue std_string * f(CXmlAttribute *self@eax, std_string *out)
+0001ccd0 CXmlElement::RebuildAttributeText void f(CXmlElement *self)
+0001cd9d CXmlElement::CXmlElement CXmlElement * f(CXmlElement *self@esi)
+0001cebc CXmlElement::DeleteAttributes void f(CXmlElement *self@edi)
+0001cee9 CXmlElement::GetEscapedValue std_string * f(CXmlElement *self@eax, std_string *out)
+0001cf59 CXmlElement::SetAttribute int f(CXmlElement *self@eax, char *name, char *value)
+0001cfff CXmlElement::FindFirstChild CXmlElement * __stdcall f(CXmlElement *self, char *name)
+0001d052 CXmlElement::FindNextChild CXmlElement * f(CXmlElement *self@esi)
+0001d09c CXmlElement::GetComment std_string * f(std_string *out@ebx, int index@eax, CXmlElement *self@edi)
+0001d0d5 CXmlElement::FindAttribute CXmlAttribute * f(CXmlElement *self@ecx, char *name)
+0001d14d CXmlElement::GetAttribute std_string * f(std_string *out@esi, CXmlElement *self@ecx, char *name)
+0001d178 CXmlElement::GetFirstChild CXmlElement * f(CXmlElement *self@eax)
+0001d193 CXmlElement::RemoveAttribute BOOL f(CXmlElement *self@edi, char *name)
+0001d202 CXmlElement::SetValue void f(char *value@ecx, CXmlElement *self)
+0001d2ea CXmlElement::AddComment void f(char *text@esi, CXmlElement *self)
+0001d3bd CXmlDocument::ToString std_string * f(CXmlDocument *self@eax, std_string *out)
+0001d446 CXmlDocument::Parse BOOL f(CXmlDocument *self, char *text)
+0001dd1a CXmlDocument::RemoveElement BOOL f(CXmlDocument *self@eax, CXmlElement *element@edi)
+0001dd78 CXmlDocument::Load BOOL __stdcall f(CXmlDocument *self, char *fileName)
+0001de81 CXmlDocument::LoadFromString BOOL __stdcall f(CXmlDocument *self, char *text)
+0001def4 CXmlDocument::Refresh BOOL __stdcall f(CXmlDocument *self)
+0001df31 CXmlDocument::Save BOOL f(CXmlDocument *self@eax, BOOL markModified)
+0001df5e CXmlDocument::SaveAs BOOL __cdecl f(CXmlDocument *self, char *fileName)
+0001e041 CXmlDocument::FindElement CXmlElement * __stdcall f(CXmlDocument *self, CXmlElement *parent, char *name)
+0001e0aa CXmlDocument::Clear void f(CXmlDocument *self@esi)
 0001e115 CXmlDocument::ParseTag
-0001e1c9 CXmlDocument::SerializeElement
+0001e1c9 CXmlDocument::SerializeElement BOOL __thiscall f(CXmlElement *element, std_string *out)
 0026c614 g_nXmlElementCount
 
 # ---- more string helpers ----
@@ -114,3 +114,111 @@
 0005e001 _strdup
 00036736 SetFileAttributesA
 00036d18 OutputDebugStringA
+
+# ---- XML helpers outside the module ----
+0001c918 IsFalseString BOOL f(char *s@esi)
+0001cada CXmlAttribute::CXmlAttribute CXmlAttribute * f(CXmlAttribute *self@esi, char *name, char *value)
+0001d362 CXmlDocument::CXmlDocument CXmlDocument * f(CXmlDocument *self@edi)
+00023319 CXmlDocument::GetFirstChild CXmlElement * f(CXmlDocument *self@esi, CXmlElement *parent@eax)
+00023347 CXmlDocument::GetNextChild CXmlElement * f(CXmlDocument *self@edx, CXmlElement *parent@eax)
+
+# ---- std::string (FID-identified library copies, given usable signatures) ----
+0001151e std::string::ctor_copy std_string * f(std_string *self@ecx, std_string *src)
+00011544 std::string::ctor_cstr2 std_string * f(std_string *self@ecx, char *s)
+00011587 std::string::assign_n std_string * f(std_string *self@ecx, char *s, DWORD count)
+000115f6 std::string::assign_cstr2 std_string * f(std_string *self@ecx, char *s)
+00011619 std::string::erase std_string * f(std_string *self@ecx, DWORD pos, DWORD count)
+0001190c std::string::ctor std_string * f(std_string *self@ecx)
+00011b66 std::string::_Eos void f(std_string *self@ecx, DWORD newsize)
+00011c13 std::string::_Tidy void f(std_string *self@ecx, BYTE built, DWORD newsize)
+0002319e std::string::compare int f(std_string *self@ecx, std_string *right)
+
+# ---- settings ----
+000ad908 CAppSettings::GetInstance CAppSettings * f(void)
+000ace0b CAppSettings::CAppSettings CAppSettings * __stdcall f(CAppSettings *self)
+0027626c CAppSettings::s_pInstance
+00276230 g_pSettings
+00278160 g_config
+000e5a4f LoadConfigSettings
+000ea0a6 ConfigLoaderThread
+00021e1a IsTrueString BOOL f(char *s@esi)
+000213f2 CXmlElement::GetNextChild CXmlElement * f(CXmlElement *self@eax)
+000213de CXmlElement::GetValue std_string * f(CXmlElement *self@eax, std_string *out)
+0001f01a StrTrim std_string * f(std_string *self@eax)
+000117d0 std::string::ctor_copy2 std_string * __stdcall f(std_string *self, std_string *src)
+000117c0 std::string::ctor2 std_string * __stdcall f(std_string *self)
+001e14fe inet_addr DWORD __stdcall f(char *cp)
+0005f108 _strtod double __cdecl f(char *s, char **end)
+00038543 XGetVideoFlags DWORD __stdcall f(void)
+0003851a XGetVideoStandard DWORD __stdcall f(void)
+00039795 XGetLaunchInfo DWORD __stdcall f(DWORD *type, void *data)
+000367dc GetFileAttributesA DWORD __stdcall f(char *fileName)
+00036827 GetFileAttributesExA BOOL __stdcall f(char *fileName, int level, void *info)
+0003693f DeleteFileA BOOL __stdcall f(char *fileName)
+00034979 FileTimeToSystemTime BOOL __stdcall f(void *fileTime, void *systemTime)
+0005de8d _endthreadex void __cdecl f(DWORD code)
+000394ff XGetAVPack DWORD __stdcall f(void)
+
+# ---- src/settings, src/common/FileUtil, src/xml/XmlUtil ----
+00031418 SAudioSettings::SAudioSettings
+00031488 SNetworkSettings::SNetworkSettings
+000314b3 SFTPSettings::SFTPSettings
+000314d6 SPreferences::SPreferences
+0009ddfc DirectoryExists BOOL __cdecl f(char *path)
+0009de34 FileExists BOOL __cdecl f(char *path)
+0009df6f StrUtf8ToWide void f(DWORD unused@ecx, DWORD size@edx, char *src, WORD *dst)
+00020b69 StrFromWide std_string * f(WORD *s@eax, std_string *out)
+00020c7a StrFromWide2 std_string * __stdcall f(std_string *out)
+000a3745 ReadTextFile std_string * __cdecl f(std_string *out, char *path)
+000a3934 GetXbePath std_string * __cdecl f(std_string *out)
+000a3d25 GetDriveDevicePath HRESULT __cdecl f(char drive, std_string *devicePath)
+000a41df StrAddBackslash void __cdecl f(std_string *s)
+000a4aad IsDriveAvailable BOOL __cdecl f(char drive)
+000a5bc6 WriteTextFile BOOL f(char *path, BOOL append, char *text@edi)
+000ac39b CAppSettings::SetDefaults void __stdcall f(CAppSettings *self)
+000ac73f ResolvePath void __cdecl f(char *path, std_string *out)
+000aca86 CAppSettings::InitPaths void __stdcall f(CAppSettings *self)
+000e37c7 BuildDefaultMenu void f(void)
+000234c7 AddChildElement CXmlElement * __stdcall f(CXmlElement *parent, char *name, char *value, char *attributes)
+0002a801 CloneElement CXmlElement * f(CXmlElement *src@ecx)
+0002a8f9 AddChild BOOL f(CXmlElement *parent@eax, CXmlElement *child@ecx)
+0002aea9 AppendElement BOOL f(CXmlElement *parent@eax, CXmlElement *child@ecx, CXmlDocument *doc)
+0002abe1 SetAttributeText void __stdcall f(CXmlElement *element, char *text)
+0001c8ae StrConcat std_string * f(std_string *out, char *prefix, std_string *suffix@edi)
+00012af5 StrReverseFind int __cdecl f(std_string *s, char *find, int pos)
+000194f2 StrFindStr int __cdecl f(std_string *s, char *find, int pos)
+
+# ---- src/system/Drives ----
+000aac8b MountDrive BOOL __cdecl f(char drive)
+000aa99a UnmountDrive void __cdecl f(char drive)
+000aa690 IsDriveFMapped BOOL f(void)
+000aa68a IsDriveGMapped BOOL f(void)
+000ab8f3 SetDriveFMapped void f(BOOL mapped@esi)
+000ab8d1 SetDriveGMapped void f(BOOL mapped@esi)
+0026bbf4 g_bDriveFMapped
+0027637c g_bDriveGMapped
+
+# ---- other subsystems referenced by the config loader ----
+0009dd2f SetXboxSystemTime void __cdecl f(SYSTEMTIME st, BOOL local)
+0009f552 SetFanSpeed void f(int speed@eax)
+0009e66d GetFanSpeed int f(void)
+0013d304 LoadLanguageFile void __cdecl f(char *fileName)
+002761fc g_pLanguage
+0002b080 CGamepadInput::GetAction int f(void *self@eax)
+00278280 g_gamepadInput
+000e020f UpdateGamepads void f(void *app@esi)
+00276204 g_pApp
+00138146 CNewsfeed::AddFeed HRESULT f(void *self, char *title, char *url@eax)
+002784b0 g_newsfeed
+001380ef CSoundEffects::SetQuiet void f(BOOL quiet@eax, void *self@esi)
+002784d0 g_soundEffects
+0002b3e4 SAudioSettings::SetEnable51 void f(BOOL enable@edx, void *self)
+00278040 g_defaultMenu
+0026a610 g_bConfigLoaded
+00276208 g_bColdBoot
+0026bbdc g_bAppSettingsCreated
+0026a4b0 g_ledColorNames
+0003537c CopyFileA BOOL __stdcall f(char *existing, char *newFile, BOOL failIfExists)
+00035ff3 MultiByteToWideChar int __stdcall f(DWORD codePage, DWORD flags, char *src, int srcLen, WORD *dst, int dstLen)
+0005e03c toupper int __cdecl f(int c)
+0005e988 _mbslwr BYTE * __cdecl f(BYTE *s)

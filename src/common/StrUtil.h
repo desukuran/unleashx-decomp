@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "Platform.h"
+
 std::string StrLeft(const std::string &s, int count);                // 0x00012A1D
 std::string StrRight(const std::string &s, int count);               // 0x00011812
 std::string StrMid(const std::string &s, int start, int count);      // 0x00012A90
@@ -26,3 +28,27 @@ inline int StrCmpNoCase(const std::string &a, const char *b)                  //
 
 // sprintf into a std::string (tries buffers of 2K, 4K, ... 12K).
 std::string &StrFormat(std::string &out, const char *fmt, ...);              // 0x0001ADD6
+
+// Position of s in str at or after pos, or -1.                    (0x000191A9 / 0x000191C2)
+int StrFind(const std::string &str, const char *s, int pos = 0);
+// Last position of s in str at or before pos (-1 = end), or -1.   (0x00012AF5)
+int StrReverseFind(const std::string &str, const char *s, int pos = -1);
+// Appends '\' unless the string already ends with one.            (0x000A41DF)
+void StrAddBackslash(std::string &s);
+// Lowercased copy (the original uses _strdup + _mbslwr and leaks the copy).
+std::string StrToLower(const char *s);
+inline std::string StrToLower(const std::string &s)
+{
+	return StrToLower(s.c_str());
+}
+
+// "Yes", "True" or "1" (any case).                                (0x00021E1A)
+BOOL IsTrueString(const char *s);
+// "No", "False" or "0" (any case).                                (0x0001C918)
+BOOL IsFalseString(const char *s);
+
+// UTF-8 to wide into a buffer of size bytes, with the original's fallback
+// for text that doesn't convert cleanly.                          (0x0009DF6F)
+void StrUtf8ToWide(const char *src, wchar_t *dst, unsigned int size);
+// Wide to narrow string.                                          (0x00020B69)
+std::string StrFromWide(const wchar_t *s);

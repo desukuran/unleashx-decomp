@@ -103,6 +103,24 @@ public class XbeSetup extends GhidraScript {
 			}
 		}
 
+		// Ghidra's "discovered" non-returning analysis marks Sleep() as noreturn
+		// and truncates its callers, so use an explicit list instead.
+		setAnalysisOption(currentProgram, "Non-Returning Functions - Discovered", "false");
+		if (args.length > 1) {
+			for (String line : Files.readAllLines(new File(args[1]).toPath())) {
+				String[] f = line.trim().split("\\s+");
+				if (f.length < 2 || f[0].startsWith("#")) {
+					continue;
+				}
+				Address a = toAddr(Long.parseLong(f[0], 16));
+				disassemble(a);
+				Function fn = createFunction(a, f[1]);
+				if (fn != null) {
+					fn.setNoReturn(true);
+				}
+			}
+		}
+
 		Address ep = toAddr(entry);
 		addEntryPoint(ep);
 		createFunction(ep, "entry");

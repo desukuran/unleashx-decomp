@@ -244,6 +244,15 @@ CXmlElement *CXmlElement::GetFirstChild()
 	return child;
 }
 
+// 0x000213F2
+// Continues a GetFirstChild()/FindFirstChild() walk without name matching.
+CXmlElement *CXmlElement::GetNextChild()
+{
+	if (m_findPos == NULL)
+		return NULL;
+	return (CXmlElement *)m_children.GetNext(m_findPos);
+}
+
 // 0x0001D193
 BOOL CXmlElement::RemoveAttribute(const char *name)
 {
@@ -529,6 +538,40 @@ CXmlElement *CXmlDocument::FindElement(CXmlElement *parent, const char *name)
 	return child;
 }
 
+// 0x00023319
+// Like CXmlElement::GetFirstChild, but also makes the child current.
+CXmlElement *CXmlDocument::GetFirstChild(CXmlElement *parent)
+{
+	if (parent == NULL)
+	{
+		parent = &m_root;
+		m_pCurrent = parent;
+	}
+	parent->m_findPos = NULL;
+	POSITION pos = parent->m_children.GetHeadPosition();
+	if (pos == NULL)
+		return NULL;
+	CXmlElement *child = (CXmlElement *)parent->m_children.GetNext(pos);
+	parent->m_findPos = pos;
+	m_pCurrent = child;
+	return child;
+}
+
+// 0x00023347
+CXmlElement *CXmlDocument::GetNextChild(CXmlElement *parent)
+{
+	if (parent == NULL)
+	{
+		parent = &m_root;
+		m_pCurrent = parent;
+	}
+	if (parent->m_findPos == NULL)
+		return NULL;
+	CXmlElement *child = (CXmlElement *)parent->m_children.GetNext(parent->m_findPos);
+	m_pCurrent = child;
+	return child;
+}
+
 // 0x0001DD1A
 // Removing the root clears the whole document.
 BOOL CXmlDocument::RemoveElement(CXmlElement *element)
@@ -601,25 +644,21 @@ int CXmlDocument::ParseTag(const std::string &tag, std::string &name)
 	return type;
 }
 
-// Parses element->m_strAttributes ('a="b" c=d') into attributes.
-// The original inlines this twice in Parse() with slightly different rules:
-//  - root element: a quoted value may contain "" (a doubled quote doesn't end it)
-//  - other elements: a quoted value ends at the next quote
-// In both, an unquoted value ends at the next space, so an unquoted last
-// attribute is dropped.
-void CXmlDocument::ParseAttributes(CXmlElement *element, bool rootRules)
+// Collapses " =" and "= " to "=" so pairs split cleanly.
+void NormalizeXmlAttributeText(std::string &text)
 {
-	std::string &text = element->m_strAttributes;
-	StrTrimRight(StrTrimLeft(text));
-	if (text.size() == 0)
-		return;
-
 	while (text.find(" =") != std::string::npos)
 		StrReplaceAll(text, " =", "=");
 	while (text.find("= ") != std::string::npos)
 		StrReplaceAll(text, "= ", "=");
+}
 
-	std::string rest(text);
+// Splits 'a="b" c=d' into attributes on element. Each copy of this loop in
+// the original treats quoted values slightly differently (XmlQuoteRule). In
+// all of them an unquoted value ends at the next space, so an unquoted last
+// attribute is dropped.
+void ParseXmlAttributeList(CXmlElement *element, std::string rest, XmlQuoteRule rule)
+{
 	std::string key, value;
 	int pos = FindChar(rest, '=');
 	while (pos != -1)
@@ -631,9 +670,14 @@ void CXmlDocument::ParseAttributes(CXmlElement *element, bool rootRules)
 		{
 			rest = StrMid(rest, 1, (int)rest.size() - 1);
 			pos = FindChar(rest, '"');
-			if (rootRules)
+			if (rule == XML_QUOTES_DOUBLED)
 			{
 				while (pos > 0 && StrMid(rest, pos - 1, 1).compare("\"") == 0)
+					pos = FindChar(rest, '"', pos + 1);
+			}
+			else if (rule == XML_QUOTES_DOUBLED_BOUNDED)
+			{
+				while (pos >= 1 && pos + 1 < (int)rest.size() && StrMid(rest, pos - 1, 1).compare("\"") == 0)
 					pos = FindChar(rest, '"', pos + 1);
 			}
 		}
@@ -651,7 +695,20 @@ void CXmlDocument::ParseAttributes(CXmlElement *element, bool rootRules)
 		if (value.size() != 0)
 			element->SetAttribute(key.c_str(), value.c_str());
 	}
+}
 
+// Parses element->m_strAttributes after Parse() split it off the tag name.
+// The original inlines this twice: the root element allows "" inside quoted
+// values, other elements end a quoted value at the next quote.
+void CXmlDocument::ParseAttributes(CXmlElement *element, bool rootRules)
+{
+	std::string &text = element->m_strAttributes;
+	StrTrimRight(StrTrimLeft(text));
+	if (text.size() == 0)
+		return;
+
+	NormalizeXmlAttributeText(text);
+	ParseXmlAttributeList(element, text, rootRules ? XML_QUOTES_DOUBLED : XML_QUOTES_SIMPLE);
 	StrTrimRight(element->m_strAttributes);
 }
 

@@ -23,8 +23,10 @@ def main():
     in_src = set()
     for path in glob.glob(os.path.join(ROOT, 'src/**/*.cpp'), recursive=True) + \
             glob.glob(os.path.join(ROOT, 'src/**/*.h'), recursive=True):
-        for m in re.finditer(r'//\s*0x([0-9A-Fa-f]{8})', open(path).read()):
-            in_src.add(int(m.group(1), 16))
+        for line in open(path):
+            if '//' in line and 'TODO: decompile' not in line:
+                for m in re.finditer(r'0x([0-9A-Fa-f]{8})', line.split('//', 1)[1]):
+                    in_src.add(int(m.group(1), 16))
 
     text = {a: v for a, v in funcs.items() if v[0] == '.text'}
     app = {a: v for a, v in text.items() if any(lo <= a < hi for lo, hi in APP_RANGES)}

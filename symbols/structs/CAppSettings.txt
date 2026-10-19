@@ -1,0 +1,117 @@
+# CAppSettings: the dashboard's settings singleton (Config.xml + defaults).
+# Instance: CAppSettings::s_pInstance (0x0027626C), also cached in g_pSettings (0x00276230).
+struct CAppSettings 0x191c
+0x0000 void* vftable
+0x0c28 std_string m_strHomePath          # dashboard directory/XBE path; first char = boot drive. TODO: verify
+0x0c44 std_string m_strXbeName           # TODO: verify
+0x0c60 std_string m_strDataPath          # directory of recent.dat. TODO: verify
+0x0c7c std_string m_strMSDashboard       # <MSDashBoard>
+0x0c98 BOOL m_bUnknownC98                # skips cfgcheck/config save. TODO
+0x0ca0 BOOL m_bNewsfeedEnable
+0x0ca4 int m_nNewsfeedInterval
+0x0ca8 BOOL m_bNewsfeedContinuous
+0x1320 int m_nScrollSpeed
+0x1324 int m_nSoundVolume
+0x1328 int m_nMusicVolume
+0x132c BOOL m_bEnable51
+0x1330 std_string m_strMusicPath
+0x134c BOOL m_bMusicRandom
+0x1350 BOOL m_bMusicGlobal
+0x1354 int m_nSoundTrackMode             # 1 Xbox, 2 Custom, 3 Both
+0x1358 BOOL m_bSoundEffects
+0x135c std_string m_strSoundScroll
+0x1378 std_string m_strSoundSelect
+0x1394 std_string m_strSoundActionComplete
+0x13b0 std_string m_strSoundAmbient
+0x13cc std_string m_strSoundKeyboardStroke
+0x13e8 std_string m_strSoundBack
+0x1404 std_string m_strSoundMenuUp
+0x1420 std_string m_strSoundMenuDown
+0x143c std_string m_strSoundGameSaveSelect
+0x1458 std_string m_strSoundMemorySlot
+0x14c0 BOOL m_bWidescreen
+0x14c4 BOOL m_bUsePAL60
+0x14c8 BOOL m_bUse480p
+0x14cc BOOL m_bUse720p
+0x14d0 BOOL m_bUse1080i
+0x1564 BOOL m_bFastRefresh
+0x156c BOOL m_bSoften
+0x1570 int m_nFilterLevel
+0x1574 BOOL m_bUse16bit
+0x1578 BOOL m_bTextureCompression
+0x157c std_string m_strPassword
+0x159c int m_nPasswordMaxTries
+0x15a0 BOOL m_bNoPassword
+0x15a4 BOOL m_bUsePasscode
+0x15a8 BOOL m_bNetworkEnable
+0x15ac BOOL m_bDHCP
+0x15b0 std_string m_strIP
+0x15cc std_string m_strSubnet
+0x15e8 std_string m_strGateway
+0x1604 std_string m_strDNS1
+0x1620 std_string m_strDNS2
+0x163c BOOL m_bNetAutoDetect
+0x1640 BOOL m_bHttpUseProxy
+0x1644 std_string m_strHttpProxy
+0x1660 int m_nHttpProxyPort
+0x1664 BOOL m_bFTPEnable
+0x1668 int m_nFTPPort
+0x166c int m_nFTPMaxUsers
+0x1670 BOOL m_bFTPAllowAnon
+0x1674 std_string m_strFTPGreeting
+0x1690 std_string m_strFTPUser
+0x16ac std_string m_strFTPPassword
+0x16c8 int m_nFTPMinPasvPort
+0x16cc int m_nFTPMaxPasvPort
+0x16d0 std_string m_strFTPSyst
+0x16ec BOOL m_bFTPBoost
+0x170c BOOL m_bGamesAutoLaunch
+0x1710 BOOL m_bDVDAutoLaunch
+0x1714 std_string m_strDVDPlayer
+0x1730 BOOL m_bAudioCDAutoLaunch
+0x1734 std_string m_strAudioCDPlayer
+0x1750 BOOL m_bDataAutoLaunch
+0x1754 std_string m_strDataLauncher
+0x1770 BOOL m_bSNTPSync
+0x1774 std_string m_strSNTPServer
+0x1790 int m_nSNTPPort
+0x17b4 std_string m_strSkinPath
+0x17d0 std_string m_strSkinName
+0x17ec BOOL m_bEnableDriveF
+0x17f0 BOOL m_bEnableDriveG
+0x17f4 BOOL m_bDVDMediaCheckExtended
+0x17f8 BOOL m_bUseFahrenheit
+0x17fc BOOL m_bAllowUninstall
+0x1800 BOOL m_bAllowItemEdit
+0x1804 BOOL m_bAllowRecentList
+0x1808 BOOL m_bLinkToGame
+0x180c BOOL m_bLinkToSave
+0x1810 int m_nScreenSaverWait
+0x1814 int m_nScreenSaverType
+0x1818 std_string m_strScreenSaverText
+0x1834 std_string m_strScreenSaverVideo
+0x1850 std_string m_strScreenSaverPath
+0x186c BOOL m_bScreenSaverBGM
+0x1870 std_string m_strLanguageFile
+0x188c int m_nFanSpeed                   # FanSpeed * 10, 10..50
+0x1890 int m_nAutoTurnOff
+0x1894 BOOL m_bAutoSetTime
+0x1898 BOOL m_bUse24HFormat
+0x189c int m_nLEDDefault
+0x18a0 int m_nLEDScreenSaver
+0x18a4 int m_nLEDFileCopy
+0x18b0 int m_nLEDFTPSend
+0x18b4 int m_nLEDFTPReceive
+0x18b8 int m_nLEDFTPBoost
+0x18bc int m_nLEDBusy
+0x18c0 int m_nTempThreshold
+0x18c4 BOOL m_bAutoVideoMode
+0x18c8 int m_nMultiRegion                # 1 NTSC, 2 NTSC-J, 3 PAL
+0x18cc BOOL m_bAutoVideoPAL60
+0x18d0 BOOL m_bAutoRename
+0x18d4 BOOL m_bAutoPatch
+0x18d8 BOOL m_bAbortOnError
+0x18dc std_string m_strDefaultFolder
+0x18f8 BOOL m_bLiveUpdateAutoCheck
+0x18fc std_string m_strLiveUpdate
+0x1918 BOOL m_bLiveUpdateWIP

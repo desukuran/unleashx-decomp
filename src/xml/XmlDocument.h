@@ -55,6 +55,8 @@ public:
 	CXmlElement *GetFirstChild();                                 // 0x0001D178
 	CXmlElement *FindFirstChild(const char *name);                // 0x0001CFFF
 	CXmlElement *FindNextChild();                                 // 0x0001D052
+	CXmlElement *GetNextChild();                                  // 0x000213F2
+	std::string GetValue() const { return m_strValue; }           // 0x000213DE
 
 	// Comments written after the closing tag on save
 	void AddComment(const char *text);                            // 0x0001D2EA
@@ -99,6 +101,8 @@ public:
 	void Clear();                                                 // 0x0001E0AA
 
 	CXmlElement *FindElement(CXmlElement *parent, const char *name);  // 0x0001E041
+	CXmlElement *GetFirstChild(CXmlElement *parent);              // 0x00023319
+	CXmlElement *GetNextChild(CXmlElement *parent);               // 0x00023347
 	BOOL RemoveElement(CXmlElement *element);                     // 0x0001DD1A
 
 	static int ParseTag(const std::string &tag, std::string &name);   // 0x0001E115
@@ -115,6 +119,16 @@ public:
 	CXmlElement m_root;          // +0x44
 	CXmlElement *m_pCurrent;     // +0x118
 };
+
+enum XmlQuoteRule
+{
+	XML_QUOTES_SIMPLE,          // a quoted value ends at the next '"'
+	XML_QUOTES_DOUBLED,         // ...unless that quote follows another '"'
+	XML_QUOTES_DOUBLED_BOUNDED, // same, but only while not at the last character
+};
+
+void NormalizeXmlAttributeText(std::string &text);
+void ParseXmlAttributeList(CXmlElement *element, std::string text, XmlQuoteRule rule);
 
 // Incremented for every element written by CXmlDocument::SerializeElement and
 // reset to 1 after the root; nothing reads it. 0x0026C614

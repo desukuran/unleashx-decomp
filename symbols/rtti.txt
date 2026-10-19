@@ -403,13 +403,13 @@
 000c1b3a CHDDSetting::~CHDDSetting
 000c1b6d CHDDSetting::CHDDSetting
 000c1b87 CScreenAdjust::vfunc1
-000c1bb8 CScreenAdjust::CScreenAdjust
+000c1bb8 CScreenAdjust::~CScreenAdjust
 000c1bd9 CVideoSetting::~CVideoSetting
 000c1bed CVideoSetting::CVideoSetting
 000c1c00 CDateTimeSetting::~CDateTimeSetting
 000c1c14 CDateTimeSetting::CDateTimeSetting
 000c1c20 CLiveUpdate::vfunc4
-000c1c39 CLiveUpdate::CLiveUpdate
+000c1c39 CLiveUpdate::~CLiveUpdate
 000c1c87 CLiveUpdate::CLiveUpdate
 000c1cf7 CQuickLaunch::~CQuickLaunch
 000c1d0b CQuickLaunch::CQuickLaunch
@@ -457,6 +457,7 @@
 000d8a57 CWMAPlayer::~CWMAPlayer
 000d8c48 CWMAPlayer::vfunc4
 000d8dc5 CWMAPlayer::vfunc3
+000d8f85 CWMAPlayer::CWMAPlayer
 000d9354 CInternetSession::~CInternetSession
 000db8a7 CInternetSession::CInternetSession
 000dc9d7 CVirtualKeyboard::vfunc3
@@ -538,6 +539,7 @@
 0010924c CMP3Player::vfunc25
 001092c1 CMP3Player::vfunc7
 001092e5 CMP3Player::~CMP3Player
+001096d3 CMP3Player::CMP3Player
 0010976a CMP3Player::vfunc3
 001097af CMP3Player::vfunc5
 001098d2 CMenuItemEditor::~CMenuItemEditor
@@ -550,7 +552,7 @@
 00114664 CInfoCenter::~CInfoCenter
 001185d2 CImageViewer::vfunc1
 001186f3 CImageViewer::vfunc3
-00118dc1 CAppFrame::CAppFrame
+00118dc1 CImageViewer::~CImageViewer
 00118e34 CImageViewer::CImageViewer
 001194ae CImageViewer::vfunc4
 0011bf60 CGameSaveItem::~CGameSaveItem
@@ -616,6 +618,7 @@
 001301cc CWAVPlayer::vfunc13
 001301eb CWAVPlayer::~CWAVPlayer
 00130218 CWAVPlayer::vfunc3
+0013062d CWAVPlayer::CWAVPlayer
 00130699 CDDAPlayer::vfunc6
 001306d2 CDDAPlayer::vfunc25
 0013070e CDDAPlayer::vfunc5
@@ -632,7 +635,7 @@
 00130b66 CDDACopy::vfunc4
 00130b6b CDDACopy::vfunc2
 00130b6f CDDACopy::vfunc5
-00130c30 CAppFrame::CAppFrame
+00130c30 CDDACopy::~CDDACopy
 00130c6f CDDACopy::vfunc1
 00130dd5 CAudioGUI::vfunc2
 0013361e CAudioGUI::~CAudioGUI

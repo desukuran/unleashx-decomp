@@ -35,3 +35,52 @@ typedef struct std_vector {
 	void *_Mylast;
 	void *_Myend;
 } std_vector;
+
+/* ---- src/common/ObList.h ---- */
+typedef struct CObList_CNode {
+	struct CObList_CNode *pNext;
+	struct CObList_CNode *pPrev;
+	void *data;
+} CObList_CNode;
+
+typedef struct CObList {
+	void *vftable;
+	CObList_CNode *m_pNodeHead;
+	CObList_CNode *m_pNodeTail;
+	int m_nCount;
+	CObList_CNode *m_pNodeFree;
+	void *m_pBlocks;
+	int m_nBlockSize;
+} CObList;
+
+/* ---- src/xml/XmlDocument.h ---- */
+typedef struct CXmlAttribute {
+	void *vftable;
+	std_string m_strName;          /* +0x04 */
+	std_string m_strValue;         /* +0x20 */
+} CXmlAttribute;
+
+typedef struct CXmlElement {
+	void *vftable;
+	std_string m_strName;          /* +0x04 */
+	std_string m_strAttributes;    /* +0x20 */
+	std_string m_strValue;         /* +0x3c */
+	std_string m_strUnknown58;     /* +0x58 */
+	CObList m_children;            /* +0x74 */
+	std_vector m_attributes;       /* +0x90 CXmlAttribute* */
+	std_vector m_comments;         /* +0xa0 std::string */
+	struct CXmlElement *m_pParent; /* +0xb0 */
+	CObList_CNode *m_findPos;      /* +0xb4 */
+	std_string m_strFindName;      /* +0xb8 */
+} CXmlElement;
+
+typedef struct CXmlDocument {
+	void *vftable;
+	std_string m_strFileName;      /* +0x04 */
+	BYTE m_bModified;              /* +0x20 */
+	BYTE _pad21[3];
+	int m_nIndent;                 /* +0x24 */
+	std_string m_strXml;           /* +0x28 */
+	CXmlElement m_root;            /* +0x44 */
+	CXmlElement *m_pCurrent;       /* +0x118 */
+} CXmlDocument;
