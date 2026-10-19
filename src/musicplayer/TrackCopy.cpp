@@ -602,13 +602,55 @@ BOOL CTrackCopy::CopySong(UINT index, const wchar_t *name, DWORD length)
 }
 
 // The encoder's state (0x00270FB8-0x00270FD0).
-static int s_encoderUnusedB8;         // 0x00270FB8
+static DWORD s_dwEncoderBuffered;      // 0x00270FB8 bytes in s_pEncoderBuffer
 static short *s_pGainTable;           // 0x00270FBC
-static int s_encoderUnusedC0;         // 0x00270FC0
+static DWORD s_dwEncoderBufferStart;   // 0x00270FC0 their offset in the file
 static HANDLE s_hEncoderInput;        // 0x00270FC4
 static BYTE *s_pEncoderBuffer;        // 0x00270FC8
-static int s_encoderUnusedCC;         // 0x00270FCC
+static DWORD s_dwEncoderPosition;      // 0x00270FCC
 static DWORD s_dwEncoderInputSize;    // 0x00270FD0
+
+// 0x000D9040
+// The encoder's PCM source, left behind (nothing calls it): samples
+// 16-bit stereo samples from position, through the gain table, buffered.
+// (samples in ecx)
+static DWORD EncoderReadPcm(DWORD samples, BYTE **out, DWORD position)
+{
+	s_dwEncoderPosition = position * 4;
+	DWORD bytes = samples * 4;
+	// Keep the part of the buffer from the position on.
+	if (s_dwEncoderPosition < s_dwEncoderBufferStart ||
+	    s_dwEncoderBuffered + s_dwEncoderBufferStart <= s_dwEncoderPosition)
+	{
+		s_dwEncoderBuffered = 0;
+	}
+	else
+	{
+		DWORD skip = s_dwEncoderPosition - s_dwEncoderBufferStart;
+		s_dwEncoderBuffered -= skip;
+		memmove(s_pEncoderBuffer, s_pEncoderBuffer + skip, s_dwEncoderBuffered);
+	}
+	s_dwEncoderBufferStart = s_dwEncoderPosition;
+	if (s_dwEncoderBuffered < bytes)
+	{
+		DWORD read;
+		short *samplesRead = (short *)(s_pEncoderBuffer + s_dwEncoderBuffered);
+		if (SetFilePointer(s_hEncoderInput, s_dwEncoderBuffered + s_dwEncoderPosition, NULL, FILE_BEGIN) ==
+		        (DWORD)-1 ||
+		    !ReadFile(s_hEncoderInput, samplesRead, bytes - s_dwEncoderBuffered, &read, NULL))
+			return 0;
+		read &= ~1;
+		s_dwEncoderBuffered += read;
+		if (s_pGainTable != NULL)
+		{
+			for (DWORD i = 0; i < read; i += 2, samplesRead++)
+				*samplesRead = s_pGainTable[*samplesRead + 0x8000];
+		}
+	}
+	DWORD copy = bytes < s_dwEncoderBuffered ? bytes : s_dwEncoderBuffered;
+	memcpy(*out, s_pEncoderBuffer, copy);
+	return copy;
+}
 
 // 0x000D9155
 BOOL EncodeTrackToWma(short peak)
@@ -637,8 +679,8 @@ BOOL EncodeTrackToWma(short peak)
 		return FALSE;
 	}
 	BOOL ok = FALSE;
-	s_encoderUnusedC0 = 0;
-	s_encoderUnusedB8 = 0;
+	s_dwEncoderBufferStart = 0;
+	s_dwEncoderBuffered = 0;
 	s_pEncoderBuffer = new BYTE[bufferSize];
 	if (s_pEncoderBuffer == NULL)
 	{
@@ -660,7 +702,7 @@ BOOL EncodeTrackToWma(short peak)
 		}
 		// (The encoding itself isn't there.)
 		s_dwEncoderInputSize = 0;
-		s_encoderUnusedCC = 0;
+		s_dwEncoderPosition = 0;
 		if (s_pGainTable != NULL)
 		{
 			delete[] s_pGainTable;

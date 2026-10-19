@@ -226,7 +226,7 @@ BOOL CMusicManager::IsPlaying()
 		return FALSE;
 	if (m_pPlayer == NULL)
 		return m_bReady;
-	return m_pPlayer->IsPlaying();
+	return m_pPlayer->IsReady();
 }
 
 // 0x00106189
@@ -1182,7 +1182,7 @@ void CMusicManager::SetSpeakerConfig(const void *config)
 		for (UINT i = 0; i < m_nPlayers; i++)
 		{
 			if (m_pPlayers[i] != NULL)
-				m_pPlayers[i]->SetSpeakerConfig(config);
+				m_pPlayers[i]->SetSpeakerConfig((const DSMIXBINS *)config);
 		}
 	}
 	catch (...)

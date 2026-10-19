@@ -377,7 +377,7 @@ BOOL CMusicSetting::Save()
 				BOOL enable = !IsNoW(value);
 				audio.SetEnable51(enable);
 				if (g_pMusicManager != NULL && g_pMusicManager->IsPlaying())
-					g_pMusicManager->SetSpeakerConfig(audio.m_bEnable51 ? g_pSettings->m_unknownAudio : NULL);
+					g_pMusicManager->SetSpeakerConfig(audio.m_bEnable51 ? g_pSettings->m_speakerMixBins : NULL);
 				SetAudioAC3(enable);   // the Xbox's own Dolby Digital setting
 				element->SetAttribute("Enable_5_1", enable ? "Yes" : "No");
 				changed = TRUE;

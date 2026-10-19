@@ -1,21 +1,33 @@
 // The DirectSound device, created on first use (with a thread that runs
-// DirectSoundDoWork). TODO: decompile
+// DirectSoundDoWork), from the MS dashboard's audio code. See
+// AudioDevice.cpp.
 #pragma once
 
 #include "../common/Platform.h"
-
-struct IDirectSound;
+#include "DSound.h"
 
 // 0x0C bytes; one instance (0x002776D8).
 class CAudioDevice
 {
 public:
+	CAudioDevice();                       // 0x0007FBA6 (this in eax)
 	static CAudioDevice *GetInstance();   // 0x0007FBB1
 	// Creates the device on first use. (this in eax)
 	IDirectSound *GetDirectSound();       // 0x00011472
 	// Stops the work thread and releases the device. (this in esi)
 	HRESULT Shutdown();                   // 0x0007FC2E
-	HRESULT Create(BOOL unknown);         // 0x0007FC65
+	// The device and, with workThread, the thread that runs
+	// DirectSoundDoWork every 100 ms. S_FALSE if it exists. (this in edi)
+	HRESULT Create(BOOL workThread);      // 0x0007FC65
+	// A sound buffer with 12 dB of headroom. (this in eax)
+	HRESULT CreateSoundBuffer(const WAVEFORMATEX *format, DWORD bytes, DWORD flags,
+	                          IDirectSoundBuffer **buffer);   // 0x0007FCDC
+	// Copies size bytes of data into the buffer at offset.
+	static void FillBuffer(IDirectSoundBuffer *buffer, DWORD offset, DWORD size, const void *data);   // 0x0007FBDA
+
+private:
+	static DWORD __stdcall WorkThread(void *param);       // 0x0007FB84
+public:
 
 	BYTE m_bStopping;                     // +0x00
 	IDirectSound *m_pDirectSound;         // +0x04

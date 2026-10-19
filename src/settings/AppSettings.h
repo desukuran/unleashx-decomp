@@ -272,7 +272,7 @@ public:
 	float m_fFontScale;                      // +0x131C 1.0; the screen mode's font scale (videoset.dat)
 	int m_nScrollSpeed;                      // +0x1320 10..60
 	SAudioSettings m_audio;                  // +0x1324
-	BYTE m_unknownAudio[0x14BC - 0x1474];    // rest of the audio block
+	BYTE m_speakerMixBins[0x14BC - 0x1474]; // +0x1474 the 5.1 DSMIXBINS and its pairs (SetEnable51)
 	SVideoSettings m_video;                  // +0x14BC
 	std::string m_strPassword;               // +0x157C
 	int m_nPasswordFailures;                 // +0x1598 wrong passwords/passcodes so far

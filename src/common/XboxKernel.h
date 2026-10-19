@@ -169,6 +169,12 @@ DWORD GetFileSize(HANDLE file, DWORD *high);
 BOOL SetFilePointerEx(HANDLE file, LARGE_INTEGER distance, LARGE_INTEGER *newPointer, DWORD moveMethod);   // 0x000356DC
 BOOL GetFileTime(HANDLE file, FILETIME *creation, FILETIME *lastAccess, FILETIME *lastWrite);   // 0x0003587D
 BOOL SetFileTime(HANDLE file, const FILETIME *creation, const FILETIME *lastAccess, const FILETIME *lastWrite);   // 0x000358E3
+DWORD WaitForMultipleObjects(DWORD count, const HANDLE *handles, BOOL waitAll, DWORD ms);
+DWORD SignalObjectAndWait(HANDLE signal, HANDLE wait, DWORD ms, BOOL alertable);
+BOOL QueryPerformanceCounter(LARGE_INTEGER *count);
+BOOL QueryPerformanceFrequency(LARGE_INTEGER *frequency);   // (XAPI: a constant 733333333, 0x00034EFB)
+// An Xbox soundtrack song's WMA file (XDK).
+HANDLE XOpenSoundtrackSong(DWORD songId, BOOL async);       // 0x000389AC
 HANDLE CreateThread(void *security, DWORD stackSize, DWORD (__stdcall *start)(void *), void *param, DWORD flags,
                     DWORD *threadId);
 HANDLE CreateMutexA(void *security, BOOL initialOwner, LPCSTR name);

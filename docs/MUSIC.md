@@ -148,6 +148,54 @@ Quirks:
 * There's an unused built-in player window (`0x00135089`), drawn from the
   layout `Show` computes.
 
+## The players
+
+The music manager has one player per kind of song. It opens a song with
+the matching player, calls Play, and then calls Process every frame; when
+Process fails, the song is over and the next one starts.
+
+| Player | Songs | How |
+|---|---|---|
+| `CWMAPlayer` | WMA files, Xbox soundtrack songs | XACT: the data folder's sound bank has a streaming cue, `Cue1`, that is given a one-entry playlist (a file, or a soundtrack song). |
+| `CMP3Player` | MP3 | `CAudioDecoder`: libmad frames, dithered to 16 bits (madplay's linear dither) and written into a looping DirectSound buffer about a second ahead. |
+| `CWAVPlayer` | WAV | Up to 64 KB of data in one buffer (`CAudioBuf`); longer files are streamed from disk (`CFilePump`, 4 packets of 8 KB). |
+| `CDDAPlayer` | audio CD tracks | `XCDPlayer` reads the raw sectors (16 at a time) into a 4-second stream. |
+
+The streaming classes (`CAudioBuf`, `CAudioPump`, `CFilePump`,
+`CWMAPump`, `XCDPlayer`) come from the MS dashboard
+(`src/audio/AudioPump.cpp`, `CdAudio.cpp`). A pump's buffer is cut into
+packets, each with a notification event. A thread refills a packet with
+the next data as soon as the play cursor passes it. When the data runs
+out, the rest of the packet is filled with silence and the pump stops
+after the last full packet has played. `CWMAPump` is never used.
+
+With 5.1 enabled, the players are given the speaker mix bins. The WAV,
+CD and MP3 buffers then switch to a 6-channel format; the WMA player
+routes its cue through an XACT sound source instead.
+
+The song's title comes from the WMA stream, from the ID3v1 tag for MP3
+(with "album - artist" as a second line), from "Track N" for the CD, and
+otherwise from the file's name.
+
+The time played is counted with the performance counter while the song
+plays.
+
+### Quirks
+
+* The time played is shown in whole seconds.
+* The WAV and CD players report the song length in seconds, where the
+  others give milliseconds (plus one for MP3 and WAV).
+* A WAV file's title drops the last letter of the name.
+* A WAV file without a `data` chunk hangs the chunk search.
+* A streamed WAV plays any chunks after the data as noise.
+* The WMA and MP3 players keep a `_strdup` copy of every path they open.
+* After the MP3 decoder runs dry, the song still counts as playing for
+  2.5 s.
+* The CD's table of contents is meant to be re-read once when the drive
+  isn't ready, but the retry loop gives up after the first try.
+* A WMA file that isn't on a hard disk drive is copied to `Z:\tmp.wma`
+  first.
+
 ## Managing soundtracks
 
 "Manage Tracks" in the player's START menu opens the soundtrack tools
