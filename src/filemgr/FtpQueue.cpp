@@ -147,7 +147,8 @@ HRESULT CFTPQueue::ProcessInput(int *action)
 		return S_OK;
 	if (m_bMenuOpen)
 	{
-		m_pMenu->ProcessInput(action);
+		// (The original passes the stack word after action as the pad.)
+		m_pMenu->ProcessInput(action, NULL);
 		m_bMenuOpen = m_pMenu->IsOpen();
 		if (!m_bMenuOpen && !m_pMenu->m_bCancelled && m_pMenu->m_nSelection != -1)
 		{

@@ -4,7 +4,7 @@
 
 #include "../src/filemgr/FtpLog.h"
 
-COptionMenu::COptionMenu() {}
+COptionMenu::COptionMenu(BOOL) {}
 COptionMenu::~COptionMenu() {}
 HRESULT COptionMenu::Create(CXBFont *, const wchar_t *, float, float, float, float, int) { return S_OK; }
 void COptionMenu::ProcessInput(int *, SGamepadState **) {}

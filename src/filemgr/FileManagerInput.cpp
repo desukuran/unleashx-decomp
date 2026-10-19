@@ -981,7 +981,7 @@ HRESULT CFileManager::ProcessInput(int *action, SGamepadState **pad)
 	// The sort drop-down.
 	if (m_pSortMenu != NULL)
 	{
-		m_pSortMenu->ProcessInput(action);
+		m_pSortMenu->ProcessInput(action, pad);
 		if (m_pSortMenu->IsOpen())
 			return S_OK;
 		if (!m_pSortMenu->m_bCancelled && m_pSortMenu->m_nSelection != -1)

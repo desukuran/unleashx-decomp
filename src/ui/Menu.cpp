@@ -882,7 +882,7 @@ void CMenu::OpenRecentList()
 {
 	if (m_pRecentMenu == NULL)
 	{
-		m_pRecentMenu = new COptionMenu;
+		m_pRecentMenu = new COptionMenu(FALSE);
 		if (m_pRecentMenu != NULL)
 		{
 			m_pRecentMenu->Create(m_pFont, L"Recent List", 0.0f, 0.0f, 0.0f, 0.0f, 10);
@@ -1971,7 +1971,7 @@ HRESULT CMenu::ProcessInput(int *action, SGamepadState **pad)
 	}
 
 	// The context menu is open.
-	m_pContextMenu->ProcessInput(action);
+	m_pContextMenu->ProcessInput(action, pad);
 	m_bContextMenuShown = m_pContextMenu->IsOpen();
 	if (m_bContextMenuShown || m_pContextMenu->m_bCancelled || m_pContextMenu->m_nSelection == -1)
 		return S_OK;

@@ -222,7 +222,7 @@ HRESULT CAudioTrackOption::ProcessInput(int *action, SGamepadState **pad)
 				else
 					ShowSoundtrackOptions();
 				m_menu.Show(0);
-				m_menu.m_bAnimate = FALSE;
+				m_menu.m_bSlideIn = FALSE;
 			}
 			else
 			{
@@ -316,7 +316,7 @@ void CAudioCDOption::ProcessInput(int *action, SGamepadState **pad)
 		g_pMusicManager->PlayAudioCD();
 	// (Copy does nothing: it's disabled.)
 	Show(0);
-	m_bAnimate = FALSE;
+	m_bSlideIn = FALSE;
 }
 
 // ---- CSoundTrackOption ----
@@ -579,7 +579,7 @@ void CSoundTrackOption::ProcessInput(int *action, SGamepadState **pad)
 	}
 	}
 	Show(0);
-	m_bAnimate = FALSE;
+	m_bSlideIn = FALSE;
 }
 
 // ---- CTrackManager ----

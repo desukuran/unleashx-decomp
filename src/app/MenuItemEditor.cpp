@@ -456,7 +456,7 @@ HRESULT CMenuItemEditor::HandleInput(int *action, SGamepadState **pad)
 	}
 	if (m_bDropDownOpen)
 	{
-		m_pDropDown->ProcessInput(action);
+		m_pDropDown->ProcessInput(action, pad);
 		m_bDropDownOpen = m_pDropDown->IsOpen();
 		if (m_bDropDownOpen || m_pDropDown->m_bCancelled || m_pDropDown->m_nSelection == -1)
 			return S_OK;

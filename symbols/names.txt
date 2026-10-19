@@ -2425,9 +2425,8 @@
 0009f58d WriteXbePatchBytes
 # (reads the bytes at the patch's offset and compares them) TODO: verify
 0009f62a CheckXbePatchBytes
-000d7072 CDropDown::IsCurrentSelectable
-# (TRUE for an option with no text or the flag at +0x30 clear) TODO: verify
-000ade61 COptionMenu::IsOptionBlank
+000d7072 CDropDown::IsSelectionDisabled
+000ade61 COptionMenu::IsSelectionDisabled
 000f997b CSkin::GetLoadingPreview
 000f9991 CSkin::GetLoadingBackgroundName
 001279fc CFileBrowser::CFileBrowser
@@ -2472,3 +2471,10 @@
 00072e3e MbsFindLastChar
 # XMV: the shared open (textures, audio)
 0008f34c CXMVPlayer::OpenCommon
+# COptionMenu / CDropDown (src/ui/OptionMenu.cpp, DropDown.cpp)
+000ae9ad COptionMenu::Create
+000ae6f1 COptionMenu::ProcessInput
+000adf2c COptionMenu::Render
+00030f11 COptionMenu::SOption::SOption
+0002db5c CDropDown::SItem::SItem
+000193a5 CDropDown::GetCount

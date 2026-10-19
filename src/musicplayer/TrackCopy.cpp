@@ -203,7 +203,7 @@ HRESULT CTrackCopy::ProcessInput(int *action, SGamepadState **pad)
 			StrFormat(text, GetStringA(STR_MSG_COPY_ERROR), GetLastError());
 			ShowMessage(text.c_str(), GetString(STR_ERROR), MSGBOX_BUTTONS_OK);
 			m_pTargetMenu->Show(0);
-			m_pTargetMenu->m_bAnimate = FALSE;
+			m_pTargetMenu->m_bSlideIn = FALSE;
 			m_bNewSoundtrack = FALSE;
 			return S_OK;
 		}

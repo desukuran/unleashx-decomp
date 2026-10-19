@@ -147,6 +147,40 @@ START opens a menu for the selected item:
 Quirk: the NTSC/PAL entries change the item's `Region` for the rest of the
 session.
 
+## Pop-up menus
+
+Two widgets draw the dashboard's pop-up menus (`src/ui/MenuDialogs.h`).
+
+**The drop-down** (`CDropDown`, `DropDown.cpp`) is the context menu above,
+the file manager's sort menu and the FTP queue's menu.
+* It's a plain box in `DIALOG_BORDERCOLOR`/`DIALOG_BACKCOLOR` that unrolls
+  downwards by 20 pixels a frame.
+* Unavailable entries are hidden rather than greyed out.
+* Up/down and the triggers move (wrapping), A or START chooses, B or BACK
+  closes.
+* It stays at least 20 pixels from the top left and 10 inside the screen's
+  edges.
+
+**The option menu** (`COptionMenu`, `OptionMenu.cpp`) is the recent list
+and the menus of the file managers, archive browsers, FTP manager, game
+saves manager, text editor and music player.
+* It's a dialog window with a caption bar (60% of the width) holding the
+  title in the dialog font.
+* A zero size fits the options. That's 300x260 to 560x430 on 640x480,
+  counting at most 19 rows, and the window is centered.
+* It slides down from above the screen, 1/24 of the screen height every
+  5 ms.
+* Disabled options are greyed out (`DIALOG_DISABLEDTEXT`) and skipped.
+* The ends wrap around except in the recent list and the skin server list.
+* A pointer click on an option chooses it.
+
+Quirks:
+* Each widget has one slide position shared by every menu of its kind. It
+  starts at the first menu's size, so later menus of another size start
+  their slide from the wrong place.
+* The drop-down's clickable area reaches below the menu: its height is the
+  menu's bottom edge.
+
 ## Drawing
 
 `src/ui/MenuRender.cpp` draws the menu in one of three layouts, chosen

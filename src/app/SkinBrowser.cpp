@@ -343,7 +343,7 @@ void CSkinBrowser::ShowServerMenu()
 {
 	if (m_pServerMenu == NULL)
 	{
-		m_pServerMenu = new COptionMenu;
+		m_pServerMenu = new COptionMenu(FALSE);
 		if (m_pServerMenu != NULL)
 		{
 			m_pServerMenu->Create(m_pFont, L"Select Server", 0.0f, 0.0f, 0.0f, 0.0f, 10);
