@@ -2082,7 +2082,7 @@ HRESULT CMenu::StepBatch()
 // The "Deleting. Please Wait" box with the progress.
 void CMenu::DrawDeleteProgress()
 {
-	float x = 120.0f, y = 210.0f, width = 400.0f, height = 60.0f;   // TODO: verify (0x0025CC28, 0x0025CB88, ...)
+	float x = 70.0f, y = 180.0f, width = 500.0f, height = 150.0f;
 	ScaleToScreen(&x, &width, &y, &height, TRUE);
 	unsigned percent = 0;
 	unsigned total = g_nOperationFiles + g_nOperationFolders;
@@ -2092,7 +2092,8 @@ void CMenu::DrawDeleteProgress()
 		if (percent > 100)
 			percent = 100;
 	}
-	DrawProgressBox(x, y, width, height, L"Deleting. Please Wait", g_szOperationFile, NULL, (float)percent, 1.0f, 0);
+	DrawProgressBox(m_pSelectedFont, x, y, width, height, L"Deleting. Please Wait", g_szOperationFile, NULL,
+	                (float)percent, -1.0f, FALSE);
 }
 
 // --- Skin settings ------------------------------------------------------------

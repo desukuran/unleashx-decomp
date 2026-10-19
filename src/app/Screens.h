@@ -62,6 +62,9 @@ public:
 	virtual ~CScreenSaver();
 	// (this in ecx, action in eax)
 	HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00139D04
+	HRESULT Render();                                     // 0x001398F7 (this in ecx)
+	// Neither the video nor the slideshow runs (only the text). (this in eax)
+	BOOL IsTextOnly() const;                              // 0x0002B806
 };
 
 class CFileManager
@@ -75,6 +78,7 @@ public:
 	void Reset();                                         // 0x0002B4C9
 	void SetBackground(IDirect3DTexture8 *texture);       // 0x0002B4A1
 	void ProcessInput(int *action, SGamepadState **pad);  // 0x0012C91D TODO: decompile
+	void Render();                                        // 0x00127052 TODO: decompile (this in eax)
 
 	BYTE m_unknown004[0x8B0 - 0x4];
 	BOOL m_bOpen;                                         // +0x8B0
@@ -95,6 +99,7 @@ public:
 	HRESULT Init(CXBFontEx *font);                        // 0x0011E048
 	void Show();                                          // 0x0011BAFA
 	void ProcessInput(int *action, SGamepadState **pad);  // 0x0011E249 TODO: decompile
+	void Render();                                        // 0x0011C8F4 TODO: decompile (this in eax)
 
 	BYTE m_unknown04[0x74 - 0x4];
 	BOOL m_bOpen;                                         // +0x74
@@ -149,6 +154,7 @@ public:
 	void Show();                                          // 0x000F6791
 	// (this in ecx, pad in eax)
 	void ProcessInput(int *action, SGamepadState **pad);  // 0x000F67FD TODO: decompile
+	void Render();                                        // 0x000F8685 TODO: decompile (this in esi)
 	BOOL IsOpen() const { return m_bOpen && !m_bClosing; }   // 0x0002B7ED
 
 	BYTE m_unknown04[0x54];
@@ -171,6 +177,8 @@ public:
 	void Init(int, int, int);                             // 0x00104399
 	void NewFile();                                       // 0x00103D4D
 	HRESULT Open(const char *path);                       // 0x00104181
+	// Loads a file for viewing (the file operation log). TODO: decompile
+	BOOL Load(const char *path);                          // 0x00103B58
 };
 
 // The "SetClock" screen: six CUpDown spinners (the date in the language's

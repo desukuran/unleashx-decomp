@@ -103,7 +103,8 @@ public:
 
 	// Handles one input action (InputAction); may change *action.
 	HRESULT ProcessInput(int *action, struct SGamepadState **pad);   // 0x001123B9
-	void Render();                                    // 0x0010D055 TODO: decompile
+	HRESULT Render();                                 // 0x0010ED3D TODO: decompile (this in eax)
+	void RenderItems();                               // 0x0010D055 TODO: decompile
 
 	// Internal
 	HRESULT ProcessAction(int *action);

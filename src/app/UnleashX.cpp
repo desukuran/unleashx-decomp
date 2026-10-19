@@ -1,5 +1,6 @@
 // CUnleashX: construction, screen switching, teardown and the skin/menu
-// callbacks. FrameMove is in FrameMove.cpp; Initialize and Render are TODO.
+// callbacks. FrameMove is in FrameMove.cpp, Render in AppRender.cpp;
+// Initialize is TODO.
 #include "UnleashX.h"
 
 #include <cstring>
@@ -23,7 +24,7 @@ HANDLE g_hNetworkThread = INVALID_HANDLE_VALUE;   // 0x0026A630
 CXBPackedResource *g_pResource;            // 0x00276200 m_resource of the app
 int g_unknown276224;                       // 0x00276224 TODO
 BOOL g_bMenuPending;                       // 0x0027623C
-BOOL g_bMusicReady;                        // 0x00276218
+BOOL g_bFrameDrawn;                        // 0x00276218
 float g_fGlobeSpin;                        // 0x0027621C
 DWORD g_dwGlobeSpinTime;                   // 0x00276220
 static BOOL s_bBackgroundSoundPlaying;     // 0x00278D48
@@ -80,7 +81,7 @@ CUnleashX::CUnleashX()
 	m_pTextEditor = NULL;
 	m_bMessageShown = FALSE;
 	m_unknown1964 = 0;
-	m_unknown1968 = 0;
+	m_bTakeScreenshot = FALSE;
 	m_pBackgroundSound = NULL;
 	m_pScreenSaver = NULL;
 	m_bScreenSaverActive = 0;

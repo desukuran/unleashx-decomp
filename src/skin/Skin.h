@@ -243,6 +243,8 @@ public:
 	void SetDefaultMusicPlayerLayout();               // 0x000FA219 TODO: decompile
 
 	HRESULT PollLoad(BOOL *busy);                     // 0x000F8E2B
+	// Draws the skin's own elements (texts, images...). (this in eax)
+	HRESULT Render();                                 // 0x0010160B TODO: decompile
 
 	std::string ResolveFile(const char *path);        // 0x000F9DFC
 	HRESULT FindFont(const char *name, CXBFont **font);   // 0x000F9A08

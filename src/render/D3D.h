@@ -32,6 +32,9 @@ typedef DWORD D3DCOLOR;
 #define D3DVSDE_DIFFUSE 3      // SetVertexDataColor register
 #define D3DVSDE_VERTEX (-1)    // SetVertexData4f: the position
 #define D3DFILL_SOLID 0x1B02
+// D3DTEXTUREFILTERTYPE
+#define D3DTEXF_NONE 0
+#define D3DTEXF_LINEAR 2
 
 // D3DPRIMITIVETYPE (Xbox)
 #define D3DPT_LINELIST 2
@@ -93,6 +96,7 @@ enum D3DRENDERSTATETYPE
 };
 
 // D3DBLEND (Xbox uses the GL values)
+#define D3DBLEND_SRCCOLOR 0x300
 #define D3DBLEND_SRCALPHA 0x302
 #define D3DBLEND_INVSRCALPHA 0x303
 

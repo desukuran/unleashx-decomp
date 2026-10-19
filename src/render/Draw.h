@@ -72,6 +72,9 @@ HRESULT DrawProgressBar(float x, float y, float width, float height, float perce
 HRESULT DrawBusyBox(CXBFont *font, const wchar_t *text);                     // 0x000A1D70
 
 // The "please wait" box of file operations: title, current file, a second
-// line and a progress bar (percent).
-void DrawProgressBox(float x, float y, float width, float height, const wchar_t *title, const wchar_t *file,
-                     const wchar_t *line2, float percent, float alpha, int unknown);    // 0x000A2D02
+// line and a progress bar (percent); copies and moves also show the
+// overall progress (totalPercent, -1 = none). TODO: decompile. The
+// original takes font in ebx.
+void DrawProgressBox(CXBFont *font, float x, float y, float width, float height, const wchar_t *title,
+                     const wchar_t *file, const wchar_t *line2, float percent, float totalPercent,
+                     BOOL showTotal);                                          // 0x000A2D02

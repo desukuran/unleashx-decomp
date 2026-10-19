@@ -2,6 +2,8 @@
 // progress screen. TODO: decompile
 #pragma once
 
+#include <string>
+
 #include "../common/Platform.h"
 
 // Set to stop a running file operation (or a menu batch).
@@ -22,6 +24,13 @@ extern unsigned g_nOperationFiles;       // 0x002775FC
 extern unsigned g_nOperationFolders;     // 0x002775F8
 extern ULONGLONG g_ullOperationBytes;    // 0x00277618
 extern wchar_t g_szOperationFile[0x12F]; // 0x00277138 the current file
+extern wchar_t g_szOperationTarget[0x12F];   // 0x00277398 where it goes (copies, moves)
+extern double g_dFilePercent;            // 0x00277608 of the current file
+extern double g_dTotalPercent;           // 0x00277610 0 = work it out from the counts below
+extern ULONGLONG g_ullOperationTotal;    // 0x00277130 bytes to copy
+extern ULONGLONG g_ullOperationDone;     // 0x00277620 bytes copied
+// Where failed operations are logged ("" = no log).
+extern std::string g_strOperationLog;    // 0x0026C280
 void ResetFileOperationStats();          // inlined
 // Counts files, folders and bytes under path into the stats above.
 void CountFolder(const char *path);      // 0x000A6E7C

@@ -28,7 +28,7 @@ public:
 
 	virtual HRESULT Initialize();                     // 0x000EC94A TODO: decompile
 	virtual HRESULT FrameMove();                      // 0x000EB93B (FrameMove.cpp)
-	virtual HRESULT Render();                         // 0x000F0097 TODO: decompile
+	virtual HRESULT Render();                         // 0x000F0097 (AppRender.cpp)
 	virtual HRESULT Cleanup();                        // 0x000E1B1E TODO: decompile
 
 	void SetMode(int mode);                           // 0x000E568F
@@ -45,6 +45,10 @@ public:
 	// The screen saver and the "any input" bookkeeping: starts the saver
 	// after the wait, stops it on input. (this in ebx)
 	void UpdateScreenSaver(int *action);              // 0x000EA56C TODO: decompile
+	// The background: the globe/orb and the skin's 3D scene. TODO: decompile
+	void RenderBackground();                          // 0x000E0E0F
+	// The file operation progress/error over the menu (inlined in Render).
+	void RenderFileOperation();
 	// Started by the updater with launch data naming the old dashboard XBE:
 	// renames that to .bak and moves this one (from D:) in its place.
 	// TODO: decompile
@@ -122,7 +126,7 @@ public:
 	BOOL m_bMessageShown;                     // +0x195C
 	BOOL m_bPasswordShown;                    // +0x1960 the keyboard asks for the password at startup
 	int m_unknown1964;                        // +0x1964
-	int m_unknown1968;                        // +0x1968
+	BOOL m_bTakeScreenshot;                   // +0x1968 save the next frame as a .bmp
 	BOOL m_bAutoLaunchDisc;                   // +0x196C start a disc when one is inserted
 	BOOL m_bStartMusic;                       // +0x1970 create the music manager (soundtracks)
 	BOOL m_bKeepAwake;                        // +0x1974 no screen saver this frame. TODO: verify
@@ -158,12 +162,20 @@ extern DWORD g_dwShutdownDeadline;           // 0x00276238
 extern HANDLE g_hExitEvent;                  // 0x0027624C
 extern std::string g_strLoadingPreview;      // 0x00277F70 <Item Preview> for the GamePreview loading screen
 
+// The pointer's cursor, fading out (alpha). The original takes x in ecx and
+// y in eax. TODO: decompile
+void DrawPointer(int x, int y, float alpha);         // 0x000E0950
+// A free screenshotN.bmp on Z:, Y: or X: (one with 1MB free), or "".
+// TODO: decompile
+std::string GetScreenshotPath();                     // 0x000A3C39
+extern DWORD g_dwPointerMoveTime;            // 0x0027216C
+
 // Creates g_pMusicManager (on a thread; directly if that fails). TODO: decompile
 unsigned __stdcall MusicManagerThread(void *app);  // 0x000E85B3
 // Set (by nothing in the code) to create the menu from mode 0.
 extern BOOL g_bMenuPending;                  // 0x0027623C
-// The soundtracks are known (the music manager may be created).
-extern BOOL g_bMusicReady;                   // 0x00276218 TODO: verify
+// Set by Render after each frame (FrameMove waits for the first one).
+extern BOOL g_bFrameDrawn;                   // 0x00276218
 // The globe spins this way after a menu move (+1 up, -1 down), and when.
 extern float g_fGlobeSpin;                   // 0x0027621C
 extern DWORD g_dwGlobeSpinTime;              // 0x00276220

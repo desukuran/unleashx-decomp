@@ -114,7 +114,7 @@ HRESULT CUnleashX::FrameMove()
 	else
 	{
 		// Start a disc when one goes in (unless a trigger is held).
-		if (!m_bAutoLaunchDisc || !g_bMusicReady)
+		if (!m_bAutoLaunchDisc || !g_bFrameDrawn)
 		{
 			s_bDiscHandled = FALSE;
 		}
@@ -144,7 +144,7 @@ HRESULT CUnleashX::FrameMove()
 
 		// Started by the Live Update installer: once it has run for 5s, say
 		// the update works, show the new Release.nfo, then install it.
-		if (m_bUpdatePending && g_bMusicReady && m_fAppTime > 5.0f)
+		if (m_bUpdatePending && g_bFrameDrawn && m_fAppTime > 5.0f)
 		{
 			if (!s_bUpdateMessageShown)
 			{
@@ -216,7 +216,7 @@ HRESULT CUnleashX::FrameMove()
 
 	// Soundtracks: create the player, keep it going, pause it for a preview
 	// with sound.
-	if (g_bMusicReady && m_bStartMusic)
+	if (g_bFrameDrawn && m_bStartMusic)
 	{
 		if (g_pMusicManager == NULL)
 		{
@@ -438,7 +438,7 @@ HRESULT CUnleashX::FrameMove()
 		}
 		{
 			CMusicManager *music = g_pMusicManager;
-			if (g_bMusicReady && music == NULL && (action == INPUT_RTHUMB_CLICK || action == INPUT_IR_PLAY))
+			if (g_bFrameDrawn && music == NULL && (action == INPUT_RTHUMB_CLICK || action == INPUT_IR_PLAY))
 			{
 				m_bStartMusic = TRUE;
 				break;
