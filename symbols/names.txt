@@ -1132,7 +1132,6 @@
 0026c99c s_nRemotePort
 00278d4c s_dwRepeats
 00271ed8 g_irRemotes
-000ea56c CUnleashX::UpdateScreenSaver
 000e2604 CUnleashX::InstallUpdate
 000e85b3 MusicManagerThread
 0009f342 BuildWorldMatrix
@@ -1240,3 +1239,12 @@
 000dfed7 IsFormatSkipped BOOL f(XBGAMEPAD *pad@eax)
 0009171d XKEEPROM::ReadFromXBOX void f(XKEEPROM *this@esi)
 000ac019 CheckDvdMedia
+000ea56c CUnleashX::UpdateScreenSaver void f(CUnleashX *this@ebx, int *action)
+0002b5c2 CXBStopWatch::StartTicks void f(CXBStopWatch *this@esi)
+0002b5de CXBStopWatch::StopTicks void f(CXBStopWatch *this@esi)
+0002b604 CXBStopWatch::GetElapsedTicks float f(CXBStopWatch *this@esi)
+00139e2c CScreenSaver::CScreenSaver CScreenSaver * f(CScreenSaver *this@edi)
+00139da4 CScreenSaver::Init
+00139eb2 CScreenSaver::SetSource
+0013a17a CScreenSaver::Start void f(CScreenSaver *this@edi)
+0013a26c CScreenSaver::Stop void f(CScreenSaver *this@esi)

@@ -3,10 +3,14 @@
 // passcode, the clock prompt, then the current screen), and runs the
 // background chores: disc autostart, the FTP launch, shutdown countdowns,
 // the soundtrack player and the globe animation.
+#include <cstring>
+
 #include "../audio/MusicManager.h"
 #include "../input/Gamepad.h"
 #include "../media/WMVideoPlayer.h"
+#include "../render/D3D.h"
 #include "../render/Draw.h"
+#include "../render/Texture.h"
 #include "../settings/AppSettings.h"
 #include "../settings/ConfigLoader.h"
 #include "../skin/Skin.h"
@@ -626,4 +630,207 @@ done:
 		m_nGlobePos = next;
 	BuildWorldMatrix(m_globeMatrix, 0.0f, 0.0f, 48.0f, 1.0f, 1.0f, 1.0f, 1.5707964f, angle + 3.1415927f, 0.0f);
 	return S_OK;
+}
+
+// 0x000EA56C
+// Called with each frame's action. Any input (an action, a key, the
+// remote's MENU, m_bKeepAwake) restarts the idle timer and ends the screen
+// saver and a pending auto turn-off. Without input: the screen saver
+// starts after <ScreenSaver Wait> seconds, and the Xbox turns off
+// <AutoTurnOff> minutes after the last input (with a 30 s countdown).
+// Holding the remote's POWER button 1.5 s turns it off too.
+void CUnleashX::UpdateScreenSaver(int *action)
+{
+	SPreferences &prefs = g_pSettings->m_prefs;
+	BOOL input = FALSE;
+	if (*action != INPUT_NONE)
+	{
+		// The remote's POWER held: its repeats keep coming within 1.7 s;
+		// after 1.5 s the Xbox turns off.
+		CXBStopWatch &powerTimer = m_timers[1];
+		if (m_defaultIR.wKeyCode == 0xD5)
+		{
+			if (!powerTimer.IsRunning() || powerTimer.GetElapsedTicks() >= 1700.0f)
+			{
+				m_unknown878 = 333.0f;   // TODO: what this is
+				powerTimer.StartTicks();
+			}
+			else if (powerTimer.GetElapsedTicks() > 1500.0f)
+			{
+				g_trayMonitor.PowerOff();
+				powerTimer.StopTicks();
+			}
+		}
+		else
+		{
+			powerTimer.StopTicks();
+		}
+		if (*action == INPUT_BACK)
+			g_bCancelOperation = FALSE;
+	}
+	else if (prefs.m_nScreenSaverType != 0 && (g_ftpServer.m_bPaused || g_ftpServer.m_nActiveTransfers != 0))
+	{
+		// FTP transfers count as input (except for the text screen saver).
+		input = TRUE;
+	}
+	else
+	{
+		*action = g_gamepadInput.GetRemoteAction();
+		if (*action == INPUT_IR_MENU && m_nMode > MODE_MENU)
+		{
+			SetMode(MODE_MENU);
+			*action = INPUT_NONE;
+		}
+		if (*action == INPUT_NONE)
+		{
+			// The debug keyboard: any character, and Enter, Esc and the
+			// arrows as A, BACK and the d-pad.
+			input = m_pKeystroke->ascii != 0;
+			switch (m_pKeystroke->virtualKey)
+			{
+			case 0x0D:   // VK_RETURN
+				m_defaultGamepad.bPressedAnalogButtons[0] = TRUE;
+				input = TRUE;
+				break;
+			case 0x1B:   // VK_ESCAPE
+				m_defaultGamepad.wPressedButtons |= XINPUT_GAMEPAD_BACK;
+				input = TRUE;
+				break;
+			case 0x25:   // VK_LEFT
+				m_defaultGamepad.wPressedButtons |= 4;
+				m_defaultGamepad.wButtons |= 4;
+				input = TRUE;
+				break;
+			case 0x26:   // VK_UP
+				m_defaultGamepad.wPressedButtons |= 1;
+				m_defaultGamepad.wButtons |= 1;
+				input = TRUE;
+				break;
+			case 0x27:   // VK_RIGHT
+				m_defaultGamepad.wPressedButtons |= 8;
+				m_defaultGamepad.wButtons |= 8;
+				input = TRUE;
+				break;
+			case 0x28:   // VK_DOWN
+				m_defaultGamepad.wPressedButtons |= 2;
+				m_defaultGamepad.wButtons |= 2;
+				input = TRUE;
+				break;
+			}
+		}
+	}
+
+	if (*action != INPUT_NONE || input || m_bKeepAwake)
+	{
+		m_bKeepAwake = FALSE;
+		m_timer.Start();
+		if (g_bShuttingDown)
+		{
+			g_bShuttingDown = FALSE;
+			m_bMessageShown = FALSE;
+		}
+		g_dwShutdownDeadline = 0;
+		if (m_bScreenSaverActive)
+		{
+			m_bScreenSaverActive = FALSE;
+			if (m_pScreenSaver != NULL)
+			{
+				m_pScreenSaver->Stop();
+				SetLedPattern(LED_DEFAULT, FALSE);
+			}
+			// The input only ends the screen saver.
+			*action = INPUT_NONE;
+			if (g_pSettings->m_video.m_bFastRefresh)
+			{
+				// Back to no vsync (the screen saver ran with it).
+				g_pd3dDevice->Reset(&m_d3dpp);
+				g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xFF000000,
+				                    1.0f, 0);
+				g_pd3dDevice->Swap(0);
+				g_pd3dDevice->SetSoftDisplayFilter(g_pSettings->m_video.m_bSoften);
+				g_pd3dDevice->SetFlickerFilter(g_pSettings->m_video.m_nFilterLevel);
+				if (!g_pSettings->m_video.m_bSoften)
+					g_pd3dDevice->SetRenderState(D3DRS_MULTISAMPLEANTIALIAS, FALSE);
+			}
+			// (The deadline was cleared above, so this does nothing.)
+			if (g_dwShutdownDeadline != 0)
+			{
+				g_dwShutdownDeadline = 0;
+				if (g_bShuttingDown)
+				{
+					m_bMessageShown = FALSE;
+					g_bShuttingDown = FALSE;
+				}
+			}
+		}
+	}
+	else
+	{
+		if ((unsigned)prefs.m_nScreenSaverWait > 0 && !m_bScreenSaverActive &&
+		    m_timer.GetElapsedSeconds() > (float)(unsigned)prefs.m_nScreenSaverWait)
+		{
+			if (m_pScreenSaver == NULL)
+			{
+				m_pScreenSaver = new CScreenSaver;
+				if (m_pScreenSaver != NULL)
+					m_pScreenSaver->Init(&m_fonts[1]);
+				// A missing video or picture folder falls back to the text.
+				if ((prefs.m_nScreenSaverType == 2 && !FileExists(prefs.m_strScreenSaverVideo.c_str())) ||
+				    (prefs.m_nScreenSaverType == 3 && !DirectoryExists(prefs.m_strScreenSaverPath.c_str())))
+					prefs.m_nScreenSaverType = 0;
+			}
+			if (m_pScreenSaver != NULL)
+			{
+				wchar_t source[100];
+				memset(source, 0, sizeof(source));
+				const std::string *setting = &prefs.m_strScreenSaverText;
+				if (prefs.m_nScreenSaverType == 2)
+					setting = &prefs.m_strScreenSaverVideo;
+				else if (prefs.m_nScreenSaverType == 3)
+					setting = &prefs.m_strScreenSaverPath;
+				StrUtf8ToWide(setting->c_str(), source, 100);
+				m_pScreenSaver->SetSource(source);
+				m_pScreenSaver->Start();
+				m_bScreenSaverActive = TRUE;
+				if (g_pSettings->m_video.m_bFastRefresh)
+				{
+					// The screen saver runs with vsync.
+					SPresentParameters params = *g_pPresentParams;
+					params.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+					g_pd3dDevice->Reset(&params);
+				}
+				if (prefs.m_nLEDScreenSaver != LED_DEFAULT)
+					SetLedPattern(prefs.m_nLEDScreenSaver, FALSE);
+			}
+		}
+
+		if (g_bFileOperationQueued)
+		{
+			// No auto turn-off during a file operation.
+			g_dwShutdownDeadline = 0;
+			if (g_bShuttingDown)
+			{
+				m_bMessageShown = FALSE;
+				g_bShuttingDown = FALSE;
+			}
+		}
+		else if (g_dwShutdownDeadline == 0 && (unsigned)prefs.m_nAutoTurnOff > 0 &&
+		         m_timer.GetElapsedSeconds() > (float)(unsigned)(prefs.m_nAutoTurnOff * 60 - 30))
+		{
+			// 30 s before the time: the countdown (FrameMove turns it off).
+			m_bScreenSaverActive = FALSE;
+			g_bShuttingDown = TRUE;
+			g_dwShutdownDeadline = GetTickCount() + 30000;
+			ShowMessage(GetStringA(STR_MSG_SHUTTING_DOWN), GetString(STR_INFORMATION), MSGBOX_BUTTONS_CANCEL);
+		}
+	}
+
+	// The screenshot buttons: BLACK with the left trigger held (not the
+	// right), or the left stick held with BLACK. (Byte +0x12 is padding in
+	// XBGAMEPAD, always 0.)
+	const BYTE *pad = (const BYTE *)&m_defaultGamepad;
+	if (((pad[0x12] != 0 || (m_defaultGamepad.bAnalogButtons[6] != 0 && m_defaultGamepad.bAnalogButtons[7] == 0)) &&
+	     m_defaultGamepad.bPressedAnalogButtons[4]) ||
+	    ((m_defaultGamepad.wButtons & 0x40) != 0 && m_defaultGamepad.bAnalogButtons[4] != 0))
+		m_bTakeScreenshot = TRUE;
 }

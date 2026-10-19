@@ -24,7 +24,7 @@ enum AppMode
 	MODE_GAMEMANAGER = 3,
 	MODE_SETTINGS = 5,
 	MODE_SKINS = 6,
-	MODE_SYSINFO = 7,      // CXboxInfo (no action opens it)
+	MODE_SYSINFO = 7,      // CXboxInfo (Y or the remote's INFO in the menu)
 	MODE_TEXTEDITOR = 8,
 	MODE_MUSIC = 9,
 };
@@ -56,10 +56,18 @@ public:
 };
 
 // The screen saver (text, video or slideshow). TODO: decompile
+// 0x90 bytes.
 class CScreenSaver
 {
 public:
+	CScreenSaver();                                       // 0x00139E2C
 	virtual ~CScreenSaver();
+	HRESULT Init(CXBFont *font);                          // 0x00139DA4 (this on the stack)
+	// The text to show, the video file or the picture folder (by
+	// <ScreenSaver Type>). (this on the stack)
+	void SetSource(const wchar_t *source);                // 0x00139EB2
+	void Start();                                         // 0x0013A17A (this in edi)
+	void Stop();                                          // 0x0013A26C (this in esi)
 	// (this in ecx, action in eax)
 	HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00139D04
 	HRESULT Render();                                     // 0x001398F7 (this in ecx)

@@ -52,7 +52,7 @@ public:
 	HRESULT LaunchDVD();                              // 0x000E99FD TODO: decompile
 	// The screen saver and the "any input" bookkeeping: starts the saver
 	// after the wait, stops it on input. (this in ebx)
-	void UpdateScreenSaver(int *action);              // 0x000EA56C TODO: decompile
+	void UpdateScreenSaver(int *action);              // 0x000EA56C
 	// The background: the globe/orb and the skin's 3D scene. TODO: decompile
 	void RenderBackground();                          // 0x000E0E0F
 	// The file operation progress/error over the menu (inlined in Render).

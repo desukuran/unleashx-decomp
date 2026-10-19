@@ -89,6 +89,10 @@ public:
 	BOOL IsRunning() const;                   // 0x000945E9
 	float GetElapsedSeconds();                // 0x000945BA
 	float GetElapsedMilliseconds();           // 0x0009468D
+	// The same with GetTickCount (milliseconds). (this in esi)
+	void StartTicks();                        // 0x0002B5C2
+	void StopTicks();                         // 0x0002B5DE
+	float GetElapsedTicks();                  // 0x0002B604
 
 	float m_fSecsPerTick;
 	BYTE m_state[0x1C];
