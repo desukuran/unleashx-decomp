@@ -1029,3 +1029,17 @@
 0007850e urarlib_freelist
 000c66fd CNetworkSetting::Save
 000c0107 CNetworkSetting::ShowAddresses
+# HDD settings page lock dialog (src/app/HddLockDialog.cpp)
+001196a6 CHddLockDialog::CHddLockDialog
+001196d6 CHddLockDialog::~CHddLockDialog
+001196eb CHddLockDialog::Init
+00119712 CHddLockDialog::ShowMessage
+00119824 CHddLockDialog::Show
+001198a4 CHddLockDialog::ProcessInput
+001196c3 CHddLockDialog::Render
+001196a2 CHddLockDialog::IsOpen
+0011969e CHddLockDialog::WasChanged
+00090d42 LockHdd
+00090ef8 UnlockHdd
+0009048b GetHddInfoText
+000c7eb2 CHDDSetting::Save

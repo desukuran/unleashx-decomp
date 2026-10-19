@@ -294,3 +294,32 @@ public:
 // text is reset to the default and message says why. (index in eax, text
 // in edi)
 BOOL ValidateSettingValue(int index, wchar_t *text, char *message);   // 0x000BEF1A
+
+// The HDD page's lock/unlock question. No vtable; 0x20 bytes. Most methods
+// take this in a register (noted).
+class CHddLockDialog
+{
+public:
+	CHddLockDialog();                                         // 0x001196A6 (this in eax)
+	~CHddLockDialog();                                        // 0x001196D6 (this in esi)
+	HRESULT Init(CXBFont *font);                              // 0x001196EB (this in esi, font in ecx)
+	// Asks to lock or unlock (or says it isn't supported). (this in eax)
+	void Show();                                              // 0x00119824
+	// Returns 1 when done, E_FAIL when the question was declined.
+	// (this in edx, action in eax, pad in ecx)
+	HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x001198A4
+	HRESULT Render();                                         // 0x001196C3 (this in eax)
+	BOOL IsOpen() { return m_bOpen; }                         // 0x001196A2
+	BOOL WasChanged() { return m_bChanged; }                  // 0x0011969E
+	// Creates the message box on first use. (this in edi)
+	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x00119712
+
+	CMessageBox *m_pMessageBox;     // +0x00
+	CXBFont *m_pFont;               // +0x04
+	CSound *m_pSoundSelect;         // +0x08 "Select"
+	BOOL m_bDone;                   // +0x0C
+	BOOL m_bChanged;                // +0x10 the lock was changed
+	BOOL m_bOpen;                   // +0x14
+	BOOL m_bUnlock;                 // +0x18 the disk is locked: offer to unlock
+	BOOL m_bMessageBoxOpen;         // +0x1C
+};
