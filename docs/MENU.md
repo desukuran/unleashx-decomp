@@ -99,3 +99,70 @@ Scan results are kept in a cache, `items.xml` in UnleashX's folder:
 Launched XBEs are remembered in `recent.dat` (in the data folder): 10
 entries of name, path, launch count and region, most recent first. Items on
 `D:` aren't added.
+
+## Controls
+
+| Button | |
+|---|---|
+| A | Run the item / open the list. |
+| B, BACK, remote LEFT | Back to the parent list. |
+| D-pad up/down, triggers, left stick (fully up/down) | Move the selection; labels are skipped. With wrapping on, the ends wrap around. |
+| D-pad left/right | Move the selection in horizontal menus. |
+| START | The item's context menu (below). |
+| X | The recent list (if `AllowRecentList`). |
+| Remote 0-9 | Shortcuts: `<Settings><Shortcut><IR_1>...</IR_1>` in Config.xml, an XBE path or an action without spaces. |
+| BACK during a file operation | Cancels it. |
+
+With previews on, the selected item's `Preview` starts after the selection
+has rested for half a second.
+
+## Context menu
+
+START opens a menu for the selected item:
+
+| Entry | Available when |
+|---|---|
+| Select/Play | always |
+| Launch in NTSC mode | an XBE with region 0, 4 or 7 (launches with region 1 and AutoVideoMode) |
+| Launch in PAL mode | an XBE with region 0, 1-3 or 7 (launches with region 4) |
+| Information... | always: type, command or the XBE's title, ID, region, folder size; icon, preview, protection |
+| Backup to Harddisk... | running from DVD, on a game |
+| Delete Game... | `AllowUninstall`, not from DVD, on a game: deletes the XBE's folder after a Yes |
+| Refresh List... | always: rescans the game folders |
+| Recent Titles... | `AllowRecentList`, not from DVD |
+| Edit Item... | `AllowItemEdit`, not from DVD, not on a label |
+| Open Containing Folder | `LinkToGame`, on an XBE: the file manager at the XBE's folder |
+| Open Saves Folder | `LinkToSave`, on an XBE: the file manager at `E:\UDATA\<title id>` |
+
+Quirk: the NTSC/PAL entries change the item's `Region` for the rest of the
+session.
+
+## Passwords
+
+`Password` items open the keyboard (masked, up to 50 characters);
+`Passcode` items open the button pad. A wrong entry shows "The password
+(passcode) you entered is incorrect!" and asks again. When the dashboard
+asks for its own master password, `MicrosoftXBOX` is accepted.
+
+## Menu-level actions
+
+These actions are handled by the menu itself, not by the dispatcher in
+MENU_ACTIONS.md:
+
+| Action | |
+|---|---|
+| `AskUser` | A Yes/No box: caption from `Arg1` or `Caption`, text from the element, `Text` or `Arg2` (`\n` makes a new line). In a batch, anything but Yes/OK skips the rest of the current sub-list. |
+| `MessageBox` | An OK box, the same way (without `Arg2`). |
+| `InputBox` | The keyboard: title from `Arg1`/`Caption`, starting text from the element, `Text` or `Arg2`. The typed text is `$KBResult$` for the next items. |
+
+After a `Format` or `rename` outside a batch the menu reports "Finished
+formatting Drive ..."/"Failed to format Drive ..." or "... successfully
+renamed to ..."/"Failed to rename ... to ...".
+
+## Batches
+
+`<List Batch="true">` runs its items in order, one per frame, waiting for
+each file operation to finish. Nested lists run their items in turn. A
+locked item asks for its password first. If an item fails, the batch stops
+with "Batch process failed. The last item was: ...". BACK cancels the
+running operation and the batch.
