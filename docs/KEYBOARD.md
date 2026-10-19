@@ -71,6 +71,6 @@ Other controls:
 * START (or the remote's SELECT) accepts, and BACK cancels.
 
 At most 16 presses are taken, and they show as stars. The stored code is
-upper-cased and cut to 15 characters, so a longer code can never be
-entered. The pad also accepts the entry's MD5, but the cut makes that
+upper-cased and cut to 15 characters, so a longer code only needs its
+first 15 letters. The pad also accepts the entry's MD5, but the cut makes that
 match impossible.
