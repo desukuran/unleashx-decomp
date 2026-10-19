@@ -50,3 +50,27 @@ SHIFT and CAPS LOCK are greyed out on the symbols layout.
 
 Text stops being accepted at `m_nMaxLength` characters (64 by default),
 or when the text field is full.
+
+# Passcode pad
+
+`CPassCode` (`src/ui/PassCode.cpp`) is used when a passcode replaces the
+password: at startup (`<Password UsePasscode>`) and for locked menu items.
+The code is a sequence of button presses, each stored as a letter:
+
+| Button | Letter |
+|---|---|
+| A, B, X, Y, WHITE | A, B, X, Y, W |
+| D-pad / remote arrows | U, D, L, R |
+| Remote 0–9 | 0–9 |
+
+Other controls:
+
+* BLACK deletes the letter before the cursor; at the very start it deletes
+  the first letter instead.
+* The triggers move the cursor.
+* START (or the remote's SELECT) accepts, and BACK cancels.
+
+At most 16 presses are taken, and they show as stars. The stored code is
+upper-cased and cut to 15 characters, so a longer code can never be
+entered. The pad also accepts the entry's MD5, but the cut makes that
+match impossible.
