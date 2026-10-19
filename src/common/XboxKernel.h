@@ -7,7 +7,6 @@
 
 #ifndef _XBOX
 typedef unsigned short USHORT;
-typedef unsigned long ULONG;
 typedef char *PCHAR;
 typedef HANDLE *PHANDLE;
 typedef ULONG *PULONG;
@@ -150,7 +149,9 @@ typedef struct _ATA_PASS_THROUGH
 #define IOCTL_IDE_PASS_THROUGH 0x0004D028
 
 #ifndef _XBOX
+#ifndef GENERIC_READ
 #define GENERIC_READ 0x80000000
+#endif
 #define SYNCHRONIZE 0x00100000
 #define FILE_SHARE_READ 0x00000001
 #define FILE_SHARE_WRITE 0x00000002

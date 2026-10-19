@@ -26,3 +26,8 @@ void ReleaseTexture(IDirect3DTexture8 *&texture);   // inlined everywhere in the
 
 // Width of the current render target in pixels.
 float GetScreenWidth(int unused);                                   // 0x0009F14B TODO: decompile
+
+// The title image ($$XTIMAGE section) of an XBE: an XPR texture or a DDS.
+BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture);  // 0x0009FAAF TODO: decompile
+// The first texture of an .xpr file, copied with black as the color key.
+BOOL LoadXprFileTexture(const char *path, IDirect3DTexture8 **texture);   // 0x000A2371 TODO: decompile

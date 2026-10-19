@@ -333,7 +333,7 @@
 000aa903 GetDiscType
 000aa909 IsDiscPresent
 000aa91e GetDiscTitleIfPresent
-0009d6a3 GetDiskSpace void __cdecl f(char drive, ULONGLONG *total, ULONGLONG *free, ULONGLONG *used, int unit)
+0009d6a3 GetDiskSpace void __cdecl f(char drive, ulonglong *total, ulonglong *free, ulonglong *used, int unit)
 000a956b FormatDrive HRESULT __cdecl f(char drive)
 0009de6c GetUtilityDriveDevice
 000315a5 InitMemoryUnitTable
@@ -562,3 +562,24 @@
 001294e2 CFileManager::Init
 00128c01 CFileManager::OpenPath
 000ee514 CUnleashX::CMenuEvent::OnItemSelected
+# menu items (src/ui/MenuItem.cpp)
+000220c2 CMenuItem::CMenuItem
+00022183 CMenuItem::~CMenuItem
+000226d5 CMenuItem::`scalar_deleting_destructor'
+0002220d CMenuItem::LoadIcon
+000221fa CMenuItem::IsLabel
+0027794c s_iconCache
+0009faaf LoadXbeIcon
+000a2371 LoadXprFileTexture
+0009f909 LoadXprTexture
+00110f47 CMenu::LoadList
+00110772 CMenu::AddItem
+001100f6 CMenu::FindItemIcon
+00022647 CMenu::UpdateSoundVolume
+0015423f D3DXCreateTextureFromFileExA
+00153af7 D3DXCreateTexture
+00153c27 D3DXLoadSurfaceFromSurface
+00153ea3 D3DXCreateTextureFromFileInMemoryEx
+00034f0f CreateFileA
+0003539b ReadFile
+000355e2 SetFilePointer

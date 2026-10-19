@@ -15,6 +15,8 @@ typedef int BOOL;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef uint32_t DWORD;
+typedef uint32_t ULONG;
+typedef unsigned int UINT;
 typedef uint64_t ULONGLONG;
 typedef int32_t LONG;
 typedef int32_t HRESULT;
@@ -120,6 +122,16 @@ DWORD GetTickCount();
 BOOL DeleteFileA(LPCSTR fileName);
 BOOL CopyFileA(LPCSTR existingFileName, LPCSTR newFileName, BOOL failIfExists);
 BOOL MoveFileA(LPCSTR existingFileName, LPCSTR newFileName);
+#ifndef GENERIC_READ
+#define GENERIC_READ 0x80000000
+#endif
+#define GENERIC_WRITE 0x40000000
+#define OPEN_EXISTING 3
+#define FILE_BEGIN 0
+HANDLE CreateFileA(LPCSTR fileName, DWORD access, DWORD shareMode, void *security, DWORD creationDisposition,
+                   DWORD flags, HANDLE templateFile);
+BOOL ReadFile(HANDLE file, void *buffer, DWORD size, DWORD *read, void *overlapped);
+DWORD SetFilePointer(HANDLE file, LONG distance, LONG *distanceHigh, DWORD moveMethod);
 void _endthreadex(unsigned int code);
 DWORD XGetLaunchInfo(DWORD *launchDataType, PLAUNCH_DATA launchData);
 DWORD XGetVideoFlags();
