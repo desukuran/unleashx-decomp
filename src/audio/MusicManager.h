@@ -40,6 +40,8 @@ public:
 	// Called by the main loop. TODO: decompile
 	HRESULT Play();                     // 0x001083B0 (this in edi) start/resume
 	HRESULT Pause();                    // 0x0010602C (this in esi) 1 if not playing
+	// Plays again if paused (not stopped). (this in eax) TODO: decompile
+	HRESULT Resume();                   // 0x00108E69
 	HRESULT PlayAudioCD();              // 0x001084E7 (this in eax)
 	HRESULT Update();                   // 0x0010896C (this in eax) next song when one ends
 	// The music keys (play/pause, stop, skip...) in the menu. (this in ecx,

@@ -1248,3 +1248,16 @@
 00139eb2 CScreenSaver::SetSource
 0013a17a CScreenSaver::Start void f(CScreenSaver *this@edi)
 0013a26c CScreenSaver::Stop void f(CScreenSaver *this@esi)
+00139d64 CScreenSaver::~CScreenSaver void f(CScreenSaver *this@edi)
+00139ce3 CScreenSaver::CloseMedia void f(CScreenSaver *this@eax)
+0002b806 CScreenSaver::IsTextOnly BOOL f(CScreenSaver *this@eax)
+000f4e50 CSlideShow::Stop void f(CSlideShow *this@esi)
+000f4dd5 CSlideShow::SetDelay void f(DWORD seconds@eax, CSlideShow *this)
+000f4dd1 CSlideShow::SetUnknown70 void f(CSlideShow *this@eax, BOOL value@ecx)
+0009c224 CWMVideoPlayer::Close void f(CWMVideoPlayer *this@edi)
+0002653e CWMVideoPlayer::IsValid BOOL f(CWMVideoPlayer *this@eax)
+0009d050 CWMVideoPlayer::Reopen
+00108e69 CMusicManager::Resume HRESULT f(CMusicManager *this@eax)
+0027a364 s_fTextX
+0027a360 s_fTextY
+00278d10 s_nTextFade

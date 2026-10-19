@@ -20,6 +20,13 @@ public:
 	BOOL HasAudio();                                      // 0x0009BF69 TODO: decompile (this in eax)
 	void SetRect(int top, int left, int width, int height);   // 0x0009BB70 TODO: decompile
 	BOOL Open(const char *fileName);                      // 0x0009CE46 TODO: decompile
+	// Stops and closes the file. (this in edi) TODO: decompile
+	void Close();                                         // 0x0009C224
+	// FALSE when the file didn't open. TODO: verify (+0x6C, +0xE8)
+	// (this in eax)
+	BOOL IsValid();                                       // 0x0002653E
+	// Opens the file again (this on the stack). TODO: decompile
+	BOOL Reopen(const char *fileName);                    // 0x0009D050
 	void Unknown9C1F3(BOOL value);                        // 0x0009C1F3 TODO: decompile (this in esi, value in cl)
 
 	BYTE m_reserved04[0x9C];

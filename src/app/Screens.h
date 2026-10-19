@@ -55,24 +55,73 @@ public:
 	virtual void Show();                                  // 0x00133A5D
 };
 
-// The screen saver (text, video or slideshow). TODO: decompile
-// 0x90 bytes.
+// A slideshow of a picture folder (or a single picture). 0xD0 bytes.
+// TODO: decompile
+class CSlideShow : public CAppFrame
+{
+public:
+	explicit CSlideShow(const char *path);               // 0x000F5C9D (this in ebx)
+	virtual ~CSlideShow();                                // 0x000F5602
+	virtual BOOL IsOpen();                                // 0x00029095 (+0xC4)
+	virtual BOOL Render();                                // 0x000F4F6C
+	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x000F56B7
+	// Starts over (restarts the picture timers).
+	virtual void Show();                                  // 0x000F4DF1
+	// Ends the loader thread. (this in esi)
+	void Stop();                                          // 0x000F4E50
+	// Seconds per picture (milliseconds over 1000 are converted; 2 or
+	// less is ignored). (seconds in eax)
+	void SetDelay(DWORD seconds);                         // 0x000F4DD5
+	// TODO: what +0x70 means. (this in eax, value in ecx)
+	void SetUnknown70(BOOL value);                        // 0x000F4DD1
+};
+
+class CWMVideoPlayer;
+
+// The screen saver: bouncing text, a video, or a slideshow (by what the
+// source is). 0x90 bytes, no vtable.
 class CScreenSaver
 {
 public:
-	CScreenSaver();                                       // 0x00139E2C
-	virtual ~CScreenSaver();
-	HRESULT Init(CXBFont *font);                          // 0x00139DA4 (this on the stack)
-	// The text to show, the video file or the picture folder (by
-	// <ScreenSaver Type>). (this on the stack)
+	CScreenSaver();                                       // 0x00139E2C (this in edi)
+	~CScreenSaver();                                      // 0x00139D64 (this in edi)
+	// font NULL: "MainFont". (this on the stack)
+	HRESULT Init(CXBFont *font);                          // 0x00139DA4
+	// The text to show, a video file (.wmv/.xmv), a picture or a picture
+	// folder. (this on the stack)
 	void SetSource(const wchar_t *source);                // 0x00139EB2
 	void Start();                                         // 0x0013A17A (this in edi)
 	void Stop();                                          // 0x0013A26C (this in esi)
+	// Any action ends it; otherwise the video or slideshow gets the input.
 	// (this in ecx, action in eax)
 	HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00139D04
 	HRESULT Render();                                     // 0x001398F7 (this in ecx)
 	// Neither the video nor the slideshow runs (only the text). (this in eax)
-	BOOL IsTextOnly() const;                              // 0x0002B806
+	BOOL IsTextOnly() const { return !m_bVideo && !m_bSlideShow; }   // 0x0002B806
+
+private:
+	void CloseMedia();                                    // 0x00139CE3 (this in eax)
+
+	BOOL m_bActive;                    // +0x00
+	BOOL m_bDimmed;                    // +0x04 the screen is fully dimmed
+	BOOL m_bInitialized;               // +0x08
+	float m_fFontScaleX;               // +0x0C the font's own scale, restored after drawing
+	float m_fFontScaleY;               // +0x10
+	BOOL m_bSounds;                    // +0x14 the bounce sound plays
+	float m_fNextMove;                 // +0x18 milliseconds
+	std::wstring m_strText;            // +0x1C the source
+	CXBFont *m_pFont;                  // +0x38
+	BYTE m_reserved3C[4];              // +0x3C
+	CXBStopWatch m_timer;              // +0x40 since Start
+	CSound *m_pBounceSound;            // +0x60 "Scroll"
+	CSlideShow *m_pSlideShow;          // +0x64
+	std::vector<int> m_unused68;       // +0x68
+	BOOL m_bSlideShow;                 // +0x78
+	CWMVideoPlayer *m_pVideo;          // +0x7C
+	BOOL m_bVideo;                     // +0x80
+	BOOL m_bMusicWasPlaying;           // +0x84
+	CAppSettings *m_pSettings;         // +0x88
+	BYTE m_reserved8C[4];              // +0x8C
 };
 
 class CFileManager
