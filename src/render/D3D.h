@@ -162,6 +162,12 @@ struct IDirect3DTexture8
 	HRESULT LockRect(UINT level, D3DLOCKED_RECT *locked, const void *rect, DWORD flags);
 };
 
+struct IDirect3DVertexBuffer8
+{
+	ULONG Release();
+	HRESULT Lock(UINT offset, UINT size, BYTE **data, DWORD flags);
+};
+
 struct D3DVIEWPORT8
 {
 	DWORD X;
@@ -209,6 +215,7 @@ struct IDirect3DDevice8
 	HRESULT CreateTexture(UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, DWORD pool,
 	                      IDirect3DTexture8 **texture);
 	HRESULT SetTexture(DWORD stage, IDirect3DTexture8 *texture);
+	HRESULT CreateVertexBuffer(UINT length, DWORD usage, DWORD fvf, DWORD pool, IDirect3DVertexBuffer8 **buffer);
 	HRESULT SetTextureStageState(DWORD stage, D3DTEXTURESTAGESTATETYPE type, DWORD value);
 	HRESULT SetRenderState(D3DRENDERSTATETYPE state, DWORD value);
 	HRESULT SetVertexShader(DWORD handle);
@@ -243,6 +250,10 @@ HRESULT D3DXCreateTextureFromFileA(IDirect3DDevice8 *device, const char *file,
 float *D3DXMatrixLookAtLH(float *out, const float *eye, const float *at, const float *up);   // 0x0003E5F3
 float *D3DXMatrixPerspectiveFovLH(float *out, float fovY, float aspect, float zNear, float zFar);   // 0x0003E6DE
 float *D3DXMatrixRotationYawPitchRoll(float *out, float yaw, float pitch, float roll);         // 0x0003E5BA
+float *D3DXMatrixMultiply(float *out, const float *a, const float *b);                      // 0x0003E25B
+// v (x, y, z, 1) times m, into a 4-vector.
+float *D3DXVec3Transform(float *out, const float *v, const float *m);                       // 0x0003E19C
+float D3DXVec4Length(const float *v);                                                       // 0x0002A76A
 // XDK sample framework: where the XBUtil loaders look for media ("D:\\Media\\").
 extern char g_strMediaPath[];                                                              // 0x0026BC78
 void XBUtil_SetMediaPath(const char *path);   // 0x000930A7 (path in eax)

@@ -64,7 +64,7 @@ CUnleashX::CUnleashX()
 	m_unknown878 = 0.2f;
 	m_menuEvent.m_pApp = this;
 	m_skinEvent.m_pApp = this;
-	m_pTexture9E4 = NULL;
+	m_pOrbVB = NULL;
 	m_pCellWall = NULL;
 	m_pEarthEnvMap = NULL;
 	m_pOrb = NULL;
@@ -211,7 +211,11 @@ HRESULT CUnleashX::Cleanup()
 	delete m_pClockEditor;
 	m_pClockEditor = NULL;
 	ReleaseTexture(m_pTexture9D8);
-	ReleaseTexture(m_pTexture9E4);
+	if (m_pOrbVB != NULL)
+	{
+		m_pOrbVB->Release();
+		m_pOrbVB = NULL;
+	}
 	delete m_pFileManager;
 	m_pFileManager = NULL;
 	delete m_pGameManager;

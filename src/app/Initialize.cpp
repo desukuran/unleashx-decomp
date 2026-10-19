@@ -488,7 +488,7 @@ HRESULT CUnleashX::Initialize()
 		}
 	}
 	m_bStartMusic = g_pDirectSound != NULL;
-	CreateGlobeBuffer();
+	CreateOrbBuffer();
 	InitOrb();
 
 	// The skin. skincheck.dat is there while one loads: if it's still there

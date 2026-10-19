@@ -36,9 +36,11 @@ public:
 	// Starts or stops the background sound (only in the menu, without
 	// soundtrack music or a preview with sound).
 	void PlayBackgroundSound(BOOL play);              // 0x000E045B
-	void InitOrb();                                   // 0x000E0662 TODO: decompile
-	// The globe's vertex buffer. (this in esi)
-	HRESULT CreateGlobeBuffer();                      // 0x000E0411 TODO: decompile
+	// Fills the orb's vertex buffer: a sphere with an environment map
+	// for the current view. (this in eax)
+	void InitOrb();                                   // 0x000E0662
+	// The orb's vertex buffer. (this in esi)
+	HRESULT CreateOrbBuffer();                        // 0x000E0411
 	// Fills m_globePath (a slow sway). (this in ecx)
 	void BuildGlobePath();                            // 0x000DFF17 TODO: decompile
 	// The startup splash (or the previous program's screen) at alpha, full
@@ -122,8 +124,9 @@ public:
 	int m_unknown9D4;                         // +0x9D4
 	IDirect3DTexture8 *m_pTexture9D8;         // +0x9D8
 	BYTE m_unknown9DC[0x8];                   // +0x9DC
-	IDirect3DTexture8 *m_pTexture9E4;         // +0x9E4
-	BYTE m_unknown9E8[0x8];                   // +0x9E8
+	IDirect3DVertexBuffer8 *m_pOrbVB;         // +0x9E4 the orb: 15 rings of 31 vertex pairs
+	UINT m_nOrbVertices;                      // +0x9E8 930
+	int m_unknown9EC;                         // +0x9EC
 	CMenu m_menu;                             // +0x9F0
 	CGameManager *m_pGameManager;             // +0x1938
 	CFileManager *m_pFileManager;             // +0x193C

@@ -1211,7 +1211,7 @@
 0003e5ba D3DXMatrixRotationYawPitchRoll
 00092eef XBUtil_InitMaterial
 000dff17 CUnleashX::BuildGlobePath
-000e0411 CUnleashX::CreateGlobeBuffer
+000e0411 CUnleashX::CreateOrbBuffer
 00094645 CXBStopWatch::Resume void f(CXBStopWatch *this@esi)
 000dfd78 CVirtualKeyboard::Create
 0010302b CPassCode::CPassCode CPassCode * f(CPassCode *this@edi)
@@ -1312,3 +1312,9 @@
 001096d3 CMP3Player::CMP3Player
 0013062d CWAVPlayer::CWAVPlayer
 00130af7 CDDAPlayer::CDDAPlayer
+0003e25b D3DXMatrixMultiply
+0003e19c D3DXVec3Transform
+0002a76a D3DXVec4Length
+00279510 s_fOrbYaw
+00279514 s_fOrbPitch
+00279518 s_fOrbRoll
