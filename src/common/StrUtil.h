@@ -55,6 +55,9 @@ inline std::string StrToLower(const std::string &s)
 	return StrToLower(s.c_str());
 }
 
+// Not NULL and not "".                                          (0x0009DF0D)
+BOOL StrIsNotEmpty(const char *s);
+
 // "Yes", "True" or "1" (any case).                                (0x00021E1A)
 BOOL IsTrueString(const char *s);
 // "No", "False" or "0" (any case).                                (0x0001C918)

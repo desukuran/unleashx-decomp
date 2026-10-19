@@ -3,6 +3,7 @@
 // RETR/STOR/LIST run in the host tests.
 #include <cstring>
 
+#include "../src/common/FileUtil.h"
 #include "../src/common/XboxKernel.h"
 #include "../src/system/FileIO.h"
 
@@ -42,6 +43,8 @@ public:
 	}
 	BOOL OpenWrite(const char *path, DWORD bufferSize, DWORD, DWORD, DWORD creationDisposition)
 	{
+		// Like CFileHDD: the folders on the way are created.
+		CreateDirectoryTree(GetPathDirectory(path).c_str());
 		m_file = CreateFileA(path, GENERIC_READ | GENERIC_WRITE, 0, NULL, creationDisposition, 0, NULL);
 		if (m_file == INVALID_HANDLE_VALUE)
 		{

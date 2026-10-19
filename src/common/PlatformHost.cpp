@@ -428,6 +428,11 @@ int _mbsicmp(const char *a, const char *b)
 	return strcasecmp(a, b);
 }
 
+LONGLONG _atoi64(const char *s)
+{
+	return strtoll(s, NULL, 10);
+}
+
 int _stricmp(const char *a, const char *b)
 {
 	return strcasecmp(a, b);

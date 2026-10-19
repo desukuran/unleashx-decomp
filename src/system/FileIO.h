@@ -3,7 +3,7 @@
 //   hard disk, memory units...  CFileHDD / CDirHDD          (FileHDD.cpp)
 //   D: with a data disc          CFileISO9660 / CDirISO9660  (FileISO9660.cpp, XBMC's iso9660)
 //   P: to S: (USB drives)        CFileFAT32 / CDirFAT32      (FileFAT32.cpp, the FAT32 driver)
-//   FTP sites (file manager)     CDirFTP                     (FTP client, TODO: decompile)
+//   FTP sites (file manager)     CDirFTP                     (src/net/FtpClient.cpp)
 // The directory objects carry the Win32 file calls (find, copy with
 // progress, move, delete) so that the file manager and the file operations
 // work the same on every drive.

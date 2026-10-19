@@ -11,6 +11,7 @@
 #include "../src/audio/MusicManager.h"
 #include "../src/net/Newsfeed.h"
 #include "../src/common/StrUtil.h"
+#include "../src/net/FtpClient.h"
 #include <cstring>
 #include <cwchar>
 
@@ -53,9 +54,12 @@ std::string CNewsfeed::GetUrl(int) { return std::string(); }
 std::string CNewsfeed::GetContent(const char *) { return std::string(); }
 
 // FileOps.h
-BOOL g_bFileOperationQueued = FALSE;
 void ZipFiles(const char *source, const char *zipFile, int) { printf("[stub] ZipFiles(%s, %s)\n", source, zipFile); }
 
 // Drives.h
 void RefreshMemoryUnits() {}
 void UpdateDriveSpace(SDriveInfo *) {}
+
+// FtpClient.h (the FTP log window is part of the file manager)
+void CFTPLog::Add(const char *text, int type) { printf("[ftp %d] %s\n", type, text); }
+CFTPLog::~CFTPLog() {}

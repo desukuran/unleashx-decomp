@@ -154,6 +154,7 @@ LONG __stdcall NtFreeVirtualMemory(void **baseAddress, DWORD *regionSize, DWORD 
 int _mbsicmp(const char *a, const char *b);
 int _stricmp(const char *a, const char *b);
 char *_strdup(const char *s);
+LONGLONG _atoi64(const char *s);
 
 struct EXCEPTION_RECORD
 {

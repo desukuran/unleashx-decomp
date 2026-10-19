@@ -279,6 +279,12 @@ BOOL IsTrueString(const char *s)
 	       AsciiCompareNoCase("1", s) == 0;
 }
 
+// 0x0009DF0D (s in eax)
+BOOL StrIsNotEmpty(const char *s)
+{
+	return s != NULL && strlen(s) != 0;
+}
+
 // 0x0001C918
 BOOL IsFalseString(const char *s)
 {

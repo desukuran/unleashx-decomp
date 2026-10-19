@@ -186,3 +186,76 @@ Behaviour the original has, kept in the decompiled code:
   resumes a partly uploaded file.
 * `SITE MAKE_FILE_TREE` only converts FTP paths whose first `/` is the
   second character, and uses an unmounted X: or Y: as is.
+
+# The FTP client
+
+The file manager can also browse other FTP servers. Each site pane talks to
+its server through `CDirFTP` (`src/net/FtpClient.cpp`), the FTP version of
+the virtual file layer's `CDirectory`, and logs every command and reply to
+the FTP log window. `tests/ftpclient_test.cpp` runs it against the server
+above.
+
+## Session
+
+* **Connecting:** the client connects with 30/60 second receive/send timeouts
+  (15/20 once connected) and waits for `220`. It logs in with `USER` and
+  `PASS`.
+  * An empty user name logs in as `Anonymous` with the password
+    `UnleashX@TheBestDash.com`.
+  * A `230-` banner is read up to the final `230 `.
+* **After login:**
+  * `SYST` is sent. A reply containing `UnleashX` or `/ UX ` marks an
+    UnleashX server.
+  * `REST 100` is sent, and on `350` reset with `REST 0`. This only records
+    that resuming works; nothing resumes.
+* **Directories:** `CWD`, then `PWD` for the new current directory, which
+  always ends in `/`. A name without `/` is taken relative to the current
+  directory, and `CDUP` goes up.
+* **Data connections:** passive (`PASV`) first. The first time a server
+  refuses `PASV`, the client switches to active mode (`PORT`) for the rest
+  of the session. Active mode listens on the next port of
+  `<FTPClient><MinPort>`..`<MaxPort>` and waits 15 seconds for the server.
+* **Listings:** `LIST` in ASCII mode, once per directory, parsed with
+  ftpparse. `.` and `..` are skipped.
+* **Transfers:** in binary mode, with the same progress box as the local
+  file operations.
+  * **Downloads:** `SIZE` gives the total. Names FATX can't hold are renamed,
+    and both names are logged. An empty file is created without `RETR`.
+  * **Uploads:** `STOR`.
+* **Disconnecting:** `QUIT`.
+
+## Folders
+
+* **Download:** a source ending in `/` downloads the whole tree: the files of
+  each folder first, then its subfolders.
+* **Upload:** a folder upload lists the local tree first. On an UnleashX
+  server it then asks `SITE FREESPACE` and stops with "Not enough free space
+  on target host." when the tree doesn't fit.
+  * UnleashX servers create folders as files arrive.
+  * For other servers, a folder gets `MKD` unless its parent's listing
+    already has it.
+  * A file that fails is logged and the upload goes on.
+* **Delete:** deleting a folder `DELE`s every file in the tree, then `RMD`s
+  the folders deepest first. It reports "Deleted n Folders and n Files in
+  mm:ss."
+* **Rename:** `RNFR` and `RNTO`.
+
+The client also has a boost-mode upload, the client side of the server's
+`SITE BOOST START UPLOAD`. If boost mode fails before any file was sent, the
+client logs "Boost mode failed. Transfering in Normal mode." and falls back
+to a normal upload. Nothing ever turns boost mode on, though, so the release
+never uses it.
+
+## Client quirks
+
+* A refused `CWD` (`550`) still counts as success, staying in the directory
+  `PWD` reports.
+* A reply is read a byte at a time. If the server closes the connection
+  mid-reply, the client waits forever.
+* An upload whose local file can't be opened waits for the reply to a
+  `STOR` it never sent (20 seconds).
+* An empty downloaded file is "closed" with the wrong call, so its handle
+  stays open.
+* Cancelling the deletion of a folder tree logs "Upload Operation Canceled."
+* The boost upload connects to the address of the last `PASV` reply, and
+  skips empty files.
