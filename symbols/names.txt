@@ -2373,3 +2373,79 @@
 0002497f std::basic_ios<char>::setstate
 # (0x2494A: the tied-stream flush in _Ipfx, by its shape. TODO: verify)
 0002494a std::basic_ostream<char>::flush
+# atexit destructors of the globals (registered by the static initializers at 0x0013F7xx)
+0013fb2e dynamic_atexit_destructor_for_g_playerTracks
+0013fb3b dynamic_atexit_destructor_for_g_ftpLog
+0013fb45 dynamic_atexit_destructor_for_g_ftpQueue
+0013fb52 empty_atexit_stub
+0013fb53 dynamic_atexit_destructor_for_s_textCache
+0013fb60 dynamic_atexit_destructor_for_g_unlockedItems
+0013fb6d dynamic_atexit_destructor_for_s_iconCache
+0013fb89 dynamic_atexit_destructor_for_g_skin
+0013fb96 dynamic_atexit_destructor_for_g_stringCacheA
+0013fba3 dynamic_atexit_destructor_for_g_stringCacheW
+0013fbb0 dynamic_atexit_destructor_for_g_strUpdateMessage
+0013fbbf dynamic_atexit_destructor_for_g_strFtpLaunchPath
+0013fbce dynamic_atexit_destructor_for_g_config
+0013fbd8 dynamic_atexit_destructor_for_g_defaultMenu
+0013fbe2 dynamic_atexit_destructor_for_g_ftpEventReceiver
+0013fbed dynamic_atexit_destructor_for_g_virtualKeyboard
+0013fbfa empty_atexit_stub_2
+0013fbfb dynamic_atexit_destructor_for_g_strUpdateMD5
+0013fc0a dynamic_atexit_destructor_for_g_soundEffects
+0013fc14 dynamic_atexit_destructor_for_g_fonts
+0013fc1f dynamic_atexit_destructor_for_g_textures
+0013fc50 dynamic_atexit_destructor_for_g_trayMonitor
+0013fc69 dynamic_atexit_destructor_for_g_netClients
+0013fc76 dynamic_atexit_destructor_for_g_colorScheme
+0013fc83 dynamic_atexit_destructor_for_g_cdToc
+0013fc8d dynamic_atexit_destructor_for_00278738
+0013fc9a dynamic_atexit_destructor_for_002788E0
+0013fca4 dynamic_atexit_destructor_for_g_fileList
+0013fcb1 dynamic_atexit_destructor_for_g_strOperationVerb
+0013fcc0 dynamic_atexit_destructor_for_g_strOperationLog
+0013fccf dynamic_atexit_destructor_for_g_strOperationSource
+0013fcde dynamic_atexit_destructor_for_g_strOperationDest
+0013fced dynamic_atexit_destructor_for_00278900
+0013fd04 std::dynamic_atexit_destructor_for_locale_00270B40
+0013fd0e std::dynamic_atexit_destructor_for_Init_locks_00270BD0
+0013fd22 std::dynamic_atexit_destructor_for_Init_locks_00270C78
+# XBMC's CIoSupport (the old Mount/Unmount/Remount API)
+000b3339 CIoSupport::Mount
+000b32e2 CIoSupport::Unmount
+000b35ee CIoSupport::Remount
+000b36ea CIoSupport::OpenCDROM
+000b31d5 CIoSupport::ReadSector
+000b30f7 CIoSupport::ReadSectorCDDA
+# DVD drive (Dvd.cpp; TODO: decompile)
+000ab930 RemountDvdDrive
+# the disc polling: tray state, disc type, the data disc's iso9660 reader. TODO: verify the name
+000ab9d8 PollDvdDrive
+# small UnleashX helpers
+0009f58d WriteXbePatchBytes
+# (reads the bytes at the patch's offset and compares them) TODO: verify
+0009f62a CheckXbePatchBytes
+000d7072 CDropDown::IsCurrentSelectable
+# (TRUE for an option with no text or the flag at +0x30 clear) TODO: verify
+000ade61 COptionMenu::IsOptionBlank
+000f997b CSkin::GetLoadingPreview
+000f9991 CSkin::GetLoadingBackgroundName
+001279fc CFileBrowser::CFileBrowser
+# empty functions (a single ret) called from these places
+0006f5dd empty_stub_CDirectSound_Write
+0009f0c9 empty_stub_LoadTextureFromFile
+000d87e1 empty_stub_CWMAPlayer_Process
+000dbc3d empty_stub_CVirtualKeyboard_ProcessInput
+# MS dashboard path helpers (AudioPump.cpp's code; only reached from the unused CWMAPump)
+0007f367 DashStrCopyN
+0007f357 DashStrCopyN_thunk
+0007f3b6 SCdToc::Reset
+0007f3bb SCdToc::Reset_thunk
+0007f3c0 SCdToc::Init
+0007f66f DashJoinPath
+0007f6c0 DashFileExists
+0007f6f4 DashScanFolder
+0007f807 DashCountNumberedFiles
+0007f849 DashResolveRelativePath
+0007f946 DashUrlToPath
+0007fa38 DashResolveRelativePaths
