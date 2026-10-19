@@ -36,6 +36,10 @@ typedef const char *LPCSTR;
 #define E_FAIL ((HRESULT)0x80004005)
 #define E_INVALIDARG ((HRESULT)0x80070057)
 
+#ifndef MAX_PATH
+#define MAX_PATH 260
+#endif
+
 #define FILE_ATTRIBUTE_READONLY 0x00000001
 #define FILE_ATTRIBUTE_DIRECTORY 0x00000010
 #define FILE_ATTRIBUTE_NORMAL 0x00000080
@@ -122,6 +126,12 @@ HANDLE FindFirstFileA(LPCSTR pattern, WIN32_FIND_DATAA *data);
 BOOL FindNextFileA(HANDLE find, WIN32_FIND_DATAA *data);
 void *XLoadSection(LPCSTR name);
 BOOL XFreeSection(LPCSTR name);
+HANDLE XGetSectionHandle(LPCSTR name);
+DWORD XGetSectionSize(HANDLE section);
+// A save game folder (pathBuffer gets its path). Returns ERROR_SUCCESS (0).
+DWORD XCreateSaveGame(LPCSTR rootPath, const wchar_t *name, DWORD creationDisposition, DWORD createFlags,
+                      char *pathBuffer, UINT bufferSize);
+#define XCREATESAVEGAME_NOCOPY 1
 BOOL SetThreadPriority(HANDLE thread, int priority);
 uintptr_t _beginthreadex(void *security, unsigned stackSize, unsigned (__stdcall *start)(void *), void *arg,
                          unsigned flags, unsigned *threadId);

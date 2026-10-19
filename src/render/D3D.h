@@ -243,6 +243,9 @@ HRESULT D3DXCreateTextureFromFileA(IDirect3DDevice8 *device, const char *file,
 float *D3DXMatrixLookAtLH(float *out, const float *eye, const float *at, const float *up);   // 0x0003E5F3
 float *D3DXMatrixPerspectiveFovLH(float *out, float fovY, float aspect, float zNear, float zFar);   // 0x0003E6DE
 float *D3DXMatrixRotationYawPitchRoll(float *out, float yaw, float pitch, float roll);         // 0x0003E5BA
+// XDK sample framework: where the XBUtil loaders look for media ("D:\\Media\\").
+extern char g_strMediaPath[];                                                              // 0x0026BC78
+void XBUtil_SetMediaPath(const char *path);   // 0x000930A7 (path in eax)
 // XDK sample framework: diffuse and ambient set to the color. (material in edx)
 void XBUtil_InitMaterial(D3DMATERIAL8 *material, float r, float g, float b, float a);       // 0x00092EEF
 HRESULT D3DXCreateTextureFromFileExA(IDirect3DDevice8 *device, const char *file, UINT width, UINT height,

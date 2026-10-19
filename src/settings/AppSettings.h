@@ -250,7 +250,7 @@ public:
 	std::string m_strLaunchPath;             // +0x0C0C device path of this XBE
 	std::string m_strHomePath;               // +0x0C28 DOS dir of this XBE, lowercase, ends in '\'
 	std::string m_strXbeName;                // +0x0C44 file name of this XBE
-	std::string m_strDataPath;               // +0x0C60 TODO: verify (dir of recent.dat)
+	std::string m_strDataPath;               // +0x0C60 the media folder with "9e115330\" after the drive (LoadResources)
 	std::string m_strMSDashboard;            // +0x0C7C <MSDashBoard>
 	BOOL m_bRunFromDVD;                      // +0x0C98
 	BOOL m_bHomeNotOnD;                      // +0x0C9C our directory isn't what D: maps to. TODO: verify
@@ -259,7 +259,7 @@ public:
 	BOOL m_bNewsfeedContinuous;              // +0x0CA8
 	wchar_t m_szNewsfeedSeparator[5];        // +0x0CAC
 	BYTE m_unknown0CB6[0x514];               // +0x0CB6
-	CXBFont *m_pDialogFont;                  // +0x11CC the message box caption font; only ever read (NULL)
+	CXBFont *m_pDialogFont;                  // +0x11CC the message box font: CaptionFont (set by LoadResources)
 	IDirect3DTexture8 *m_pLoadingIcon;       // +0x11D0 loading screen image of the launched item
 	std::string m_strUnknown11D4;            // +0x11D4
 	BOOL m_bLoadingShowInfo;                 // +0x11F0 1, <LoadingScreen ShowInfo>

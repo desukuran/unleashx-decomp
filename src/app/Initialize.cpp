@@ -547,10 +547,11 @@ HRESULT CUnleashX::Initialize()
 			{
 				CFileFinder finder;
 				StrReplaceAll(skin, "\\skin.xml", "");
-				if (finder.FindFirst(skin.c_str(), "*.zip") != NULL)
+				const char *zip = finder.FindFirst(skin.c_str(), "*.zip");
+				if (zip != NULL)
 				{
 					skin.append("\\");
-					skin.append(finder.m_data.cFileName);
+					skin.append(zip);
 				}
 				else
 				{

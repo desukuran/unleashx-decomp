@@ -34,6 +34,8 @@ void GetDisplaySize(float *width, float *height, BOOL refresh);    // 0x0009F14B
 BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture);  // 0x0009FAAF TODO: decompile
 // Writes a surface as a .bmp file. TODO: decompile (library code?)
 HRESULT SaveSurfaceToBmp(IDirect3DSurface8 *surface, const char *path);   // 0x0016FD40
+// A texture from an .xpr file (the MS dashboard's .xbx files). TODO: decompile
+bool LoadXprTexture(const char *path, IDirect3DTexture8 **texture);   // 0x0009F909
 // The first texture of an .xpr file, copied with black as the color key.
 BOOL LoadXprFileTexture(const char *path, IDirect3DTexture8 **texture);   // 0x000A2371 TODO: decompile
 

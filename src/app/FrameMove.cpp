@@ -102,10 +102,10 @@ HRESULT CUnleashX::FrameMove()
 		// (Nothing in the code sets g_bMenuPending.)
 		if (g_bMenuPending)
 		{
-			IDirect3DTexture8 *texture = m_pTexture7F0 != NULL ? m_pTexture7F0 : m_pTexture7D4;
+			IDirect3DTexture8 *texture = m_pDashOrb != NULL ? m_pDashOrb : m_pOrb;
 			CXBFont *font = g_skin.m_pMenuFont != NULL ? g_skin.m_pMenuFont : &m_fonts[0];
 			m_menu.Create(&g_defaultMenu, font, &m_fonts[4], &m_menuEvent, !g_skin.m_bShowIcon,
-			              g_skin.m_nBorderWidth, texture, m_pTexture7DC);
+			              g_skin.m_nBorderWidth, texture, m_pEarthEnvMap);
 			action = INPUT_NONE;
 			InitOrb();
 			SetMode(MODE_MENU);

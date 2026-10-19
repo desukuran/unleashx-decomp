@@ -315,3 +315,28 @@ BOOL MakeFatxPath(const char *path, std::string &out)
 	return TRUE;
 }
 
+
+// 0x000A439A
+BOOL WriteBinaryFile(const char *path, const void *data, DWORD size)
+{
+	BOOL ok = FALSE;
+	if (size == 0 || data == NULL)
+		return FALSE;
+	std::string dir = path;
+	int slash = StrReverseFind(dir, "\\", -1);
+	if (slash != -1)
+	{
+		dir = StrLeft(dir, slash);
+		CreateDirectoryTree(dir.c_str());
+	}
+	SetFileAttributesA(path, FILE_ATTRIBUTE_NORMAL);
+	HANDLE file = CreateFileA(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (file != INVALID_HANDLE_VALUE)
+	{
+		DWORD written = 0;
+		if (WriteFile(file, data, size, &written, NULL) == TRUE)
+			ok = TRUE;
+		CloseHandle(file);
+	}
+	return ok;
+}

@@ -83,20 +83,20 @@ public:
 
 	CXBPackedResource m_resource;             // +0x220 UnleashX's own .xpr (icons)
 	CXBFontEx m_fonts[6];                     // +0x238 0xE4 each
-	CXBMesh m_mesh790;                        // +0x790 CXBMeshEx
+	CXBMesh m_crossHairMesh;                  // +0x790 CXBMeshEx, CrossHair.xbg
 	BYTE m_unknown7A8[0x8];                   // +0x7A8
 	CXBMesh m_mesh7B0;                        // +0x7B0 CXBMeshEx
 	BYTE m_unknown7C8[0x8];                   // +0x7C8
-	IDirect3DTexture8 *m_pTexture7D0;         // +0x7D0
-	IDirect3DTexture8 *m_pTexture7D4;         // +0x7D4
+	IDirect3DTexture8 *m_pCellWall;           // +0x7D0 "CellWall" in resource.xpr: the globe's sky
+	IDirect3DTexture8 *m_pOrb;                // +0x7D4 "Orb" in resource.xpr
 	IDirect3DTexture8 *m_pTexture7D8;         // +0x7D8
-	IDirect3DTexture8 *m_pTexture7DC;         // +0x7DC
+	IDirect3DTexture8 *m_pEarthEnvMap;        // +0x7DC "EarthEnvMap" in resource.xpr
 	IDirect3DTexture8 *m_pFileIcon;           // +0x7E0 File.png
 	IDirect3DTexture8 *m_pFolderIcon;         // +0x7E4 Folder.png
 	IDirect3DTexture8 *m_pDefaultLoadingIcon; // +0x7E8 when the skin has no loading image
-	IDirect3DTexture8 *m_pTexture7EC;         // +0x7EC
-	IDirect3DTexture8 *m_pTexture7F0;         // +0x7F0
-	int m_unknown7F4;                         // +0x7F4
+	IDirect3DTexture8 *m_pDashCellWall;       // +0x7EC the MS dashboard's cellwall.xbx
+	IDirect3DTexture8 *m_pDashOrb;            // +0x7F0 the MS dashboard's xbox4.xbx (used over Orb)
+	IDirect3DTexture8 *m_pDashLogo;           // +0x7F4 the MS dashboard's xboxlogo(w).xbx
 	CSound *m_pBackgroundSound;               // +0x7F8 looped in the menu
 	CClockEditor *m_pClockEditor;     // +0x7FC
 	CPassCode *m_pPassCode;                   // +0x800 asks for the passcode at startup
@@ -141,7 +141,7 @@ public:
 	BOOL m_bAutoLaunchDisc;                   // +0x196C start a disc when one is inserted
 	BOOL m_bStartMusic;                       // +0x1970 create the music manager (soundtracks)
 	BOOL m_bKeepAwake;                        // +0x1974 no screen saver this frame. TODO: verify
-	CXBMesh m_mesh1978;                       // +0x1978
+	CXBMesh m_outerSphereMesh;                // +0x1978 OuterSphere.xbg (textured with CellWall)
 	float m_globePath[0x200];                 // +0x1990 <Main Globe>: camera heights the globe sways through
 	int m_nGlobePos;                          // +0x2190 index in m_globePath
 	int m_nGlobeStep;                         // +0x2194 +1 or -1

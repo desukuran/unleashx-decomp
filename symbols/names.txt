@@ -1222,3 +1222,16 @@
 000bdc67 CXipArchive::GetItem HRESULT f(CXipArchive *this@edx, uint index, SXipItem *item)
 000bdac0 CXipArchive::Extract HRESULT f(CXipArchive *this@ecx, uint index, char *path)
 000bdbdb GetXipName char * f(char *names@eax, int index)
+000134c3 CFileFinder::FindNext
+0001352d CFileFinder::Close void f(CFileFinder *this@eax)
+000a439a WriteBinaryFile
+000930a7 XBUtil_SetMediaPath void f(char *path@eax)
+0026bc78 g_strMediaPath
+00137a8f CXBFontEx::CreateFromMemory
+00097f4b CXBMesh::Create
+00037198 XCreateSaveGame
+00038a3c XGetSectionHandle
+00038b18 XGetSectionSize
+000390b8 XMountUtilityDrive
+0009906e CXBFont::CXBFont CXBFont * f(CXBFont *this@edx)
+00099051 CXBFont::~CXBFont void f(CXBFont *this@eax)

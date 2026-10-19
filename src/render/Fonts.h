@@ -14,9 +14,10 @@
 class CXBFont
 {
 public:
-	CXBFont();                                                         // 0x000999xx (XDK sample)
-	virtual ~CXBFont();
+	CXBFont();                                                         // 0x0009906E (XDK sample; this in edx)
+	virtual ~CXBFont();                                                // 0x00099051 (this in eax)
 	HRESULT Create(const char *fileName, DWORD resourceOffset);       // 0x00099EC9 (XDK sample)
+	HRESULT Destroy();                                                 // 0x00098FFE (XDK sample; this in edi)
 	void SetScaleFactors(float scaleX, float scaleY);                  // 0x00098FEB (XDK sample)
 	// Brackets a group of DrawText calls (render states are set once).
 	HRESULT Begin();                                                   // 0x0009978B (XDK sample)
@@ -42,6 +43,9 @@ class CXBFontEx : public CXBFont
 {
 public:
 	CXBFontEx();                                                       // 0x00137887
+	// A bitmap font from an .xpr image in memory (an XBE section).
+	// (this on the stack, data in ecx) TODO: decompile
+	HRESULT CreateFromMemory(const void *data);                        // 0x00137A8F
 	HRESULT CreateFromTTF(const wchar_t *fileName, int unknown, int size, int flags);  // 0x00137841 TODO: decompile
 
 	BYTE m_reservedEx[0x40];                                           // size 0xE4

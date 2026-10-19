@@ -119,6 +119,9 @@ class CXBMesh
 {
 public:
 	CXBMesh();                                // 0x00097536
+	// Loads an .xbg file; its textures come from resource (if given).
+	// (this on the stack, fileName in eax) TODO: decompile
+	HRESULT Create(const char *fileName, CXBPackedResource *resource);   // 0x00097F4B
 	virtual ~CXBMesh() {}
 
 	BYTE m_data[0x14];

@@ -20,24 +20,34 @@ void ResolvePath(const char *path, std::string &out);               // 0x000AC73
 // FALSE for empty text.
 BOOL WriteTextFile(const char *path, const char *text, BOOL append);   // 0x000A5BC6 TODO: decompile
 
-// Walks the matches of a pattern in a folder. TODO: decompile
+// Walks the matches of a pattern in a folder, through the virtual file
+// layer (so it works on any drive type). TODO: decompile
 class CFileFinder
 {
 public:
 	CFileFinder();                                        // 0x0001331C (this in eax)
 	~CFileFinder();                                       // 0x00013564 (this in esi)
-	// The first match, or NULL.
-	WIN32_FIND_DATAA *FindFirst(const char *dir, const char *pattern);   // 0x00013338
+	// The first match's name, or NULL. The folder gets a trailing
+	// backslash; an empty pattern means "*".
+	const char *FindFirst(const char *dir, const char *pattern);   // 0x00013338
+	const char *FindNext();                               // 0x000134C3
+	void Close();                                         // 0x0001352D (this in eax)
 
-	HANDLE m_hFind;                                       // +0x00
-	std::string m_strDir;                                 // +0x04
-	std::string m_strPattern;                             // +0x20
-	WIN32_FIND_DATAA m_data;                              // +0x3C
+	HANDLE m_hFind;                                       // +0x000
+	std::string m_strPattern;                             // +0x004
+	std::string m_strDir;                                 // +0x020
+	BYTE m_findData[0x140];                               // +0x03C WIN32_FIND_DATA (the name at +0x068)
+	int m_nFilter;                                        // +0x17C 1 skips folders, 2 skips files. TODO: verify
+	int m_unknown180;                                     // +0x180
+	void *m_pDir;                                         // +0x184 the drive's directory object
 };
 
 // Directory part of a path to a file ("" if path has no file name).          TODO: verify
 std::string GetPathDirectory(const char *path);                       // 0x000A4B0E TODO: decompile
 BOOL CreateDirectoryTree(const char *path);                           // 0x000A3F51 TODO: decompile
+// Writes data to path (replacing it), creating its folder. FALSE when
+// there's nothing to write.
+BOOL WriteBinaryFile(const char *path, const void *data, DWORD size);   // 0x000A439A
 // Fixes up a path for FATX (name length/characters). TODO: verify
 // Whether name is a legal FATX file name: 1-42 characters from the allowed
 // set (characters >= 0x80 pass too).
