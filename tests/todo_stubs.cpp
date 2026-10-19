@@ -60,6 +60,3 @@ void ZipFiles(const char *source, const char *zipFile, int) { printf("[stub] Zip
 void RefreshMemoryUnits() {}
 void UpdateDriveSpace(SDriveInfo *) {}
 
-// FtpClient.h (the FTP log window is part of the file manager)
-void CFTPLog::Add(const char *text, int type) { printf("[ftp %d] %s\n", type, text); }
-CFTPLog::~CFTPLog() {}

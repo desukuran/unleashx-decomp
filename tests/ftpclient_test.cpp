@@ -12,6 +12,7 @@
 
 #include "../src/common/FileUtil.h"
 #include "../src/common/XboxKernel.h"
+#include "../src/filemgr/FtpLog.h"
 #include "../src/net/FtpClient.h"
 #include "../src/net/FtpServer.h"
 #include "../src/net/Network.h"
@@ -133,8 +134,10 @@ int main()
 	CHECK(ReadHostFile(base + "/E/ftp/big.bin") == big);
 	CHECK(ftp.CopyFileEx("/E/ftp/big.bin", "E:\\client\\down\\big.bin", NULL, NULL, NULL, 0));
 	CHECK(ReadHostFile(base + "/E/client/down/big.bin") == big);
-	CHECK(ftp.m_nFilesSent == 2);
-	CHECK(ftp.m_ullBytesSent == 2 * big.size());
+	CHECK(ftp.m_nFilesUploaded == 1);
+	CHECK(ftp.m_nFilesDownloaded == 1);
+	CHECK(ftp.m_ullBytesUploaded == big.size());
+	CHECK(ftp.m_ullBytesDownloaded == big.size());
 	// An empty file is just created.
 	WriteHostFile(base + "/E/ftp/empty.txt", "");
 	CHECK(ftp.CopyFile("/E/ftp/empty.txt", "E:\\client\\empty.txt", FALSE));

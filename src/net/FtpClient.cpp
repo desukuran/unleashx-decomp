@@ -8,12 +8,19 @@
 #include "../common/FileUtil.h"
 #include "../common/StrUtil.h"
 #include "../common/XboxKernel.h"
+#include "../filemgr/FtpLog.h"
 #include "../system/FileOps.h"
 #include "../thirdparty/FtpParse.h"
 #include "Network.h"
 #include "Socket.h"
 
 CopyProgressRoutine g_pFtpCopyProgress = NULL;
+
+void CDirFTP::Log(const char *text, int type)
+{
+	if (m_pLog != NULL)
+		m_pLog->Add(text, type);
+}
 
 // What GetFreeSpace() says when it can't ask: "plenty".
 static const ULONGLONG kUnknownFreeSpace = 0x0050000000000000ULL;
@@ -92,16 +99,16 @@ CDirFTP::~CDirFTP()
 // 0x0001E55E (this in eax)
 void CDirFTP::ResetStats()
 {
-	m_nFilesSent = 0;
-	m_unknown4D0 = 0;
+	m_nFilesUploaded = 0;
+	m_nFilesDownloaded = 0;
 	m_unknown4B4[0] = 0;
 	m_unknown4B4[1] = 0;
 	m_dwStartTick = 0;
 	m_dwEndTick = 0;
-	m_dwTransferMs = 0;
-	m_unknown4D8[0] = 0;
-	m_ullBytesSent = 0;
-	m_ullUnknown4E8 = 0;
+	m_dwUploadMs = 0;
+	m_dwDownloadMs = 0;
+	m_ullBytesUploaded = 0;
+	m_ullBytesDownloaded = 0;
 }
 
 // 0x00082381 (this in ebx)
@@ -1119,22 +1126,22 @@ BOOL CDirFTP::UploadFile(const char *local, const char *remote)
 					}
 				}
 				m_dwEndTick = GetTickCount();
-				m_dwTransferMs += m_dwEndTick - m_dwStartTick;
+				m_dwUploadMs += m_dwEndTick - m_dwStartTick;
 				CloseData();
 				code = ReadReplyCode(reply);
 				result = ok && (code == 226 || code == 250);
 				if (ok)
 				{
-					m_ullBytesSent += (LONGLONG)(int)sent;
-					m_nFilesSent++;
-					if (m_dwTransferMs == 0)
+					m_ullBytesUploaded += (LONGLONG)(int)sent;
+					m_nFilesUploaded++;
+					if (m_dwUploadMs == 0)
 					{
 						if (g_dOperationRate < 1.0)
-							g_dOperationRate = (double)(LONGLONG)m_ullBytesSent * (1.0 / 1024.0);
+							g_dOperationRate = (double)(LONGLONG)m_ullBytesUploaded * (1.0 / 1024.0);
 					}
 					else
 					{
-						g_dOperationRate = (double)(LONGLONG)m_ullBytesSent / (double)((m_dwTransferMs / 1000) << 10);
+						g_dOperationRate = (double)(LONGLONG)m_ullBytesUploaded / (double)((m_dwUploadMs / 1000) << 10);
 					}
 				}
 			}
@@ -1279,17 +1286,18 @@ BOOL CDirFTP::DownloadFile(const char *remote, const char *local, BOOL failIfExi
 			m_dwEndTick = GetTickCount();
 			if (ok)
 			{
-				m_ullBytesSent += (LONGLONG)(int)received;
-				m_dwTransferMs += m_dwEndTick - m_dwStartTick;
-				m_nFilesSent++;
-				if (m_dwTransferMs == 0)
+				m_ullBytesDownloaded += (LONGLONG)(int)received;
+				m_dwDownloadMs += m_dwEndTick - m_dwStartTick;
+				m_nFilesDownloaded++;
+				if (m_dwDownloadMs == 0)
 				{
 					if (g_dOperationRate < 1.0)
-						g_dOperationRate = (double)(LONGLONG)m_ullBytesSent * (1.0 / 1024.0);
+						g_dOperationRate = (double)(LONGLONG)m_ullBytesDownloaded * (1.0 / 1024.0);
 				}
 				else
 				{
-					g_dOperationRate = (double)(LONGLONG)m_ullBytesSent / (double)((m_dwTransferMs / 1000) << 10);
+					g_dOperationRate =
+						(double)(LONGLONG)m_ullBytesDownloaded / (double)((m_dwDownloadMs / 1000) << 10);
 				}
 			}
 			CloseData();
@@ -1730,11 +1738,11 @@ BOOL CDirFTP::SendBoostFiles(const std::vector<SFileListItem> &list, const std::
 		delete file;
 		if (!result)
 			break;
-		m_ullBytesSent += (LONGLONG)(int)sent;
-		m_nFilesSent++;
+		m_ullBytesUploaded += (LONGLONG)(int)sent;
+		m_nFilesUploaded++;
 	}
 	m_dwEndTick = GetTickCount();
-	m_dwTransferMs += m_dwEndTick - m_dwStartTick;
+	m_dwUploadMs += m_dwEndTick - m_dwStartTick;
 	return result;
 }
 

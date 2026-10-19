@@ -19,23 +19,8 @@
 class CSocket;
 struct SFileListItem;
 
-// What a CFTPLog line is.
-enum FtpLogType
-{
-	FTPLOG_COMMAND = 0,   // a command sent
-	FTPLOG_REPLY = 1,     // a reply
-	FTPLOG_ERROR = 2,     // an error (and replies 401 and up)
-	FTPLOG_STATUS = 3,    // the client's own messages
-};
-
-// The FTP log window of the file manager (one global, g_ftpLog). Only the
-// interface CDirFTP uses is declared. vtable 0x0024B654.
-class CFTPLog
-{
-public:
-	virtual void Add(const char *text, int type);   // 0 (0x0001E736 -> 0x001216B6) TODO: decompile
-	virtual ~CFTPLog();                             // 1 (0x00120DBE; deleting 0x0001EDC9) TODO: decompile
-};
+// The FTP log window (src/filemgr/FtpLog.h).
+class CFTPLog;
 
 // The parsed form of one LIST line (D. J. Bernstein's ftpparse, linked in;
 // see src/thirdparty/FtpParse.h for the function).
@@ -113,23 +98,23 @@ public:
 	DWORD m_dwEndTick;                  // +0x4C0
 	BOOL m_bUnleashXServer;             // +0x4C4 SYST says UnleashX: SITE FREESPACE works, folders need no MKD
 	BOOL m_bUnixL8;                     // +0x4C8 SYST is "UNIX Type: L8"
-	int m_nFilesSent;                   // +0x4CC files up or down
-	DWORD m_unknown4D0;                 // +0x4D0
-	DWORD m_dwTransferMs;               // +0x4D4 time spent transferring
-	DWORD m_unknown4D8[2];              // +0x4D8
-	ULONGLONG m_ullBytesSent;           // +0x4E0 bytes up or down
-	ULONGLONG m_ullUnknown4E8;          // +0x4E8
+	int m_nFilesUploaded;               // +0x4CC
+	int m_nFilesDownloaded;             // +0x4D0
+	DWORD m_dwUploadMs;                 // +0x4D4 time spent uploading
+	DWORD m_dwDownloadMs;               // +0x4D8
+	DWORD m_unknown4DC;                 // +0x4DC
+	ULONGLONG m_ullBytesUploaded;       // +0x4E0
+	ULONGLONG m_ullBytesDownloaded;     // +0x4E8
 	std::string m_strUnknown4F0;        // +0x4F0
 	int m_nControlPort;                 // +0x50C 21
 	std::string m_strUser;              // +0x510 "xbox"
 	std::string m_strPassword;          // +0x52C "xbox"
 	BOOL m_bPassive;                    // +0x548 1; cleared when PASV fails
 	std::string m_strLastCommand;       // +0x54C
-	BOOL m_bBoost;                      // +0x568 use the boost upload (never set)
+	BOOL m_bBoost;                      // +0x568 use the boost upload (CFTPFileFolder sets it before each transfer)
 	std::string m_strSystem;            // +0x56C the SYST reply
 	BOOL m_bResume;                     // +0x588 REST works (not used)
 
-private:
 	// Clears the transfer statistics. (this in eax)
 	void ResetStats();                                                           // 0x0001E55E
 	// Closes the sockets and forgets the session. (this in ebx)
@@ -141,12 +126,14 @@ private:
 	// Reads a reply, skipping continuation lines (logged). NULL without a
 	// connection. (this in ecx)
 	const char *ReadReply();                                                     // 0x0008259A
-	// Sends all of size bytes, waiting while the socket would block (until
-	// cancelled). (data in ecx)
-	HRESULT SendAll(SOCKET socket, const char *data, int size);                  // 0x000829D9
 	// Sends "command\r\n" on the control connection. Returns its length or
 	// -1. closeData: close the data connection first. (this in esi)
 	int SendCommand(const char *command, BOOL closeData, BOOL log);              // 0x00082E17
+
+private:
+	// Sends all of size bytes, waiting while the socket would block (until
+	// cancelled). (data in ecx)
+	HRESULT SendAll(SOCKET socket, const char *data, int size);                  // 0x000829D9
 	// ReadReply() and ParseReply() of what came back.
 	int ReadReplyCode(std::string &reply);
 	// TYPE I or TYPE A when it changes. (binary in ecx, this in eax)
@@ -183,11 +170,8 @@ private:
 	                    std::string &reply, BOOL *started);
 	// A remote folder tree.
 	BOOL DownloadFolder(const char *remote, const char *local, BOOL failIfExists);      // 0x000860FC
-	void Log(const char *text, int type)
-	{
-		if (m_pLog != NULL)
-			m_pLog->Add(text, type);
-	}
+	// (inlined) type is an FtpLogType.
+	void Log(const char *text, int type);
 };
 
 // CopyFileEx flag: the source is a folder to upload.

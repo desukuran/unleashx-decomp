@@ -31,6 +31,7 @@ public:
 
 	BYTE m_unknown04[0x7C];
 	BOOL m_bChosen;                                       // +0x80
+	BYTE m_unknown84[0x10];                               // (0x94 bytes in all)
 };
 
 // The passcode pad: the code is typed with gamepad buttons (A B X Y WHITE

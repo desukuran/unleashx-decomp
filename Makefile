@@ -15,7 +15,7 @@ INPUT := src/input/Gamepad.cpp
 
 # Everything above, plus stand-ins for what isn't decompiled yet.
 LIBS := $(COMMON) $(XML) $(SETTINGS) $(SYSTEM) $(NET) $(SKIN) $(UI) $(RENDER) $(INPUT)
-STUBS := tests/stubs.cpp tests/todo_stubs.cpp tests/skin_stubs.cpp tests/fileio_host.cpp tests/ftpparse_host.cpp
+STUBS := tests/stubs.cpp tests/todo_stubs.cpp tests/skin_stubs.cpp tests/fileio_host.cpp tests/ftpparse_host.cpp tests/ftplog_host.cpp
 HEADERS := $(wildcard src/*/*.h) src/ui/StringTable.inc
 
 TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test build/xbe_test build/menuscan_test build/ftp_test build/fileutil_test build/xip_test build/http_test build/ftpclient_test

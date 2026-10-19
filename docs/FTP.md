@@ -241,10 +241,11 @@ above.
 * **Rename:** `RNFR` and `RNTO`.
 
 The client also has a boost-mode upload, the client side of the server's
-`SITE BOOST START UPLOAD`. If boost mode fails before any file was sent, the
-client logs "Boost mode failed. Transfering in Normal mode." and falls back
-to a normal upload. Nothing ever turns boost mode on, though, so the release
-never uses it.
+`SITE BOOST START UPLOAD`, for uploading folders. After logging in, the FTP
+manager sends `SITE BOOST SUPPORTED` when the `SYST` reply doesn't contain
+`UNIX Type:` (any case), and uses boost mode with servers that answer `226`.
+If boost mode fails before any file was sent, the client logs "Boost mode
+failed. Transfering in Normal mode." and falls back to a normal upload.
 
 ## Client quirks
 
