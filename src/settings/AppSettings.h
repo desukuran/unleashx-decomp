@@ -13,6 +13,17 @@
 
 struct IDirect3DTexture8;
 
+// D3DVIEWPORT8. 0x18 bytes
+struct SViewport
+{
+	DWORD X;
+	DWORD Y;
+	DWORD Width;
+	DWORD Height;
+	float MinZ;
+	float MaxZ;
+};
+
 // Screen position/size adjustment for one video mode. 0x18 bytes
 struct SScreenAdjust
 {
@@ -248,7 +259,7 @@ public:
 	wchar_t m_szDiscTitle[0x80];             // +0x11F4 from D:\DiscTitle.txt
 	int m_nDisplayWidth;                     // +0x12F4 640. TODO: verify
 	int m_nDisplayHeight;                    // +0x12F8 480
-	BYTE m_unknown12FC[0x18];                // +0x12FC
+	SViewport m_viewport;                    // +0x12FC the screen area (D3DDevice_GetViewport)
 	int m_nSkinWidth;                        // +0x1314 render size the skin asks for (<ScreenSize>)
 	int m_nSkinHeight;                       // +0x1318
 	float m_fUnknown131C;                    // +0x131C 1.0
