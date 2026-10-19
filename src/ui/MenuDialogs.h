@@ -122,17 +122,4 @@ public:
 	BOOL m_bChosen;                                       // +0x44
 };
 
-// Edits a menu item's text, icon, action... 0x298 bytes.
-class CMenuItemEditor
-{
-public:
-	CMenuItemEditor();                                    // 0x0010A4E5
-	virtual ~CMenuItemEditor();
-	void Init(CXBFont *font, int unknown);                // 0x0010A05B
-	void Edit(CMenuItem *item);                           // 0x0010986F
-	virtual void ProcessInput(int *action, struct SGamepadState **pad);   // vtable slot 2
-	virtual BOOL IsOpen();                                // vtable slot 5
-
-	BYTE m_unknown004[0x290];
-	CMenuEventSink *m_pSink;                              // +0x294
-};
+// The item editor (CMenuItemEditor) is in src/app/MenuItemEditor.h.

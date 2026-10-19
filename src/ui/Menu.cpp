@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "../app/MenuItemEditor.h"
 #include "../app/Screens.h"
 #include "../app/UnleashX.h"
 #include "../input/Gamepad.h"

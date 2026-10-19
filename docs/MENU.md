@@ -147,6 +147,70 @@ START opens a menu for the selected item:
 Quirk: the NTSC/PAL entries change the item's `Region` for the rest of the
 session.
 
+## Item editor
+
+"Edit Item..." opens `CMenuItemEditor` (`src/app/MenuItemEditor.cpp`). It's a
+Control Panel style page with these lines:
+
+| Line | A | START / X |
+|---|---|---|
+| Title | keyboard (40 characters, must not be empty) | |
+| Icon | file pop-up (`png`, `jpg`, `bmp`, `xbx`), starting in the current file's folder | Clear Entry, Download Online... |
+| Preview | file pop-up (`xmv`, `wmv`) | Clear Entry, Download Online... |
+| Password | keyboard (15 characters, masked) | Clear Entry |
+| Passcode | the passcode pad | Clear Entry |
+| Save / Reset / Exit | write, revert, close | |
+
+Saving writes the changed values to two places: the menu's own copy of the
+entry, and the file's copy.
+
+* Games found by the game-folder scan are looked up in `D:\items.xml` by
+  `Action`.
+* Everything else is looked up in `Config.xml` under `<Menu>`. An `<Item>`
+  is matched by `Action` and a `<List>` by `Text`.
+
+What each line writes:
+
+* The title is an `<Item>`'s text, or a `<List>`'s `Text` attribute. For a
+  game, it's also written into the XBE (`SetXbeTitleName`).
+* The icon is written as `AltIcon`, the others as `Preview`, `Password`
+  and `Passcode`. An empty value removes the attribute.
+* A changed password or passcode asks for a restart.
+
+### Download Online...
+
+This is for XBEs. It uses the title ID from `<Item ID>`, or reads it from
+the XBE.
+
+1. It fetches `http://www.xbox-skins.net/games/xml/<id>.xml`. If that fails,
+   it sends `request.php?t=<title>&h=<id>&f=thumb|wmv` to ask for the game
+   and says so.
+2. The `<XBG>` element says what's available:
+   * `Thumb="1"`: the icon `thumbs/<id>.png` is fetched.
+   * `Video` and `VidID`: the preview `sendvid.php?sid=<VidID>` is fetched.
+     `Video="2"` means an `.xmv`, else `.wmv`.
+   * `VC` says how the preview is packed: 0 plain, 1 rar, else zip.
+3. A thread installs the file next to the XBE:
+   * the icon as `icon.png`, backing up the old one to `icon.bak`;
+   * the preview as `preview.xmv`/`.wmv`, backing up to `preview.bak`.
+     Packed previews are unpacked first into `ziptmp\` next to the download
+     cache.
+   * The new path goes into the line, and the new preview starts playing.
+
+B cancels a download. `xboxskins.jpg` from the media folder is shown in the
+progress box.
+
+Quirks:
+
+* Exit with unsaved changes warns "your changes will be lost", but Yes
+  saves them. That's the Control Panel's Yes answer.
+* When an item sits two or more lists deep in `Config.xml`, the save looks
+  in the wrong list (only the nearest list's name is matched under
+  `<Menu>`), so it fails.
+* From an unpacked preview archive, the first file is installed whatever
+  its type. The `.xmv`/`.wmv` test is inverted.
+* The new title is copied over the menu entry's text without a length check.
+
 ## Passwords
 
 `Password` items open the keyboard (masked, up to 50 characters);

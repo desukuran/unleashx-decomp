@@ -613,8 +613,6 @@
 0010341c CPassCode::Init HRESULT f(CPassCode *this@esi, CXBFont *font@eax, CXBFont *symbols@ecx)
 00103100 CPassCode::SetCode
 00102805 CPassCode::Show
-0010a05b CMenuItemEditor::Init
-0010986f CMenuItemEditor::Edit
 000366a8 RemoveDirectoryA
 0003627a ResumeThread
 000e2d80 AddXbeToFolder
@@ -1938,3 +1936,16 @@
 000f0e2b SongItemLess
 00029932 SSongItem::ctor
 0027a414 s_dwSongTimeUpdate
+# menu item editor (src/app/MenuItemEditor.cpp)
+0010a05b CMenuItemEditor::Init
+0010986f CMenuItemEditor::Edit
+0010987a ValidateItemValue
+00109ce7 CMenuItemEditor::Reset
+0010a61c CMenuItemEditor::Save
+0010ae75 CMenuItemEditor::HandleInput
+0010b6f2 CMenuItemEditor::InstallDownload
+0010be83 CMenuItemEditor::InstallThread
+0010bea5 CMenuItemEditor::Render
+0002341a CSettingsBase::SetItemEnabledAt
+0026c728 g_hItemInstallThread
+00278d04 g_bItemInstalling
