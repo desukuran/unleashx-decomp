@@ -2,6 +2,7 @@
 
 #include <cctype>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 #include "../settings/AppSettings.h"
@@ -66,6 +67,56 @@ std::string ReadTextFile(const char *path)
 		delete[] buf;
 	}
 	fclose(fp);
+	return text;
+}
+
+// 0x000A446C
+std::string ReadMetaFile(const char *path)
+{
+	if (path == NULL || strlen(path) == 0)
+		return std::string("");
+	FILE *fp = fopen(path, "rb");
+	if (fp == NULL)
+		return std::string("");
+	fseek(fp, 0, SEEK_END);
+	long size = ftell(fp);
+	if (size < 2)
+	{
+		// (The original leaves the file open here.)
+		fclose(fp);
+		return std::string("");
+	}
+	fseek(fp, 0, SEEK_SET);
+	unsigned char bom[2];
+	if (fread(bom, 2, 1, fp) == 0)
+	{
+		fclose(fp);
+		return std::string("");
+	}
+	if (!((bom[0] == 0xFF && bom[1] == 0xFE) || (bom[0] == 0xFE && bom[1] == 0xFF)))
+	{
+		fclose(fp);
+		return ReadTextFile(path);
+	}
+	// UTF-16 after the mark. (The original asks for twice the size.)
+	unsigned char *bytes = new unsigned char[size * 2];
+	size_t count = fread(bytes, 1, (size_t)(size - 2), fp);
+	fclose(fp);
+	size_t chars = count / 2;
+	std::wstring wide;
+	for (size_t i = 0; i < chars; i++)
+		wide += (wchar_t)(bytes[i * 2] | (bytes[i * 2 + 1] << 8));
+	delete[] bytes;
+	std::string text;
+	for (size_t i = 0; i < wide.size() && wide[i] != 0; i++)
+	{
+		char narrow[8];
+		int n = wctomb(narrow, wide[i]);
+		if (n > 0)
+			text.append(narrow, n);
+	}
+	if (chars < text.size())
+		text = text.substr(0, chars);
 	return text;
 }
 

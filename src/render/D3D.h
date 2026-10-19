@@ -272,6 +272,7 @@ struct IDirect3DDevice8
 	HRESULT SetPixelShader(DWORD handle);
 	HRESULT DrawVerticesUP(DWORD primitiveType, UINT vertexCount, const void *vertices, UINT stride);
 	HRESULT GetDisplayMode(D3DDISPLAYMODE *mode);
+	BOOL IsBusy();                                // D3DDevice_IsBusy
 	HRESULT GetBackBuffer(int index, DWORD type, IDirect3DSurface8 **surface);
 	// A surface in system memory. (D3DDevice_CreateImageSurface, 0x00144840)
 	HRESULT CreateImageSurface(UINT width, UINT height, D3DFORMAT format, IDirect3DSurface8 **surface);

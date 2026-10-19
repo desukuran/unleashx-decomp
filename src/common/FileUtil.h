@@ -9,6 +9,11 @@ BOOL FileExists(const char *path);                                  // 0x0009DE3
 BOOL DirectoryExists(const char *path);                             // 0x0009DDFC
 BOOL IsDriveAvailable(char drive);                                  // 0x000A4AAD
 std::string ReadTextFile(const char *path);                         // 0x000A3745
+// A text file that may be UTF-16 (a byte-order mark FF FE or FE FF, both
+// read as little-endian): narrowed to the current code page. Others are
+// read as ReadTextFile does. Quirk: a file under 2 bytes reads as "".
+// (The XDK's TitleMeta.xbx and SaveMeta.xbx.)
+std::string ReadMetaFile(const char *path);                         // 0x000A446C
 HRESULT GetDriveDevicePath(char drive, std::string &devicePath);    // 0x000A3D25
 std::string GetXbePath();                                           // 0x000A3934
 

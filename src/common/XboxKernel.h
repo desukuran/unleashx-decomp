@@ -49,6 +49,28 @@ BOOL XGetSoundtrackSongInfo(DWORD soundtrackId, UINT index, DWORD *songId, DWORD
                             UINT nameLength);
 BOOL XFindClose(HANDLE find);
 HANDLE XFindFirstNicknameW(BOOL titleNicknamesOnly, wchar_t *nickname, unsigned size);
+// Saved games and downloaded content (XDK).
+#define MAX_NAMELEN 64
+struct XGAME_FIND_DATA
+{
+	WIN32_FIND_DATAA wfd;                   // +0x000 the save's folder
+	char szSaveGameDirectory[MAX_PATH];     // +0x140
+	wchar_t szSaveGameName[MAX_NAMELEN];    // +0x244
+};
+struct XCONTENT_FIND_DATA
+{
+	WIN32_FIND_DATAA wfd;                   // +0x000
+	DWORD dwTitleId;                        // +0x140
+	ULONGLONG qwOfferingId;                 // +0x144
+	char szContentDirectory[MAX_PATH];      // +0x14C
+	wchar_t szDisplayName[MAX_NAMELEN];     // +0x250
+};
+HANDLE XFindFirstSaveGame(const char *rootPath, XGAME_FIND_DATA *data);   // 0x000374CB
+BOOL XFindNextSaveGame(HANDLE find, XGAME_FIND_DATA *data);              // 0x000375D5
+HANDLE XFindFirstContent(const char *rootPath, DWORD offerFilter, XCONTENT_FIND_DATA *data);   // 0x00037DCD
+BOOL XFindNextContent(HANDLE find, XCONTENT_FIND_DATA *data);            // 0x00037F1D
+// The space a folder takes, in 16 KB blocks.
+DWORD XGetDisplayBlocks(const char *path);                                // 0x00036B38
 // XGetLanguage values (XDK)
 #define XC_LANGUAGE_ENGLISH 1
 #define XC_LANGUAGE_JAPANESE 2
@@ -108,8 +130,8 @@ DWORD XGetProcessQuantumLength();
 void XSetProcessQuantumLength(DWORD quantum);
 void SetLastError(DWORD error);
 BOOL SetEndOfFile(HANDLE file);
-// Mounts a utility partition folder? TODO: identify (XAPI range)
-BOOL XSetupDriveFolder(const char *drive, const wchar_t *name);   // 0x000373FB
+// Deletes the save game name under drive (XDK).
+BOOL XDeleteSaveGame(const char *drive, const wchar_t *name);   // 0x000373FB
 BOOL CreateDirectoryA(LPCSTR path, void *security);
 
 struct OVERLAPPED

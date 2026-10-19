@@ -355,8 +355,8 @@ void CSkin::BeginLoad(const char *path)
 // 0x000F9D63 (this in eax)
 BOOL CSkin::SaveSplashForBoot()
 {
-	if (!m_bZipped && XSetupDriveFolder("U:\\", L"SkinFile"))
-		XSetupDriveFolder("X:\\", L"SkinFile");
+	if (!m_bZipped && XDeleteSaveGame("U:\\", L"SkinFile"))
+		XDeleteSaveGame("X:\\", L"SkinFile");
 	std::string target = "E:\\UDATA\\9e115330\\0064122817A8\\Splash.jpg";
 	DeleteFileA(target.c_str());
 	if (m_strSplashFile.size() != 0)

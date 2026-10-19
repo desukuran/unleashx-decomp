@@ -527,7 +527,7 @@ BOOL CUnleashX::CMenuEvent::OnItemSelected(CXmlElement *item)
 		if (app->m_pGameManager == NULL)
 		{
 			app->m_pGameManager = new CGameManager;
-			if (app->m_pGameManager != NULL && FAILED(app->m_pGameManager->Init(&app->m_fonts[4])))
+			if (app->m_pGameManager != NULL && FAILED(app->m_pGameManager->Init(&app->m_fonts[4], app->m_pOrb, app->m_pEarthEnvMap)))
 			{
 				delete app->m_pGameManager;
 				app->m_pGameManager = NULL;

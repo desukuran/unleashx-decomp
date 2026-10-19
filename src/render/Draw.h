@@ -40,6 +40,16 @@ void ScaleRectToScreen(int *rect);                                       // 0x00
 void BuildWorldMatrix(float *matrix, float x, float y, float z, float scaleX, float scaleY, float scaleZ,
                       float rotationX, float rotationY, float rotationZ);   // 0x0009F342
 
+// A transformed screen vertex (D3DFVF_XYZRHW).
+struct SScreenVertex
+{
+	float x, y, z, rhw;
+};
+// A filled convex polygon (a triangle fan) and its outline; a color of 0
+// skips that part. (DrawRect and the others build on it.)
+HRESULT DrawPolygon(const SScreenVertex *vertices, UINT count, D3DCOLOR fillColor, D3DCOLOR borderColor,
+                    float alpha, DWORD lineWidth);                           // 0x000A0A87
+
 // Flat-colored primitives (Draw.cpp). Colors are ARGB; a color of 0 skips
 // that part. alpha (0..1) replaces or scales the fill's alpha.
 HRESULT DrawRect(float x, float y, float width, float height, D3DCOLOR borderColor, D3DCOLOR fillColor,

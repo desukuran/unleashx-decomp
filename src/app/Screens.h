@@ -12,6 +12,7 @@
 #include "../ui/FileBrowser.h"
 #include "../ui/MenuDialogs.h"
 #include "../ui/VirtualKeyboard.h"
+#include "GameManager.h"
 
 class CXBFontEx;
 class CXBFont;
@@ -165,20 +166,7 @@ private:
 // The file manager: src/filemgr/FileManager.h.
 class CFileManager;
 
-// Game saves / game list manager ("SavesManager", "GameManager"). 0x210 bytes.
-class CGameManager
-{
-public:
-	CGameManager();                                       // 0x0011C649
-	virtual ~CGameManager();
-	HRESULT Init(CXBFontEx *font);                        // 0x0011E048
-	void Show();                                          // 0x0011BAFA
-	void ProcessInput(int *action, SGamepadState **pad);  // 0x0011E249 TODO: decompile
-	void Render();                                        // 0x0011C8F4 TODO: decompile (this in eax)
-
-	BYTE m_unknown04[0x74 - 0x4];
-	BOOL m_bOpen;                                         // +0x74
-};
+// The game saves manager (mode 3): CGameManager, GameManager.h.
 
 // The Control Panel: ten icons, each opening a settings page
 // (SettingsPages.h). 0xA0 bytes, no vtable. See SettingsMenu.cpp.

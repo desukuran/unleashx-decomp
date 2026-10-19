@@ -12,10 +12,6 @@
 #include "Fonts.h"
 #include "Texture.h"
 
-struct SScreenVertex
-{
-	float x, y, z, rhw;
-};
 
 static DWORD FloatBits(float value)
 {

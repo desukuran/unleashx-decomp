@@ -33,7 +33,7 @@ If the `Action` ends in `.xbe`, it is the path of the program to start:
 |---|---|
 | `LaunchDVD` | Starts the disc in the drive. |
 | `filemanager` | Opens the file manager, at `Arg1` if given. |
-| `SavesManager`, `GameManager` | Opens the game/saves manager. Refused when running from DVD. |
+| `SavesManager`, `GameManager` | Opens the game/saves manager (`docs/GAME_SAVES.md`). Refused when running from DVD. |
 | `Settings` | Opens the settings menu. |
 | `Skins`, `Skin` | Opens the skin chooser. |
 | `reboot`, `restart` | Reboots: an SMC reset when UnleashX is the dashboard, otherwise back to the default dashboard. |

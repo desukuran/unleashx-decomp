@@ -279,13 +279,14 @@ HRESULT CUnleashX::Initialize()
 	GetExitCodeThread(resourceThread, &missing);
 	CloseHandle(resourceThread);
 
-	// Required resources missing: try again on a fresh utility drive; if
+	// Required resources missing: delete the unpacked "Media" save (U:,
+	// then X:) and try again on a fresh utility drive; if
 	// that fails too, a recovery screen with FTP on 192.168.0.100 for 5
 	// minutes, then the MS dashboard.
 	if (missing != 0)
 	{
-		if (XSetupDriveFolder("U:\\", L"Media"))
-			XSetupDriveFolder("X:\\", L"Media");
+		if (XDeleteSaveGame("U:\\", L"Media"))
+			XDeleteSaveGame("X:\\", L"Media");
 		XMountUtilityDrive(TRUE);
 		if (LoadResources(this) != 0)
 		{
