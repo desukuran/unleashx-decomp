@@ -25,6 +25,11 @@ public:
 	                 float maxWidth);                                  // 0x00098E3A (XDK sample)
 	// Width of the text in pixels (returned in xmm0 in the original).
 	float GetTextWidth(const wchar_t *text);                           // 0x00099571
+	// The size of the first length characters (scaled); firstLineOnly
+	// stops at a newline. The original takes this in eax, width in edx
+	// and height in esi.
+	HRESULT GetTextExtentN(const wchar_t *text, int length, BOOL firstLineOnly, float *width,
+	                       float *height);                             // 0x00098E9E (XDK sample)
 
 	BYTE m_reserved04[0x0C];
 	float m_fFontHeight;                                               // +0x10

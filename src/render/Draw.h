@@ -34,6 +34,10 @@ void DrawBevelBox(float x, float y, float width, float height, D3DCOLOR borderCo
 void DrawWindowFrame(float x, float y, float width, float height, float inset, float captionHeight,
                      float footerHeight, D3DCOLOR borderColor, D3DCOLOR fillColor, D3DCOLOR innerBorderColor,
                      D3DCOLOR innerFillColor, DWORD borderWidth, DWORD innerBorderWidth);   // 0x000A10D2
+// A message box button's box. TODO: decompile. The original takes x in
+// xmm0.
+void DrawButtonBox(float x, float y, float width, float height, D3DCOLOR borderColor, D3DCOLOR fillColor,
+                   DWORD lineWidth);                                         // 0x000A1518
 // direction: 1 up, 2 down, 3 left, 4 right
 HRESULT DrawTriangle(float x, float y, float width, float height, int direction, D3DCOLOR borderColor,
                      D3DCOLOR fillColor, float alpha);                       // 0x000A0D78

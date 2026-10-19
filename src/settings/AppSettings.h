@@ -11,6 +11,7 @@
 
 #include "../common/Platform.h"
 
+class CXBFont;
 struct IDirect3DTexture8;
 
 // D3DVIEWPORT8. 0x18 bytes
@@ -258,7 +259,7 @@ public:
 	BOOL m_bNewsfeedContinuous;              // +0x0CA8
 	wchar_t m_szNewsfeedSeparator[5];        // +0x0CAC
 	BYTE m_unknown0CB6[0x514];               // +0x0CB6
-	int m_unknown11CC;                       // +0x11CC
+	CXBFont *m_pDialogFont;                  // +0x11CC the message box caption font; only ever read (NULL)
 	IDirect3DTexture8 *m_pLoadingIcon;       // +0x11D0 loading screen image of the launched item
 	std::string m_strUnknown11D4;            // +0x11D4
 	BOOL m_bLoadingShowInfo;                 // +0x11F0 1, <LoadingScreen ShowInfo>

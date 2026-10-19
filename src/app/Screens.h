@@ -3,6 +3,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "../common/Platform.h"
 #include "XBApp.h"
@@ -10,6 +11,7 @@
 
 class CXBFontEx;
 class CXBFont;
+class CAppSettings;
 class CSound;
 struct IDirect3DTexture8;
 struct SGamepadState;
@@ -255,23 +257,80 @@ enum MessageBoxResult
 #define MSGBOX_BUTTONS_RETRYCANCEL 5
 #define MSGBOX_BUTTONS_CANCEL 6
 
-// The message box (OK / Cancel / Abort / Retry / Ignore / Yes / No). 0x158 bytes.
+// A line of message box text, or a button. 0x34 bytes.
+struct SMessageLine
+{
+	SMessageLine(const std::wstring &text, float height, int unknown);   // 0x00030702
+
+	std::wstring text;              // +0x00
+	float height;                   // +0x1C of the text
+	int unknown20;                  // +0x20 always 0
+	int rect[4];                    // +0x24 a button's x, y, width, height (for the pointer), set when first drawn
+};
+
+// The message box (OK / Cancel / Abort / Retry / Ignore / Yes / No): a
+// caption, the text word-wrapped to the width, and a row of buttons. It
+// slides down into place when shown. No vtable; 0x158 bytes.
 class CMessageBox
 {
 public:
-	CMessageBox();                                        // 0x000B10D4
-	virtual ~CMessageBox();
-	// The font is passed in eax. The callers pass 0 for the rest and 10.
+	CMessageBox();                                        // 0x000B10D4 (this in esi)
+	~CMessageBox();                                       // 0x000B07F9 (this in eax; 0x00016217 deletes)
+	// width 0 = 360; maxLines 0 = 10 (only reserves room). The font is
+	// passed in eax. The callers pass 0 for the rest and 10.
 	HRESULT Create(CXBFont *font, const wchar_t *title, float x, float y, float width, float height,
-	               int maxVisible);                       // 0x000B084D
-	void AddButton(const wchar_t *text);                  // 0x000AFB3D
-	// buttons: MSGBOX_BUTTONS_*
+	               int maxLines);                         // 0x000B084D
+	// A button's caption (button: MSGBOX_OK...MSGBOX_NO); NULL or "" = the
+	// English default. (button in eax)
+	void SetButtonText(int button, const wchar_t *text);  // 0x000AFB3D
+	// buttons: MSGBOX_BUTTONS_*. (buttons in eax, this in ecx)
 	void Show(const char *text, const wchar_t *title, int buttons = 0);   // 0x000B0F74
-	void ProcessInput(int *action);                       // 0x000AF925
-	BOOL IsOpen() const;                                  // 0x000AF8E9
-	int GetResult();                                      // 0x000AFA59 MSGBOX_*
-	void SetSelection(int button);                        // 0x000AF8CF
-	void Render();                                        // 0x000AFC64
+	// Takes all input: Left/Right pick a button, A chooses, B/BACK cancel;
+	// the pointer can pick and click. (this in eax)
+	HRESULT ProcessInput(int *action);                    // 0x000AF925
+	BOOL IsOpen() const;                                  // 0x000AF8E9 (this in eax)
+	int GetResult();                                      // 0x000AFA59 MSGBOX_* (this in eax)
+	void SetSelection(int button);                        // 0x000AF8CF (this in esi, button in edi)
+	HRESULT Render();                                     // 0x000AFC64
+	// Unused.
+	void AddLine(const wchar_t *text);                    // 0x000B0E87 (this in eax)
+	void SetLineText(int line, const wchar_t *text);      // 0x000B076A -1 = the last (line in eax, this in edi)
+
+	int m_nFirstLine;                                     // +0x000
+	int m_nLastLine;                                      // +0x004
+	int m_nVisibleLines;                                  // +0x008 found by Render
+	int m_nButtons;                                       // +0x00C MSGBOX_BUTTONS_*
+	float m_fButtonWidth;                                 // +0x010 the widest caption; found by Render
+	CAppSettings *m_pSettings;                            // +0x014
+	std::wstring m_strTitle;                              // +0x018
+	std::wstring m_buttonText[7];                         // +0x034 by MSGBOX_OK...MSGBOX_NO
+	std::vector<SMessageLine> m_buttons;                  // +0x0F8 the buttons shown
+	std::vector<SMessageLine> m_lines;                    // +0x108 the wrapped text
+	int m_nSelected;                                      // +0x118 the button
+	BOOL m_unknown11C;                                    // +0x11C 1
+	BOOL m_bCancelled;                                    // +0x120
+	BOOL m_bChosen;                                       // +0x124
+	int m_unknown128;                                     // +0x128
+	CXBFont *m_pFont;                                     // +0x12C
+	CXBFont *m_pTitleFont;                                // +0x130 CAppSettings::m_pDialogFont, else m_pFont
+	BOOL m_bSliding;                                      // +0x134 sliding into place
+	DWORD m_dwSlideTime;                                  // +0x138
+	float m_fY;                                           // +0x13C 0 = centered
+	float m_fX;                                           // +0x140 0 = centered
+	float m_fWidth;                                       // +0x144
+	float m_fHeight;                                      // +0x148 0 = fit the text
+	float m_fPadding;                                     // +0x14C 10, scaled
+	float m_fLineSpacing;                                 // +0x150 1
+	float m_fLineHeight;                                  // +0x154
+
+private:
+	void SetTitle(const wchar_t *title);                  // 0x000B07DE (this in eax)
+	// Opens it; clear also empties the text and buttons and the position.
+	// (this in edi)
+	void Reset(BOOL clear);                               // 0x000AFBFD
+	// Word-wraps text into m_lines, widening the box for long words.
+	void SetText(const char *text);                       // 0x000B09A5
+	void AddButton(const wchar_t *text);                  // 0x000B0F05 (this in edi)
 };
 
 // The on-screen keyboard; $KBResult$ in an item's arguments is its last text.

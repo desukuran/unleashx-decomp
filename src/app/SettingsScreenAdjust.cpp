@@ -132,13 +132,13 @@ void CScreenAdjuster::ShowMessage(const char *text, const wchar_t *title, int bu
 		}
 		else
 		{
-			m_pMessageBox->AddButton(GetString(STR_OK));
-			m_pMessageBox->AddButton(GetString(STR_CANCEL));
-			m_pMessageBox->AddButton(GetString(STR_ABORT));
-			m_pMessageBox->AddButton(GetString(STR_RETRY));
-			m_pMessageBox->AddButton(GetString(STR_IGNORE));
-			m_pMessageBox->AddButton(GetString(STR_YES));
-			m_pMessageBox->AddButton(GetString(STR_NO));
+			m_pMessageBox->SetButtonText(MSGBOX_OK, GetString(STR_OK));
+			m_pMessageBox->SetButtonText(MSGBOX_CANCEL, GetString(STR_CANCEL));
+			m_pMessageBox->SetButtonText(MSGBOX_ABORT, GetString(STR_ABORT));
+			m_pMessageBox->SetButtonText(MSGBOX_RETRY, GetString(STR_RETRY));
+			m_pMessageBox->SetButtonText(MSGBOX_IGNORE, GetString(STR_IGNORE));
+			m_pMessageBox->SetButtonText(MSGBOX_YES, GetString(STR_YES));
+			m_pMessageBox->SetButtonText(MSGBOX_NO, GetString(STR_NO));
 		}
 	}
 	if (m_pMessageBox != NULL)

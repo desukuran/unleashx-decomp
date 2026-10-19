@@ -552,7 +552,7 @@
 00104181 CNotePad::Open
 000b10d4 CMessageBox::CMessageBox
 000b084d CMessageBox::Create
-000afb3d CMessageBox::AddButton
+000afb3d CMessageBox::SetButtonText
 000b0f74 CMessageBox::Show
 001294e2 CFileManager::Init
 00128c01 CFileManager::OpenPath
@@ -1110,3 +1110,16 @@
 00102165 CScreenAdjuster::HandleInput
 00102066 CScreenAdjuster::Save
 00101f49 CScreenAdjuster::ShowMessage
+000b07f9 CMessageBox::~CMessageBox
+00016217 CMessageBox::`scalar_deleting_destructor'
+000b07de CMessageBox::SetTitle
+000afbfd CMessageBox::Reset
+000b09a5 CMessageBox::SetText
+000b0f05 CMessageBox::AddButton
+000b0e87 CMessageBox::AddLine
+000b076a CMessageBox::SetLineText
+00030702 SMessageLine::SMessageLine
+000a1518 DrawButtonBox
+0027215c g_nPointerX
+00272160 g_nPointerY
+0027a374 s_fSlide
