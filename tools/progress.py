@@ -25,6 +25,11 @@ def library_functions():
             fields = line.split()
             if len(fields) == 2 and not line.startswith('#'):
                 found.add(int(fields[0], 16))
+    # STL members named by hand.
+    for line in open(os.path.join(ROOT, 'symbols/names.txt')):
+        fields = line.split()
+        if len(fields) >= 2 and not line.startswith('#') and fields[1].startswith('std::'):
+            found.add(int(fields[0], 16))
     return found
 
 
