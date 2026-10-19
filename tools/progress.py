@@ -9,7 +9,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Code ranges in .text that are UnleashX (and its bundled third-party code)
 # rather than XAPI/CRT. Approximate; refine as library boundaries are found.
+# Functions inside them that tools/libmatch.py found in the XDK libraries
+# (STL instantiations, CRT helpers) don't count as app code.
 APP_RANGES = [(0x00011000, 0x00034000), (0x0006A400, 0x0013FD38)]
+
+
+def library_functions():
+    path = os.path.join(ROOT, 'symbols/xdklib.txt')
+    if not os.path.exists(path):
+        return set()
+    found = set()
+    for line in open(path):
+        fields = line.split()
+        if len(fields) == 2 and not line.startswith('#'):
+            found.add(int(fields[0], 16))
+    return found
 
 
 def main():
@@ -37,14 +51,17 @@ def main():
     declared -= in_src
 
     text = {a: v for a, v in funcs.items() if v[0] == '.text'}
-    app = {a: v for a, v in text.items() if any(lo <= a < hi for lo, hi in APP_RANGES)}
+    library = library_functions() - in_src
+    in_ranges = {a: v for a, v in text.items() if any(lo <= a < hi for lo, hi in APP_RANGES)}
+    app = {a: v for a, v in in_ranges.items() if a not in library}
     named = lambda d: [a for a, v in d.items() if not v[1].startswith(('FUN_', 'thunk_FUN_'))]
     done = [a for a in app if a in in_src]
     size = lambda d: sum(v[2] for v in d.values())
 
     print(f'.text functions        : {len(text)}')
     print(f'  named                : {len(named(text))}')
-    print(f'app range functions    : {len(app)} ({size(app)} bytes)')
+    print(f'app range functions    : {len(app)} ({size(app)} bytes; '
+          f'{len(in_ranges) - len(app)} library functions left out)')
     print(f'  named                : {len(named(app))}')
     print(f'  in src/              : {len(done)} ({sum(app[a][2] for a in done)} bytes, '
           f'{100 * sum(app[a][2] for a in done) / max(1, size(app)):.1f}%)')

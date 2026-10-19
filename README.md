@@ -10,10 +10,14 @@ This is not a matching decomp. The aim is source that you can read, understand a
 |---|---|
 | `src/` | Recovered source, organized by subsystem |
 | `symbols/rtti.txt` | Generated names (classes, vtables, ctors/dtors) from MSVC RTTI. Regenerate, don't edit |
-| `symbols/names.txt` | Hand-curated names and signatures (overrides `rtti.txt`) |
+| `symbols/xdklib.txt` | Generated names of the statically linked XDK library code (CRT, STL, XAPI, D3D, DirectSound, XACT, XNet, ...), matched against the XDK's own `.lib` files. Regenerate, don't edit |
+| `symbols/xdk.txt` | Generated XDK names and signatures from XbSymbolDatabase (overrides `xdklib.txt`) |
+| `symbols/names.txt` | Hand-curated names and signatures (overrides everything else) |
 | `tools/xbe.py` | XBE parser: header info, flat memory image, section extraction |
 | `tools/rtti.py` | MSVC RTTI recovery (classes, base classes, vtables) |
 | `tools/gen_rtti_symbols.py` | Generates `symbols/rtti.txt` |
+| `tools/libmatch.py` | Generates `symbols/xdklib.txt` from a local XDK's `lib/` folder |
+| `tools/msvcname.py` | Readable names from MSVC decorated names (used by `libmatch.py`) |
 | `tools/ghidra_scripts/` | Headless Ghidra scripts: XBE setup, apply symbols, export |
 | `tools/data/xboxkrnl_ordinals.txt` | Kernel export ordinals/conventions (from nxdk, CC0) |
 
@@ -35,6 +39,19 @@ Output in `build/export/`:
 - `decomp/<section>.c`: raw Ghidra decompiler output for every function
 
 To work interactively, open `build/ghidra/UnleashX.gpr` in the Ghidra GUI (`tools/ghidra_12.1.4_PUBLIC/ghidraRun`).
+
+## Regenerating library symbols
+
+`Default.xbe` was linked against XDK 5933's static libraries (WMVDEC and
+XMOUSE excepted). With a local copy of that XDK's `lib/` folder (kept out of
+the repo, e.g. in the gitignored `reference/`), every library function is
+compared byte for byte with the XBE, relocated bytes masked. Unique matches
+are named, and their relocations then name their callees and the globals
+they use. Only names are written out.
+
+```sh
+python3 -I tools/libmatch.py UnleashX_0_39_0528A/Default.xbe reference/5933/lib
+```
 
 ## Regenerating RTTI symbols
 
