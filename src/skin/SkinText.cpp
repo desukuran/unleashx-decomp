@@ -46,7 +46,7 @@ static bool s_bNewsFeedDone;           // 0x00278CC0 current feed has no more it
 static CXmlElement *s_pNewsChannel;    // 0x00278CBC <channel> of the loaded feed
 static CXmlDocument *s_pNewsDoc;       // 0x002761E8
 static BOOL s_bNewsShown;              // 0x002761EC a headline has been shown
-static BOOL s_bNewsStarted;            // 0x00276244
+BOOL g_bNewsStarted;                   // 0x00276244
 static int s_nNewsLoadedFeed = -1;     // 0x0026C6CC index of the feed in s_pNewsDoc
 static wchar_t *s_pszNewsText;         // 0x002761F0 all headlines (0x401 chars)
 
@@ -552,7 +552,7 @@ static void UpdateNewsTexts(DWORD tick)
 
 		if (content.size() == 0)
 		{
-			if (!s_bNewsStarted || s_bNewsFeedDone)
+			if (!g_bNewsStarted || s_bNewsFeedDone)
 				loaded = LoadNewsFromDisk(url, &item);
 		}
 		else if (s_nNewsLoadedFeed == s_nNewsFeed)
@@ -619,7 +619,7 @@ static void UpdateNewsTexts(DWORD tick)
 			s_bNewsShown = TRUE;
 		}
 	}
-	s_bNewsStarted = TRUE;
+	g_bNewsStarted = TRUE;
 }
 
 // ----------------------------------------------------------------------------

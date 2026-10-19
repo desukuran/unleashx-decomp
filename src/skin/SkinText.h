@@ -30,3 +30,7 @@ void InvalidateSkinText(int source);               // 0x001146A3
 const wchar_t *GetInfoText(int source);            // 0x00117FB9 TODO: decompile
 // All headlines of the current feed (<Newsfeed Continuous>), or "".
 const wchar_t *GetNewsText();                      // 0x00114655
+
+// Set once the news ticker has started (the network thread starts
+// downloading feeds then).
+extern BOOL g_bNewsStarted;                        // 0x00276244

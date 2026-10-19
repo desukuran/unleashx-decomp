@@ -432,7 +432,7 @@
 00278cbc s_pNewsChannel
 002761e8 s_pNewsDoc
 002761ec s_bNewsShown
-00276244 s_bNewsStarted
+00276244 g_bNewsStarted
 0026c6cc s_nNewsLoadedFeed
 # system info helpers (src/system/SystemInfo.h)
 0008f7cb GetXboxVersion
@@ -861,4 +861,21 @@
 002784f8 g_ftpServer
 0026c238 g_ftpEventReceiver
 
-000eaab5 NetworkThreadProc
+000eaab5 NetworkThread
+# network thread (src/app/NetworkThread.cpp), FTP events (src/app/FtpEvents.cpp)
+0027620c g_bUpdateAvailable
+0026c200 g_strUpdateMessage
+00276210 g_bAutoLaunchPending
+00276234 g_bFtpActive
+00276214 g_bFtpLaunchPending
+0026c21c g_strFtpLaunchPath
+0002b9d0 CFTPEventReceiver::OnStatChanged
+0002b9f4 CFTPEventReceiver::OnSiteCommand
+0002c44a CFTPEventReceiver::OnExec
+000db7d3 CInternetSession::Get
+000db7e1 CInternetSession::IsDone
+00023396 CInternetSession::GetData
+00096269 HttpGetText
+00095b7d SyncTimeWithSntp
+0009db0c SetXbeTitleName
+0009f0ca IsFatxName

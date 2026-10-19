@@ -132,6 +132,11 @@ public:
 extern CUnleashX *g_pApp;                    // 0x00276204
 extern CAudioGUI *g_pAudioGUI;               // 0x00276228 the music player screen (mode 9)
 extern HANDLE g_hNetworkThread;              // 0x0026A630
+// Starts the network thread (NetworkThread.cpp) unless it's running.
+void StartNetworkThread();                   // 0x000EC903
+extern BOOL g_bUpdateAvailable;              // 0x0027620C a newer UnleashX was found
+extern std::string g_strUpdateMessage;       // 0x0026C200
+extern BOOL g_bAutoLaunchPending;            // 0x00276210
 
 // Set when the clock was invalid at boot (or by the SetClock action): the
 // date/time screen is shown.

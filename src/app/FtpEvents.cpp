@@ -17,8 +17,6 @@ BYTE g_bFtpActive;
 BOOL g_bFtpLaunchPending;
 std::string g_strFtpLaunchPath;
 
-void StartNetworkThread();   // 0x000EC903 TODO: decompile
-
 // Any FTP activity also cancels a pending shutdown.
 static void CancelShutdown()
 {

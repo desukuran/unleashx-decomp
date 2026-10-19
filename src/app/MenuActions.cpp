@@ -37,7 +37,6 @@ void ShowLaunchScreen(const char *path, const char *name);   // 0x000E3B65 TODO:
 // Maps D: to the XBE's folder and starts it; returns only on failure.
 DWORD LaunchXbeImage(const char *path, const char *args);    // 0x000A67D5 TODO: decompile
 // Starts the network from the settings on a thread (unless one is running).
-void StartNetworkThread();                           // 0x000EC903 TODO: decompile
 
 #ifndef _XBOX
 static void WritePort(WORD, BYTE) {}
