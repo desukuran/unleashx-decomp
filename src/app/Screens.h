@@ -17,6 +17,9 @@ class CXBFontEx;
 class CXBFont;
 class CAppSettings;
 class CSound;
+class CMessageBox;
+class CInternetSession;
+class CXmlDocument;
 struct IDirect3DTexture8;
 struct SGamepadState;
 
@@ -246,28 +249,99 @@ public:
 };
 
 
-// The skin chooser. 0xD0 bytes.
+// A skin offered by an online skin site (from its RSS feed). 0x2C8 bytes.
+struct SOnlineSkin
+{
+	// (this in esi)
+	SOnlineSkin(const char *title, const char *author, const char *link, const char *thumb);   // 0x0002825D
+
+	BOOL selected;                  // +0x000 ticked for download
+	std::string link;               // +0x004 the skin's zip
+	std::string thumb;              // +0x020 its preview (.jpg only)
+	std::string localThumb;         // +0x03C the preview once downloaded
+	wchar_t title[0x105];           // +0x058
+	wchar_t author[0x33];           // +0x262
+};
+
+// The skin chooser (mode 6, SkinBrowser.cpp): "Default", the built-in skins
+// and the skin folders (with skin.xml or a zipped skin), with a preview;
+// and the "Download Skin" list of an online skin site. No vtable; 0xD0
+// bytes.
 class CSkinBrowser
 {
 public:
-	CSkinBrowser();                                       // 0x000F6597
-	virtual ~CSkinBrowser();
-	HRESULT Init(IDirect3DTexture8 *checked, IDirect3DTexture8 *unchecked,
-	             CXBFontEx *font);                        // 0x000F5DEC
+	CSkinBrowser();                                       // 0x000F6597 (this in esi)
+	~CSkinBrowser();                                      // 0x000F5D35 (this in edi)
+	// checked/unchecked: the online list's tick boxes. E_FAIL without a
+	// font. (checked in eax, unchecked in ecx, this in ebx)
+	HRESULT Init(IDirect3DTexture8 *checked, IDirect3DTexture8 *unchecked, CXBFontEx *font);   // 0x000F5DEC
+	// Lays it out and lists the skins again. (this in ebx)
 	void Show();                                          // 0x000F6791
 	// (this in ecx, pad in eax)
-	void ProcessInput(int *action, SGamepadState **pad);  // 0x000F67FD TODO: decompile
-	void Render();                                        // 0x000F8685 TODO: decompile (this in esi)
-	BOOL IsOpen() const { return m_bOpen && !m_bClosing; }   // 0x0002B7ED
+	HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x000F67FD
+	HRESULT Render();                                     // 0x000F8685 (this in esi)
+	BOOL IsOpen() const { return m_bOpen && !m_bClosing; }   // 0x0002B7ED (this in eax)
 
-	BYTE m_unknown04[0x54];
-	std::string m_strSkinPath;                            // +0x58
-	BYTE m_unknown74[0x90 - 0x74];
-	BOOL m_bOpen;                                         // +0x90
-	BOOL m_bClosing;                                      // +0x94
+	std::vector<SOnlineSkin> m_online;    // +0x00
+	std::vector<SFileItem> m_skins;       // +0x10
+	CInternetSession *m_pSession;         // +0x20 the feed, then each download
+	CXmlDocument *m_pFeed;                // +0x24
+	BOOL m_bOnline;                       // +0x28 showing the online list
+	BOOL m_bDownloading;                  // +0x2C
+	BOOL m_bPreviewOnly;                  // +0x30 downloading just a preview (BLACK)
+	BOOL m_bCancel;                       // +0x34
+	int m_nDownloadIndex;                 // +0x38 -1 before the first
+	UINT m_nDownloaded;                   // +0x3C skins this time
+	CMessageBox *m_pMessageBox;           // +0x40
+	BOOL m_bMessageShown;                 // +0x44
+	BOOL m_bInstalling;                   // +0x48 the install thread runs
+	COptionMenu *m_pServerMenu;           // +0x4C "Select Server"
+	BOOL m_bServerMenuOpen;               // +0x50
+	CAppSettings *m_pSettings;            // +0x54
+	std::string m_strSkinPath;            // +0x58 <Skin Path>
+	float m_fY;                           // +0x74
+	float m_fX;                           // +0x78
+	float m_fWidth;                       // +0x7C
+	float m_fHeight;                      // +0x80
+	CXBFont *m_pFont;                     // +0x84
+	CXBFont *m_pCaptionFont;              // +0x88 the settings' dialog font, else m_pFont
+	CXBFont *m_pSymbolFont;               // +0x8C XboxDings
+	BOOL m_bOpen;                         // +0x90
+	BOOL m_bClosing;                      // +0x94
+	BOOL m_bKeyboardOpen;                 // +0x98 (never set)
+	CSound *m_pSoundMove;                 // +0x9C "Scroll"
+	int m_nSelected;                      // +0xA0 -1: the current skin's
+	int m_nTop;                           // +0xA4
+	int m_nBottom;                        // +0xA8
+	int m_nVisible;                       // +0xAC 0 until the first Render
+	BOOL m_bSkinChanged;                  // +0xB0 START saves it to Config.xml
+	IDirect3DTexture8 *m_pPreview;        // +0xB4 320x240
+	IDirect3DTexture8 *m_pChecked;        // +0xB8
+	IDirect3DTexture8 *m_pUnchecked;      // +0xBC
+	IDirect3DTexture8 *m_pServerLogo;     // +0xC0
+	float m_fCheckSize;                   // +0xC4 the tick box's height
+	BOOL m_bListed;                       // +0xC8 the list thread is done
+	DWORD m_dwListTick;                   // +0xCC when it was started
+
+private:
+	// Lists the skins. (thread; this on the stack)
+	static unsigned __stdcall ListThread(void *param);    // 0x000F66EC
+	HRESULT ListSkins();                                  // 0x000F6098
+	// Starts the list thread. (this in esi)
+	void StartList();                                     // 0x000F673A
+	void ShowServerMenu();                                // 0x000F5EE9 (this in ebx)
+	// (this in edi)
+	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x000F5F78
+	// The online list, downloads and installs. (this on the stack)
+	HRESULT RenderOnline();                               // 0x000F76A4
+	// Loads the highlighted skin's preview (when previews are on).
+	void UpdatePreview();                                 // (inlined in ProcessInput)
+	void ScrollToSelection();                             // (inlined in ProcessInput)
 };
 
 class CMessageBox;
+class CInternetSession;
+class CXmlDocument;
 struct SKeystroke;
 
 // The text editor (mode 8, NotePad.cpp): a window with the file name, the

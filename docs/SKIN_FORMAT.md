@@ -219,3 +219,48 @@ Two adjustments keep colors distinguishable: if `KB_KEYBG_DISABLED` equals `KB_K
 
 - **No `<Main>`** (and the `[Default]` skin): a column on the left with date/time, free MB per drive (F/G only if mapped) and CPU/board temperatures; IP, FTP clients, tray state and nickname on the right; song name and time.
 - **No `<MusicPlayer>`**: a player drawn with shapes in the `MM*` colors (`CSkin::SetDefaultMusicPlayerLayout`).
+
+## The skin browser
+
+The `Skins` action opens `CSkinBrowser` (`src/app/SkinBrowser.cpp`).
+
+### Local list
+
+The list has `Default`, the built-in skins, and every folder under `<SkinPath>` that has either a `skin.xml` or a `.zip` with a `skin.xml` in it. For a zipped skin, `preview.jpg` is unzipped next to the zip the first time the list is built.
+
+| Button | Effect |
+|---|---|
+| A | Applies the highlighted skin. Pressed again on the same skin, it acts like START. |
+| START | Saves the skin to `<Settings><Preference><Skin>` in Config.xml (not when running from DVD), saves the splash for the next boot, and closes. |
+| B / BACK | Closes. The skin that's showing stays, but it isn't saved. |
+| Y / remote INFO | Opens "Select Server". |
+| Right stick click | Turns previews (`<skin>\preview.jpg`) on or off. |
+
+### Downloading skins
+
+Two RSS feeds are offered:
+
+* AllXboxSkins.com: `http://www.allxboxskins.com/rssunleashxdash.xml` (logo `<data>\allxboxskins.jpg`)
+* Xbox-Skins.net: `http://www.xbox-skins.net/rss/uxdash.php` (logo `<data>\xboxskins.jpg`)
+
+The feed is read as `<Channel><Item>` elements with `Title`, `Author`, `Link` and `Thumb` children.
+
+* Items are skipped when the link doesn't start with `http:`, or when the title matches an installed skin folder.
+* A `Thumb` that isn't a `.jpg` is ignored.
+
+In the online list:
+
+* A toggles a skin's tick. X toggles it and moves down.
+* BLACK downloads the highlighted skin's thumbnail and shows it.
+* START downloads the ticked skins.
+* B/BACK goes back to the local list, and cancels a download that's running.
+
+Each download goes to `<SkinPath>\<Title>\<Title without spaces>.zip`, then its thumbnail goes to `preview.jpg`. A thread then installs it:
+
+* A zip with `skin.xml` at its top level is left as it is.
+* Any other zip is unpacked.
+* A file that doesn't open as a zip is renamed to `.rar` and unrarred.
+
+If the `skin.xml` ends up in a subfolder, that subfolder's contents are moved up into the skin folder.
+
+The final message counts the skins and kilobytes downloaded. At 10 skins it also asks you to keep downloads to 10 at most; nothing actually enforces the limit.

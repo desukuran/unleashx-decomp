@@ -203,8 +203,6 @@ void DrawSavedScreen(IDirect3DTexture8 *texture, DWORD width, DWORD height, floa
 HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 *device);   // 0x0009F23D TODO: decompile
 // Text centered on x, y. TODO: decompile
 void DrawTextCentered(CXBFont *font, float x, float y, const wchar_t *text, D3DCOLOR color, DWORD flags);   // 0x0002AED1
-// Mounts a utility partition folder? TODO: identify (XDK)
-BOOL XSetupDriveFolder(const char *drive, const wchar_t *name);   // 0x000373FB
 // Called by the kernel for each thread created/ended. TODO: decompile
 void __stdcall ThreadNotifyRoutine(BOOL create);    // 0x000DFF8C
 

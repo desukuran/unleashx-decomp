@@ -1167,7 +1167,6 @@
 00024845 CNotePad::IsOpen
 0010496b CNotePad::Render
 00105438 CNotePad::ProcessInput
-0002b806 CScreenSaver::IsTextOnly
 001398f7 CScreenSaver::Render
 000e0e0f CUnleashX::RenderBackground
 0010160b CSkin::Render
@@ -1356,7 +1355,6 @@
 000de1ea CVirtualKeyboard::HandleKeystroke int f(CVirtualKeyboard *this@eax)
 000de720 CVirtualKeyboard::BuildLayouts
 000985a4 GetKeystroke
-00098fc3 CXBFont::GetTextExtent
 0026c23c s_keyboardLanguages
 0026a69c s_pKeyboardStrings
 0026cc24 s_nKeyboardPort
@@ -1443,7 +1441,6 @@
 000d93d1 UrlEncode
 00278478 g_md5
 00278d50 s_bWebCacheChecked
-000226f6 StrMakeLower
 000a51ac UnzipThread
 000a79ff MoveThread
 000a8365 DeleteThread
@@ -1601,3 +1598,15 @@
 000a39d9 MapDriveLink
 000a94f0 FormatPartition
 0009da9b FormatMemoryUnit
+000f5d35 CSkinBrowser::~CSkinBrowser
+000f6098 CSkinBrowser::ListSkins
+000f673a CSkinBrowser::StartList
+000f5ee9 CSkinBrowser::ShowServerMenu
+000f5f78 CSkinBrowser::ShowMessage
+000f76a4 CSkinBrowser::RenderOnline
+000f5d18 OnlineSkinLess
+000f6701 EnsureChildElement
+0002825d SOnlineSkin::SOnlineSkin
+0008ebd8 FindZipItem
+000f9d63 CSkin::SaveSplashForBoot
+001017de CSkin::ChangeSkin

@@ -3,6 +3,7 @@
 
 #include "../common/FileUtil.h"
 #include "../common/StrUtil.h"
+#include "../common/XboxKernel.h"
 #include "../settings/AppSettings.h"
 #include "../thirdparty/XUnzip.h"
 #include "../xml/XmlDocument.h"
@@ -30,6 +31,12 @@ static const struct
 int GetInternalSkinCount()
 {
 	return sizeof(g_internalSkins) / sizeof(g_internalSkins[0]);
+}
+
+// (inlined in the skin browser)
+const char *GetInternalSkinName(int index)
+{
+	return g_internalSkins[index].name;
 }
 
 // 0x000F90B0
@@ -343,4 +350,16 @@ void CSkin::BeginLoad(const char *path)
 	{
 		SetThreadPriority(m_hLoadThread, THREAD_PRIORITY_ABOVE_NORMAL);
 	}
+}
+
+// 0x000F9D63 (this in eax)
+BOOL CSkin::SaveSplashForBoot()
+{
+	if (!m_bZipped && XSetupDriveFolder("U:\\", L"SkinFile"))
+		XSetupDriveFolder("X:\\", L"SkinFile");
+	std::string target = "E:\\UDATA\\9e115330\\0064122817A8\\Splash.jpg";
+	DeleteFileA(target.c_str());
+	if (m_strSplashFile.size() != 0)
+		CopyFileA(m_strSplashFile.c_str(), target.c_str(), FALSE);
+	return TRUE;
 }

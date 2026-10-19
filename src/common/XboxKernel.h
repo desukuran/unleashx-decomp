@@ -108,6 +108,8 @@ DWORD XGetProcessQuantumLength();
 void XSetProcessQuantumLength(DWORD quantum);
 void SetLastError(DWORD error);
 BOOL SetEndOfFile(HANDLE file);
+// Mounts a utility partition folder? TODO: identify (XAPI range)
+BOOL XSetupDriveFolder(const char *drive, const wchar_t *name);   // 0x000373FB
 BOOL CreateDirectoryA(LPCSTR path, void *security);
 
 struct OVERLAPPED

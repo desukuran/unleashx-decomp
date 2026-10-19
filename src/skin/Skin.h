@@ -239,6 +239,13 @@ public:
 	// Plays file in the <Menu><Preview> area (NULL or "" stops it).
 	void PlayPreview(const char *file);               // 0x000FD563 TODO: decompile
 	void BeginLoad(const char *path);                 // 0x00101743
+	// Switches skins: stops the videos, keeps a picture of the screen for
+	// the loading screen and starts BeginLoad (NULL = the default skin).
+	// (this in eax)
+	void ChangeSkin(const char *path);                // 0x001017DE TODO: decompile
+	// Copies the skin's UXSplash next to the dashboard's data
+	// (E:\UDATA\...\Splash.jpg), for the next boot. (this in eax)
+	BOOL SaveSplashForBoot();                         // 0x000F9D63
 	void SetDefaultMainLayout();                      // 0x000FCEA6 TODO: decompile
 	void SetDefaultMusicPlayerLayout();               // 0x000FA219 TODO: decompile
 
@@ -372,5 +379,7 @@ SSkinText MakeSkinTextPublic(int left, int top, int width, int height, int sourc
                              int scaleX, int scaleY, int scroll, CXBFont *font, DWORD align);   // 0x000266B8
 int GetInternalSkinCount();                                // 0x000F8E27
 int FindInternalSkin(const char *name);                    // 0x000F90B0
+// The built-in skin's name (g_internalSkins[index].name). (inlined)
+const char *GetInternalSkinName(int index);
 DWORD ParseSkinAlign(const char *align);                   // 0x000F9B86
 void ParseSkinRect(SSkinRect *rect, CXmlElement *element);  // 0x000F9CA6
