@@ -1014,3 +1014,4 @@
 0001123b CFileBrowser::IsOpen
 000112d9 CFileBrowser::GetSelectedPath
 000202ee WStringToString
+000ca63b CQuickLaunch::Save

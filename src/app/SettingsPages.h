@@ -120,3 +120,31 @@ public:
 
 	BOOL Save();                                              // 0x000CAA5D
 };
+
+// AutoRun Settings ("QuickLaunch"): an XBE for each gamepad button and
+// remote control digit, in <Settings><Shortcut><GP_A>path</GP_A>...
+// 0xB8 bytes, vtable 0x002567EC.
+class CQuickLaunch : public CSettingsBase
+{
+public:
+	enum
+	{
+		ITEM_GAMEPAD_HEADER,
+		ITEM_GP_A,              // ... ITEM_GP_BLACK = 7: A, B, X, Y, Start, White, Black
+		ITEM_GP_BLACK = 7,
+		ITEM_IR_HEADER,
+		ITEM_IR_0,              // ... ITEM_IR_9 = 18
+		ITEM_IR_9 = 18,
+		ITEM_SAVE_HEADER,
+		ITEM_SAVE,
+		ITEM_RESET,
+		ITEM_EXIT,
+	};
+
+	CQuickLaunch();                                           // 0x000C1D0B
+	virtual ~CQuickLaunch();                                  // 0x000C1CF7
+	virtual HRESULT Init(CXBFont *font);                      // 0x000C45AB
+	virtual HRESULT HandleInput(int *action, SGamepadState **pad);   // 0x000D5734
+
+	BOOL Save();                                              // 0x000CA63B
+};
