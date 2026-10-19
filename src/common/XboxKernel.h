@@ -43,6 +43,12 @@ DWORD XGetLanguage();
 extern "C" {
 
 typedef LONG NTSTATUS;
+
+typedef struct _IO_STATUS_BLOCK
+{
+	NTSTATUS Status;
+	ULONG Information;
+} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
 #define NT_SUCCESS(status) ((NTSTATUS)(status) >= 0)
 
 typedef struct _ANSI_STRING
@@ -64,17 +70,61 @@ typedef struct _OBJECT_ATTRIBUTES
 NTSTATUS __stdcall NtOpenSymbolicLinkObject(PHANDLE LinkHandle, POBJECT_ATTRIBUTES ObjectAttributes);
 NTSTATUS __stdcall NtQuerySymbolicLinkObject(HANDLE LinkHandle, PSTRING LinkTarget, PULONG ReturnedLength);
 NTSTATUS __stdcall NtClose(HANDLE Handle);
+NTSTATUS __stdcall NtCreateFile(HANDLE *FileHandle, ULONG DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes,
+                                PIO_STATUS_BLOCK IoStatusBlock, LARGE_INTEGER *AllocationSize, ULONG FileAttributes,
+                                ULONG ShareAccess, ULONG CreateDisposition, ULONG CreateOptions);
 NTSTATUS __stdcall IoCreateSymbolicLink(PSTRING SymbolicLinkName, PSTRING DeviceName);
 NTSTATUS __stdcall IoDeleteSymbolicLink(PSTRING SymbolicLinkName);
 void __stdcall RtlInitAnsiString(PANSI_STRING Destination, const char *Source);
 
 extern PANSI_STRING XeImageFileName;
 extern STRING HalDiskSerialNumber;
+typedef struct _XBOX_KRNL_VERSION
+{
+	USHORT Major;
+	USHORT Minor;
+	USHORT Build;
+	USHORT Qfe;
+} XBOX_KRNL_VERSION;
+extern XBOX_KRNL_VERSION XboxKrnlVersion;
 extern BYTE XboxHDKey[16];
 void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime);
 NTSTATUS __stdcall HalReadSMBusValue(UCHAR address, UCHAR command, BOOLEAN readWord, ULONG *value);
 
 }
+
+// IDE pass-through (not in the XDK headers)
+typedef struct _IDEREGS
+{
+	UCHAR bFeaturesReg;
+	UCHAR bSectorCountReg;
+	UCHAR bSectorNumberReg;
+	UCHAR bCylLowReg;
+	UCHAR bCylHighReg;
+	UCHAR bDriveHeadReg;
+	UCHAR bCommandReg;   // status on return
+	UCHAR bHostSendsData;
+} IDEREGS;
+
+typedef struct _ATA_PASS_THROUGH
+{
+	IDEREGS IdeReg;
+	ULONG DataBufferSize;
+	void *DataBuffer;
+} ATA_PASS_THROUGH;
+
+#define IOCTL_IDE_PASS_THROUGH 0x0004D028
+
+#ifndef _XBOX
+#define GENERIC_READ 0x80000000
+#define SYNCHRONIZE 0x00100000
+#define FILE_SHARE_READ 0x00000001
+#define FILE_SHARE_WRITE 0x00000002
+#define FILE_OPEN 0x00000001
+#define FILE_SYNCHRONOUS_IO_NONALERT 0x00000020
+BOOL DeviceIoControl(HANDLE device, DWORD code, void *in, DWORD inSize, void *out, DWORD outSize, DWORD *returned,
+                     void *overlapped);
+#endif
 
 // XAPI
 BOOL GetDiskFreeSpaceExA(const char *root, ULONGLONG *freeAvailable, ULONGLONG *total, ULONGLONG *totalFree);

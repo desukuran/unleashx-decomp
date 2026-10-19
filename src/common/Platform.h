@@ -81,6 +81,8 @@ BOOL SetFileAttributesA(LPCSTR fileName, DWORD attributes);
 DWORD GetFileAttributesA(LPCSTR fileName);
 BOOL GetFileAttributesExA(LPCSTR fileName, GET_FILEEX_INFO_LEVELS level, void *info);
 BOOL FileTimeToSystemTime(const FILETIME *fileTime, SYSTEMTIME *systemTime);
+BOOL FileTimeToLocalFileTime(const FILETIME *fileTime, FILETIME *localFileTime);
+char *_fcvt(double value, int count, int *decimalPos, int *negative);
 void OutputDebugStringA(LPCSTR text);
 void Sleep(DWORD ms);
 int MultiByteToWideChar(unsigned codePage, DWORD flags, const char *src, int srcLen, wchar_t *dst, int dstLen);

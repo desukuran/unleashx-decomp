@@ -6,7 +6,7 @@ CXXFLAGS ?= -std=c++11 -Wall -Wextra -O1 -g
 COMMON := src/common/StrUtil.cpp src/common/ObList.cpp src/common/PlatformHost.cpp src/common/FileUtil.cpp
 XML := src/xml/XmlDocument.cpp src/xml/XmlUtil.cpp
 SETTINGS := src/settings/AppSettings.cpp src/settings/ConfigLoader.cpp
-SYSTEM := src/system/Drives.cpp src/system/Dvd.cpp
+SYSTEM := src/system/Drives.cpp src/system/Dvd.cpp src/system/SystemInfo.cpp
 NET := src/net/Network.cpp src/net/XNetHost.cpp
 SKIN := src/skin/Skin.cpp src/skin/SkinText.cpp src/skin/SkinParser.cpp src/skin/SkinColors.cpp src/skin/SkinDefaults.cpp
 UI := src/ui/Language.cpp
@@ -18,7 +18,13 @@ HEADERS := $(wildcard src/*/*.h) src/ui/StringTable.inc
 
 TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test
 
-all: $(TESTS)
+# Xbox-only sources (hardware access): syntax-checked, not linked.
+XBOX_ONLY := src/system/Hardware.cpp src/skin/SkinLoader.cpp
+
+all: $(TESTS) check
+
+check:
+	$(CXX) $(CXXFLAGS) -fsyntax-only $(XBOX_ONLY)
 
 build/%: tests/%.cpp $(LIBS) $(STUBS) $(HEADERS)
 	@mkdir -p build
@@ -35,4 +41,4 @@ test: $(TESTS)
 	build/skintext_test
 	@echo ok
 
-.PHONY: all test
+.PHONY: all test check

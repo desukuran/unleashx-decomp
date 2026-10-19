@@ -29,26 +29,16 @@ void MakeFatxPath(const char *path, std::string &out) { out = path; }
 std::string GetPersistentDataPath(const wchar_t *, unsigned int) { return std::string(); }
 std::string GetXbeTitleName(const char *) { return std::string(); }
 
-// SystemInfo.h
-wchar_t GetThousandsSeparator() { return L','; }
-wchar_t GetDecimalSeparator() { return L'.'; }
-void FormatNumberW(wchar_t *out, ULONGLONG n) { swprintf(out, 100, L"%llu", (unsigned long long)n); }
-std::string FormatDouble(int decimals, double v) { std::string s; StrFormat(s, "%.*f", decimals, v); return s; }
-std::string FormatIPAddress(DWORD addr) { std::string s; StrFormat(s, "%u.%u.%u.%u", addr & 0xFF, (addr >> 8) & 0xFF, (addr >> 16) & 0xFF, addr >> 24); return s; }
-std::string GetKernelVersionString() { return "1.0.5838.1"; }
+// SystemInfo.h (Hardware.cpp is Xbox only)
 std::string GetFlashChipName(BOOL) { return "Unknown"; }
 void GetXboxVersion(char *out) { strcpy(out, "V1.0"); }
 float ReadTemperature(BOOL, BOOL) { return 40.0f; }
-void FormatFileTime(const FILETIME *, wchar_t *date, wchar_t *time, BOOL, BOOL)
-{
-	if (date) wcscpy(date, L"2026-10-19");
-	if (time) wcscpy(time, L"12:00:00");
-}
 void GetIdeModel(BOOL hdd, char *out, unsigned) { strcpy(out, hdd ? "ST310014A   " : "PHILIPS XBOX DVD"); }
 void GetIdeSerial(BOOL, char *out, unsigned) { out[0] = 0; }
 void GetIdeFirmware(BOOL, char *out, unsigned) { strcpy(out, "3.10"); }
 WORD GetHddSecurityStatus() { return HDD_SECURITY_SUPPORTED | HDD_SECURITY_ENABLED; }
 BYTE GetHddTemperature() { return 0; }
+void GetSmartAttribute(unsigned, DWORD *, DWORD *, DWORD *) {}
 CMD5::CMD5(const void *, int) { m_bValid = false; }
 BOOL CMD5::HashMemory(const void *, int) { return FALSE; }
 

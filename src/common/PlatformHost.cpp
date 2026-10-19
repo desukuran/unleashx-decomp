@@ -94,6 +94,17 @@ BOOL CopyFileA(LPCSTR, LPCSTR, BOOL)
 	return FALSE;
 }
 
+BOOL FileTimeToLocalFileTime(const FILETIME *ft, FILETIME *local)
+{
+	*local = *ft;   // the host stand-in treats UTC as local time
+	return TRUE;
+}
+
+char *_fcvt(double value, int count, int *decimalPos, int *negative)
+{
+	return fcvt(value, count, decimalPos, negative);
+}
+
 void OutputDebugStringA(LPCSTR text)
 {
 	fputs(text, stderr);
@@ -187,6 +198,7 @@ NTSTATUS __stdcall NtQuerySymbolicLinkObject(HANDLE, PSTRING, PULONG)
 }
 STRING HalDiskSerialNumber = {9, 10, (char *)"HOSTDISK1"};
 BYTE XboxHDKey[16];
+XBOX_KRNL_VERSION XboxKrnlVersion = {1, 0, 5838, 1};
 
 void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime)
 {

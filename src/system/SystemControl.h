@@ -8,4 +8,4 @@
 void SetXboxSystemTime(SYSTEMTIME st, BOOL local);   // 0x0009DD2F TODO: decompile
 
 void SetFanSpeed(int speed);                         // 0x0009F552 TODO: decompile
-int GetFanSpeed();                                   // 0x0009E66D TODO: decompile
+int GetFanSpeed();                                   // 0x0009E66D (Hardware.cpp)

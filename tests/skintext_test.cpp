@@ -5,6 +5,7 @@
 #include "../src/settings/AppSettings.h"
 #include "../src/skin/Skin.h"
 #include "../src/skin/SkinText.h"
+#include "../src/system/SystemInfo.h"
 
 int main()
 {
@@ -52,6 +53,28 @@ int main()
 			failures++;
 		}
 	}
+	// Number formatting (English separators)
+	wchar_t number[100];
+	FormatNumberW(number, 1234567);
+	if (wcscmp(number, L"1,234,567") != 0)
+		printf("FAIL FormatNumberW: %ls\n", number), failures++;
+	FormatNumberW(number, 123);
+	if (wcscmp(number, L"123") != 0)
+		printf("FAIL FormatNumberW: %ls\n", number), failures++;
+	const struct
+	{
+		double v;
+		const char *expected;
+	} doubles[] = {{1234.5, "1,234.50"}, {0.5, "0.50"}, {0.05, "0.05"}, {123456.789, "123,456.79"}, {-2, "-2.00"}};
+	for (size_t i = 0; i < sizeof(doubles) / sizeof(doubles[0]); i++)
+	{
+		std::string s = FormatDouble(2, doubles[i].v);
+		if (s != doubles[i].expected)
+			printf("FAIL FormatDouble(%g): %s\n", doubles[i].v, s.c_str()), failures++;
+	}
+	if (FormatIPAddress(0x0500A8C0) != "192.168.0.5")
+		failures++;
+
 	InvalidateSkinText(TEXT_APPVERSION);
 	if (wcscmp(GetSkinTextValue(TEXT_APPVERSION), L"0.39.0528A") != 0)
 		failures++;
