@@ -112,6 +112,16 @@ entries of name, path, launch count and region, most recent first. Items on
 | X | The recent list (if `AllowRecentList`). |
 | Remote 0-9 | Shortcuts: `<Settings><Shortcut><IR_1>...</IR_1>` in Config.xml, an XBE path or an action without spaces. |
 | BACK during a file operation | Cancels it. |
+| Y, remote INFO | The System Info screen (SETTINGS.md, "Xbox Info"). |
+| BLACK | Pauses/resumes the preview video. |
+| BLACK held + D-pad right | The next RSS news item. |
+| WHITE | The music player, while soundtrack music plays. |
+| Right stick click, remote PLAY | Starts the soundtrack player when it isn't running yet; with a preview playing, toggles it full screen. |
+| Remote MENU (any screen), BACK (other screens) | Back to the menu. |
+
+The debug keyboard works too: Enter and the Windows keys are START, Esc is
+B, the arrows move, the Menu key is WHITE, Alt+F4 is BACK, and other keys
+type.
 
 With previews on, the selected item's `Preview` starts after the selection
 has rested for half a second.
