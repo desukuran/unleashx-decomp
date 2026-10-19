@@ -4,7 +4,6 @@
 #include "../src/audio/SoundEffects.h"
 #include "../src/common/FileUtil.h"
 #include "../src/input/Gamepad.h"
-#include "../src/net/Newsfeed.h"
 #include "../src/settings/AppSettings.h"
 #include "../src/system/Drives.h"
 #include "../src/system/SystemControl.h"
@@ -12,7 +11,6 @@
 #include "../src/app/XBApp.h"
 
 CGamepadInput g_gamepadInput;
-CNewsfeed g_newsfeed;
 CSoundEffects g_soundEffects;
 
 void SetXboxSystemTime(SYSTEMTIME st, BOOL) { printf("[stub] SetXboxSystemTime(%d)\n", st.wYear); }
@@ -23,7 +21,6 @@ XBGAMEPAD g_Gamepads[4];
 SIRRemote g_irRemotes[4];
 SKeyboardState g_keyboards[4];
 void UpdateGamepads(CXBApplicationEx *) {}
-HRESULT CNewsfeed::AddFeed(const char *url, const char *title) { printf("[stub] AddFeed(%s, '%s')\n", url, title); return S_OK; }
 CSoundEffects::CSoundEffects() : m_pSettings(NULL), m_bDisabled(FALSE), m_bQuiet(FALSE) {}
 CSoundEffects::~CSoundEffects() {}
 void CSoundEffects::SetQuiet(BOOL quiet) { m_bQuiet = quiet; }

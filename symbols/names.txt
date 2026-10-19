@@ -209,7 +209,7 @@
 00278280 g_gamepadInput
 000e020f UpdateGamepads void f(void *app@esi)
 00276204 g_pApp
-00138146 CNewsfeed::AddFeed HRESULT f(void *self, char *title, char *url@eax)
+00138146 CNewsfeed::AddFeed HRESULT f(void *self, char *content, char *url@eax)
 002784b0 g_newsfeed
 001380ef CSoundEffects::SetQuiet void f(BOOL quiet@eax, void *self@esi)
 002784d0 g_soundEffects
@@ -467,6 +467,11 @@
 # newsfeed
 00021409 CNewsfeed::GetUrl
 001381b3 CNewsfeed::GetContent
+00137d8d CNewsfeed::~CNewsfeed
+00137e0d CNewsfeed::Find
+00137e8c CNewsfeed::FindContent
+0002e39e SNewsfeed::SNewsfeed
+000214c1 CNewsfeed::GetCount
 # XAPI
 0003842e XFindFirstNicknameW
 000380e7 GlobalMemoryStatus
@@ -1030,7 +1035,14 @@
 000a4225 SaveTextureToXpr
 00078582 urarlib_list
 00078811 urarlib_get
+# unrar 3.x (extract.cpp, cmddata.cpp, find.cpp): third-party, named only
+0013980d CmdExtract::DoExtract
+00139674 CmdExtract::ExtractArchive
+0013877d CmdExtract::ExtractCurrentFile
+0007bfd5 CommandData::GetArcName
+00079a0a FindFile::FastFind
 0007850e urarlib_freelist
+000b1240 MD5Transform
 000c66fd CNetworkSetting::Save
 000c0107 CNetworkSetting::ShowAddresses
 # HDD settings page lock dialog (src/app/HddLockDialog.cpp)

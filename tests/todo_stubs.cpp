@@ -9,7 +9,6 @@
 #include "../src/system/SystemInfo.h"
 #include "../src/thirdparty/XKUtils.h"
 #include "../src/audio/MusicManager.h"
-#include "../src/net/Newsfeed.h"
 #include "../src/common/StrUtil.h"
 #include "../src/net/FtpClient.h"
 #include <cstring>
@@ -43,10 +42,6 @@ CMusicManager *g_pMusicManager = NULL;
 HRESULT CMusicManager::GetSongInfo(wchar_t *, wchar_t *, DWORD *) { return E_FAIL; }
 SSongFormat *CMusicManager::GetSongFormat() { return NULL; }
 float CMusicManager::GetSongPosition() { return 0.0f; }
-
-// Newsfeed.h
-std::string CNewsfeed::GetUrl(int) { return std::string(); }
-std::string CNewsfeed::GetContent(const char *) { return std::string(); }
 
 // FileOps.h
 void ZipFiles(const char *source, const char *zipFile, int) { printf("[stub] ZipFiles(%s, %s)\n", source, zipFile); }
