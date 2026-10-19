@@ -1,4 +1,7 @@
 // CVirtualKeyboard: the on-screen keyboard. See VirtualKeyboard.h.
+// (Not decompiled, as nothing calls them: 0x000DBB67 draws text with a
+// shadow, 0x000DBEDE draws language names, 0x000DD83A reads the gamepad
+// with key repeat.)
 #include "VirtualKeyboard.h"
 
 #include <cmath>
