@@ -17,7 +17,9 @@ int main(int argc, char **argv)
 
 	std::string dir = argv[1];
 	CXmlDocument doc;
-	if (!doc.Load((dir + "/Skin.xml").c_str()))
+	if (dir.size() < 4 || dir.compare(dir.size() - 4, 4, ".xml") != 0)
+		dir += "/Skin.xml";
+	if (!doc.Load(dir.c_str()))
 	{
 		fprintf(stderr, "load failed\n");
 		return 1;

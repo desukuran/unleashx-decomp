@@ -19,3 +19,11 @@ void ResolvePath(const char *path, std::string &out);               // 0x000AC73
 // Writes text to path (append: add to the end instead of replacing). Returns
 // FALSE for empty text.
 BOOL WriteTextFile(const char *path, const char *text, BOOL append);   // 0x000A5BC6 TODO: decompile
+
+// Directory part of a path to a file ("" if path has no file name).          TODO: verify
+std::string GetPathDirectory(const char *path);                       // 0x000A4B0E TODO: decompile
+BOOL CreateDirectoryTree(const char *path);                           // 0x000A3F51 TODO: decompile
+// Fixes up a path for FATX (name length/characters). TODO: verify
+void MakeFatxPath(const char *path, std::string &out);                // 0x000A4630 TODO: decompile
+// Per-title persistent folder for name (flags as XapiMapLetterToDirectory). TODO: verify
+std::string GetPersistentDataPath(const wchar_t *name, unsigned int flags);   // 0x000A6D44 TODO: decompile

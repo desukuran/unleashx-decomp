@@ -283,3 +283,17 @@
 0009ce46 CWMVideoPlayer::Open
 0005f0f1 _strtoul ulong __cdecl f(char *s, char **end, int base)
 000226f6 StrMakeLower
+0008e753 OpenZip
+0008e725 GetZipItem
+0008eae0 UnzipItem
+0008e5f2 CloseZip
+000f8e27 GetInternalSkinCount
+0026a470 g_internalSkins
+000a4b0e GetPathDirectory
+000a3f51 CreateDirectoryTree
+000a4630 MakeFatxPath
+000a6d44 GetPersistentDataPath
+00012a74 StrMidFrom
+0005df0b _beginthreadex
+00038ae2 XLoadSection
+00038afd XFreeSection

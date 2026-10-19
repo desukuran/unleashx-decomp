@@ -2,7 +2,7 @@
 
 This reference is reconstructed from the decompiled parser (`src/skin/SkinParser.cpp`, original `CSkin::Parse` at `0x000FD644`). It describes what UnleashX 0.39.0528A actually reads, quirks included. Tag and attribute names are case-insensitive.
 
-A skin is a folder (or a `.zip`) under the Skins path containing `Skin.xml` plus its images, fonts and videos. An optional `UXSplash.jpg` (or `.png`) next to it is the loading splash. Two image-less skins are built in: `NoImages_Blue -By Jezz_X` and `NoImages_Green -By Jezz_X`, stored in the XBE's `INT_SKINS` section.
+A skin is a folder (or a `.zip`) under the Skins path containing `Skin.xml` plus its images, fonts and videos. An optional `UXSplash.jpg` (or `.png`) next to it is the loading splash. Eight skins are built in, stored as a zip in the XBE's `INT_SKINS` section: `NoImages_Blue -By Jezz_X`, `NoImages_Green -By Jezz_X`, `NoImages - By Jezz_X`, and `BlueShapes`, `GreenShapes`, `OrangeShapes`, `PurpleShapes` and `RedShapes` (all `- By Kthulu`). Extract them with `tools/xbe.py extract` and unzip `INT_SKINS.bin`.
 
 ## File paths
 

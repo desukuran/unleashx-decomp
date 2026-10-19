@@ -223,7 +223,8 @@ public:
 	void SetDefaults();                               // 0x000F9166
 	void Free();                                      // 0x000F9372
 	BOOL Parse(CXmlDocument *doc);                    // 0x000FD644
-	BOOL Load(const char *path);                      // 0x000FFE1A TODO: decompile
+	BOOL Load(const char *path);                      // 0x000FFE1A
+	void BeginLoad(const char *path);                 // 0x00101743
 	void SetDefaultMainLayout();                      // 0x000FCEA6 TODO: decompile
 	void SetDefaultMusicPlayerLayout();               // 0x000FA219 TODO: decompile
 
@@ -348,5 +349,7 @@ extern CSkin g_skin;   // 0x00277968
 // CaptionFont). 0x002784C0
 extern CFontTable g_fonts;
 
+int GetInternalSkinCount();                                // 0x000F8E27
+int FindInternalSkin(const char *name);                    // 0x000F90B0
 DWORD ParseSkinAlign(const char *align);                   // 0x000F9B86
 void ParseSkinRect(SSkinRect *rect, CXmlElement *element);  // 0x000F9CA6

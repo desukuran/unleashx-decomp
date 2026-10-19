@@ -84,6 +84,32 @@ void OutputDebugStringA(LPCSTR text);
 void Sleep(DWORD ms);
 int MultiByteToWideChar(unsigned codePage, DWORD flags, const char *src, int srcLen, wchar_t *dst, int dstLen);
 #define INFINITE 0xFFFFFFFF
+#define INVALID_HANDLE_VALUE ((HANDLE)-1)
+#define THREAD_PRIORITY_ABOVE_NORMAL 1
+#ifndef __stdcall
+#define __stdcall
+#endif
+
+struct WIN32_FIND_DATAA
+{
+	DWORD dwFileAttributes;
+	FILETIME ftCreationTime;
+	FILETIME ftLastAccessTime;
+	FILETIME ftLastWriteTime;
+	DWORD nFileSizeHigh;
+	DWORD nFileSizeLow;
+	char cFileName[260];
+	char cAlternateFileName[14];
+};
+
+HANDLE FindFirstFileA(LPCSTR pattern, WIN32_FIND_DATAA *data);
+BOOL FindNextFileA(HANDLE find, WIN32_FIND_DATAA *data);
+void *XLoadSection(LPCSTR name);
+BOOL XFreeSection(LPCSTR name);
+BOOL SetThreadPriority(HANDLE thread, int priority);
+uintptr_t _beginthreadex(void *security, unsigned stackSize, unsigned (__stdcall *start)(void *), void *arg,
+                         unsigned flags, unsigned *threadId);
+int stricmp(const char *a, const char *b);
 DWORD WaitForSingleObject(HANDLE handle, DWORD ms);
 BOOL CloseHandle(HANDLE handle);
 DWORD GetTickCount();
