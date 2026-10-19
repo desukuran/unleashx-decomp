@@ -248,8 +248,8 @@ public:
 	// Copies the skin's UXSplash next to the dashboard's data
 	// (E:\UDATA\...\Splash.jpg), for the next boot. (this in eax)
 	BOOL SaveSplashForBoot();                         // 0x000F9D63
-	void SetDefaultMainLayout();                      // 0x000FCEA6 TODO: decompile
-	void SetDefaultMusicPlayerLayout();               // 0x000FA219 TODO: decompile
+	void SetDefaultMainLayout();                      // 0x000FCEA6
+	void SetDefaultMusicPlayerLayout();               // 0x000FA219
 
 	HRESULT PollLoad(BOOL *busy);                     // 0x000F8E2B
 	// Draws the skin's own elements (texts, images...). (this in eax)

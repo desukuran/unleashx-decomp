@@ -58,7 +58,7 @@ struct SRecentItem
 	int region;              // +0x134
 };
 
-// Gamepad state of the menu (CGamepadInput). TODO: decompile (0x00021F02)
+// Gamepad state of the menu (CGamepadInput, 0x00021F02).
 struct SMenuInput
 {
 	BYTE data[0xA8];

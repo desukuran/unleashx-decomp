@@ -71,10 +71,11 @@ SRarEntry::SRarEntry(const char *entryName, const char *entryPath, DWORD unpacke
 	size.append(text);
 }
 
-// The list's order: names without case. (0x0001AACB)
+// 0x000BDE77
+// The list's order: names without case, by collation (sorted at 0x0001AACB).
 static bool RarEntryLess(const SRarEntry &a, const SRarEntry &b)
 {
-	return _wcsicmp(a.name.c_str(), b.name.c_str()) < 0;
+	return _wcsicoll(a.name.c_str(), b.name.c_str()) < 0;
 }
 
 // 0x00017783 (this in esi)

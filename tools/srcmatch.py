@@ -158,7 +158,7 @@ def parse_sources(paths):
     return funcs
 
 
-def load_binary(xbe_path, ranges):
+def load_binary(xbe_path, ranges, reset=()):
     from capstone import Cs, CS_ARCH_X86, CS_MODE_32
     from capstone.x86 import X86_OP_IMM
     from xbe import Xbe
@@ -167,12 +167,14 @@ def load_binary(xbe_path, ranges):
     funcs = []
     for line in list(open(os.path.join(ROOT, 'build/export/functions.tsv')))[1:]:
         f = line.rstrip('\n').split('\t')
-        funcs.append((int(f[0], 16), int(f[1]), f[3]))
-    names = {a: n for a, s, n in funcs}
+        a = int(f[0], 16)
+        funcs.append((a, int(f[1]), 'FUN_%08x' % a if a in reset else f[3], f[3]))
+    names = {a: n for a, s, n, exported in funcs}
     starts = set(names)
-    by_name = {}
-    for a, s, n in funcs:
-        by_name.setdefault(n, []).append(a)
+    by_name = {}            # strings.tsv uses the exported names
+    for a, s, n, exported in funcs:
+        by_name.setdefault(exported, []).append(a)
+    funcs = [(a, s, n) for a, s, n, exported in funcs]
     md = Cs(CS_ARCH_X86, CS_MODE_32)
     md.detail = True
     scope = [a for a, s, n in funcs if any(lo <= a < hi for lo, hi in ranges)]
@@ -208,12 +210,12 @@ def distinct(seq):
     return out
 
 
-def match_library(xbe, src_globs, ranges, seeds=(), verbose=False):
+def match_library(xbe, src_globs, ranges, seeds=(), verbose=False, reset=()):
     """{binary address: source name} for the functions found, and a
     one-line report. seeds: (address, source name) pairs."""
     paths = sorted({p for g in src_globs for p in glob.glob(g, recursive=True)})
     src = parse_sources(paths)
-    names, sizes, scope, calls, bstrings = load_binary(xbe, ranges)
+    names, sizes, scope, calls, bstrings = load_binary(xbe, ranges, reset)
     scope_set = set(scope)
 
     short = {}

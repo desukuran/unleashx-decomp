@@ -7,6 +7,7 @@
 
 // Number formatting with the dashboard language's separators.
 wchar_t GetThousandsSeparator();                      // 0x00099F10
+char GetThousandsSeparatorA();                        // 0x0009DCE9
 wchar_t GetDecimalSeparator();                        // 0x00099F3A
 // n with thousands separators, e.g. "8,042,401,792". out holds 100 chars.
 void FormatNumberW(wchar_t *out, ULONGLONG n);        // 0x000A1A7F

@@ -159,6 +159,7 @@ uintptr_t _beginthreadex(void *security, unsigned stackSize, unsigned (__stdcall
                          unsigned flags, unsigned *threadId);
 int stricmp(const char *a, const char *b);
 int _wcsicmp(const wchar_t *a, const wchar_t *b);
+int _wcsicoll(const wchar_t *a, const wchar_t *b);
 int _wcsnicmp(const wchar_t *a, const wchar_t *b, size_t count);
 char *_strdup(const char *s);
 int _wtoi(const wchar_t *s);

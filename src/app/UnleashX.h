@@ -27,10 +27,10 @@ public:
 	CUnleashX();                                      // 0x000E229C
 	virtual ~CUnleashX();                             // 0x0002B81C
 
-	virtual HRESULT Initialize();                     // 0x000EC94A TODO: decompile
+	virtual HRESULT Initialize();                     // 0x000EC94A
 	virtual HRESULT FrameMove();                      // 0x000EB93B (FrameMove.cpp)
 	virtual HRESULT Render();                         // 0x000F0097 (AppRender.cpp)
-	virtual HRESULT Cleanup();                        // 0x000E1B1E TODO: decompile
+	virtual HRESULT Cleanup();                        // 0x000E1B1E
 
 	void SetMode(int mode);                           // 0x000E568F
 	// Starts or stops the background sound (only in the menu, without
@@ -49,7 +49,7 @@ public:
 	// Message box with OK; text is ANSI.
 	void ShowMessage(const char *text, const wchar_t *title, int flags = 0);   // 0x000E2153
 	BOOL CreateTextEditor();                          // 0x000E2853
-	void PrepareHardDisk();                           // 0x000E48B4 TODO: decompile
+	void PrepareHardDisk();                           // 0x000E48B4
 	// Starts the disc in the drive: a game, the DVD or audio CD player, the
 	// data launcher or the file manager. manual: the LaunchDVD action
 	// (otherwise a disc was inserted, and each kind needs its AutoLaunch
@@ -77,7 +77,7 @@ public:
 		{
 			return TRUE;
 		}                                             // 0x000DFF11
-		virtual void OnPreview(const char *file);     // 0x000E4173 TODO: decompile
+		virtual void OnPreview(const char *file);     // 0x000E4173
 
 		CUnleashX *m_pApp;                            // +0x04
 	};

@@ -572,6 +572,12 @@ int _wcsicmp(const wchar_t *a, const wchar_t *b)
 	return wcscasecmp(a, b);
 }
 
+// The C locale's collation is the plain order.
+int _wcsicoll(const wchar_t *a, const wchar_t *b)
+{
+	return _wcsicmp(a, b);
+}
+
 int _wcsnicmp(const wchar_t *a, const wchar_t *b, size_t count)
 {
 	return wcsncasecmp(a, b, count);

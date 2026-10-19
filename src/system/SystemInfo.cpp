@@ -35,6 +35,20 @@ wchar_t GetThousandsSeparator()
 	return L'.';
 }
 
+// 0x0009DCE9
+// The same as a char (FormatNumberA's).
+char GetThousandsSeparatorA()
+{
+	DWORD language = XGetLanguage();
+	if (language == LANGUAGE_GERMAN)
+		return '.';
+	if (language == LANGUAGE_FRENCH)
+		return ' ';
+	if (language < LANGUAGE_SPANISH || (language > LANGUAGE_ITALIAN && language != LANGUAGE_PORTUGUESE))
+		return ',';
+	return '.';
+}
+
 // 0x00099F3A
 wchar_t GetDecimalSeparator()
 {
@@ -154,7 +168,7 @@ std::string FormatNumberA(ULONGLONG n)
 	} while (n != 0);
 	char text[0x64];
 	int out = 0;
-	char separator = (char)GetThousandsSeparator();
+	char separator = GetThousandsSeparatorA();
 	for (int i = length - 1; i >= 0; i--)
 	{
 		text[out++] = digits[i];
