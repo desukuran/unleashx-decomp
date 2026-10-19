@@ -5,6 +5,16 @@ typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
 typedef int BOOL;
+typedef long HRESULT;
+
+typedef struct SYSTEMTIME {
+	WORD wYear, wMonth, wDayOfWeek, wDay, wHour, wMinute, wSecond, wMilliseconds;
+} SYSTEMTIME;
+
+typedef struct FILETIME {
+	DWORD dwLowDateTime;
+	DWORD dwHighDateTime;
+} FILETIME;
 
 /* std::basic_string<char> (Dinkumware, VC7.1): small-string buffer of 16. 0x1c bytes */
 typedef struct std_string {

@@ -222,3 +222,18 @@
 00035ff3 MultiByteToWideChar int __stdcall f(DWORD codePage, DWORD flags, char *src, int srcLen, WORD *dst, int dstLen)
 0005e03c toupper int __cdecl f(int c)
 0005e988 _mbslwr BYTE * __cdecl f(BYTE *s)
+
+# ---- app entry / XDK sample framework (CXBApplicationEx, library code: name only) ----
+000e24d4 main int __cdecl f(int argc, char **argv, char **envp)
+000ec94a CUnleashX::Initialize
+000eb93b CUnleashX::FrameMove
+000f0097 CUnleashX::Render
+000e1b1e CUnleashX::Cleanup
+0009b270 CXBApplicationEx::Create HRESULT f(void *self@esi)
+0009a514 CXBApplicationEx::Run void f(void *self@esi)
+0008f9ef CXBApplicationEx::Destroy
+00034e15 GetLocalTime void __stdcall f(SYSTEMTIME *st)
+0003490d GetSystemTime void __stdcall f(SYSTEMTIME *st)
+000349e4 SystemTimeToFileTime BOOL __stdcall f(SYSTEMTIME *st, FILETIME *ft)
+00034ebf LocalFileTimeToFileTime BOOL __stdcall f(FILETIME *local, FILETIME *utc)
+00145e80 Direct3DCreate8

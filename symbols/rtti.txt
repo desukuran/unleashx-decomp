@@ -57,7 +57,7 @@
 0001d362 CXmlDocument::CXmlDocument
 0001d38d CXmlDocument::~CXmlDocument
 0001e4d4 CXmlDocument::`scalar_deleting_destructor'
-0001e736 CFTPLog::`scalar_deleting_destructor'
+0001e736 CFTPLog::vfunc0
 0001e7ae CFTPFileFolder::vfunc21
 0001e86b CFTPManager::vfunc2
 0001edc9 CFTPLog::vfunc1
@@ -145,7 +145,7 @@
 000311b1 CAppSettings::~CAppSettings
 00031268 CAppSettings::`scalar_deleting_destructor'
 00031589 CStorageInfo::`scalar_deleting_destructor'
-00031abb USink::`scalar_deleting_destructor'
+00031abb USink::vfunc0
 00031b9f CWMVideoPlayer::`scalar_deleting_destructor'
 00031e8b CXBMemUnit::`scalar_deleting_destructor'
 00031ea7 CXBMesh::vfunc2
@@ -205,7 +205,7 @@
 00033c04 CDirectSound::`scalar_deleting_destructor'
 00033c20 CAudioDecoder::vfunc3
 0005fec5 CAudioPump::vfunc10
-00068291 CAppFrame::vfunc2
+00068291 _purecall
 0006e184 CAudioDecoder::CAudioDecoder
 0006e3f1 CAudioDecoder::vfunc4
 0006e44d CAudioDecoder::vfunc2
@@ -213,7 +213,7 @@
 0006e603 CAudioDecoder::vfunc6
 0006ed7c CAudioDecoder::CAudioDecoder
 0006ede1 CAudioDecoder::vfunc5
-0006f16c CAudioDecoder::`scalar_deleting_destructor'
+0006f16c CAudioDecoder::vfunc0
 0006f61b CDirectSound::~CDirectSound
 0006f63c CDirectSound::CDirectSound
 0007a713 File::File
@@ -344,7 +344,7 @@
 00094429 CXBStorageDevice::CXBStorageDevice
 00097536 CXBMesh::CXBMesh
 000975e9 CXBMesh::vfunc1
-00097759 CXBMesh::`scalar_deleting_destructor'
+00097759 CXBMesh::vfunc0
 00097801 CXBMesh::CXBMesh
 00098191 CXBMemUnit::CXBMemUnit
 000981a8 CXBMemUnit::CXBMemUnit
@@ -354,7 +354,7 @@
 00099051 CXBFont::CXBFont
 0009906e CXBFont::CXBFont
 00099345 CXBFont::vfunc4
-00099e24 CXBFont::`scalar_deleting_destructor'
+00099e24 CXBFont::vfunc0
 0009a26f CXBApplicationEx::CXBApplicationEx
 0009bf4c CWMVideoPlayer::vfunc2
 0009c26c CWMVideoPlayer::vfunc4
@@ -363,7 +363,7 @@
 0009c951 CWMVideoPlayer::vfunc1
 0009d28c CWMVideoPlayer::CWMVideoPlayer
 000aa3db Thread::vfunc1
-000aa3dc Thread::`scalar_deleting_destructor'
+000aa3dc Thread::vfunc0
 000aa448 Thread::Thread
 000aa458 Thread::Thread
 000aa953 CStorageInfo::~CStorageInfo
@@ -464,7 +464,7 @@
 000dda5a CVirtualKeyboard::vfunc2
 000de58d CVirtualKeyboard::vfunc1
 000de5b4 CVirtualKeyboard::CVirtualKeyboard
-000dfd78 CVirtualKeyboard::`scalar_deleting_destructor'
+000dfd78 CVirtualKeyboard::vfunc0
 000dff11 CUnleashX::CMenuEvent::vfunc2
 000e040c CUnleashX::CSkinEvent::vfunc1
 000e0538 CUnleashX::CSkinEvent::vfunc4
@@ -475,7 +475,7 @@
 000e5824 CUnleashX::CSkinEvent::vfunc2
 000ea055 CUnleashX::CSkinEvent::vfunc5
 000eb93b CUnleashX::vfunc1
-000ec94a CUnleashX::`scalar_deleting_destructor'
+000ec94a CUnleashX::vfunc0
 000ee514 CUnleashX::CMenuEvent::vfunc1
 000f0097 CUnleashX::vfunc2
 000f091f CAudioTrackOption::vfunc3
@@ -515,7 +515,7 @@
 000f5602 CSlideShow::~CSlideShow
 000f56b7 CSlideShow::vfunc4
 000f5c9d CSlideShow::CSlideShow
-00102a03 CPassCode::`scalar_deleting_destructor'
+00102a03 CPassCode::vfunc0
 0010302b CPassCode::CPassCode
 0010317b CPassCode::vfunc1
 001037e7 CNotePad::KeyboardCharEvent::vfunc2
@@ -605,7 +605,7 @@
 0012a2b4 IFileFolder::vfunc6
 0012a36b CFileFolder::vfunc4
 0012a732 CFileFolder::vfunc1
-0012aa4e IFileFolder::`scalar_deleting_destructor'
+0012aa4e IFileFolder::vfunc0
 0012c480 CFileFolderEventsink::vfunc1
 0012ff6c CWAVPlayer::vfunc6
 0012ffa5 CWAVPlayer::vfunc25

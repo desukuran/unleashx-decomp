@@ -7,6 +7,7 @@
 // custom conventions MSVC's link-time code generation produces, e.g.
 // "000117e4 std::string::ctor_cstr std_string * f(std_string *self@eax, char *s)".
 // Remaining parameters are laid out on the stack in order.
+// A signature of just "data" makes the symbol a label even in a code section.
 // Later files override earlier ones.
 // Usage (headless postScript): ApplySymbols.java <file> [<file> ...]
 //@category Xbox
@@ -128,7 +129,8 @@ public class ApplySymbols extends GhidraScript {
 		}
 
 		MemoryBlock b = getMemoryBlock(a);
-		if (b == null || !b.isExecute()) {
+		boolean isData = "data".equals(sig);
+		if (b == null || !b.isExecute() || isData) {
 			Symbol s = st.getPrimarySymbol(a);
 			if (s != null && s.getSource() != SourceType.DEFAULT && s.getName(true).equals(fullName)) {
 				return;

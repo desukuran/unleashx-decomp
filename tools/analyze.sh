@@ -6,7 +6,7 @@ ROOT=$(cd "$(dirname "$0")/.." && pwd)
 XBE=${XBE:-$ROOT/UnleashX_0_39_0528A/Default.xbe}
 GHIDRA=${GHIDRA:-$ROOT/tools/ghidra_12.1.4_PUBLIC}
 BUILD=$ROOT/build
-SYMBOLS="$ROOT/symbols/rtti.txt $ROOT/symbols/names.txt"
+SYMBOLS="$ROOT/symbols/xdk.txt $ROOT/symbols/rtti.txt $ROOT/symbols/names.txt"
 
 mkdir -p "$BUILD/ghidra" "$BUILD/export"
 python3 -I "$ROOT/tools/xbe.py" flat "$XBE" "$BUILD/default.flat"

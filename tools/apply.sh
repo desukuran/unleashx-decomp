@@ -13,5 +13,5 @@ cat "$ROOT/symbols/types.h" "$BUILD/structs.h" > "$BUILD/types_all.h"
 	-process default.flat -noanalysis \
 	-scriptPath "$ROOT/tools/ghidra_scripts" \
 	-postScript ApplyTypes.java "$BUILD/types_all.h" \
-	-postScript ApplySymbols.java "$ROOT/symbols/rtti.txt" "$ROOT/symbols/names.txt" \
+	-postScript ApplySymbols.java "$ROOT/symbols/xdk.txt" "$ROOT/symbols/rtti.txt" "$ROOT/symbols/names.txt" \
 	-postScript ExportAll.java "$BUILD/export"

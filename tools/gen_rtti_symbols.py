@@ -20,6 +20,11 @@ from rtti import recover  # noqa: E402
 from xbe import Xbe  # noqa: E402
 
 
+OPERATOR_DELETE = 0x0005D844
+FREE = 0x0005DCB6
+PURECALL = 0x00068291
+
+
 def load_functions(path):
     funcs = []
     with open(path) as f:
@@ -54,24 +59,37 @@ def main():
             put(v['address'], f"{c['name']}::vftable{suffix}")
             vt_owner[v['address']] = c['name']
 
+    md = Cs(CS_ARCH_X86, CS_MODE_32)
+    md.detail = True
+    sizes = {a: sz for a, sz, _ in funcs}
+
+    def calls_delete(addr):
+        # A scalar deleting destructor calls operator delete itself.
+        code = img[addr - x.base:addr - x.base + min(sizes.get(addr, 0x40), 0x80)]
+        for ins in md.disasm(code, addr):
+            if ins.mnemonic in ('call', 'jmp') and ins.operands and ins.operands[0].type == X86_OP_IMM \
+                    and ins.operands[0].imm in (OPERATOR_DELETE, FREE):
+                return True
+        return False
+
     # Slot ownership: process classes from the shallowest hierarchy depth so a
     # slot function shared with a base keeps the base's name.
     depth = {c['name']: len(c['bases']) for c in classes}
     for c in sorted(classes, key=lambda c: (depth[c['name']], c['name'])):
         for v in c['vtables']:
             for i, f in enumerate(v['slots']):
-                if i == 0 and v['offset'] == 0:
+                if f == PURECALL:
+                    put(f, '_purecall')
+                elif i == 0 and v['offset'] == 0 and calls_delete(f):
                     put(f, f"{c['name']}::`scalar_deleting_destructor'")
                 else:
                     put(f, f"{c['name']}::vfunc{i}" if v['offset'] == 0 else f"{c['name']}::vfunc{i}_{v['offset']}")
 
     # Ctor/dtor scan: "mov dword ptr [reg(+off)], imm32" where imm32 is a vtable.
-    md = Cs(CS_ARCH_X86, CS_MODE_32)
-    md.detail = True
     sdd = {}  # class -> scalar deleting destructor address
     for c in classes:
         for v in c['vtables']:
-            if v['offset'] == 0 and v['slots']:
+            if v['offset'] == 0 and v['slots'] and calls_delete(v['slots'][0]):
                 sdd[c['name']] = v['slots'][0]
     writes = {}  # func -> set of classes whose primary vtable it stores
     calls = {}   # func -> set of call targets
