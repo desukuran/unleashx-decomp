@@ -7,7 +7,7 @@ GHIDRA=${GHIDRA:-$ROOT/tools/ghidra_12.1.4_PUBLIC}
 BUILD=$ROOT/build
 
 python3 -I "$ROOT/tools/gen_structs.py"
-cat "$ROOT/symbols/types.h" "$BUILD/structs.h" > "$BUILD/types_all.h"
+grep -v "^#pragma" "$ROOT/src/ui/StringIds.h" | cat "$ROOT/symbols/types.h" "$BUILD/structs.h" - > "$BUILD/types_all.h"
 
 "$GHIDRA/support/analyzeHeadless" "$BUILD/ghidra" UnleashX \
 	-process default.flat -noanalysis \

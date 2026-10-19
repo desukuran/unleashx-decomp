@@ -305,9 +305,9 @@
 
 # ---- src/ui/Language ----
 0013a631 LookupLanguageKey char * __cdecl f(char *key)
-0013a679 GetDefaultString char * f(int id@eax)
-0013d242 GetStringA char * f(int id@eax)
-0013d299 GetString WORD * __cdecl f(int id)
+0013a679 GetDefaultString char * f(StringId id@eax)
+0013d242 GetStringA char * f(StringId id@eax)
+0013d299 GetString WORD * __cdecl f(StringId id)
 00278024 g_stringCacheA
 00278030 g_stringCacheW
 0009df0d StrIsNotEmpty BOOL f(char *s@eax)
