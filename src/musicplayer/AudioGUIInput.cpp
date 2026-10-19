@@ -10,6 +10,7 @@
 #include "../ui/FileBrowser.h"
 #include "../ui/Menu.h"
 #include "SongList.h"
+#include "TrackOptions.h"
 
 // The skin's button order: CSkin::m_nButtonPrev and on, one per
 // PlayerButton (0xFF = not in the skin).

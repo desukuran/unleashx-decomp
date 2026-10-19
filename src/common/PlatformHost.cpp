@@ -303,7 +303,10 @@ HANDLE CreateFileA(LPCSTR fileName, DWORD access, DWORD, void *, DWORD creationD
 	}
 	FILE *fp = fopen(path.c_str(), mode);
 	if (fp == NULL)
+	{
+		SetLastError(errno == ENOENT ? 2 : 5);   // ERROR_FILE_NOT_FOUND, ERROR_ACCESS_DENIED
 		return INVALID_HANDLE_VALUE;
+	}
 	std::lock_guard<std::mutex> lock(s_handleMutex);
 	s_openFiles.insert(fp);
 	return (HANDLE)fp;
@@ -421,6 +424,11 @@ static DWORD s_lastError;
 void SetLastError(DWORD error)
 {
 	s_lastError = error;
+}
+
+DWORD GetLastError()
+{
+	return s_lastError;
 }
 
 int _mbsicmp(const char *a, const char *b)

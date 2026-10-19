@@ -21,6 +21,7 @@
 #include "../ui/Language.h"
 #include "../ui/StringIds.h"
 #include "SongList.h"
+#include "TrackOptions.h"
 
 UINT g_nPlayerSoundtrack = MUSIC_NO_SONG;          // 0x00269BC8
 std::vector<SPlayerTrack> g_playerTracks;          // 0x00277710

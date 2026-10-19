@@ -48,21 +48,9 @@ struct SPlayerButton
 	float bottom;              // +0x14
 };
 
-// The soundtrack manager pop-up ("Manage Soundtracks"). 0xB8 bytes.
-// TODO: decompile (0x000F091F-0x000F2F98)
-class CAudioTrackOption : public CAppFrame
-{
-public:
-	CAudioTrackOption();                                  // 0x000F2A10 (this in edi)
-	virtual ~CAudioTrackOption();                         // 0x000F0E67
-	virtual BOOL Init(CXBFontEx *font);                   // slot 1, 0x000F2F98
-	virtual BOOL IsOpen();                                // slot 2, 0x00029984
-	virtual BOOL Render();                                // slot 3, 0x000F091F
-	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // slot 4, 0x000F2EC6
-	virtual void Show();                                  // slot 5, 0x000F148C
-
-	BYTE m_reserved04[0xB4];
-};
+// The soundtrack manager pop-up ("Manage Tracks"): CAudioTrackOption,
+// TrackOptions.h.
+class CAudioTrackOption;
 
 // 0x1EC bytes.
 class CAudioGUI : public CAppFrame

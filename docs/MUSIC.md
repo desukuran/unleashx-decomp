@@ -131,7 +131,7 @@ level meter and bars are drawn by the player:
 
 * On Play with the song list shown, the selected song plays.
 * The options menu has Play Disc (enabled with an audio CD in the drive),
-  Manage Soundtracks (`CAudioTrackOption`, not decompiled yet), Open File
+  Manage Soundtracks (see below), Open File
   (WMA/MP3/WAV) and Browse Folder (all songs under a folder). The last two
   play through the Media Player soundtrack. The menu opens by itself when
   a disc is inserted while the player is open.
@@ -147,3 +147,99 @@ Quirks:
 * The menu also disables a sixth option that doesn't exist.
 * There's an unused built-in player window (`0x00135089`), drawn from the
   layout `Show` computes.
+
+## Managing soundtracks
+
+"Manage Tracks" in the player's START menu opens the soundtrack tools
+(`src/musicplayer/TrackOptions.cpp`, `TrackEditor.cpp`, `TrackCopy.cpp`).
+The Xbox soundtracks are edited directly in the MS dashboard's database
+(below); the music folders can only be played and renamed.
+
+"Select Audio Track" lists Audio CD (only enabled with an audio CD in the
+drive), every Xbox soundtrack, then every music folder. Choosing one opens
+its menu, titled with its name:
+
+| Source | Menu |
+|---|---|
+| Audio CD | Play, Copy (always greyed out) |
+| Xbox soundtrack | Play, Copy, Edit, Rename, Delete |
+| Music folder | Play, Rename (Copy, Edit and Delete greyed out) |
+
+* **Play** starts the soundtrack (an Xbox one by its ID, a folder by its
+  place in the music manager's list).
+* **Rename** opens the keyboard (32 characters). An Xbox soundtrack is
+  renamed in ST.DB; a folder gets the title in its `Info.xml`.
+* **Delete** asks "Are you sure that you want to delete '...'?" (No
+  selected). It removes the soundtrack, its song groups and its folder of
+  WMA files.
+* **Edit** shows the songs above four buttons: Move Up, Move Down, Rename
+  (31 characters) and Delete. Left/right pick a button, A uses it on the
+  selected song, B closes. Moving swaps the song with its neighbour.
+* **Copy** shows the songs above Select (tick or untick the selected
+  song), Select All and Copy. Copy (with something ticked) asks for the
+  target: New Soundtrack... (the keyboard suggests the first free
+  "Soundtrack N") or one of the other Xbox soundtracks. A thread copies
+  each ticked song's WMA file, with a progress box, and adds it to the
+  target in ST.DB. Song names starting with "Track" are renumbered as
+  "Track N" in the target. If nothing could be copied, a new target
+  soundtrack is deleted again.
+
+After an edit the list is filled again. XAPI keeps the soundtrack it read
+last in memory, so the list first reads another soundtrack's first song to
+make XAPI read ST.DB again.
+
+### CD ripping (disabled)
+
+The copy screen also has a CD path, used when the source soundtrack is 0.
+It reads the track's raw audio into `x:\tempcda.cda`, after checking the
+free space on X:, and records the loudest sample. A WMA encoder would then
+make `x:\tempwma.wma`, which is moved to the soundtrack's folder.
+`EncodeTrackToWma` is a stub: it builds a gain table and deletes the input
+without encoding anything. The path can't be reached anyway, because the CD
+menu's Copy is greyed out. If it ran, every track would be added to ST.DB
+without a file, since the move of the missing WMA fails and isn't treated
+as an error.
+
+### Quirks
+
+* An Xbox soundtrack with ID 0, the first one made in a fresh ST.DB, has
+  the same menu value as Audio CD. It opens the CD's menu, and its song
+  list shows the CD.
+* Pressing B on the copy target menu starts a copy into soundtrack -1,
+  which then fails with "An error occurred while copying file(s)".
+* The copy's error is only cleared once per copy, so after one song fails
+  every later song fails too.
+* Right on the copy screen can move past Copy to a fourth button that
+  isn't there.
+* Unselected button labels use the dialog text color, not the button text
+  color.
+* The rename error message has `%s to %s` but gets the names as wide
+  strings, so only their first letters show. The soundtrack version also
+  gets no error code.
+* The copy screen keeps the editor's Yes/No delete handling, which nothing
+  there triggers.
+
+## ST.DB
+
+`E:\TDATA\fffe0000\music\ST.DB` is the MS dashboard's soundtrack
+database (`src/audio/SoundtrackDB.cpp`). It's made of 0x200-byte sectors:
+
+| Sector | Contents |
+|---|---|
+| 0 | header: version (1), soundtrack count, next soundtrack ID, the 100 soundtrack IDs in list order, next song serial |
+| 1-100 | one soundtrack per used slot: magic `0x21371`, ID, song count, up to 84 song group numbers, total time (ms), name (32 UTF-16) |
+| 101 on | song groups: magic `0x31073`, soundtrack ID, place in the soundtrack, in-use flag, 6 song IDs, 6 times (ms), 6 names |
+
+A song's ID is `(soundtrack ID << 16) | serial`, and its file is
+`music\<soundtrack %04x>\<song %08x>.wma`. A soundtrack holds up to 500
+songs and the database up to 100 soundtracks. A new database is the header
+plus 100 empty soundtrack sectors. A new song group reuses the first free
+one, or is added at the end of the file. `tests/soundtrackdb_test.cpp`
+checks the format.
+
+Quirks:
+
+* Deleting the only song of a soundtrack's last group leaves that group
+  marked in use, so it's never reused.
+* A sector in the song group area that isn't a song group makes the
+  search for a free group append groups forever.

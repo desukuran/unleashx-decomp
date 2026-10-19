@@ -248,6 +248,31 @@ void CSongListControl::SetSoundtrack(int soundtrack)
 	m_nSelected = 0;
 }
 
+// 0x000F0FBD
+void CSongListControl::Reload()
+{
+	m_nFilled = (UINT)-1;
+	m_items.clear();
+	Sleep(100);
+	XSOUNDTRACK_DATA data;
+	HANDLE find = XFindFirstSoundtrack(&data);
+	if (find != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			if (data.uSongCount != 0 && (int)data.uSoundtrackId != m_nSoundtrack)
+			{
+				DWORD songId = 0;
+				DWORD length;
+				wchar_t name[100];
+				XGetSoundtrackSongInfo(data.uSoundtrackId, 0, &songId, &length, name, 100);
+				break;
+			}
+		} while (XFindNextSoundtrack(find, &data));
+		XFindClose(find);
+	}
+}
+
 // 0x000F0ED6
 void CSongListControl::UpdateCurrentSongTime()
 {

@@ -99,6 +99,12 @@ public:
 	float GetSongPosition();                                 // 0x00106017 (this in eax) seconds
 	// The soundtracks after the CD and Media Player. (this in eax)
 	UINT GetUserSoundtrackCount();                           // 0x00105FEC
+	// The user soundtrack index (after the CD and Media Player), NULL past
+	// the end. (this in edi, index in eax)
+	SSoundtrack *GetUserSoundtrack(UINT index)                // 0x000299AA
+	{
+		return index + 2 < m_soundtracks.size() ? &m_soundtracks[index + 2] : NULL;
+	}
 	UINT GetSongCount();                                     // 0x0010619B (this in eax)
 	// The current soundtrack's name (31 characters). (this in eax)
 	void GetSoundtrackName(wchar_t *name);                   // 0x00106189

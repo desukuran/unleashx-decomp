@@ -91,9 +91,26 @@ struct SCdToc
 {
 	HANDLE hDevice;        // +0x00 INVALID_HANDLE_VALUE when closed
 	int nTracks;           // +0x04
-	// TODO: the rest
+	DWORD trackSector[100];   // +0x08 each track's first sector, then the lead-out TODO: verify the size
 };
 extern SCdToc g_cdToc;     // 0x00278748
+
+// Reads raw CD audio (0x930-byte sectors) from the TOC's drive, 16
+// sectors at a time (also XCDPlayer's stream). TODO: decompile
+struct SCddaReader
+{
+	BYTE *buffer;          // +0x00 0x9300 bytes of contiguous memory
+	int bufferPos;         // +0x04 how much of the buffer was handed out
+	SCdToc *toc;           // +0x08
+	int retries;           // +0x0C
+	DWORD sector;          // +0x10 the next one to read (up to the lead-out)
+};
+// (reader in esi, toc in ecx)
+void CddaReaderOpen(SCddaReader *reader, SCdToc *toc, int retries);   // 0x0007FD6E
+void CddaReaderClose(SCddaReader *reader);                            // 0x0007FD61 (reader in eax)
+// Up to size bytes: the count, 0 at the lead-out, below 0 when a read
+// fails. (reader in ebx)
+int CddaReaderRead(SCddaReader *reader, void *buffer, int size);      // 0x0007FE11
 
 // Opens the drive and reads the TOC. (toc in eax) TODO: decompile
 HRESULT CdTocOpen(SCdToc *toc);          // 0x0007F5FB

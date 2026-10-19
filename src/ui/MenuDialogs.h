@@ -2,6 +2,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "../app/XBApp.h"
 #include "../common/Platform.h"
@@ -28,13 +29,32 @@ public:
 	// Greys out (or enables) the entry at index. (index in eax, this in edi)
 	void SetOptionEnabled(int index, BOOL enabled);       // 0x000AD997
 	int GetSelection() const;                             // 0x000AD946
+	// The selected option's value (AddOption's), -1 when cancelled or
+	// empty. (this in edi)
+	int GetSelectedValue() const;                         // 0x000AD960
+	// Removes the options (an inlined vector clear). (options in esi)
+	void ClearOptions() { m_options.clear(); }            // 0x00029AAD
 
-	BYTE m_unknown04[0x54];
+	// One option. 0x34 bytes.
+	struct SOption
+	{
+		std::wstring text;                                // +0x00
+		BOOL enabled;                                     // +0x1C
+		int value;                                        // +0x20
+		int rect[4];                                      // +0x24 TODO: verify
+	};
+
+	BYTE m_unknown04[0x28];
+	std::wstring m_strTitle;                              // +0x2C
+	std::vector<SOption> m_options;                       // +0x48
 	int m_nSelection;                                     // +0x58
 	BYTE m_unknown5C[0x20];
 	BOOL m_bCancelled;                                    // +0x7C
 	BOOL m_bChosen;                                       // +0x80
-	BYTE m_unknown84[0x10];                               // (0x94 bytes in all)
+	int m_unknown84;                                      // +0x84
+	CXBFont *m_pFont;                                     // +0x88
+	int m_unknown8C;                                      // +0x8C
+	BOOL m_bAnimate;                                      // +0x90 Show sets it, Render clears it TODO: verify
 };
 
 // The passcode pad: the code is typed with gamepad buttons (A B X Y WHITE

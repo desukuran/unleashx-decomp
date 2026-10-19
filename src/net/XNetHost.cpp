@@ -161,9 +161,4 @@ int XNetDnsRelease(XNDNS *dns)
 	return 0;
 }
 
-DWORD GetLastError()
-{
-	return 0;
-}
-
 #endif

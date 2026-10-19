@@ -55,6 +55,10 @@ public:
 	void SetMarked(UINT index, BOOL marked);              // 0x000F124B
 	void ClearMarks();                                    // 0x000F1273 (this in edi)
 	void ToggleMark(UINT index);                          // 0x000F0B92 (this in edi, index in eax)
+	// Empties the list to fill it again from ST.DB after an edit. XAPI
+	// keeps the soundtrack it read last, so another soundtrack's first
+	// song is read to make it read ours again. (this in ecx)
+	void Reload();                                        // 0x000F0FBD
 	// The selected line's text. (this in ecx)
 	const wchar_t *GetSelectedName();                     // 0x000F0C97
 

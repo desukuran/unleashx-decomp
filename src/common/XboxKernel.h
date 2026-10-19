@@ -166,6 +166,11 @@ struct OVERLAPPED
 BOOL GetOverlappedResult(HANDLE file, OVERLAPPED *overlapped, DWORD *transferred, BOOL wait);
 BOOL GetFileSizeEx(HANDLE file, LARGE_INTEGER *size);
 DWORD GetFileSize(HANDLE file, DWORD *high);
+BOOL SetFilePointerEx(HANDLE file, LARGE_INTEGER distance, LARGE_INTEGER *newPointer, DWORD moveMethod);   // 0x000356DC
+BOOL GetFileTime(HANDLE file, FILETIME *creation, FILETIME *lastAccess, FILETIME *lastWrite);   // 0x0003587D
+BOOL SetFileTime(HANDLE file, const FILETIME *creation, const FILETIME *lastAccess, const FILETIME *lastWrite);   // 0x000358E3
+HANDLE CreateThread(void *security, DWORD stackSize, DWORD (__stdcall *start)(void *), void *param, DWORD flags,
+                    DWORD *threadId);
 HANDLE CreateMutexA(void *security, BOOL initialOwner, LPCSTR name);
 BOOL ReleaseMutex(HANDLE mutex);
 DWORD GetCurrentThreadId();

@@ -34,6 +34,7 @@
 #include "../skin/SkinText.h"
 #include "../ui/FileBrowser.h"
 #include "SongList.h"
+#include "TrackOptions.h"
 
 // A colored, textured screen vertex (D3DFVF_XYZRHW | D3DFVF_DIFFUSE |
 // D3DFVF_TEX1).
