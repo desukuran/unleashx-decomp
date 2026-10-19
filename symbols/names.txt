@@ -1360,3 +1360,10 @@
 0026c23c s_keyboardLanguages
 0026a69c s_pKeyboardStrings
 0026cc24 s_nKeyboardPort
+00102a03 CPassCode::ProcessInput
+0010317b CPassCode::Render
+000264e2 CPassCode::~CPassCode
+00102757 CPassCode::PlayClick void f(CPassCode *this@eax)
+00102765 CPassCode::DrawTextBox void f(CPassCode *this@eax)
+001027b8 CPassCode::DrawFrame void f(CPassCode *this@eax)
+00102c48 CPassCode::DrawText

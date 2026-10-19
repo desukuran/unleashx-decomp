@@ -3,9 +3,12 @@
 
 #include <string>
 
+#include "../app/XBApp.h"
 #include "../common/Platform.h"
+#include "../system/SystemInfo.h"
 
 class CMenuEventSink;
+class CSound;
 class CMenuItem;
 class CXBFont;
 
@@ -27,28 +30,67 @@ public:
 	BOOL m_bChosen;                                       // +0x80
 };
 
-// The passcode pad (eight button presses). 0x120 bytes.
+// The passcode pad: the code is typed with gamepad buttons (A B X Y WHITE
+// and the d-pad as letters, BLACK deletes, the triggers move the cursor)
+// or the remote (arrows and digits); START or the remote's SELECT accepts,
+// BACK cancels. Up to 16 presses, shown as stars. See PassCode.cpp.
+// 0x120 bytes.
 class CPassCode
 {
 public:
 	CPassCode();                                          // 0x0010302B (this in edi)
 	// vtable: ProcessInput, Render, then the (deleting) destructor.
-	virtual void ProcessInput(int *action, struct SGamepadState **pad);   // vtable slot 0
-	virtual void Render();                                // vtable slot 1
-	virtual ~CPassCode();                                 // vtable slot 2
+	// (pad is the CGamepadInput)
+	virtual HRESULT ProcessInput(int *action, struct SGamepadState **pad);   // slot 0, 0x00102A03
+	virtual HRESULT Render();                             // slot 1, 0x0010317B
+	virtual ~CPassCode();                                 // slot 2, 0x00026522 (body 0x000264E2)
+	// (this in esi)
 	void SetTitle(const wchar_t *title);                  // 0x0002209E
 	// symbols: the button-glyph font, NULL for XboxDings. Fails without a
-	// font or when already set up. (this in esi, font in eax, symbols in ecx)
+	// font or when already set up; shows the pad either way. (this in esi,
+	// font in eax, symbols in ecx)
 	HRESULT Init(CXBFont *font, CXBFont *symbols);       // 0x0010341C
+	// The code to expect: upper-cased, at most 15 characters. (this in esi)
 	void SetCode(const char *code);                       // 0x00103100
+	// Places the pad and starts a new entry. (this on the stack)
 	void Show();                                          // 0x00102805
-	BOOL IsClosed() const { return m_bCancelled || m_unknown50; }   // 0x0002208B
+	BOOL IsClosed() const { return m_bClosed || m_bCancelled; }   // 0x0002208B (this in eax)
+	// The entry is the code (or its MD5). (this in ebx)
 	BOOL IsCorrect();                                     // 0x00021FCE
 
-	BYTE m_unknown04[0x2C];
-	std::string m_strCode;                                // +0x30 what was entered
-	BOOL m_bCancelled;                                    // +0x4C
-	BOOL m_unknown50;                                     // +0x50
+	int m_unknown04;                       // +0x004
+	CXBFont *m_pFont;                      // +0x008
+	CXBFont *m_pSymbols;                   // +0x00C button glyphs (XboxDings)
+	std::string m_strCode;                 // +0x010
+	int m_unknown2C;                       // +0x02C
+	std::string m_strEntered;              // +0x030 the entry as narrow text (IsCorrect)
+	BOOL m_bCancelled;                     // +0x04C
+	BOOL m_bClosed;                        // +0x050 accepted or cancelled
+	float m_fY;                            // +0x054
+	float m_fX;                            // +0x058
+	float m_fWidth;                        // +0x05C
+	float m_fHeight;                       // +0x060
+	float m_fBoxHeight;                    // +0x064 the entry field
+	float m_fTextWidth;                    // +0x068
+	int m_unknown6C;                       // +0x06C
+	float m_fTitleHeight;                  // +0x070
+	std::wstring m_strInput;               // +0x074
+	UINT m_nCursor;                        // +0x090
+	CSound *m_pClickSound;                 // +0x094
+	BOOL m_bClickSound;                    // +0x098
+	int m_unknown9C;                       // +0x09C
+	CXBStopWatch m_cursorTimer;            // +0x0A0
+	std::wstring m_strTitle;               // +0x0C0 "Passcode"
+	float m_fLineHeight;                   // +0x0DC
+	float m_fScaleX;                       // +0x0E0
+	float m_fScaleY;                       // +0x0E4
+	CMD5 m_md5;                            // +0x0E8
+
+private:
+	void PlayClick();                                     // 0x00102757 (this in eax)
+	void DrawTextBox();                                   // 0x00102765 (this in eax)
+	void DrawFrame();                                     // 0x001027B8 (this in eax)
+	void DrawText(float x, float y);                      // 0x00102C48 (this on the stack)
 };
 
 // A small pop-up menu (the START menu of an item). 0x78 bytes.
