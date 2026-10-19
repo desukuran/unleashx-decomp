@@ -214,6 +214,23 @@ Each frame clears to the skin's sky color (black without a globe), then:
 5. a text screen saver on top, or the clock prompt;
 6. the pointer cursor, for 5 seconds after it moved, fading out by 10.
 
+### The background
+
+`RenderBackground` (`src/app/Background.cpp`) draws:
+
+* **The globe** (`<Main Globe>`): the sky sphere (`OuterSphere.xbg`) in the
+  scheme's cell color. Its texture is the skin's `<Cellwall>`, else the MS
+  dashboard's `cellwall.xbx`, else UnleashX's own. With `<Main Fog>`, the
+  rest is drawn with linear fog in the fog color, from 5 to 100 units.
+* **The skin's `<BackGround>`**: an image over the screen area, or a video.
+* **The orb** (`<Main Orb>`): the MS dashboard's ring mesh (`CrossHair.xbg`)
+  and a sphere inside it, both up and to the left. In the menu the sphere
+  shows the selected item's icon; otherwise it shows the skin's `<Orb>`
+  image, else UnleashX's own. When the selection moves, the orb turns
+  quickly in that direction for 30 steps. After that it keeps turning
+  slowly the same way.
+* **`<GameIcon>`**: the selected item's icon in its own rectangle.
+
 Screenshots: holding the left trigger (not the right) and pressing BLACK,
 or holding BLACK and clicking the left stick, saves the next frame from the
 back buffer as `screenshotN.bmp` on the first of Z:, Y:, X: with 1MB free.
