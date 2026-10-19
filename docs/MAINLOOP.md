@@ -1,7 +1,8 @@
 # The main loop
 
-What `CUnleashX::FrameMove` (`src/app/FrameMove.cpp`) does every frame.
-Rendering (`Render`) and startup (`Initialize`) aren't decompiled yet.
+What `CUnleashX::FrameMove` (`src/app/FrameMove.cpp`) and `Render`
+(`src/app/AppRender.cpp`) do every frame. Startup (`Initialize`) isn't
+decompiled yet.
 
 ## Input
 
@@ -55,3 +56,25 @@ keyboard up) and the remote's MENU go back to the menu.
   sent once (the menu refreshes on it).
 * **Globe:** with `<Main Globe>`, the globe sways back and forth along the
   path of 512 heights from the skin, at a speed tied to the frame rate.
+
+## Drawing
+
+Each frame clears to the skin's sky color (black without a globe), then:
+
+1. a video or slideshow screen saver alone, full screen; otherwise
+2. the background (globe/orb), except for the file manager, settings,
+   System Info and the text editor on a 1080-line screen;
+3. the skin's own elements (menu, game manager, settings, skins, System
+   Info and the music player screens);
+4. the focused thing: a message box, the password keyboard, the passcode
+   pad, or the current screen. Over the menu, a running file operation shows
+   its progress box ("Copying/Moving/Deleting/Compressing/Extracting.
+   Please Wait"; copies and moves with From/To and an overall bar), and a
+   failed one its error ("An error occured while copying '...'. Error Code:
+   N", offering to show the log file when there is one);
+5. a text screen saver on top, or the clock prompt;
+6. the pointer cursor, for 5 seconds after it moved, fading out by 10.
+
+A pending screenshot (the menu's screenshot action) is saved from the back
+buffer as `screenshotN.bmp` on the first of Z:, Y:, X: with 1MB free.
+
