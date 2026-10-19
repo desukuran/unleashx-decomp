@@ -6,6 +6,7 @@
 #include <cstring>
 
 #include "../settings/AppSettings.h"
+#include "../system/Drives.h"
 #include "StrUtil.h"
 
 #include "XboxKernel.h"
@@ -446,4 +447,102 @@ std::string GetPathDirectory(const char *path)
 	if (StrReverseFind(dir, ":", -1) == 1 && dir.size() == 2)
 		dir.append("\\");
 	return dir;
+}
+
+// 0x000A4C4C
+// (Quirk: a dot anywhere in the path counts as an extension.)
+std::string GetPathFileName(const char *path, BOOL requireExtension)
+{
+	std::string name = "";
+	std::string full = path;
+	int dot = StrReverseFind(full, ".", -1);
+	int slash = StrReverseFind(full, "\\", -1);
+	if (!requireExtension || dot >= 0)
+	{
+		if (slash < 0)
+			name = full;
+		else
+			name = StrMid(full, slash + 1, (int)full.size() - (slash + 1));
+	}
+	return name;
+}
+
+// 0x000A5A6C
+BOOL WriteUnicodeTextFile(const char *path, const wchar_t *text)
+{
+	if (path == NULL || strlen(path) == 0 || text == NULL || wcslen(text) == 0)
+		return FALSE;
+	CreateDirectoryTree(GetPathDirectory(path).c_str());
+	FILE *fp = fopen(path, "w+b");
+	if (fp == NULL)
+		return FALSE;
+	const unsigned char bom[2] = {0xFF, 0xFE};
+	fwrite(bom, 1, 2, fp);
+	// (UTF-16 units, as the Xbox's wchar_t.)
+	for (size_t i = 0; i < wcslen(text); i++)
+	{
+		unsigned char unit[2] = {(unsigned char)text[i], (unsigned char)(text[i] >> 8)};
+		fwrite(unit, 1, 2, fp);
+	}
+	const unsigned char crlf[4] = {'\r', 0, '\n', 0};
+	fwrite(crlf, 2, 2, fp);
+	fclose(fp);
+	return TRUE;
+}
+
+// 0x000A5B45
+// The text widened (each byte to a character) and written as UTF-16.
+static BOOL WriteTextFileAsUnicode(const char *path, const char *text)
+{
+	if (text == NULL || strlen(text) == 0)
+		return FALSE;
+	size_t length = strlen(text);
+	wchar_t *wide = new wchar_t[length + 1];
+	if (wide == NULL)
+		return FALSE;
+	memset(wide, 0, length * sizeof(wchar_t));
+	swprintf(wide, length + 1, L"%hs", text);
+	BOOL ok = WriteUnicodeTextFile(path, wide);
+	delete[] wide;
+	return ok;
+}
+
+// 0x000A5BC6
+BOOL WriteTextFile(const char *path, const char *text, BOOL unicode)
+{
+	if (unicode)
+		return WriteTextFileAsUnicode(path, text) != FALSE;
+	if (text == NULL || strlen(text) == 0)
+		return FALSE;
+	return WriteBinaryFile(path, text, (DWORD)strlen(text));
+}
+
+// 0x000A6D44
+std::string GetPersistentDataPath(const wchar_t *name, unsigned int creation)
+{
+	char folder[MAX_PATH];
+	if (creation == 0)
+	{
+		creation = OPEN_ALWAYS;
+	}
+	else if (creation & 1)
+	{
+		XDeleteSaveGame("U:\\", name);
+		XDeleteSaveGame("X:\\", name);
+		Sleep(5);
+	}
+	if (XCreateSaveGame("U:\\", name, creation, 0, folder, MAX_PATH) != 0)
+	{
+		if (!DirectoryExists("X:\\"))
+			MountDrive('X');
+		if (XCreateSaveGame("X:\\", name, creation, 0, folder, MAX_PATH) != 0)
+			return std::string("");
+	}
+	std::string path = folder;
+	if (StrRight(path, 1).compare("\\") != 0)
+	{
+		strcat(folder, "\\");
+		path = folder;
+	}
+	return path;
 }

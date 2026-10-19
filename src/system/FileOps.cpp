@@ -1304,7 +1304,6 @@ void CopyDVD(const char *destination)
 		int disc = GetDiscType();
 		if (disc == DISC_GAME || fromXbe)
 		{
-			EnterFileLock();
 			SXbeInfo info;
 			if (ReadXbeInfo(fromXbe ? destination : "D:\\default.xbe", &info))
 			{
@@ -1313,7 +1312,6 @@ void CopyDVD(const char *destination)
 				if (name.size() == 0)
 					StrFormat(name, "%08x", info.titleId);
 			}
-			LeaveFileLock();
 		}
 		else if (disc == DISC_VIDEO)
 		{

@@ -27,11 +27,14 @@ If the `Action` ends in `.xbe`, it is the path of the program to start:
 * `Preview` is the video shown by a loading screen whose `<BackGround>` is
   `GamePreview`. With `GameIcon` the item's icon is shown.
 
+The loading screen, the `D:` mapping and the launch data are described in
+`docs/LAUNCHING.md`.
+
 ## Commands
 
 | Action | What it does |
 |---|---|
-| `LaunchDVD` | Starts the disc in the drive. |
+| `LaunchDVD` | Starts the disc in the drive (`docs/LAUNCHING.md`). |
 | `filemanager` | Opens the file manager, at `Arg1` if given. |
 | `SavesManager`, `GameManager` | Opens the game/saves manager (`docs/GAME_SAVES.md`). Refused when running from DVD. |
 | `Settings` | Opens the settings menu. |

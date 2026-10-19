@@ -740,3 +740,16 @@ DWORD XMountUtilityDrive(BOOL)
 	return 0;
 }
 #endif
+
+// Save games: none on the host (GetPersistentDataPath gives "").
+DWORD XCreateSaveGame(LPCSTR, const wchar_t *, DWORD, DWORD, char *pathBuffer, UINT bufferSize)
+{
+	if (pathBuffer != NULL && bufferSize != 0)
+		pathBuffer[0] = 0;
+	return 1;
+}
+
+BOOL XDeleteSaveGame(const char *, const wchar_t *)
+{
+	return FALSE;
+}

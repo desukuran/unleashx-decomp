@@ -17,6 +17,7 @@
 #include "../render/Draw.h"
 #include "../settings/AppSettings.h"
 #include "../settings/ConfigLoader.h"
+#include "../system/XbeLaunch.h"
 #include "../thirdparty/Unrar.h"
 #include "../ui/Language.h"
 #include "../ui/StringIds.h"
@@ -170,13 +171,13 @@ HRESULT CLiveUpdate::HandleInput(int *action, SGamepadState **pad)
 			updater.append("UXUpdate.xbe");
 			target.append(GetPathFileName(g_pSettings->m_strLaunchPath.c_str(), TRUE));
 
-			LAUNCH_DATA launch;
+			SXbeLaunchData launch;
 			memset(&launch, 0, sizeof(launch));
-			*(DWORD *)&launch.Data[0x000] = 0x9E115330;   // UnleashX's title ID
-			strcpy((char *)&launch.Data[0x004], target.c_str());
-			strcpy((char *)&launch.Data[0x130], GetPathFileName(g_pSettings->m_strLaunchPath.c_str(), TRUE).c_str());
-			launch.Data[0x2F4] = 4;
-			LaunchXbeWithData(updater.c_str(), &launch);
+			launch.magic = 0x9E115330;   // UnleashX's title ID
+			strcpy(launch.path, target.c_str());
+			strcpy(launch.name, GetPathFileName(g_pSettings->m_strLaunchPath.c_str(), TRUE).c_str());
+			launch.type = XBE_LAUNCH_FROM_UPDATE;
+			LaunchXbeWithData(updater.c_str(), (LAUNCH_DATA *)&launch);
 			return S_OK;
 		}
 	}

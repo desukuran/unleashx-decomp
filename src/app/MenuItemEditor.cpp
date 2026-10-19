@@ -177,10 +177,8 @@ void CMenuItemEditor::Reset()
 				if (m_strTitleId.size() == 0)
 				{
 					SXbeInfo info;
-					EnterFileLock();
 					if (ReadXbeInfo(m_strAction.c_str(), &info))
 						StrFormat(m_strTitleId, "%08x", info.titleId);
-					LeaveFileLock();
 				}
 			}
 			SetItemValue(&m_items[ITEM_TITLE], m_pItem->m_pszText, FALSE);

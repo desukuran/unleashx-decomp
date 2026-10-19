@@ -50,8 +50,11 @@ public:
 	void ShowMessage(const char *text, const wchar_t *title, int flags = 0);   // 0x000E2153
 	BOOL CreateTextEditor();                          // 0x000E2853
 	void PrepareHardDisk();                           // 0x000E48B4 TODO: decompile
-	// Starts the disc in the drive (games, or the DVD/CD player).
-	HRESULT LaunchDVD();                              // 0x000E99FD TODO: decompile
+	// Starts the disc in the drive: a game, the DVD or audio CD player, the
+	// data launcher or the file manager. manual: the LaunchDVD action
+	// (otherwise a disc was inserted, and each kind needs its AutoLaunch
+	// setting). (this in ebx, manual in edx)
+	HRESULT LaunchDVD(BOOL manual);                   // 0x000E99FD
 	// The screen saver and the "any input" bookkeeping: starts the saver
 	// after the wait, stops it on input. (this in ebx)
 	void UpdateScreenSaver(int *action);              // 0x000EA56C
@@ -181,7 +184,6 @@ extern BYTE g_bLaunching;                    // 0x00276236 leaving the dashboard
 extern BYTE g_bShuttingDown;                 // 0x00276235
 extern DWORD g_dwShutdownDeadline;           // 0x00276238
 extern HANDLE g_hExitEvent;                  // 0x0027624C
-extern std::string g_strLoadingPreview;      // 0x00277F70 <Item Preview> for the GamePreview loading screen
 
 // The pointer's cursor, fading out (alpha). The original takes x in ecx and
 // y in eax. TODO: decompile
@@ -226,6 +228,8 @@ void AddRecentItem(const char *path, const char *name, int region);   // 0x000E1
 // Shows the loading screen and starts path (an XBE); returns only on
 // failure. region: the game's region (-1 = read it from the XBE).
 BOOL LaunchXbe(const char *path, const char *name, int region, const char *args);   // 0x000E4691
-DWORD LaunchXbeImage(const char *path, const char *args);    // 0x000A67D5 TODO: decompile
-// Maps D: to the XBE's folder and launches it with launchData. TODO: decompile
-DWORD LaunchXbeWithData(const char *path, LAUNCH_DATA *launchData);               // 0x000A648C
+// The skin's loading screen before path starts: its preview video, or the
+// loading picture fading in, with "Loading..." and the title (name, else
+// the XBE's) when ShowInfo is set. A or START cuts it short. See
+// LaunchScreen.cpp.
+void ShowLaunchScreen(const char *path, const char *name);   // 0x000E3B65

@@ -19,12 +19,7 @@ BOOL MountMemoryUnit(SDriveInfo *, char) { return FALSE; }
 BOOL UnmountMemoryUnit(SDriveInfo *) { return TRUE; }
 void InitMemoryUnitTable() {}
 HRESULT GetUtilityDriveDevice(char *) { return E_FAIL; }
-void EnterFileLock() {}
-void LeaveFileLock() {}
-BOOL ExtractXbeTitleImage(const char *, const char *) { return FALSE; }
 HRESULT FormatDrive(char) { return E_FAIL; }
-BOOL WriteTextFile(const char *path, const char *, BOOL) { printf("[stub] WriteTextFile(%s)\n", path); return TRUE; }
-std::string GetPersistentDataPath(const wchar_t *, unsigned int) { return std::string(); }
 
 // SystemInfo.h (Hardware.cpp is Xbox only)
 std::string GetFlashChipName(BOOL) { return "Unknown"; }

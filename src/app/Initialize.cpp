@@ -23,6 +23,7 @@
 #include "../system/Drives.h"
 #include "../system/SystemControl.h"
 #include "../system/XSettings.h"
+#include "../system/XbeLaunch.h"
 #include "../ui/Language.h"
 #include "../ui/MenuDialogs.h"
 #include "../ui/StringIds.h"

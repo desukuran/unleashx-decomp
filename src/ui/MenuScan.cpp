@@ -121,11 +121,9 @@ static std::string FindFile(std::string path, const char *const *steps, int step
 // names.
 static void AddXbeToFolder(CXmlElement *folder, const char *xbePath, BOOL quick)
 {
-	EnterFileLock();
 	WIN32_FILE_ATTRIBUTE_DATA attributes;
 	if (!GetFileAttributesExA(xbePath, GetFileExInfoStandard, &attributes))
 	{
-		LeaveFileLock();
 		return;
 	}
 
@@ -163,7 +161,6 @@ static void AddXbeToFolder(CXmlElement *folder, const char *xbePath, BOOL quick)
 		}
 		if (item == NULL)
 		{
-			LeaveFileLock();
 			return;
 		}
 
@@ -255,7 +252,6 @@ static void AddXbeToFolder(CXmlElement *folder, const char *xbePath, BOOL quick)
 			}
 		}
 	}
-	LeaveFileLock();
 }
 
 // 0x000E4459

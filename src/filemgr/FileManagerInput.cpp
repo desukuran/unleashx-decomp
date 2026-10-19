@@ -690,7 +690,6 @@ void CFileManager::OnMenu(IFileFolder *pane)
 	{
 		if (pane->m_pCurrent == NULL)
 			break;
-		EnterFileLock();
 		std::string path = FolderOf(pane);
 		path.append(pane->m_pCurrent->GetName());
 		m_nPrevState = m_nState;
@@ -708,7 +707,6 @@ void CFileManager::OnMenu(IFileFolder *pane)
 			StrUtf8ToWide(title.c_str(), text, 0x28);
 			g_virtualKeyboard.SetText(text);
 		}
-		LeaveFileLock();
 		break;
 	}
 

@@ -25,7 +25,7 @@ typedef DWORD D3DCOLOR;
 #define D3DX_DEFAULT ((UINT)-1)
 
 #define D3DRTYPE_TEXTURE 3
-#define D3DLOCK_READONLY 0x80   // TODO: verify (LockRect flags 0x80 in the original)
+#define D3DLOCK_READONLY 0x80
 
 #define D3DERR_INVALIDCALL ((HRESULT)0x8876086C)
 
@@ -254,6 +254,8 @@ struct IDirect3DDevice8
 	HRESULT BlockUntilVerticalBlank();
 	HRESULT Swap(DWORD flags);
 	HRESULT SetSoftDisplayFilter(BOOL enable);
+	// Keeps the current frame on screen through the next program's start.
+	HRESULT PersistDisplay();
 	HRESULT SetFlickerFilter(DWORD level);
 	HRESULT CreateTexture(UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, DWORD pool,
 	                      IDirect3DTexture8 **texture);
@@ -340,6 +342,7 @@ extern char g_strMediaPath[];                                                   
 void XBUtil_SetMediaPath(const char *path);   // 0x000930A7 (path in eax)
 // XDK sample framework: diffuse and ambient set to the color. (material in edx)
 void XBUtil_InitMaterial(D3DMATERIAL8 *material, float r, float g, float b, float a);       // 0x00092EEF
+HRESULT XGWriteSurfaceOrTextureToXPR(void *resource, const char *path, BOOL writeSurfaceAsTexture);   // 0x0003E84B
 HRESULT D3DXCreateTextureFromFileExA(IDirect3DDevice8 *device, const char *file, UINT width, UINT height,
                                      UINT mipLevels, DWORD usage, D3DFORMAT format, DWORD pool, DWORD filter,
                                      DWORD mipFilter, D3DCOLOR colorKey, void *srcInfo, void *palette,

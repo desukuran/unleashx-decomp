@@ -25,9 +25,12 @@ std::string GetXbePath();                                           // 0x000A393
 // resolved against the dashboard's home directory. See FileUtil.cpp.
 void ResolvePath(const char *path, std::string &out);               // 0x000AC73F
 
-// Writes text to path (append: add to the end instead of replacing). Returns
-// FALSE for empty text.
-BOOL WriteTextFile(const char *path, const char *text, BOOL append);   // 0x000A5BC6 TODO: decompile
+// Writes text to path, replacing it: as is, or (unicode) as UTF-16 with a
+// byte-order mark and a closing CRLF. FALSE for empty text. (text in edi)
+BOOL WriteTextFile(const char *path, const char *text, BOOL unicode);   // 0x000A5BC6
+// UTF-16 with a byte-order mark and a closing CRLF; creates the folder.
+// (path in eax)
+BOOL WriteUnicodeTextFile(const char *path, const wchar_t *text);    // 0x000A5A6C
 
 // Walks the matches of a pattern in a folder, through the virtual file
 // layer (so it works on any drive type). TODO: decompile
@@ -70,9 +73,12 @@ BOOL IsFatxName(const char *name);                                    // 0x0009F
 // characters removed and the name shortened to 42 characters, and TRUE.
 // Otherwise FALSE and out is left alone.
 BOOL MakeFatxPath(const char *path, std::string &out);                // 0x000A4630
-// Per-title persistent folder for name (flags as XapiMapLetterToDirectory). TODO: verify
-std::string GetPersistentDataPath(const wchar_t *name, unsigned int flags);   // 0x000A6D44 TODO: decompile
+// A folder that survives reboots: the save game name on the utility drive
+// U: (else X:), made with creation (0: OPEN_ALWAYS; with bit 0 set the old
+// one is deleted first). With a trailing backslash; "" when it can't be
+// made.
+std::string GetPersistentDataPath(const wchar_t *name, unsigned int creation);   // 0x000A6D44
 
 // The file name part of path (after the last '\\'); "" if requireExtension
 // and the path has no '.'.
-std::string GetPathFileName(const char *path, BOOL requireExtension);   // 0x000A4C4C TODO: decompile
+std::string GetPathFileName(const char *path, BOOL requireExtension);   // 0x000A4C4C

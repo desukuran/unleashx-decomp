@@ -1,6 +1,7 @@
 // Reading the title name, ID and region of an XBE (from its certificate).
 #include <cstring>
 
+#include "../common/FileUtil.h"
 #include "../common/StrUtil.h"
 #include "Storage.h"
 
@@ -146,4 +147,47 @@ BOOL ReadXbeHeader(const char *xbePath, SXbeHeaderInfo *info)
 		CloseHandle(file);
 	}
 	return ok;
+}
+
+// The kernel device behind each drive letter.
+static const char *const g_szHarddiskPartition = "\\Device\\Harddisk0\\Partition";   // 0x0026BC58
+static const char *const g_szCdrom = "\\Device\\Cdrom0";                              // 0x0026BC54
+
+// 0x000A5C05
+std::string GetXbeDevicePath(const char *xbePath)
+{
+	std::string dir = GetPathDirectory(xbePath);
+	std::string device;
+	std::string rest;
+	if (dir.size() >= 2)
+		rest = StrMid(dir, 2, (int)dir.size() - 2);
+	// (Each letter is looked for with a search that must hit at position 0.)
+	if (StrFind(dir, "C:") == 0 || StrFind(dir, "c:") == 0)
+		StrFormat(device, "%s2%s", g_szHarddiskPartition, rest.c_str());
+	else if (StrFind(dir, "E:") == 0 || StrFind(dir, "e:") == 0)
+		StrFormat(device, "%s1%s", g_szHarddiskPartition, rest.c_str());
+	else if (StrFind(dir, "F:") == 0 || StrFind(dir, "f:") == 0)
+		StrFormat(device, "%s6%s", g_szHarddiskPartition, rest.c_str());
+	else if (StrFind(dir, "D:") == 0 || StrFind(dir, "d:") == 0)
+		StrFormat(device, "%s%s", g_szCdrom, rest.c_str());
+	else if (StrFind(dir, "G:") == 0 || StrFind(dir, "g:") == 0)
+		StrFormat(device, "%s7%s", g_szHarddiskPartition, rest.c_str());
+	else if (dir.size() >= 2 && dir[1] == ':')
+	{
+		// Other letters: a lowercase one counts from 'a' as the partition
+		// number. Quirk: uppercase H-Z (and a, b) give an empty path.
+		int partition = -1;
+		char letter = dir[0];
+		if (letter > 'e' && letter <= 'z')
+			partition = letter - 0x60;
+		if (partition >= 1)
+			StrFormat(device, "%s%d%s", g_szHarddiskPartition, partition, rest.c_str());
+	}
+	else if (dir.size() == 0)
+		device = g_szCdrom;
+	else if (dir[0] == '\\')
+		StrFormat(device, "%s%s", g_szCdrom, dir.c_str());
+	else
+		StrFormat(device, "%s\\%s", g_szCdrom, dir.c_str());
+	return device;
 }

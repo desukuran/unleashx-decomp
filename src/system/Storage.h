@@ -15,16 +15,15 @@ BOOL UnmountMemoryUnit(SDriveInfo *info);
 void InitMemoryUnitTable();                         // 0x000315A5 TODO: decompile
 HRESULT GetUtilityDriveDevice(char *devicePath);    // 0x0009DE6C TODO: decompile
 
-// Serializes file operations between threads. TODO: verify
-void EnterFileLock();                               // 0x00018FF7 TODO: decompile
-void LeaveFileLock();                               // 0x0001901A TODO: decompile
-
-// Fields read from an XBE's header/certificate. 0x78 bytes.
+// Fields read from an XBE's header/certificate. 0x78 bytes; constructor
+// 0x00018FF7 and destructor 0x0001901A (this in esi), both implicit.
 struct SXbeInfo
 {
 	DWORD titleId;             // +0x00 TODO: verify
 	std::string titleName;     // +0x04
-	BYTE unknown20[0x54];      // +0x20
+	std::string unused20;      // +0x20 never filled
+	std::string unused3C;      // +0x3C never filled
+	std::string unused58;      // +0x58 never filled
 	DWORD gameRegion;          // +0x74 certificate game region flags
 };
 BOOL ReadXbeInfo(const char *xbePath, SXbeInfo *info);             // 0x000A608D (Xbe.cpp)
@@ -59,4 +58,11 @@ BOOL ReadXbeHeader(const char *xbePath, SXbeHeaderInfo *info);     // 0x0009E08A
 // TRUE if it was written or already the same. TODO: decompile
 BOOL SetXbeTitleName(const char *xbePath, const wchar_t *title);    // 0x0009DB0C
 std::string GetXbeTitleName(const char *xbePath);                  // 0x000A5F49 (Xbe.cpp)
-BOOL ExtractXbeTitleImage(const char *xbePath, const char *outFile);   // 0x000A4D10 TODO: decompile
+// The kernel path of an XBE's folder (E:\Games\x.xbe ->
+// \Device\Harddisk0\Partition1\Games), what D: is mapped to when it
+// launches. (Xbe.cpp)
+std::string GetXbeDevicePath(const char *xbePath);                 // 0x000A5C05
+// Saves the XBE's title image ($$XTIMAGE section) as outFile: an XPR
+// texture is written as an .xpr, a DDS is copied when outFile doesn't exist
+// yet. (src/render/XbeImage.cpp)
+BOOL ExtractXbeTitleImage(const char *xbePath, const char *outFile);   // 0x000A4D10

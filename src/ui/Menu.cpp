@@ -516,7 +516,6 @@ void CMenu::FindItemIcon(CXmlElement *item)
 	                (StrCmpNoCase(StrRight(icon, 4), ".xbx") == 0 && !FileExists(icon.c_str()));
 	if (needIcon)
 	{
-		EnterFileLock();
 		SXbeInfo info;
 		if (ReadXbeInfo(action.c_str(), &info))
 		{
@@ -547,7 +546,6 @@ void CMenu::FindItemIcon(CXmlElement *item)
 				item->SetAttribute("Icon", icon.c_str());
 			}
 		}
-		LeaveFileLock();
 	}
 	else if (icon.size() != 0 && StrFind(icon, ":") != 0)
 	{
@@ -1377,7 +1375,6 @@ void CMenu::ShowItemInfo(CMenuItem *item, CXmlElement *element, const std::strin
 	else
 	{
 		StrFormat(info, "Location: %s\n", action.c_str());
-		EnterFileLock();
 		SXbeInfo xbe;
 		if (!ReadXbeInfo(action.c_str(), &xbe))
 		{
@@ -1416,7 +1413,6 @@ void CMenu::ShowItemInfo(CMenuItem *item, CXmlElement *element, const std::strin
 			StrFormat(line, "Contains: %u Files, %u Folders\n", g_nOperationFiles, g_nOperationFolders);
 			info += line;
 		}
-		LeaveFileLock();
 	}
 	StrFormat(line, "Icon: %s\n", element->GetAttribute("Icon").c_str());
 	info += line;
@@ -1553,7 +1549,6 @@ HRESULT CMenu::RunContextMenuChoice(int *action)
 		}
 		else
 		{
-			EnterFileLock();
 			SXbeInfo xbe;
 			if (ReadXbeInfo(text.c_str(), &xbe))
 			{
@@ -1565,7 +1560,6 @@ HRESULT CMenu::RunContextMenuChoice(int *action)
 					RunItem(m_pCommand, FALSE);
 				}
 			}
-			LeaveFileLock();
 		}
 		break;
 	}

@@ -105,6 +105,11 @@ BOOL LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime);
 void GetSystemTime(SYSTEMTIME *systemTime);
 void GetLocalTime(SYSTEMTIME *systemTime);
 DWORD XLaunchNewImageA(LPCSTR imagePath, PLAUNCH_DATA launchData);
+// Internal XAPI (not in the XDK headers): writes the title info for the
+// next boot (D: as dDrivePath, then launchPath), then quick-reboots with
+// HalReturnToFirmware(ReturnFirmwareQuickReboot). TODO: verify the name
+DWORD XWriteTitleInfoAndRebootA(LPCSTR launchPath, LPCSTR dDrivePath, DWORD launchDataType, DWORD titleId,
+                                PLAUNCH_DATA launchData);   // 0x000397F9
 
 // threads, events, memory and the file cache
 #define STILL_ACTIVE 0x103

@@ -19,12 +19,12 @@
 #include "../system/FileOps.h"
 #include "../system/Storage.h"
 #include "../system/SystemControl.h"
+#include "../system/XbeLaunch.h"
 #include "../ui/Language.h"
 #include "../ui/StringIds.h"
 #include "../filemgr/FileManager.h"
 #include "../xml/XmlDocument.h"
 
-std::string g_strLoadingPreview;          // 0x00277F70
 BYTE g_bLaunching;                        // 0x00276236
 BYTE g_bShuttingDown;                     // 0x00276235
 DWORD g_dwShutdownDeadline;               // 0x00276238
@@ -32,8 +32,6 @@ DWORD g_dwShutdownDeadline;               // 0x00276238
 // Video standard switching (the EEPROM setting), used when launching games
 // of another region and by the VideoMode action.
 void SetVideoRegion(int standard, int mode);         // 0x000BCF48 TODO: decompile
-// Shows the skin's loading screen for the XBE.
-void ShowLaunchScreen(const char *path, const char *name);   // 0x000E3B65 TODO: decompile
 // Maps D: to the XBE's folder and starts it; returns only on failure.
 // Starts the network from the settings on a thread (unless one is running).
 
@@ -144,10 +142,10 @@ BOOL LaunchXbe(const char *path, const char *name, int region, const char *args)
 	if (path == NULL || strlen(path) == 0 || !FileExists(path))
 		return FALSE;
 
-	EnterFileLock();
+	// (The original zeroes the whole struct, strings included, right after
+	// constructing it.)
 	SXbeInfo info;
 	info.titleId = 0;
-	memset(info.unknown20, 0, sizeof(info.unknown20));
 	info.gameRegion = 0;
 	std::string title = name;
 
@@ -231,7 +229,6 @@ BOOL LaunchXbe(const char *path, const char *name, int region, const char *args)
 		RebootToDashboard();
 	else
 		SmcReset();
-	LeaveFileLock();
 	return FALSE;
 }
 
@@ -270,7 +267,9 @@ static BOOL LaunchItem(CUnleashX *app, CXmlElement *item, std::string &path)
 	// The loading screen shows the item's preview video or its icon.
 	if (StrCmpNoCase(g_skin.m_strLoadingPreview, "GamePreview") == 0)
 	{
-		g_strLoadingPreview = item->GetAttribute("Preview");
+		// (Over the skin's own setting: ShowLaunchScreen plays whatever
+		// file it names.)
+		g_skin.m_strLoadingPreview = item->GetAttribute("Preview");
 	}
 	else if (StrCmpNoCase(g_skin.m_strLoadingBackground, "GameIcon") == 0)
 	{
@@ -507,7 +506,7 @@ BOOL CUnleashX::CMenuEvent::OnItemSelected(CXmlElement *item)
 
 	if (StrCmpNoCase(cmd, "LaunchDVD") == 0)
 	{
-		app->LaunchDVD();
+		app->LaunchDVD(TRUE);
 		return FALSE;
 	}
 	if (StrCmpNoCase(cmd, "filemanager") == 0)

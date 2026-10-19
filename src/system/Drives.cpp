@@ -343,7 +343,6 @@ void MountTitleDataDrive(const char *xbePath)
 	if (e == NULL || !e->mounted)
 		return;
 
-	EnterFileLock();   // 0x00018FF7 TODO: verify
 	SXbeInfo xbe;
 	if (FileExists(xbePath) && ReadXbeInfo(xbePath, &xbe))
 	{
@@ -378,7 +377,6 @@ void MountTitleDataDrive(const char *xbePath)
 			}
 		}
 	}
-	LeaveFileLock();   // 0x0001901A TODO: verify
 }
 
 // 0x000AB7F1

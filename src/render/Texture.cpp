@@ -208,19 +208,6 @@ HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 * /*dev
 	return S_OK;
 }
 
-// The start of an .xbx: the XPR header with one texture's resource
-// header. 0x24 bytes.
-struct SXbxHeader
-{
-	DWORD magic;          // "XPR0" or "XPR1"
-	DWORD totalSize;
-	DWORD headerSize;     // 0x800: the data starts there
-	D3DResource texture;  // Common, Data, Lock
-	DWORD format;
-	DWORD size;
-	DWORD endMarker;      // 0xFFFFFFFF
-};
-
 // 0x0009F909
 bool LoadXprTexture(const char *path, IDirect3DTexture8 **texture)
 {

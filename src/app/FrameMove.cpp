@@ -138,7 +138,7 @@ HRESULT CUnleashX::FrameMove()
 				if (m_nMode == MODE_MUSIC && GetDiscType() == DISC_AUDIO)
 					g_pMusicManager->PlayAudioCD();
 				else
-					LaunchDVD();
+					LaunchDVD(FALSE);
 			}
 		}
 

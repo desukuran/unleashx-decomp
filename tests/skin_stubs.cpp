@@ -4,6 +4,7 @@
 
 #include "../src/media/WMVideoPlayer.h"
 #include "../src/render/Fonts.h"
+#include "../src/system/Storage.h"
 #include "../src/render/D3D.h"
 #include "../src/render/Texture.h"
 #include "../src/skin/Skin.h"
@@ -50,8 +51,9 @@ void CWMVideoPlayer::SetRect(int, int, int, int) {}
 BOOL CWMVideoPlayer::Open(const char *) { return TRUE; }
 
 
-// FTP SITE TITLES title images
+// XBE title images (Xbox-only XbeImage.cpp): FTP SITE TITLES, the game scan
 BOOL LoadXbeIcon(const char *, IDirect3DTexture8 **texture) { *texture = NULL; return FALSE; }
+BOOL ExtractXbeTitleImage(const char *, const char *) { return FALSE; }
 HRESULT SaveSurfaceToBmp(IDirect3DSurface8 *, const char *) { return E_FAIL; }
 void Get2DSurfaceDesc(D3DResource *, DWORD, D3DSURFACE_DESC *desc) { memset(desc, 0, sizeof(*desc)); }
 HRESULT IDirect3DDevice8::CreateTexture(UINT, UINT, UINT, DWORD, D3DFORMAT, DWORD, IDirect3DTexture8 **texture)

@@ -174,7 +174,8 @@
 000a3d25 GetDriveDevicePath HRESULT __cdecl f(char drive, std_string *devicePath)
 000a41df StrAddBackslash void __cdecl f(std_string *s)
 000a4aad IsDriveAvailable BOOL __cdecl f(char drive)
-000a5bc6 WriteTextFile BOOL f(char *path, BOOL append, char *text@edi)
+000a5bc6 WriteTextFile BOOL f(char *path, BOOL unicode, char *text@edi)
+000a5b45 WriteTextFileAsUnicode
 000ac39b CAppSettings::SetDefaults void __stdcall f(CAppSettings *self)
 000ac73f ResolvePath void __cdecl f(char *path, std_string *out)
 000aca86 CAppSettings::InitPaths void __stdcall f(CAppSettings *self)
@@ -337,8 +338,8 @@
 000a956b FormatDrive HRESULT __cdecl f(char drive)
 0009de6c GetUtilityDriveDevice
 000315a5 InitMemoryUnitTable
-00018ff7 EnterFileLock
-0001901a LeaveFileLock
+00018ff7 SXbeInfo::ctor
+0001901a SXbeInfo::dtor
 000a608d ReadXbeInfo
 000a4d10 ExtractXbeTitleImage
 00038c16 GetVolumeInformationA
@@ -1018,6 +1019,19 @@
 0009e6db HexToBytes
 000a4c4c GetPathFileName
 000a648c LaunchXbeWithData
+000a5c05 GetXbeDevicePath
+000a6aff LaunchXbeWithLaunchData
+000a6eb0 LaunchDashboardMusic
+000a6ee7 LaunchDashboardSettings
+000a6f24 LaunchDashboardMemory
+000397f9 XWriteTitleInfoAndRebootA
+000a2357 CKernelString::ctor
+000a1a11 CKernelString::dtor
+0009d427 CKernelString::Alloc
+0009d489 CKernelString::Text
+0009ebbf CKernelString::Set
+0009ec7a CKernelString::Get
+000a4225 SaveTextureToXpr
 00078582 urarlib_list
 00078811 urarlib_get
 0007850e urarlib_freelist

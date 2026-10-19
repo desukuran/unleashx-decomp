@@ -40,8 +40,25 @@ void GetDisplaySize(float *width, float *height, BOOL refresh);    // 0x0009F14B
 // first). (texture in eax)
 HRESULT CaptureBackBuffer(IDirect3DTexture8 **texture, BOOL backBuffer);   // 0x0009F19C
 
+// The start of an .xbx (and of an XBE's XPR title image): the XPR header
+// with one texture's resource header. 0x24 bytes.
+struct SXbxHeader
+{
+	DWORD magic;          // "XPR0" or "XPR1"
+	DWORD totalSize;
+	DWORD headerSize;     // 0x800: the data starts there
+	D3DResource texture;  // Common, Data, Lock
+	DWORD format;
+	DWORD size;
+	DWORD endMarker;      // 0xFFFFFFFF
+};
+
 // The title image ($$XTIMAGE section) of an XBE: an XPR texture or a DDS.
-BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture);  // 0x0009FAAF TODO: decompile
+// (XbeImage.cpp)
+BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture);  // 0x0009FAAF
+// Writes a copy of texture's top level as an .xpr file (creating its
+// folder). (texture in a register; XbeImage.cpp)
+BOOL SaveTextureToXpr(const char *path, IDirect3DTexture8 *texture);   // 0x000A4225
 // Writes a surface as a .bmp file. TODO: decompile (library code?)
 HRESULT SaveSurfaceToBmp(IDirect3DSurface8 *surface, const char *path);   // 0x0016FD40
 // A texture from an .xpr file holding one texture (the MS dashboard's .xbx
