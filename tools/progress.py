@@ -20,13 +20,21 @@ def main():
             a, size, block, name = line.split('\t')[:4]
             funcs[int(a, 16)] = (block, name, int(size))
 
+    # Implemented: an address comment in a .cpp, or on a header line with an
+    # inline body. Declared: only on a header declaration (interfaces, and
+    # library code that is named but not reconstructed).
     in_src = set()
+    declared = set()
     for path in glob.glob(os.path.join(ROOT, 'src/**/*.cpp'), recursive=True) + \
             glob.glob(os.path.join(ROOT, 'src/**/*.h'), recursive=True):
+        header = path.endswith('.h')
         for line in open(path):
             if '//' in line and 'TODO: decompile' not in line:
-                for m in re.finditer(r'0x([0-9A-Fa-f]{8})', line.split('//', 1)[1]):
-                    in_src.add(int(m.group(1), 16))
+                code, comment = line.split('//', 1)
+                target = declared if header and '{' not in code else in_src
+                for m in re.finditer(r'0x([0-9A-Fa-f]{8})', comment):
+                    target.add(int(m.group(1), 16))
+    declared -= in_src
 
     text = {a: v for a, v in funcs.items() if v[0] == '.text'}
     app = {a: v for a, v in text.items() if any(lo <= a < hi for lo, hi in APP_RANGES)}
@@ -40,6 +48,10 @@ def main():
     print(f'  named                : {len(named(app))}')
     print(f'  in src/              : {len(done)} ({sum(app[a][2] for a in done)} bytes, '
           f'{100 * sum(app[a][2] for a in done) / max(1, size(app)):.1f}%)')
+    decl = [a for a in app if a in declared]
+    print(f'  declared only        : {len(decl)} ({sum(app[a][2] for a in decl)} bytes, '
+          f'{100 * sum(app[a][2] for a in decl) / max(1, size(app)):.1f}%; '
+          'interfaces and library code)')
 
 
 if __name__ == '__main__':
