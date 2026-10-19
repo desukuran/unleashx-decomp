@@ -2240,3 +2240,14 @@
 00059920 mad_bit_read
 002373e0 mad_timer_zero
 000d9040 EncoderReadPcm
+# Sound effects (src/audio/SoundEffects.cpp; CSound is the XDK samples' CXBSound)
+0013860d CSoundEffects::CSoundEffects
+00138492 CSoundEffects::~CSoundEffects
+00137d64 CSoundEffects::ApplyVolume
+0002e11f SSoundEffect::Init
+0002e155 SSoundEffect::Load
+00094699 CSound::CSound
+0009511d CSound::Create
+00094aa3 CSound::Destroy
+00094a70 CSound::Stop
+0002b63d CSound::deleting_dtor

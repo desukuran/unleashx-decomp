@@ -24,6 +24,8 @@ SIRRemote g_irRemotes[4];
 SKeyboardState g_keyboards[4];
 void UpdateGamepads(CXBApplicationEx *) {}
 HRESULT CNewsfeed::AddFeed(const char *url, const char *title) { printf("[stub] AddFeed(%s, '%s')\n", url, title); return S_OK; }
+CSoundEffects::CSoundEffects() : m_pSettings(NULL), m_bDisabled(FALSE), m_bQuiet(FALSE) {}
+CSoundEffects::~CSoundEffects() {}
 void CSoundEffects::SetQuiet(BOOL quiet) { m_bQuiet = quiet; }
 void SAudioSettings::SetEnable51(BOOL enable) { m_bEnable51 = enable; }
 
