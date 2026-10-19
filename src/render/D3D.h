@@ -19,6 +19,7 @@ typedef DWORD D3DCOLOR;
 #define D3DFMT_LIN_R5G6B5 0x11
 #define D3DFMT_LIN_A8R8G8B8 0x12
 #define D3DFMT_LIN_X1R5G5B5 0x1C
+#define D3DFMT_YUY2 0x24
 #define D3DX_FILTER_NONE 1
 #define D3DX_FILTER_TRIANGLE 4
 #define D3DX_DEFAULT ((UINT)-1)
@@ -38,6 +39,7 @@ typedef DWORD D3DCOLOR;
 
 #define D3DVSDE_DIFFUSE 3      // SetVertexDataColor register
 #define D3DVSDE_VERTEX (-1)    // SetVertexData4f: the position
+#define D3DVSDE_TEXCOORD0 9    // SetVertexData2f
 #define D3DFILL_SOLID 0x1B02
 // D3DTEXTUREFILTERTYPE
 #define D3DTEXF_NONE 0
@@ -118,6 +120,7 @@ enum D3DRENDERSTATETYPE
 	D3DRS_FOGSTART,
 	D3DRS_FOGEND,
 	D3DRS_FOGDENSITY,
+	D3DRS_YUVENABLE,
 };
 
 // D3DBLEND (Xbox uses the GL values)
@@ -284,8 +287,13 @@ struct IDirect3DDevice8
 	// immediate-mode drawing (Xbox extension)
 	HRESULT Begin(DWORD primitiveType);
 	HRESULT End();
+	HRESULT SetVertexData2f(int reg, float a, float b);
 	HRESULT SetVertexData4f(int reg, float a, float b, float c, float d);
 	HRESULT SetVertexDataColor(int reg, D3DCOLOR color);
+	// The video overlay (Xbox extension).
+	HRESULT EnableOverlay(BOOL enable);
+	HRESULT UpdateOverlay(IDirect3DSurface8 *surface, const RECT *source, const RECT *destination, BOOL colorKey,
+	                      D3DCOLOR colorKeyColor);
 };
 
 // The surface the previous program (or the boot animation) left on screen.

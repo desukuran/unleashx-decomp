@@ -40,10 +40,10 @@ HRESULT CFontTable::Add(const char *name, CXBFont *, BOOL) { printf("[stub] font
 
 CWMVideoPlayer::CWMVideoPlayer() {}
 CWMVideoPlayer::~CWMVideoPlayer() {}
-void CWMVideoPlayer::SetFont(CXBFont *) {}
-BOOL CWMVideoPlayer::IsPlaying() { return FALSE; }
-void CWMVideoPlayer::Render() {}
-HRESULT CWMVideoPlayer::Update(BOOL *, int) { return S_OK; }
+BOOL CWMVideoPlayer::Init(CXBFontEx *) { return S_OK; }
+BOOL CWMVideoPlayer::IsOpen() { return FALSE; }
+BOOL CWMVideoPlayer::Render() { return S_OK; }
+HRESULT CWMVideoPlayer::ProcessInput(int *, SGamepadState **) { return S_OK; }
 void CWMVideoPlayer::SetFullScreen(BOOL) {}
 void CWMVideoPlayer::SetAudio(BOOL) {}
 void CWMVideoPlayer::SetRect(int, int, int, int) {}

@@ -659,17 +659,17 @@ HRESULT CUnleashX::Initialize()
 			if (movie != NULL)
 			{
 				movie->SetFullScreen(TRUE);
-				movie->m_bUnknownA0 = FALSE;
-				movie->Unknown9C1F3(FALSE);
+				movie->m_bModal = FALSE;
+				movie->SetLoop(FALSE);
 				movie->SetFont(font);
 				movie->Open(g_skin.m_strIntroMovie.c_str());
-				while (movie->IsPlaying())
+				while (movie->IsOpen())
 				{
 					g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xFF000000,
 					                    1.0f, 0);
 					UpdateGamepads(this);
 					int key2 = g_gamepadInput.GetAction();
-					if (movie->Update((BOOL *)&key2, 0) >= 0)
+					if (movie->ProcessInput(&key2, NULL) >= 0)
 						movie->Render();
 					g_pd3dDevice->Swap(0);
 				}

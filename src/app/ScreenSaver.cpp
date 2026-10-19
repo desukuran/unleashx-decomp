@@ -112,7 +112,7 @@ void CScreenSaver::SetSource(const wchar_t *source)
 			{
 				m_pVideo->SetFont(m_pFont);
 				m_pVideo->SetFullScreen(TRUE);
-				m_pVideo->m_bUnknownA0 = FALSE;
+				m_pVideo->m_bModal = FALSE;
 				m_pVideo->SetAudio(TRUE);
 				m_pVideo->Open(path.c_str());
 				if (m_pVideo->IsValid())
@@ -222,7 +222,7 @@ HRESULT CScreenSaver::ProcessInput(int *action, SGamepadState **pad)
 	}
 	else if (m_bVideo)
 	{
-		m_pVideo->Update((BOOL *)action, 0);
+		m_pVideo->ProcessInput(action, NULL);
 	}
 	else if (m_bSlideShow)
 	{

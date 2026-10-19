@@ -49,6 +49,11 @@ typedef const char *LPCSTR;
 #define CP_ACP 0
 #define CP_UTF8 65001
 
+struct RECT
+{
+	LONG left, top, right, bottom;
+};
+
 struct FILETIME
 {
 	DWORD dwLowDateTime;

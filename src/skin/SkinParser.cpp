@@ -951,7 +951,7 @@ static void ParseMenu(CSkin *skin, CXmlElement *menu)
 			{
 				skin->m_pPreviewVideo->SetFont(skin->m_pInfoFont);
 				skin->m_pPreviewVideo->SetFullScreen(FALSE);
-				skin->m_pPreviewVideo->m_bUnknownA0 = FALSE;
+				skin->m_pPreviewVideo->m_bModal = FALSE;
 				skin->m_bPreviewAudio = !IsFalseString(preview->GetAttribute("EnableAudio").c_str());
 				skin->m_bPreviewMusic = IsTrueString(preview->GetAttribute("EnableMusic").c_str());
 				skin->m_pPreviewVideo->SetAudio(skin->m_bPreviewAudio != 0);
@@ -998,7 +998,7 @@ static void ParseMain(CSkin *skin, CXmlElement *main)
 			{
 				skin->m_pBackgroundVideo->SetFont(skin->m_pInfoFont);
 				skin->m_pBackgroundVideo->SetFullScreen(TRUE);
-				skin->m_pBackgroundVideo->m_bUnknownA0 = FALSE;
+				skin->m_pBackgroundVideo->m_bModal = FALSE;
 				skin->m_pBackgroundVideo->SetAudio(FALSE);
 				std::string audio = background->GetAttribute("EnableAudio");
 				if (audio.size() != 0 && IsTrueString(audio.c_str()))

@@ -225,11 +225,13 @@ HRESULT CSkin::PollLoad(BOOL *busy)
 			if (m_pEventSink != NULL)
 				m_pEventSink->OnPreviewTimer();
 		}
+		// (Quirk: the busy flag is passed as the input action, so while
+		// loading it reads as A, which would stop a video that doesn't loop.)
 		if (m_pPreviewVideo != NULL && m_bPreviewPlaying)
-			m_pPreviewVideo->Update(busy, 0);
+			m_pPreviewVideo->ProcessInput((int *)busy, NULL);
 	}
 	if (m_pBackgroundVideo != NULL)
-		m_pBackgroundVideo->Update(busy, 0);
+		m_pBackgroundVideo->ProcessInput((int *)busy, NULL);
 	return S_OK;
 }
 

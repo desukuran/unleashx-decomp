@@ -9,14 +9,6 @@
 #include "../musicplayer/AudioGUI.h"
 #include "Viewers.h"
 
-// The viewers are CAppFrame screens; the video player isn't one, but its
-// vtable has the same shape (font, IsPlaying, Render, Update), so the
-// original keeps it in the same pointer. (inlined)
-static CAppFrame *AsViewer(CWMVideoPlayer *player)
-{
-	return (CAppFrame *)(void *)player;
-}
-
 // 0x0012C480
 void CFileFolderEventsink::OnOpen(std::string path, int type, CXBFontEx *font)
 {
@@ -78,7 +70,7 @@ void CFileFolderEventsink::OnOpen(std::string path, int type, CXBFontEx *font)
 		// The player is kept (not deleted) when it closes.
 		g_bDeleteViewerOnClose = FALSE;
 		g_bFileViewerOpen = TRUE;
-		g_pFileViewer = AsViewer(g_pFileVideoPlayer);
+		g_pFileViewer = g_pFileVideoPlayer;
 		return;
 
 	case ITEM_TEXT:
