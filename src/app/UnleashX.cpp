@@ -14,6 +14,7 @@
 #include "../settings/ConfigLoader.h"
 #include "../skin/SkinColors.h"
 #include "../system/FileOps.h"
+#include "SettingsPages.h"
 
 CUnleashX *g_pApp;                         // 0x00276204
 CAudioGUI *g_pAudioGUI;                    // 0x00276228
@@ -23,15 +24,6 @@ int g_unknown276224;                       // 0x00276224 TODO
 static BOOL s_bBackgroundSoundPlaying;     // 0x00278D48
 
 // The screens created on demand (TODO: decompile).
-class CFtpSiteList
-{
-public:
-	CFtpSiteList();                        // 0x000C00CC
-	virtual ~CFtpSiteList();
-	void Init(CXBFontEx *font);            // 0x000D2D87
-	void Show();                           // 0x000BEC78
-};
-
 class CAudioGUI
 {
 public:
@@ -98,7 +90,7 @@ CUnleashX::CUnleashX()
 	m_pFileManager = NULL;
 	m_pMessageBox = NULL;
 	m_pSkinBrowser = NULL;
-	m_pFtpSites = NULL;
+	m_pSystemInfo = NULL;
 	m_pTextEditor = NULL;
 	m_bMessageShown = FALSE;
 	m_unknown1964 = 0;
@@ -170,14 +162,14 @@ void CUnleashX::SetMode(int mode)
 			m_pFileManager->SetBackground(g_skin.GetFileManagerBackground());
 		}
 	}
-	else if (mode == MODE_FTPSITES)
+	else if (mode == MODE_SYSINFO)
 	{
-		if (m_pFtpSites == NULL)
+		if (m_pSystemInfo == NULL)
 		{
-			m_pFtpSites = new CFtpSiteList;
-			m_pFtpSites->Init(&m_fonts[4]);
+			m_pSystemInfo = new CXboxInfo;
+			m_pSystemInfo->Init(&m_fonts[4]);
 		}
-		m_pFtpSites->Show();
+		m_pSystemInfo->Show();
 	}
 	else if (mode == MODE_MUSIC)
 	{
@@ -239,8 +231,8 @@ HRESULT CUnleashX::Cleanup()
 	m_pMessageBox = NULL;
 	delete m_pSkinBrowser;
 	m_pSkinBrowser = NULL;
-	delete m_pFtpSites;
-	m_pFtpSites = NULL;
+	delete m_pSystemInfo;
+	m_pSystemInfo = NULL;
 	delete m_pFrame1954;
 	m_pFrame1954 = NULL;
 	delete m_pSettingsMenu;

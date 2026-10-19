@@ -24,7 +24,7 @@ enum AppMode
 	MODE_GAMEMANAGER = 3,
 	MODE_SETTINGS = 5,
 	MODE_SKINS = 6,
-	MODE_FTPSITES = 7,
+	MODE_SYSINFO = 7,      // CXboxInfo (no action opens it)
 	MODE_TEXTEDITOR = 8,
 	MODE_MUSIC = 9,
 };

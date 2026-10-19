@@ -14,7 +14,7 @@
 class CAppFrame;
 class CAudioGUI;
 class CSound;
-class CFtpSiteList;
+class CXboxInfo;
 class CXmlElement;
 
 // 0x2268 bytes
@@ -103,7 +103,7 @@ public:
 	CFileManager *m_pFileManager;             // +0x193C
 	CMessageBox *m_pMessageBox;               // +0x1940
 	CSkinBrowser *m_pSkinBrowser;             // +0x1944
-	CFtpSiteList *m_pFtpSites;                // +0x1948
+	CXboxInfo *m_pSystemInfo;                 // +0x1948 the System Info screen (mode 7)
 	CNotePad *m_pTextEditor;                  // +0x194C
 	int m_unknown1950;                        // +0x1950
 	CAppFrame *m_pFrame1954;                  // +0x1954 TODO: verify the class
