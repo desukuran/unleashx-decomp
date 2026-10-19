@@ -33,7 +33,16 @@ public:
 	// An <Item> (or a <Command>) was chosen; for a <List>, whether to open
 	// it. Returns FALSE when the action failed or left the menu.
 	virtual BOOL OnItemSelected(CXmlElement *item) { (void)item; return TRUE; }   // slot 1
-	virtual BOOL Unknown2() { return TRUE; }          // slot 2, 0x0002B65C
+	// Before an item is drawn: may move it (x, y) or draw it itself
+	// (FALSE: the menu draws neither text nor icon). selected: it's the
+	// selection; first/last: the visible range.
+	virtual BOOL DrawItem(int index, float *x, float *y, const wchar_t *text, DWORD color, float width,
+	                      BOOL selected, CMenuItem *item, int first, int last)
+	{
+		(void)index; (void)x; (void)y; (void)text; (void)color; (void)width; (void)selected; (void)item;
+		(void)first; (void)last;
+		return TRUE;
+	}                                                 // slot 2, 0x0002B65C
 	virtual void Unknown3() {}                        // slot 3, 0x0002B8DA
 	// Play the selected item's preview video (NULL stops it).
 	virtual void OnPreview(const char *file) { (void)file; }   // slot 4, 0x0002B8DA
@@ -103,8 +112,9 @@ public:
 
 	// Handles one input action (InputAction); may change *action.
 	HRESULT ProcessInput(int *action, struct SGamepadState **pad);   // 0x001123B9
-	HRESULT Render();                                 // 0x0010ED3D TODO: decompile (this in eax)
-	void RenderItems();                               // 0x0010D055 TODO: decompile
+	HRESULT Render();                                 // 0x0010ED3D (this in eax; MenuRender.cpp)
+	void RenderItems();                               // 0x0010D055 (this on the stack) the skin's item positions
+	void RenderHorizontal();                          // 0x0010E017 (this in ebx)
 
 	// Internal
 	HRESULT ProcessAction(int *action);
@@ -125,7 +135,7 @@ public:
 	void ScanFoldersNow();                            // 0x001120A7
 	static void PlaySound(CSound *sound);             // 0x0010CEB2
 
-	float m_fAreaY;                           // +0x008 the menu area (skin), default 50. TODO: verify x/y order
+	float m_fAreaY;                           // +0x008 the menu area (skin), default 50
 	float m_fAreaX;                           // +0x00C 50
 	float m_fAreaWidth;                       // +0x010 540
 	float m_fAreaHeight;                      // +0x014 380
@@ -185,8 +195,8 @@ public:
 	BOOL m_bRecentMenuShown;                  // +0x1C4
 	SRecentItem m_recent[10];                 // +0x1C8 recent.dat
 	IDirect3DTexture8 *m_pIconTexture;        // +0xDF8 icon of the selected item
-	int m_unknownDFC;                         // +0xDFC
-	int m_unknownE00;                         // +0xE00
+	BOOL m_bPreloadIcons;                     // +0xDFC Render only loads the visible icons (one a frame) until done
+	int m_nPreloadIndex;                      // +0xE00
 	CMD5 m_md5;                               // +0xE04 not used by the menu code seen so far
 	BOOL m_bDirty;                            // +0xE38
 	CAppSettings *m_pSettings;                // +0xE3C
@@ -201,20 +211,20 @@ public:
 	SMenuInput m_input;                       // +0xE60
 	BOOL m_bShowArrows;                       // +0xF08 1
 	BOOL m_bNoIcons;                          // +0xF0C the skin has ShowIcon off: lines are as tall as the font
-	int m_unknownF10;                         // +0xF10 1
+	BOOL m_bShowText;                         // +0xF10 1: draw the item texts
 	DWORD m_dwTextAlign;                      // +0xF14 XBFONT_* flags, 12 = left
 	int m_nBorderWidth;                       // +0xF18
 	int m_nItemSpacing;                       // +0xF1C 2, added above and below each line
-	float m_fUnknownF20;                      // +0xF20 1.0
-	float m_fUnknownF24;                      // +0xF24 1.0
+	float m_fFontScaleX;                      // +0xF20 the font's own scale (1.0)
+	float m_fFontScaleY;                      // +0xF24 1.0
 	float m_fTextScale;                       // +0xF28 grows the text when lines are tall
 	int m_nMaxVisibleItems;                   // +0xF2C 0 = no limit
 	bool m_bWrap;                             // +0xF30 <Menu Rotate>: the selection wraps around
 	bool m_bFixed;                            // +0xF31 <Menu Fixed>: the list scrolls under a fixed selection row
 	int m_nFixAt;                             // +0xF34 that row
-	BOOL m_bScrollText;                       // +0xF38 <Menu Scroll> TODO: verify
-	DWORD m_dwIconLoadTime;                   // +0xF3C
-	float m_fUnknownF40;                      // +0xF40
+	BOOL m_bScrollText;                       // +0xF38 <Menu Scroll>: a selected text too long for its line scrolls
+	DWORD m_dwMarqueeTick;                    // +0xF3C when the selected text scrolls next
+	float m_fMarqueeOffset;                   // +0xF40 how far it has scrolled
 };
 
 // Passwords already entered for locked items this session.

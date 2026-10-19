@@ -71,6 +71,11 @@ public:
 	BYTE m_reserved[0x10];
 };
 
+// The pen position for DrawFontText (a TrueType font rounds it down).
+// (font in eax) TODO: decompile
+void SetFontCursor(CXBFont *font, float x, float y);                   // 0x00021E58
+// Draws text at the pen position. (font in esi) TODO: decompile
+void DrawFontText(CXBFont *font, DWORD color, const wchar_t *text, DWORD flags, float maxWidth);   // 0x00021ECB
 // Line height of a font: the TrueType face's height, or the bitmap font's
 // height times its vertical scale.
 float GetFontHeight(CXBFont *font);                                    // 0x00021EA0 TODO: decompile

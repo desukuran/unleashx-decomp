@@ -70,7 +70,10 @@ public:
 	{
 	public:
 		virtual BOOL OnItemSelected(CXmlElement *item);   // 0x000EE514
-		virtual BOOL Unknown2() { return TRUE; }      // 0x000DFF11
+		virtual BOOL DrawItem(int, float *, float *, const wchar_t *, DWORD, float, BOOL, CMenuItem *, int, int)
+		{
+			return TRUE;
+		}                                             // 0x000DFF11
 		virtual void OnPreview(const char *file);     // 0x000E4173 TODO: decompile
 
 		CUnleashX *m_pApp;                            // +0x04

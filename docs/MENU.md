@@ -147,6 +147,52 @@ START opens a menu for the selected item:
 Quirk: the NTSC/PAL entries change the item's `Region` for the rest of the
 session.
 
+## Drawing
+
+`src/ui/MenuRender.cpp` draws the menu in one of three layouts, chosen
+from the skin's `<Menu>`:
+
+* The vertical list is the default.
+* A row is used with `Horizontal`. Each item takes its icon, its text and
+  twice the spacing.
+* Free positions are used with `<Menu><Item Left Top Width Height
+  Align>` (up to 20). Item *n* on screen goes to position *n*.
+
+### Each line
+
+* A line is an icon followed by the text. The icon is a square of
+  `ItemSpacing` + 34 pixels; it's left out with `ShowIcon` off. Labels use
+  the caption color, items `MENU_TEXTCOLOR`.
+* The selected item is drawn over a `MENU_ACTIVEBACKCOLOR` bar, in
+  `MENU_ACTIVETEXTCOLOR`.
+* A selected text too long for its line scrolls right to left, a pixel
+  every `<ScrollSpeed>` ms. This needs `<Menu Scroll>`.
+* Moving the selection slides the lines into place over a few frames. The
+  first and last lines fade to half while they slide.
+
+### List options
+
+* `Rotate` fills the room after the last item with the first ones.
+* `Fixed` keeps the selection on row `FixAt` and scrolls the list under
+  it.
+* Pulsing arrows show that there's more above and below (left and right in
+  a row).
+* An empty list says "( empty )". While a list loads (after a quarter
+  second) it says "Checking. Please Wait".
+* The skin's event sink sees every line before it's drawn (`DrawItem`). It
+  can move the line or draw it itself.
+
+Quirks:
+
+* Once the sink has drawn one line itself, no more icons are drawn that
+  frame.
+* In the positions layout, the items that wrap around (`Rotate`) are drawn
+  at the skin's unscaled coordinates with 32x32 icons.
+* In the positions layout, an empty position size is written back into the
+  skin's data when hit rectangles are recorded.
+* In the positions layout, the slide speed drops per item drawn, not per
+  frame.
+
 ## Item editor
 
 "Edit Item..." opens `CMenuItemEditor` (`src/app/MenuItemEditor.cpp`). It's a

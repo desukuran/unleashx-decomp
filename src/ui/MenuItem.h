@@ -27,7 +27,7 @@ public:
 	BOOL m_unknown24;               // +0x24 1
 	BOOL m_bIsList;                 // +0x28
 	CXmlElement *m_pElement;        // +0x2C the <Item>/<List>; NULL for labels
-	BYTE m_unknown30[0x10];         // +0x30
+	int m_rcHit[4];                 // +0x30 left, top, width, height on screen (set when Render runs with m_bDirty; the pointer's target)
 	wchar_t *m_pszText;             // +0x40 owned
 	IDirect3DTexture8 *m_pTexture;  // +0x44 one reference, the cache holds another
 };

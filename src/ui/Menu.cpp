@@ -40,8 +40,8 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_fAreaY = 50.0f;
 	m_fAreaWidth = 540.0f;
 	m_fAreaHeight = 380.0f;
-	m_fUnknownF20 = 1.0f;
-	m_fUnknownF24 = 1.0f;
+	m_fFontScaleX = 1.0f;
+	m_fFontScaleY = 1.0f;
 	m_pSink = NULL;
 	m_nItemSpacing = 2;
 	m_nBorderWidth = 0;
@@ -97,7 +97,7 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_fContextMenuX = 0.0f;
 	m_fContextMenuY = 0.0f;
 	m_bShowPreviews = FALSE;
-	m_unknownF10 = 1;
+	m_bShowText = 1;
 	m_bNoIcons = FALSE;
 	m_pPassCode = NULL;
 	m_bWaitingForPassCode = FALSE;
@@ -108,12 +108,12 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_bRecentMenuShown = FALSE;
 	memset(m_recent, 0, sizeof(m_recent));
 	m_bScrollText = FALSE;
-	m_dwIconLoadTime = GetTickCount() + 2000;
-	m_fUnknownF40 = 0.0f;
+	m_dwMarqueeTick = GetTickCount() + 2000;
+	m_fMarqueeOffset = 0.0f;
 	m_pItemEditor = NULL;
 	m_bItemEditorShown = FALSE;
-	m_unknownDFC = 0;
-	m_unknownE00 = 0;
+	m_bPreloadIcons = 0;
+	m_nPreloadIndex = 0;
 
 	m_pCommand = new CXmlElement;
 	if (m_pCommand != NULL)
@@ -210,8 +210,8 @@ HRESULT CMenu::Create(CXmlDocument *doc, CXBFont *font, CXBFont *selectedFont, C
 	m_pMenuDoc = doc;
 	m_pFont = font;
 	m_pSelectedFont = selectedFont != NULL ? selectedFont : font;
-	m_fUnknownF20 = 1.0f;
-	m_fUnknownF24 = 1.0f;
+	m_fFontScaleX = 1.0f;
+	m_fFontScaleY = 1.0f;
 	m_bNoIcons = noIcons;
 	if (!noIcons)
 		m_nItemHeight = kDefaultItemHeight;
@@ -406,8 +406,8 @@ void CMenu::LoadList(CXmlElement *list)
 	Sleep(1);
 	m_bReady = TRUE;
 	m_bDirty = TRUE;
-	m_dwIconLoadTime = GetTickCount() + 2000;
-	m_fUnknownF40 = 0.0f;
+	m_dwMarqueeTick = GetTickCount() + 2000;
+	m_fMarqueeOffset = 0.0f;
 }
 
 // 0x00110772
@@ -1236,7 +1236,7 @@ HRESULT CMenu::SelectNext()
 void CMenu::FinishMove(CSound *sound)
 {
 	MENU_SOUND(sound);
-	m_fUnknownF40 = 0.0f;
+	m_fMarqueeOffset = 0.0f;
 	if (m_pIconTexture != NULL)
 	{
 		m_pIconTexture->Release();
@@ -2140,8 +2140,8 @@ void CMenu::SetFont(CXBFont *font)
 	if (font == NULL)
 		return;
 	m_pFont = font;
-	m_fUnknownF20 = font->m_fScaleFactorX;
-	m_fUnknownF24 = font->m_fScaleFactorY;
+	m_fFontScaleX = font->m_fScaleFactorX;
+	m_fFontScaleY = font->m_fScaleFactorY;
 }
 
 // 0x0002B67E

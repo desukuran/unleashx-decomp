@@ -1949,3 +1949,12 @@
 0002341a CSettingsBase::SetItemEnabledAt
 0026c728 g_hItemInstallThread
 00278d04 g_bItemInstalling
+# menu drawing (src/ui/MenuRender.cpp)
+0010e017 CMenu::RenderHorizontal
+0010cd40 AlignMenuText
+00021e58 SetFontCursor
+00021ecb DrawFontText
+00278cf4 s_fArrowAlpha
+0026c6f8 s_fArrowStep
+00278cf0 s_fRowArrowAlpha
+0026c6ec s_fRowArrowStep
