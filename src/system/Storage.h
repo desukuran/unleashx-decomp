@@ -28,6 +28,10 @@ struct SXbeInfo
 	DWORD gameRegion;          // +0x74 certificate game region flags
 };
 BOOL ReadXbeInfo(const char *xbePath, SXbeInfo *info);             // 0x000A608D (Xbe.cpp)
+// Lets a copied game XBE run from the hard disk: sets the certificate's
+// allowed media to everything ("FF010040") and applies four byte patches.
+// TRUE if any patch applied. (path in edi)
+BOOL PatchXbe(const char *xbePath);                                 // 0x000A2245 TODO: decompile
 
 // An XBE's image header and certificate as read by ReadXbeHeader(). 0x35C
 // bytes; only the fields used are named.

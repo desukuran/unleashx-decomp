@@ -30,7 +30,6 @@ DWORD g_dwShutdownDeadline;               // 0x00276238
 
 // Video standard switching (the EEPROM setting), used when launching games
 // of another region and by the VideoMode action.
-int GetVideoRegionSetting();                         // 0x00039507 TODO: decompile; 1 NTSC-M, 2 NTSC-J, 4 PAL
 void SetVideoRegion(int standard, int mode);         // 0x000BCF48 TODO: decompile
 // Shows the skin's loading screen for the XBE.
 void ShowLaunchScreen(const char *path, const char *name);   // 0x000E3B65 TODO: decompile
