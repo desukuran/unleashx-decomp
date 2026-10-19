@@ -92,7 +92,7 @@ CUnleashX::CUnleashX()
 	m_hThread2248 = NULL;
 	m_bEditOnYes = 0;
 	m_bShowReleaseNfo = 1;
-	m_bDiscLaunchPending = FALSE;
+	m_bUpdatePending = FALSE;
 }
 
 // 0x000E045B

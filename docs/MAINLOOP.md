@@ -18,7 +18,7 @@ The action goes to the first of these that is open:
 
 1. a message box (it takes all input);
 2. a file operation in progress outside the file manager: BACK cancels it
-   ("cancelling..." for copies);
+   (a copy says "Copy operation has been Canceled.");
 3. the startup password (keyboard), then the startup passcode (buttons):
    after `<Password MaxTries>` failures the box says so and the Xbox turns
    off when it's closed. Quirk: a configured password of `MicrosoftXBOX`
@@ -37,16 +37,20 @@ keyboard up) and the remote's MENU go back to the menu.
   started once it's inserted (an audio CD plays in the music player if
   that's open). Holding either trigger skips it.
 * **FTP:** a pending `SITE EXEC` launch is started.
-* **Boot disc:** when UnleashX itself runs from a disc, its `Release.nfo`
-  opens in the text editor once (after a "please wait"), then the launch
-  data the disc was started with is handled.
+* **Live Update, second half:** the installer (`UXUpdate.xbe`) starts the
+  new UnleashX with launch data naming the old dashboard XBE. After 5
+  seconds it says "Update is validated. Keep this running a few more
+  minutes. Press OK to proceed with the upgrade."; then the new version's
+  `Release.nfo` opens in the text editor, and once that's closed the old
+  XBE is renamed to `.bak` and the new one moved in its place.
 * **Shutdown:** a pending shutdown waits for file operations, at most 30
   seconds; the message box counts down "Xbox will shutdown in... N
   seconds". Answering any message box cancels it.
 * **Soundtracks:** once requested, the music manager is created on a
-  thread; it moves to the next song every 100 ms check, starts playing when
-  soundtrack mode is on, and pauses while a preview video with sound plays
-  (unless the skin's preview allows music).
+  thread. While it plays it's checked every frame (moving on to the next
+  song); when it stops, it's started again if soundtrack mode is on, and
+  paused while a preview video with sound plays (unless the skin's preview
+  allows music).
 * **File operations:** when one ends, an "operation finished" action is
   sent once (the menu refreshes on it).
 * **Globe:** with `<Main Globe>`, the globe sways back and forth along the

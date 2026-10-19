@@ -33,7 +33,7 @@ enum
 };
 
 static BOOL s_bDiscHandled;                      // 0x00278D40 the inserted disc was autostarted (or skipped)
-static BOOL s_bWaitMessageShown;                 // 0x00278D3C
+static BOOL s_bUpdateMessageShown;               // 0x00278D3C
 static DWORD s_dwNextMusicCheck;                 // 0x00278D38
 static DWORD s_dwMusicIdleUntil = 1;             // 0x0026CBFC 1 = check the player thread
 static BOOL s_bLockedOut;                        // 0x00278D44 too many wrong passwords: turn off after the message
@@ -142,14 +142,14 @@ HRESULT CUnleashX::FrameMove()
 			LaunchXbe(g_strFtpLaunchPath.c_str(), NULL, -1, NULL);
 		}
 
-		// The disc UnleashX was started from: its Release.nfo, then the
-		// launch data.
-		if (m_bDiscLaunchPending && g_bMusicReady && m_fAppTime > 5.0f)
+		// Started by the Live Update installer: once it has run for 5s, say
+		// the update works, show the new Release.nfo, then install it.
+		if (m_bUpdatePending && g_bMusicReady && m_fAppTime > 5.0f)
 		{
-			if (!s_bWaitMessageShown)
+			if (!s_bUpdateMessageShown)
 			{
-				s_bWaitMessageShown = TRUE;
-				ShowMessage(GetStringA(0x79), GetString(STR_INFORMATION), 0);
+				s_bUpdateMessageShown = TRUE;
+				ShowMessage(GetStringA(STR_MSG_DASHUPDATE_PASS), GetString(STR_INFORMATION), 0);
 			}
 			else if (!m_bMessageShown)
 			{
@@ -180,8 +180,8 @@ HRESULT CUnleashX::FrameMove()
 				}
 				else
 				{
-					HandleLaunchData();
-					m_bDiscLaunchPending = FALSE;
+					InstallUpdate();
+					m_bUpdatePending = FALSE;
 				}
 			}
 		}
@@ -314,7 +314,7 @@ HRESULT CUnleashX::FrameMove()
 		{
 			g_bCancelOperation = TRUE;
 			if (g_nFileOperationType == 0)
-				ShowMessage(GetStringA(0x6E), GetString(STR_INFORMATION), 0);
+				ShowMessage(GetStringA(STR_MSG_COPY_CANCELED), GetString(STR_INFORMATION), 0);
 		}
 		Sleep(5);
 		g_bFileOperationActive = FALSE;
@@ -341,12 +341,12 @@ HRESULT CUnleashX::FrameMove()
 			{
 				s_bLockedOut = TRUE;
 				std::string text;
-				StrFormat(text, "%s\n\n%s", GetStringA(0x70), GetStringA(0x71));
+				StrFormat(text, "%s\n\n%s", GetStringA(STR_MSG_INVALID_PASSWORD), GetStringA(STR_MSG_MAX_INVALID_PASSWORD));
 				ShowMessage(text.c_str(), GetString(STR_INVALID_PASSWORD), 0);
 			}
 			else
 			{
-				ShowMessage(GetStringA(0x70), GetString(STR_INVALID_PASSWORD), 0);
+				ShowMessage(GetStringA(STR_MSG_INVALID_PASSWORD), GetString(STR_INVALID_PASSWORD), 0);
 			}
 		}
 		g_virtualKeyboard.Open();
@@ -370,12 +370,12 @@ HRESULT CUnleashX::FrameMove()
 				{
 					s_bLockedOut = TRUE;
 					std::string text;
-					StrFormat(text, "%s\n\n%s", GetStringA(0x73), GetStringA(0x74));
+					StrFormat(text, "%s\n\n%s", GetStringA(STR_MSG_INVALID_PASSCODE), GetStringA(STR_MSG_MAX_INVALID_PASSCODE));
 					ShowMessage(text.c_str(), GetString(STR_INVALID_PASSCODE), 0);
 				}
 				else
 				{
-					ShowMessage(GetStringA(0x73), GetString(STR_INVALID_PASSCODE), 0);
+					ShowMessage(GetStringA(STR_MSG_INVALID_PASSCODE), GetString(STR_INVALID_PASSCODE), 0);
 				}
 			}
 			else

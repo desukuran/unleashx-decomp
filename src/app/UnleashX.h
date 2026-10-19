@@ -45,8 +45,10 @@ public:
 	// The screen saver and the "any input" bookkeeping: starts the saver
 	// after the wait, stops it on input. (this in ebx)
 	void UpdateScreenSaver(int *action);              // 0x000EA56C TODO: decompile
-	// What to do with the launch data a title returned with. TODO: decompile
-	void HandleLaunchData();                          // 0x000E2604
+	// Started by the updater with launch data naming the old dashboard XBE:
+	// renames that to .bak and moves this one (from D:) in its place.
+	// TODO: decompile
+	BOOL InstallUpdate();                             // 0x000E2604
 
 	// Menu callbacks; m_pApp points back here.
 	class CMenuEvent : public CMenuEventSink
@@ -134,7 +136,7 @@ public:
 	CMenuEvent m_menuEvent;                   // +0x224C
 	CSkinEvent m_skinEvent;                   // +0x2254
 	BOOL m_bEditOnYes;                        // +0x225C the message box answered Yes opens the text editor
-	BOOL m_bDiscLaunchPending;                // +0x2260 TODO: verify
+	BOOL m_bUpdatePending;                    // +0x2260 started by the Live Update installer: validate, then install
 	BOOL m_bShowReleaseNfo;                   // +0x2264 TRUE: show the disc's Release.nfo once
 };
 

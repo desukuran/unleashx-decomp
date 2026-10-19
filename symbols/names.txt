@@ -1133,7 +1133,7 @@
 00278d4c s_dwRepeats
 00271ed8 g_irRemotes
 000ea56c CUnleashX::UpdateScreenSaver
-000e2604 CUnleashX::HandleLaunchData
+000e2604 CUnleashX::InstallUpdate
 000e85b3 MusicManagerThread
 0009f342 BuildWorldMatrix
 000b3282 CTrayMonitor::PowerOff
@@ -1157,7 +1157,7 @@
 0026bc60 g_nFileOperationType
 0027213c g_bPointerEvent
 00278d40 s_bDiscHandled
-00278d3c s_bWaitMessageShown
+00278d3c s_bUpdateMessageShown
 00278d38 s_dwNextMusicCheck
 0026cbfc s_dwMusicIdleUntil
 00278d44 s_bLockedOut
