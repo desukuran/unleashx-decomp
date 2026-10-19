@@ -12,6 +12,8 @@ wchar_t GetDecimalSeparator();                        // 0x00099F3A
 void FormatNumberW(wchar_t *out, ULONGLONG n);        // 0x000A1A7F
 // The same for an int (the text editor's size). (out in eax)
 void FormatIntW(wchar_t *out, int n);                 // 0x0009A060
+// v with decimals decimals, grouped with separators if group.
+void FormatDoubleW(wchar_t *out, int decimals, BOOL group, double v);   // 0x00099F58
 // n with thousands separators, as narrow text.
 std::string FormatInt(int n);                         // 0x000A3B09
 std::string FormatNumberA(ULONGLONG n);               // 0x000A2C2B

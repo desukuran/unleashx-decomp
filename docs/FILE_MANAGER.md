@@ -56,6 +56,59 @@ You can also use the pointer:
 | `zip` `rar` `xip` | Browsed like a folder. |
 | `xm` `xbg` | The module player. |
 
+## Archives
+
+Opening a `zip`, `rar` or `xip` file shows its contents in a window
+(`src/filemgr/ZipManager.cpp`, `RarManager.cpp`, `XipManager.cpp`). The
+title is the archive's path. Each line shows the name (without its folders)
+and the size: packed, then `/` and unpacked when the archive records it.
+Entries are sorted by name, ignoring case. RAR folders aren't listed; zip
+and xip folders are.
+
+| Button | Effect |
+|---|---|
+| Up/Down, LT/RT, left stick | Move. |
+| X | Mark the entry and move down. Marked entries are drawn highlighted. |
+| A, START, WHITE | The menu ("Zip Explorer", or "Rar Explorer" for RAR). |
+| B, BACK | Close. |
+
+The menu has four entries:
+
+* **Extract selected File(s):** extracts into a folder next to the archive,
+  named after it (`E:\a\b.zip` goes to `E:\a\b\`).
+* **Extract selected File(s) to...:** asks for the folder first.
+* **Extract all Files** and **Extract all Files to...:** the same, for all
+  entries.
+
+"Selected" means the marked entries, or the highlighted one when nothing is
+marked. A progress box shows the current file and the count of files done.
+The result box reports how many files were "unzipped", "unRarred" or
+"extracted".
+
+Zip entries keep their folders, with `:` turned into `_`. RAR entries keep
+theirs too, except that when the archive starts with a folder that folder is
+the base, which is dropped. An "extract all" of a RAR is one unrarlib call.
+
+### Archive quirks
+
+* The xip browser's menu is also titled "Zip Explorer".
+* The zip and RAR browsers have code to cancel a running extract with B,
+  but it's never reached: buttons are ignored while an extract runs. Only
+  the global cancel flag stops a RAR extract.
+* The xip browser doesn't create the archive's subfolders, so files in them
+  fail to extract.
+* The zip browser has a hidden "add to zip" operation (menu index 6) that no
+  entry reaches. The xip browser checks for it too.
+* RAR: the base folder is also replaced in the *target* path. Extracting
+  only the highlighted entry ignores the base folder. If its old file can't
+  be deleted, the browser creates a folder named after the file in the
+  current directory. Marked files get their attributes reset on their
+  folder, not the file.
+* RAR: the listing never frees unrarlib's list, and each entry's path leaks
+  a `_strdup` copy.
+* Unless a message is showing, an archive with no entries closes as soon as
+  it's listed.
+
 ## Context menu
 
 Entries that don't apply are greyed out.

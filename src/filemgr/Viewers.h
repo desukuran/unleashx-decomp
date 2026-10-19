@@ -6,7 +6,15 @@
 #pragma once
 
 #include "../app/Screens.h"
+#include "../system/XipArchive.h"
+#include "../thirdparty/Unrar.h"
 #include "FileFolder.h"
+
+#include <string>
+#include <vector>
+
+class CFileBrowser;
+class CSound;
 
 // A picture (bmp jpg png xbx xpr) full screen, with a slideshow of its
 // folder. vtable 0x0024E618, 0x29D4 bytes.
@@ -24,46 +32,231 @@ public:
 	BOOL Open(const char *path);                          // 0x0011935E
 };
 
-// A zip's contents, with extracting. vtable 0x0024AADC, 0x2E8 bytes.
+// One line of the zip browser. 0x40 bytes.
+struct SZipEntry
+{
+	// (this in esi)
+	SZipEntry(const char *name, DWORD originalSize, DWORD packedSize, int index);   // 0x00014365
+
+	std::wstring name;                 // +0x00 without folders ("dir/" for a folder entry)
+	std::wstring size;                 // +0x1C "packed/original"
+	int index;                         // +0x38 in the zip
+	BOOL marked;                       // +0x3C
+};
+
+// A zip's contents: mark entries (X) and extract the marked ones (or the
+// highlighted one), or all, next to the zip or into a chosen folder.
+// vtable 0x0024AADC, 0x2E8 bytes. See ZipManager.cpp.
 class CZipManager : public CAppFrame
 {
 public:
-	CZipManager();                                        // 0x000147A3
-	virtual ~CZipManager();                               // 0x0001484D (deleting 0x000161FB)
+	CZipManager();                                        // 0x000147A3 (this in esi)
+	virtual ~CZipManager();                               // 0x0001484D (this in ebx; deleting 0x000161FB)
 	virtual BOOL Init(CXBFontEx *font);                   // 1 (0x00014924)
-	virtual BOOL IsOpen();                                // 2 (0x000327ED)
+	virtual BOOL IsOpen() { return m_bOpen; }             // 2 (0x000327ED)
 	virtual BOOL Render();                                // 3 (0x00014F46)
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 4 (0x000149E6)
-	// (this in eax)
+	// Lists the zip (on a thread). (this in eax)
 	BOOL Open(const char *path);                          // 0x000148C2
+
+	enum
+	{
+		OP_NONE = 0,
+		OP_EXTRACT_MARKED = 1,
+		OP_EXTRACT_ALL = 2,
+		OP_ADD = 3,              // (no menu entry leads here)
+	};
+
+	int m_nOperation;                  // +0x004
+	int m_nSelected;                   // +0x008
+	BOOL m_bOpen;                      // +0x00C
+	CSound *m_pScrollSound;            // +0x010
+	float m_fY;                        // +0x014
+	float m_fX;                        // +0x018
+	float m_fWidth;                    // +0x01C
+	float m_fHeight;                   // +0x020
+	CFileBrowser *m_pBrowser;          // +0x024 "... to..."
+	COptionMenu *m_pMenu;              // +0x028
+	CMessageBox *m_pMessageBox;        // +0x02C
+	BOOL m_bBrowserOpen;               // +0x030
+	BOOL m_bMenuOpen;                  // +0x034
+	BOOL m_bMessageShown;              // +0x038
+	DWORD m_unknown03C;                // +0x03C
+	std::vector<SZipEntry> m_entries;  // +0x040
+	std::string m_strZipFile;          // +0x050
+	std::string m_strTarget;           // +0x06C where to extract
+	std::string m_strAddPath;          // +0x088 what to add (OP_ADD)
+	wchar_t m_szCurrentFile[0x105];    // +0x0A4 for the progress box
+	int m_nTop;                        // +0x2B0
+	int m_nBottom;                     // +0x2B4
+	int m_nVisible;                    // +0x2B8
+	BOOL m_bInitialized;               // +0x2BC
+	float m_fLineHeight;               // +0x2C0
+	CXBFontEx *m_pFont;                // +0x2C4
+	CXBFont *m_pCaptionFont;           // +0x2C8 the dialog font, else m_pFont
+	BOOL m_bDone;                      // +0x2CC the operation finished
+	BOOL m_bFailed;                    // +0x2D0
+	BOOL m_bRunning;                   // +0x2D4
+	BOOL m_bCancel;                    // +0x2D8 B while running
+	int m_nExtracted;                  // +0x2DC
+	CAppSettings *m_pSettings;         // +0x2E0
+	BOOL m_bListed;                    // +0x2E4
+
+private:
+	// The folder browser for "... to..." (selectFiles for OP_ADD). (this
+	// in edi)
+	void ShowBrowser(BOOL selectFiles);                   // 0x000155AC (shared with CXipManager)
+	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x00017030 (this in edi; shared with CXipManager)
+	void ScrollToSelection();
+	static unsigned __stdcall ListThread(void *param);    // 0x0001565A
+	static unsigned __stdcall ExtractThread(void *param); // 0x000158E3
 };
 
-// A RAR's contents. vtable 0x0024AB00 (an UnrarSink at +4), 0x308 bytes.
-class CRarManager : public CAppFrame
+// One line of the RAR browser. 0x58 bytes.
+struct SRarEntry
+{
+	// (this in esi)
+	SRarEntry(const char *name, const char *path, DWORD unpackedSize, DWORD packedSize);   // 0x00014579
+
+	std::wstring name;                 // +0x00 without folders
+	std::string path;                  // +0x1C in the archive
+	std::wstring size;                 // +0x38 "packed/unpacked"
+	BOOL marked;                       // +0x54
+};
+
+// A RAR's contents, like the zip browser (no adding). vtable 0x0024AB00,
+// with an UnrarSink at +4 (vtable 0x0024AAF8) that counts the files of an
+// "extract all". 0x308 bytes. See RarManager.cpp.
+class CRarManager : public CAppFrame, public UnrarSink
 {
 public:
-	CRarManager();                                        // 0x00017783
-	virtual ~CRarManager();                               // 0x00017854 (deleting 0x00018F5A)
+	CRarManager();                                        // 0x00017783 (this in esi)
+	virtual ~CRarManager();                               // 0x00017854 (this in ebx; deleting 0x00018F5A)
 	virtual BOOL Init(CXBFontEx *font);                   // 1 (0x0001793F)
-	virtual BOOL IsOpen();                                // 2 (0x00017F48)
+	virtual BOOL IsOpen() { return m_bOpen; }             // 2 (0x00017F48)
 	virtual BOOL Render();                                // 3 (0x00017F4C)
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 4 (0x00017A01)
-	// (this in eax)
+	// UnrarSink (thunk 0x00018975)
+	virtual void OnFile(const char *name, bool ok, bool *proceed);
+	// Lists the archive (on a thread). (this in eax)
 	BOOL Open(const char *path);                          // 0x000178DD
+
+	enum
+	{
+		OP_NONE = 0,
+		OP_EXTRACT_MARKED = 1,
+		OP_EXTRACT_ALL = 2,
+	};
+
+	int m_nOperation;                  // +0x008
+	int m_nSelected;                   // +0x00C
+	BOOL m_bOpen;                      // +0x010
+	CSound *m_pScrollSound;            // +0x014
+	float m_fY;                        // +0x018
+	float m_fX;                        // +0x01C
+	float m_fWidth;                    // +0x020
+	float m_fHeight;                   // +0x024
+	CFileBrowser *m_pBrowser;          // +0x028
+	COptionMenu *m_pMenu;              // +0x02C
+	CMessageBox *m_pMessageBox;        // +0x030
+	BOOL m_bBrowserOpen;               // +0x034
+	BOOL m_bMenuOpen;                  // +0x038
+	BOOL m_bMessageShown;              // +0x03C
+	DWORD m_unknown040;                // +0x040
+	std::vector<SRarEntry> m_entries;  // +0x044
+	std::string m_strRarFile;          // +0x054
+	std::string m_strBaseFolder;       // +0x070 "\folder\" when the first entry is a folder
+	std::string m_strTarget;           // +0x08C where to extract
+	std::string m_unknown0A8;          // +0x0A8 (never used)
+	wchar_t m_szCurrentFile[0x105];    // +0x0C4 for the progress box
+	int m_nTop;                        // +0x2D0
+	int m_nBottom;                     // +0x2D4
+	int m_nVisible;                    // +0x2D8
+	BOOL m_bInitialized;               // +0x2DC
+	float m_fLineHeight;               // +0x2E0
+	CXBFontEx *m_pFont;                // +0x2E4
+	CXBFont *m_pCaptionFont;           // +0x2E8
+	BOOL m_bDone;                      // +0x2EC
+	BOOL m_bFailed;                    // +0x2F0
+	BOOL m_bRunning;                   // +0x2F4
+	int m_nExtracted;                  // +0x2F8
+	BOOL m_bCancel;                    // +0x2FC B while running
+	CAppSettings *m_pSettings;         // +0x300
+	BOOL m_bListed;                    // +0x304
+
+private:
+	void ShowBrowser(BOOL selectFiles);                   // 0x000185AC (this in edi)
+	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x0001865A (this in edi)
+	void ScrollToSelection();
+	static unsigned __stdcall ListThread(void *param);    // 0x0001877A
+	static unsigned __stdcall ExtractThread(void *param); // 0x000189F7
 };
 
-// An .xip archive (the MS dashboard's). vtable 0x0024AB28, 0x30C bytes.
+// An .xip archive's contents (the MS dashboard's), like the zip browser
+// (no adding). The layout matches CZipManager up to +0x2D4. vtable
+// 0x0024AB28, 0x30C bytes. See XipManager.cpp.
 class CXipManager : public CAppFrame
 {
 public:
-	CXipManager();                                        // 0x00016274
-	virtual ~CXipManager();                               // 0x00016325 (deleting 0x00017767)
+	CXipManager();                                        // 0x00016274 (this in esi)
+	virtual ~CXipManager();                               // 0x00016325 (this in ebx; deleting 0x00017767)
 	virtual BOOL Init(CXBFontEx *font);                   // 1 (0x0001640F)
-	virtual BOOL IsOpen();                                // 2 (0x000327ED)
+	virtual BOOL IsOpen() { return m_bOpen; }             // 2 (0x000327ED)
 	virtual BOOL Render();                                // 3 (0x000169F0)
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 4 (0x000164D1)
-	// (this in eax)
+	// Lists the archive (on a thread). (this in eax)
 	BOOL Open(const char *path);                          // 0x000163AD
+
+	enum
+	{
+		OP_NONE = 0,
+		OP_EXTRACT_MARKED = 1,
+		OP_EXTRACT_ALL = 2,
+		OP_ADD = 3,              // (checked, never set)
+	};
+
+	int m_nOperation;                  // +0x004
+	int m_nSelected;                   // +0x008
+	BOOL m_bOpen;                      // +0x00C
+	CSound *m_pScrollSound;            // +0x010
+	float m_fY;                        // +0x014
+	float m_fX;                        // +0x018
+	float m_fWidth;                    // +0x01C
+	float m_fHeight;                   // +0x020
+	CFileBrowser *m_pBrowser;          // +0x024
+	COptionMenu *m_pMenu;              // +0x028
+	CMessageBox *m_pMessageBox;        // +0x02C
+	BOOL m_bBrowserOpen;               // +0x030
+	BOOL m_bMenuOpen;                  // +0x034
+	BOOL m_bMessageShown;              // +0x038
+	DWORD m_unknown03C;                // +0x03C
+	std::vector<SZipEntry> m_entries;  // +0x040
+	std::string m_strXipFile;          // +0x050
+	std::string m_strTarget;           // +0x06C
+	std::string m_strAddPath;          // +0x088 (OP_ADD)
+	wchar_t m_szCurrentFile[0x105];    // +0x0A4
+	int m_nTop;                        // +0x2B0
+	int m_nBottom;                     // +0x2B4
+	int m_nVisible;                    // +0x2B8
+	BOOL m_bInitialized;               // +0x2BC
+	float m_fLineHeight;               // +0x2C0
+	CXBFontEx *m_pFont;                // +0x2C4
+	CXBFont *m_pCaptionFont;           // +0x2C8
+	BOOL m_bDone;                      // +0x2CC
+	BOOL m_bFailed;                    // +0x2D0
+	BOOL m_bRunning;                   // +0x2D4
+	CXipArchive m_archive;             // +0x2D8 open from the listing on
+	int m_nExtracted;                  // +0x300
+	CAppSettings *m_pSettings;         // +0x304
+	BOOL m_bListed;                    // +0x308
+
+private:
+	// The same code as CZipManager's (the linker merged them).
+	void ShowBrowser(BOOL selectFiles);                   // 0x000155AC (this in edi)
+	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x00017030 (this in edi)
+	void ScrollToSelection();
+	static unsigned __stdcall ListThread(void *param);    // 0x00017150
+	static unsigned __stdcall ExtractThread(void *param); // 0x00017397
 };
 
 // Plays an XM module (and .xbg). vtable 0x00258900, 0xD0 bytes.

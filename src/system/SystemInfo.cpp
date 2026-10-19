@@ -46,7 +46,7 @@ wchar_t GetDecimalSeparator()
 
 // 0x00099F58
 // v with decimals digits after the separator, thousands grouped if group.
-static void FormatDoubleW(wchar_t *out, int decimals, BOOL group, double v)
+void FormatDoubleW(wchar_t *out, int decimals, BOOL group, double v)
 {
 	int decimalPos, negative;
 	const char *digits = _fcvt(v, decimals < 0 ? 0 : decimals, &decimalPos, &negative);

@@ -6,8 +6,16 @@
 
 struct ArchiveList_struct
 {
+	// unrarlib's RAR20_archive_entry:
 	char *name;                 // +0x00
-	BYTE m_unknown04[0x1C];
+	WORD nameSize;              // +0x04
+	DWORD packedSize;           // +0x08
+	DWORD unpackedSize;         // +0x0C
+	BYTE hostOS;                // +0x10
+	DWORD crc;                  // +0x14
+	DWORD fileTime;             // +0x18
+	BYTE unpackVersion;         // +0x1C
+	BYTE method;                // +0x1D
 	DWORD attributes;           // +0x20 FILE_ATTRIBUTE_DIRECTORY for folders
 	ArchiveList_struct *next;   // +0x24
 };
