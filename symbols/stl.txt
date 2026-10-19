@@ -4,7 +4,6 @@
 00011892 std::vector<SFileItem>::size
 000118aa std::vector<SPlayerButton>::size
 000118c0 std::vector<SPlayerButton>::push_back
-00011c5c T::operator=
 00011dee std::vector<SPlayerButton>::capacity
 00011e04 std::vector<SPlayerButton>::insert
 00011e45 std::vector<SPlayerButton>::_Ufill

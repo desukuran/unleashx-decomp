@@ -212,7 +212,13 @@ def main():
     # without source get names.
     scope = [f for a, f in sorted(funcs.items()) if PART1[0] <= a < PART1[1] and a not in known]
     free = {f.addr for f in scope}
-    nameable = {f.addr for f in scope if f.addr not in done and f.name.startswith(('FUN_', 'thunk_FUN_'))}
+    curated = set()
+    for line in open(os.path.join(ROOT, 'symbols/names.txt')):
+        p = line.split()
+        if len(p) >= 2 and not line.startswith('#'):
+            curated.add(int(p[0], 16))
+    nameable = {f.addr for f in scope if f.addr not in done and f.addr not in curated
+                and f.name.startswith(('FUN_', 'thunk_FUN_'))}
     names = {}                                       # address -> name
 
     def give(f, role, elem=None):
