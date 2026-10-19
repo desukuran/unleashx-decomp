@@ -290,7 +290,7 @@ HRESULT CUnleashX::FrameMove()
 		m_bMessageShown = m_pMessageBox->IsOpen();
 		if (!m_bMessageShown)
 		{
-			if (m_nMode == 10)
+			if (m_nMode == MODE_REBOOT)
 			{
 				RebootToDashboard();
 			}

@@ -6,6 +6,8 @@
 #include <cstring>
 
 #include "../audio/AudioDevice.h"
+#include "../common/FileUtil.h"
+#include "../common/StrUtil.h"
 #include "../audio/MusicManager.h"
 #include "../audio/Sound.h"
 #include "../net/FtpServer.h"
@@ -16,7 +18,9 @@
 #include "../settings/ConfigLoader.h"
 #include "../skin/SkinColors.h"
 #include "../system/FileOps.h"
+#include "../ui/Language.h"
 #include "../ui/MenuDialogs.h"
+#include "../ui/StringIds.h"
 #include "SettingsPages.h"
 
 CUnleashX *g_pApp;                         // 0x00276204
@@ -313,4 +317,55 @@ void CUnleashX::CSkinEvent::OnSkinLoaded()
 	if (g_skin.m_bOrb)
 		m_pApp->InitOrb();
 	menu.ReloadList();
+}
+
+// 0x000E2604
+// The new build runs from D: (wherever the updater unpacked it); the
+// launch data names the installed dashboard's XBE.
+BOOL CUnleashX::InstallUpdate()
+{
+	m_bUpdatePending = FALSE;
+	BOOL installed = FALSE;
+	if (g_pSettings->m_bRunFromDVD || g_pSettings->m_bHomeNotOnD)
+		return FALSE;
+	if (g_pSettings->m_dwLaunchDataType != 4 || *(const DWORD *)g_pSettings->m_launchData != 0x9E115330)
+		return FALSE;
+	const char *installedXbe = (const char *)g_pSettings->m_launchData + 4;
+	if (installedXbe[0] == '\0' || !FileExists(installedXbe))
+		return FALSE;
+
+	std::string newXbe;
+	ResolvePath("D:\\", newXbe);
+	StrAddBackslash(newXbe);
+	newXbe.append(GetPathFileName(g_pSettings->m_strLaunchPath.c_str(), TRUE));
+	if (!FileExists(newXbe.c_str()))
+		return FALSE;
+
+	// <old>.xbe -> <old>.bak, then the new one in its place (and back on
+	// failure).
+	std::string backup = installedXbe;
+	backup = StrLeft(backup, (int)backup.size() - 4);
+	backup.append(".bak");
+	SetFileAttributesA(backup.c_str(), FILE_ATTRIBUTE_NORMAL);
+	DeleteFileA(backup.c_str());
+	BOOL moved = MoveFileA(installedXbe, backup.c_str());
+	if (moved)
+	{
+		moved = MoveFileA(newXbe.c_str(), installedXbe);
+		if (!moved)
+			MoveFileA(backup.c_str(), installedXbe);
+	}
+	if (moved)
+	{
+		installed = TRUE;
+		std::string message;
+		StrFormat(message, GetStringA(STR_MSG_DASHUPDATE_SUCCESS), backup.c_str());
+		ShowMessage(message.c_str(), GetString(STR_SUCCESS), 0);
+	}
+	else
+	{
+		ShowMessage(GetStringA(STR_MSG_DASHUPDATE_FAILED), GetString(STR_ERROR), 0);
+	}
+	m_nMode = MODE_REBOOT;
+	return installed;
 }

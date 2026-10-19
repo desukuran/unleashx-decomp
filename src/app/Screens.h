@@ -27,6 +27,7 @@ enum AppMode
 	MODE_SYSINFO = 7,      // CXboxInfo (Y or the remote's INFO in the menu)
 	MODE_TEXTEDITOR = 8,
 	MODE_MUSIC = 9,
+	MODE_REBOOT = 10,      // reboot when the message box closes (after an update)
 };
 
 // Base of the full-screen tools (the text editor, the music player...).

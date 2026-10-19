@@ -58,8 +58,8 @@ public:
 	// The file operation progress/error over the menu (inlined in Render).
 	void RenderFileOperation();
 	// Started by the updater with launch data naming the old dashboard XBE:
-	// renames that to .bak and moves this one (from D:) in its place.
-	// TODO: decompile
+	// renames that to .bak and moves this one (from D:) in its place,
+	// then asks to reboot. (this on the stack)
 	BOOL InstallUpdate();                             // 0x000E2604
 
 	// Menu callbacks; m_pApp points back here.
