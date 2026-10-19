@@ -345,10 +345,18 @@ public:
 
 extern CSkin g_skin;   // 0x00277968
 
+// Mapping state of a drive letter; see src/system/Drives.  TODO: decompile
+struct SDriveInfo;
+SDriveInfo *GetDriveInfo(char drive);   // 0x000AA69E
+BOOL IsDriveInfoMounted(SDriveInfo *info);   // reads +0x45
+
 // Fonts shared by every skin (MainFont, MenuFont, InfoFont, SmallFont,
 // CaptionFont). 0x002784C0
 extern CFontTable g_fonts;
 
+bool CompareSkinZIndex(const SSkinDrawItem &a, const SSkinDrawItem &b);
+SSkinText MakeSkinTextPublic(int left, int top, int width, int height, int source, DWORD color, BOOL isFormat,
+                             int scaleX, int scaleY, int scroll, CXBFont *font, DWORD align);   // 0x000266B8
 int GetInternalSkinCount();                                // 0x000F8E27
 int FindInternalSkin(const char *name);                    // 0x000F90B0
 DWORD ParseSkinAlign(const char *align);                   // 0x000F9B86

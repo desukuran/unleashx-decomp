@@ -676,9 +676,16 @@ void CSkin::ParseImages(CXmlElement *parent, const char *tag, std::vector<SSkinI
 	}
 }
 
-static bool CompareZIndex(const SSkinDrawItem &a, const SSkinDrawItem &b)
+bool CompareSkinZIndex(const SSkinDrawItem &a, const SSkinDrawItem &b)
 {
 	return a.zIndex < b.zIndex;
+}
+
+SSkinText MakeSkinTextPublic(int left, int top, int width, int height, int source, DWORD color, BOOL isFormat,
+                             int scaleX, int scaleY, int scroll, CXBFont *font, DWORD align)
+{
+	return MakeSkinText(left, top, width, height, source, std::string(""), color, 0, isFormat, scaleX, scaleY,
+	                    scroll, font, align);
 }
 
 // Reads an element's text and resolves it as a skin file; FALSE if empty.
@@ -1172,7 +1179,7 @@ BOOL CSkin::Parse(CXmlDocument *doc)
 		ParseShapes(element, "Shape", m_mainShapes, &m_mainOrder);
 		ParseImages(element, "Image", m_mainImages, &m_mainOrder);
 		if (m_bSortByZIndex)
-			std::sort(m_mainOrder.begin(), m_mainOrder.end(), CompareZIndex);   // 0x000274D4 TODO: verify ordering of ties
+			std::sort(m_mainOrder.begin(), m_mainOrder.end(), CompareSkinZIndex);   // 0x000274D4 TODO: verify ordering of ties
 
 		m_bColorScheme = doc->FindElementRecursive("ColorScheme", NULL) != NULL;
 		if (m_bColorScheme)
@@ -1298,7 +1305,7 @@ BOOL CSkin::Parse(CXmlDocument *doc)
 		ParseTexts(element, "Text", m_musicTexts, &m_musicOrder);
 		ParseShapes(element, "Element", m_musicShapes, &m_musicOrder);
 		ParseImages(element, "Image", m_musicImages, &m_musicOrder);
-		std::sort(m_musicOrder.begin(), m_musicOrder.end(), CompareZIndex);   // TODO: verify (always sorted here)
+		std::sort(m_musicOrder.begin(), m_musicOrder.end(), CompareSkinZIndex);   // TODO: verify (always sorted here)
 
 		if (m_bMusicPlayerRelative)
 		{

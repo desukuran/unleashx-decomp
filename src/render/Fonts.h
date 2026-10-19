@@ -12,7 +12,11 @@ public:
 	HRESULT Create(const char *fileName, DWORD resourceOffset);       // 0x00099EC9 (XDK sample)
 	void SetScaleFactors(float scaleX, float scaleY);                  // 0x00098FEB (XDK sample)
 
-	BYTE m_reserved[0xA0];                                             // size 0xA4
+	BYTE m_reserved04[0x0C];
+	float m_fFontHeight;                                               // +0x10
+	float m_fScaleFactorX;                                             // +0x14
+	float m_fScaleFactorY;                                             // +0x18
+	BYTE m_reserved1C[0x88];                                           // size 0xA4
 };
 
 class CXBFontEx : public CXBFont

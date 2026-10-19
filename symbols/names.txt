@@ -262,10 +262,9 @@
 00101743 CSkin::BeginLoad void f(void *self@esi, char *path)
 000f90b0 FindInternalSkin int __cdecl f(void *unused, char *name)
 000265f2 CXmlDocument::FindElementRecursive CXmlElement * __thiscall f(char *name, CXmlElement *parent)
-000ad398 LoadSkinColorScheme
+
 002784c0 g_fonts
-002786fc g_dwSkinBorderColor
-00278700 g_dwSkinBackColor
+
 00277e70 g_bSkinGameIcon
 00277664 g_pd3dDevice
 0009ecb3 LoadTextureFromFile BOOL f(char *path@ecx, void *device, void **texture, int width, int height, void *info)
@@ -297,3 +296,9 @@
 0005df0b _beginthreadex
 00038ae2 XLoadSection
 00038afd XFreeSection
+00278680 g_colorScheme
+000ac07a SColorScheme::SetDefaults void f(void *self@eax)
+000ac19c SColorScheme::SetName void f(void *self@edi, char *name)
+000ad398 SColorScheme::Load void f(void *self@ecx, CXmlDocument *doc@eax)
+000ac201 SColorScheme::~SColorScheme void f(void *self@esi)
+000aa69e GetDriveInfo

@@ -54,8 +54,8 @@ void CSkin::SetDefaults()
 	m_bFixed = FALSE;
 	m_bRotate = FALSE;
 	m_bScroll = FALSE;
-	m_dwBackColor = g_dwSkinBackColor;
-	m_dwBorderColor = g_dwSkinBorderColor;
+	m_dwBackColor = g_colorScheme.MENU_BACKCOLOR;
+	m_dwBorderColor = g_colorScheme.MENU_BORDERCOLOR;
 	m_bSmooth = TRUE;
 	m_nAlign = 0;
 	m_bShowIcon = TRUE;

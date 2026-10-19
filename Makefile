@@ -15,7 +15,7 @@ build/config_test: tests/config_test.cpp tests/stubs.cpp $(SETTINGS) $(XML) $(CO
 	@mkdir -p build
 	$(CXX) $(CXXFLAGS) -o $@ tests/config_test.cpp tests/stubs.cpp $(SETTINGS) $(XML) $(COMMON)
 
-SKIN := src/skin/Skin.cpp src/skin/SkinParser.cpp
+SKIN := src/skin/Skin.cpp src/skin/SkinParser.cpp src/skin/SkinColors.cpp src/skin/SkinDefaults.cpp
 
 build/skin_test: tests/skin_test.cpp tests/skin_stubs.cpp $(SKIN) $(SETTINGS) $(XML) $(COMMON) tests/stubs.cpp $(wildcard src/*/*.h)
 	@mkdir -p build

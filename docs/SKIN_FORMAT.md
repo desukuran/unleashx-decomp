@@ -197,3 +197,25 @@ The numeric IDs are in `enum SkinTextSource` (`src/skin/Skin.h`).
 - `Source` can be `GameIcon`, `GamePreview` (needs a `<Menu><Preview>` area) or `AlbumArt`. Otherwise the element text, or failing that `Source`, is the file.
 - `Opacity` is a percentage. Values 0 and 1 both mean fully opaque.
 - A missing `Width`/`Height` is taken from the image file.
+
+## `<ColorScheme>`
+
+```xml
+<ColorScheme Name="Blue">
+  <MENU_TEXTCOLOR>0x99FFFFFF</MENU_TEXTCOLOR>
+  ...
+</ColorScheme>
+```
+
+Colors for the dashboard's own UI (`SColorScheme`, `src/skin/SkinColors.h`). Each child sets one color in hex ARGB, and a value of 0 is ignored. `<ColorScheme>` can appear anywhere in Skin.xml. The defaults are listed in `SColorScheme::SetDefaults`.
+
+`AMBIENT_FOGCOLOR` `AMBIENT_SKYCOLOR` `AMBIENT_CELLCOLOR` `CAPTION_TEXTCOLOR` `CAPTION_BACKCOLOR` `DIALOG_BORDERCOLOR` `DIALOG_BACKCOLOR` `DIALOG_INNER_BORDERCOLOR` `DIALOG_INNER_BACKCOLOR` `DIALOG_TEXTCOLOR` `DIALOG_DISABLEDTEXT` `OPTION_TEXTCOLOR` `OPTION_ACTIVETEXTCOLOR` `OPTION_ACTIVEBACKCOLOR` `BUTTON_BORDERCOLOR` `BUTTON_TEXTCOLOR` `BUTTON_BACKCOLOR` `BUTTON_ACTIVETEXTCOLOR` `BUTTON_ACTIVEBACKCOLOR` `KB_KEYBG_HIGHLIGHT` `KB_KEYBG_DISABLED` `KB_KEY_PRESSED` `KB_KEY_NORMAL` `KB_KEY_DISABLED` `KB_KEY_ACTIVEBORDER` `KB_KEY_TEXTCOLOR` `KB_KEY_TEXTBACKCOLOR` `KB_KEY_TEXTBORDERCOLOR` `MENU_TEXTCOLOR` `MENU_ACTIVETEXTCOLOR` `MENU_BORDERCOLOR` `MENU_BACKCOLOR` `MENU_ACTIVEBACKCOLOR` `MENU_ACTIVEBORDERCOLOR` `WindowBackCOLOR` `WindowForeCOLOR` `MM_BORDERCOLOR` `MMLightBackColor` `MMDarkBackColor` `MMLightBarColor` `MMBarBackColor` `MMDarkBarColor` `MMForeColor` `MMOffForeColor` `MMActiveForeColor`
+
+`MENU_BORDERCOLOR` and `MENU_BACKCOLOR` are the defaults for `<Menu><BorderColor>`/`<BackColor>`. The `MM*` colors are used by the built-in music player.
+
+Two adjustments keep colors distinguishable: if `KB_KEYBG_DISABLED` equals `KB_KEYBG_HIGHLIGHT` it is changed by 1, and if `OPTION_ACTIVETEXTCOLOR` equals `DIALOG_TEXTCOLOR` it is darkened slightly.
+
+## Built-in layouts
+
+- **No `<Main>`** (and the `[Default]` skin): a column on the left with date/time, free MB per drive (F/G only if mapped) and CPU/board temperatures; IP, FTP clients, tray state and nickname on the right; song name and time.
+- **No `<MusicPlayer>`**: a player drawn with shapes in the `MM*` colors (`CSkin::SetDefaultMusicPlayerLayout`).

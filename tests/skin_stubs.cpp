@@ -9,8 +9,6 @@
 
 IDirect3DDevice8 *g_pd3dDevice;
 CFontTable g_fonts;
-DWORD g_dwSkinBorderColor = 0xFF808080;
-DWORD g_dwSkinBackColor = 0x80000000;
 
 BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *, IDirect3DTexture8 **texture, int, int, SImageInfo *)
 {
@@ -20,7 +18,6 @@ BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *, IDirect3DTexture8
 }
 void ReleaseTexture(IDirect3DTexture8 *&texture) { texture = NULL; }
 float GetScreenWidth(int) { return 640.0f; }
-void LoadSkinColorScheme(CXmlDocument *) {}
 
 CXBFont::CXBFont() {}
 CXBFont::~CXBFont() {}
@@ -44,5 +41,7 @@ void CWMVideoPlayer::SetAudio(BOOL) {}
 void CWMVideoPlayer::SetRect(int, int, int, int) {}
 BOOL CWMVideoPlayer::Open(const char *) { return TRUE; }
 
-void CSkin::SetDefaultMainLayout() { printf("[stub] SetDefaultMainLayout\n"); }
-void CSkin::SetDefaultMusicPlayerLayout() { printf("[stub] SetDefaultMusicPlayerLayout\n"); }
+
+struct SDriveInfo { int dummy; };
+SDriveInfo *GetDriveInfo(char) { return NULL; }
+BOOL IsDriveInfoMounted(SDriveInfo *) { return FALSE; }
