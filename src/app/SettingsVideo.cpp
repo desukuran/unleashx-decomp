@@ -229,7 +229,7 @@ void CVideoSetting::TestVideoMode()
 			Sleep(500);
 			now = GetTickCount();
 		}
-		m_pFont->SetScaleFactors(g_pSettings->m_fUnknown131C, g_pSettings->m_fUnknown131C);
+		m_pFont->SetScaleFactors(g_pSettings->m_fFontScale, g_pSettings->m_fFontScale);
 	}
 	g_pd3dDevice->Reset(g_pPresentParams);
 }

@@ -413,3 +413,103 @@ public:
 
 	BOOL Save();                                              // 0x000CE1B9
 };
+
+// The System page's "Xbox Info" screen (controller ports, drive space, ...).
+// No vtable; 0x48 bytes. TODO: decompile (Init 0x000D2D87, Show 0x000BEC78,
+// ProcessInput 0x000D2200, Render 0x000BF326).
+class CXboxInfo
+{
+public:
+	CXboxInfo();                                              // 0x000C00CC (this in eax)
+	~CXboxInfo();                                             // 0x0002C6F2 (scalar deleting)
+	HRESULT Init(CXBFont *font, int unknown);                 // 0x000D2D87
+	void Show();                                              // 0x000BEC78
+	void ProcessInput(SGamepadState **pad, int *action);      // 0x000D2200
+	void Render();                                            // 0x000BF326 (this in edi)
+
+	BYTE m_unknown00[0x40];
+	BOOL m_bClosed;                 // +0x40
+	DWORD m_unknown44;
+};
+
+// System Settings: Xbox info, file operations, context menu, font,
+// temperatures, language, LEDs, screen saver, skin and the RSS ticker.
+// 0xC0 bytes, vtable 0x0025690C.
+class CSystemSetting : public CSettingsBase
+{
+public:
+	enum
+	{
+		ITEM_XBOX_HEADER,
+		ITEM_DASH_VERSION,
+		ITEM_XBOX_INFO,         // opens CXboxInfo
+		ITEM_NICKNAME,
+		ITEM_FILE_HEADER,
+		ITEM_AUTO_RENAME,
+		ITEM_AUTO_PATCH,
+		ITEM_ABORT_ON_ERROR,
+		ITEM_DEFAULT_FOLDER,
+		ITEM_CONTEXT_HEADER,
+		ITEM_ALLOW_UNINSTALL,
+		ITEM_ALLOW_ITEM_EDIT,
+		ITEM_ALLOW_RECENT_LIST,
+		ITEM_LINK_TO_GAME,
+		ITEM_LINK_TO_SAVE,
+		ITEM_FONT_HEADER,
+		ITEM_FONT_SCALE,        // 1.00x-3.00x, LEFT/RIGHT step 0.1
+		ITEM_SCROLL_SPEED,
+		ITEM_TEMPERATURE_HEADER,
+		ITEM_MB_TEMP,
+		ITEM_CPU_TEMP,
+		ITEM_USE_FAHRENHEIT,
+		ITEM_TEMP_THRESHOLD,    // "<n> C"
+		ITEM_FAN_SPEED,         // 1.0x-5.0x
+		ITEM_MISC_HEADER,
+		ITEM_LANGUAGE_FILE,
+		ITEM_AUTO_TURN_OFF,
+		ITEM_LED_HEADER,
+		ITEM_LED_DEFAULT,       // ... ITEM_LED_BUSY: a LedColor in m_nValue
+		ITEM_LED_SCREEN_SAVER,
+		ITEM_LED_COPYING,
+		ITEM_LED_FTP_SEND,
+		ITEM_LED_FTP_RECEIVE,
+		ITEM_LED_FTP_BOOST,
+		ITEM_LED_BUSY,
+		ITEM_LED_TEST,          // shows the color at once
+		ITEM_SCREEN_SAVER_HEADER,
+		ITEM_SS_WAIT,
+		ITEM_SS_TYPE,           // Text / Video / Slideshow
+		ITEM_SS_TEXT,
+		ITEM_SS_VIDEO,
+		ITEM_SS_PATH,
+		ITEM_SS_BGM,
+		ITEM_SKIN_HEADER,
+		ITEM_SKINS_PATH,
+		ITEM_CURRENT_SKIN,
+		ITEM_NEWSFEED_HEADER,
+		ITEM_NEWSFEED_ENABLE,
+		ITEM_NEWSFEED_INTERVAL,
+		ITEM_NEWSFEED_CONTINUOUS,
+		ITEM_NEWSFEED_SEPARATOR,
+		ITEM_SAVE_HEADER,
+		ITEM_SAVE,
+		ITEM_RESET,
+		ITEM_EXIT,
+	};
+
+	CSystemSetting();                                         // 0x000C1AE0
+	virtual ~CSystemSetting();                                // 0x000C1ACC
+	virtual HRESULT Init(CXBFont *font);                      // 0x000CCC88
+	virtual HRESULT HandleInput(int *action, SGamepadState **pad);   // 0x000D3EE3
+	virtual HRESULT Render();                                 // 0x000C66E1
+
+	BOOL Save();                                              // 0x000CB4A4
+	void ShowXboxInfo();                                      // 0x000D3E7A (this in esi)
+
+	CXboxInfo *m_pXboxInfo;         // +0xB8
+	BOOL m_bXboxInfoOpen;           // +0xBC
+};
+
+// Checks a value typed on the System page for the line index (index in
+// edi, text in ebx).
+BOOL ValidateSystemValue(int index, wchar_t *text, char *message);   // 0x000C14A7

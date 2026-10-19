@@ -227,7 +227,7 @@ void CAppSettings::SetDefaults()
 	m_bNewsfeedContinuous = TRUE;
 	wcsncpy(m_szNewsfeedSeparator, L" | ", 3);
 
-	m_fUnknown131C = 1.0f;
+	m_fFontScale = 1.0f;
 	m_nScrollSpeed = 20;
 
 	// <VideoSettings>

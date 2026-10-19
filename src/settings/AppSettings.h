@@ -236,6 +236,8 @@ public:
 	void InitPaths(std::string xbePath);     // 0x000ACA86
 	// DirectSound volume (hundredths of dB) for effects. TODO: decompile
 	LONG GetSoundVolume();                   // 0x000AC21A
+	// The screen adjustment of the current video mode. TODO: decompile
+	SScreenAdjust *GetScreenAdjust();        // 0x000AC2EF
 	// DirectSound volume (hundredths of dB) for music. TODO: decompile
 	LONG GetMusicVolume();                   // 0x000AC287
 
@@ -266,7 +268,7 @@ public:
 	SViewport m_viewport;                    // +0x12FC the screen area (D3DDevice_GetViewport)
 	int m_nSkinWidth;                        // +0x1314 render size the skin asks for (<ScreenSize>)
 	int m_nSkinHeight;                       // +0x1318
-	float m_fUnknown131C;                    // +0x131C 1.0
+	float m_fFontScale;                      // +0x131C 1.0; the screen mode's font scale (videoset.dat)
 	int m_nScrollSpeed;                      // +0x1320 10..60
 	SAudioSettings m_audio;                  // +0x1324
 	BYTE m_unknownAudio[0x14BC - 0x1474];    // rest of the audio block

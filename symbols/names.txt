@@ -1053,3 +1053,18 @@
 000ac287 CAppSettings::GetMusicVolume
 00138511 CSoundEffects::Load
 00278d64 s_fMusicLabelWidth
+0009e65f SmcSetFanAuto
+000ac2ef CAppSettings::GetScreenAdjust
+000cb4a4 CSystemSetting::Save
+000d3e7a CSystemSetting::ShowXboxInfo
+000c14a7 ValidateSystemValue BOOL f(int index@edi, wchar_t *text@ebx, char *message)
+000c00cc CXboxInfo::CXboxInfo
+0002c6f2 CXboxInfo::`scalar_deleting_destructor'
+000d2d87 CXboxInfo::Init
+000bec78 CXboxInfo::Show
+000d2200 CXboxInfo::ProcessInput
+000bf326 CXboxInfo::Render
+0026a6a0 s_ledColorNames
+00038136 XSetNicknameW
+0005f1c5 _wtof
+0005f297 wcstod

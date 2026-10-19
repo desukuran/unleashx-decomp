@@ -37,6 +37,7 @@ struct MEMORYSTATUS
 void GlobalMemoryStatus(MEMORYSTATUS *status);
 HANDLE XFindFirstNicknameW(BOOL titleNicknamesOnly, wchar_t *nickname, unsigned size);
 DWORD XGetLanguage();
+BOOL XSetNicknameW(const wchar_t *nickname, BOOL preserveCase);
 BOOL SystemTimeToFileTime(const SYSTEMTIME *systemTime, FILETIME *fileTime);
 BOOL LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime);
 void GetSystemTime(SYSTEMTIME *systemTime);

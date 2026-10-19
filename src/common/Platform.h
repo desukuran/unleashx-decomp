@@ -128,6 +128,7 @@ int stricmp(const char *a, const char *b);
 int _wcsicmp(const wchar_t *a, const wchar_t *b);
 char *_strdup(const char *s);
 long _wtol(const wchar_t *s);
+double _wtof(const wchar_t *s);
 DWORD WaitForSingleObject(HANDLE handle, DWORD ms);
 BOOL CloseHandle(HANDLE handle);
 DWORD GetTickCount();

@@ -11,6 +11,8 @@ void SetXboxSystemTime(SYSTEMTIME st, BOOL local);   // 0x0009DD2F
 // Fan speed in SMC units (0-50; 10 = 20%). Values up to 10 are ignored.
 void SetFanSpeed(int speed);                         // 0x0009F552
 int GetFanSpeed();                                   // 0x0009E66D
+// Gives the fan back to the SMC's automatic control.
+void SmcSetFanAuto();                                // 0x0009E65F
 
 void SmcPowerCycle();                                // 0x0008F9EF
 void SmcPowerOff();                                  // 0x0008FA04

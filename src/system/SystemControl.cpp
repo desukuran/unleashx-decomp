@@ -76,6 +76,12 @@ void SetFanSpeed(int speed)
 	}
 }
 
+// 0x0009E65F
+void SmcSetFanAuto()
+{
+	HalWriteSMBusValue(SMBUS_SMC, SMC_FAN_MODE, FALSE, 0);
+}
+
 // 0x0009E66D
 int GetFanSpeed()
 {

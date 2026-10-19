@@ -272,7 +272,7 @@ void CSettingsBase::Reset()
 	m_fX = 40.0f;
 	m_fWidth = 560.0f;
 	m_fHeight = 420.0f;
-	m_pFont->SetScaleFactors(g_pSettings->m_fUnknown131C, g_pSettings->m_fUnknown131C);
+	m_pFont->SetScaleFactors(g_pSettings->m_fFontScale, g_pSettings->m_fFontScale);
 
 	// Shrink the box to the list: caption, the lines and some margin.
 	float lineHeight = LineHeight(m_pFont);
@@ -654,7 +654,7 @@ HRESULT CSettingsBase::Render()
 // those differences.
 void CSettingsBase::RenderPage(float &labelWidth, BOOL musicPage)
 {
-	m_pFont->SetScaleFactors(g_pSettings->m_fUnknown131C, g_pSettings->m_fUnknown131C);
+	m_pFont->SetScaleFactors(g_pSettings->m_fFontScale, g_pSettings->m_fFontScale);
 	DimScreen(0.3f);
 	DrawBevelBox(m_fX, m_fY, m_fWidth, m_fHeight, g_colorScheme.DIALOG_BORDERCOLOR, g_colorScheme.DIALOG_BACKCOLOR,
 	             1.0f, 1);
