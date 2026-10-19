@@ -3,7 +3,8 @@
 // methods in them become __thiscall. Addresses in executable blocks become
 // functions, everything else a label. If a C signature follows the name it is
 // parsed and applied (e.g. "00012345 CMenu::Draw void __thiscall CMenu::Draw(int x)").
-// A parameter may be pinned to a register with "@reg" after its name, for the
+// A parameter may be pinned to a register with "@reg" after its name (e.g.
+// @eax, or @xmm0 for a float in an SSE register), for the
 // custom conventions MSVC's link-time code generation produces, e.g.
 // "000117e4 std::string::ctor_cstr std_string * f(std_string *self@eax, char *s)".
 // Remaining parameters are laid out on the stack in order.
@@ -67,7 +68,7 @@ public class ApplySymbols extends GhidraScript {
 	}
 
 	private static final Pattern CONV = Pattern.compile("\\b(__stdcall|__cdecl|__thiscall|__fastcall)\\b");
-	private static final Pattern REG = Pattern.compile("@(e[abcd]x|e[sd]i|ebp|[abcd][lh])\\s*$");
+	private static final Pattern REG = Pattern.compile("@(e[abcd]x|e[sd]i|ebp|[abcd][lh]|xmm[0-7])\\s*$");
 
 	/** Strips "@reg" markers from the parameter list, recording one entry (or null) per parameter. */
 	private static String extractRegisters(String sig, List<String> regs) {
@@ -100,7 +101,9 @@ public class ApplySymbols extends GhidraScript {
 			VariableStorage vs;
 			String r = i < regs.size() ? regs.get(i) : null;
 			if (r != null) {
-				Register reg = currentProgram.getRegister(r.toUpperCase());
+				// xmmN holds a float in its low dword (LTCG passes some floats there)
+				String name = r.startsWith("xmm") ? r.toUpperCase() + "_Da" : r.toUpperCase();
+				Register reg = currentProgram.getRegister(name);
 				vs = new VariableStorage(currentProgram, reg);
 			}
 			else {
@@ -110,9 +113,10 @@ public class ApplySymbols extends GhidraScript {
 			params.add(new ParameterImpl(old[i].getName(), dt, vs, currentProgram));
 		}
 		DataType rt = fn.getReturnType();
+		String retReg = rt instanceof ghidra.program.model.data.AbstractFloatDataType ? "ST0" : "EAX";
 		ReturnParameterImpl ret = rt.getLength() <= 0
 				? new ReturnParameterImpl(rt, VariableStorage.VOID_STORAGE, currentProgram)
-				: new ReturnParameterImpl(rt, new VariableStorage(currentProgram, currentProgram.getRegister("EAX")), currentProgram);
+				: new ReturnParameterImpl(rt, new VariableStorage(currentProgram, currentProgram.getRegister(retReg)), currentProgram);
 		fn.updateFunction(null, ret, params, Function.FunctionUpdateType.CUSTOM_STORAGE, true, SourceType.USER_DEFINED);
 	}
 

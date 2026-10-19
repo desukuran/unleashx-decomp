@@ -28,6 +28,10 @@ typedef DWORD D3DCOLOR;
 #define D3DFVF_DIFFUSE 0x040
 #define D3DFVF_TEX1 0x100
 
+#define D3DVSDE_DIFFUSE 3      // SetVertexDataColor register
+#define D3DVSDE_VERTEX (-1)    // SetVertexData4f: the position
+#define D3DFILL_SOLID 0x1B02
+
 // D3DPRIMITIVETYPE (Xbox)
 #define D3DPT_LINELIST 2
 #define D3DPT_LINELOOP 3
@@ -82,6 +86,8 @@ enum D3DRENDERSTATETYPE
 	D3DRS_LINEWIDTH,
 	D3DRS_CULLMODE,
 	D3DRS_MULTISAMPLEANTIALIAS,
+	D3DRS_FILLMODE,
+	D3DRS_DITHERENABLE,
 };
 
 // D3DBLEND (Xbox uses the GL values)
@@ -161,6 +167,11 @@ struct IDirect3DDevice8
 	HRESULT Present(const void *, const void *, void *, void *);
 	HRESULT CopyRects(IDirect3DSurface8 *source, const void *sourceRects, UINT count,
 	                  IDirect3DSurface8 *destination, const void *destPoints);
+	// immediate-mode drawing (Xbox extension)
+	HRESULT Begin(DWORD primitiveType);
+	HRESULT End();
+	HRESULT SetVertexData4f(int reg, float a, float b, float c, float d);
+	HRESULT SetVertexDataColor(int reg, D3DCOLOR color);
 };
 
 // The surface the previous program (or the boot animation) left on screen.

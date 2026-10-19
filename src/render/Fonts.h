@@ -4,6 +4,13 @@
 
 #include "../common/Platform.h"
 
+// CXBFont::DrawText flags (XDK sample framework)
+#define XBFONT_LEFT 0x00000000
+#define XBFONT_RIGHT 0x00000001
+#define XBFONT_CENTER_X 0x00000002
+#define XBFONT_CENTER_Y 0x00000004
+#define XBFONT_TRUNCATED 0x00000008
+
 class CXBFont
 {
 public:
@@ -11,6 +18,13 @@ public:
 	virtual ~CXBFont();
 	HRESULT Create(const char *fileName, DWORD resourceOffset);       // 0x00099EC9 (XDK sample)
 	void SetScaleFactors(float scaleX, float scaleY);                  // 0x00098FEB (XDK sample)
+	// Brackets a group of DrawText calls (render states are set once).
+	HRESULT Begin();                                                   // 0x0009978B (XDK sample)
+	HRESULT End();                                                     // 0x0009968D (XDK sample)
+	HRESULT DrawText(float x, float y, DWORD color, const wchar_t *text, DWORD flags,
+	                 float maxWidth);                                  // 0x00098E3A (XDK sample)
+	// Width of the text in pixels (returned in xmm0 in the original).
+	float GetTextWidth(const wchar_t *text);                           // 0x00099571
 
 	BYTE m_reserved04[0x0C];
 	float m_fFontHeight;                                               // +0x10
