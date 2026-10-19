@@ -170,6 +170,19 @@ keyboard up) and the remote's MENU go back to the menu.
   minutes. Press OK to proceed with the upgrade."; then the new version's
   `Release.nfo` opens in the text editor, and once that's closed the old
   XBE is renamed to `.bak` and the new one moved in its place.
+* **Screen saver and auto turn-off** (`UpdateScreenSaver`):
+  * Any input restarts the idle timer. That means an action, a key on the
+    debug keyboard, or the remote's MENU (which also returns to the menu).
+    Input ends the screen saver, and is consumed doing so.
+  * A running FTP transfer also counts as input, unless the screen saver
+    is the text one.
+  * After `<ScreenSaver Wait>` seconds idle, the screen saver starts: text,
+    a video, or a slideshow of a folder. A missing video or folder falls
+    back to text. The screen saver runs with vsync, and its LED color is
+    applied.
+  * 30 seconds before `<AutoTurnOff>` minutes idle, the turn-off countdown
+    starts. It's skipped while a file operation is queued.
+  * Holding the remote's POWER button for 1.5 seconds turns the Xbox off.
 * **Shutdown:** a pending shutdown waits for file operations, at most 30
   seconds; the message box counts down "Xbox will shutdown in... N
   seconds". Answering any message box cancels it.
