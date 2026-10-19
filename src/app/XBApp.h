@@ -4,6 +4,7 @@
 #pragma once
 
 #include "../common/Platform.h"
+#include "../input/XBInput.h"
 
 struct IDirect3DDevice8;
 struct IDirect3DTexture8;
@@ -62,9 +63,11 @@ public:
 	float m_fFPS;                             // +0x06C
 	wchar_t m_strFrameRate[20];               // +0x070
 	BYTE m_unknown098[0x10];                  // +0x098
-	BYTE m_defaultGamepad[0xE4];              // +0x0A8 XBGAMEPAD; +0xB0/+0xB1 are the black/white
-	                                          //        analog buttons, read at startup
-	BYTE m_defaultIR[0x8C];                   // +0x18C XBIR_REMOTE TODO: verify size
+	XBGAMEPAD m_defaultGamepad;               // +0x0A8 all four gamepads merged (UpdateGamepads)
+	DWORD m_unknown188;                       // +0x188
+	SIRRemote m_defaultIR;                    // +0x18C the remote in use
+	SKeystroke *m_pKeystroke;                 // +0x210 the debug keyboard's last key
+	DWORD m_unknown214;                       // +0x214
 	DWORD m_dwScreenWidth;                    // +0x218 640, 720, 1280, 1920
 	DWORD m_dwScreenHeight;                   // +0x21C 480, 576, 720, 1080
 };

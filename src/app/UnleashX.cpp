@@ -14,6 +14,7 @@
 #include "../settings/ConfigLoader.h"
 #include "../skin/SkinColors.h"
 #include "../system/FileOps.h"
+#include "../ui/MenuDialogs.h"
 #include "SettingsPages.h"
 
 CUnleashX *g_pApp;                         // 0x00276204
@@ -22,25 +23,6 @@ HANDLE g_hNetworkThread = INVALID_HANDLE_VALUE;   // 0x0026A630
 CXBPackedResource *g_pResource;            // 0x00276200 m_resource of the app
 int g_unknown276224;                       // 0x00276224 TODO
 static BOOL s_bBackgroundSoundPlaying;     // 0x00278D48
-
-// The screens created on demand (TODO: decompile).
-class CAudioGUI
-{
-public:
-	CAudioGUI();                           // 0x000F0B92? TODO: verify
-	virtual ~CAudioGUI();
-	virtual HRESULT Init(CXBFontEx *font); // slot 1
-	virtual void Unknown2();
-	virtual void Unknown3();
-	virtual void Unknown4();
-	virtual void Show();                   // slot 5
-};
-
-class CAppFrame
-{
-public:
-	virtual ~CAppFrame();
-};
 
 // The XDK framework's resource/font teardown and DirectSound shutdown.
 void ShutdownAudio();                      // 0x0007FBB1 TODO: verify
@@ -56,12 +38,12 @@ CUnleashX::CUnleashX()
 	m_nMode = 0;
 	m_nPrevMode = 1;
 	g_pSettings = CAppSettings::GetInstance();
-	m_pDefaultGamepad = m_defaultGamepad;
-	m_pDefaultIR = m_defaultIR;
+	m_pDefaultGamepad = &m_defaultGamepad;
+	m_pDefaultIR = &m_defaultIR;
 	m_nGlobePos = 0;
 	m_nGlobeStep = 1;
 	g_pResource = &m_resource;
-	m_unknown1970 = 0;
+	m_bStartMusic = 0;
 	m_bNoHardDisk = FALSE;
 	g_unknown276224 = 0;
 	g_pMusicManager = NULL;
@@ -96,16 +78,16 @@ CUnleashX::CUnleashX()
 	m_unknown1964 = 0;
 	m_unknown1968 = 0;
 	m_pBackgroundSound = NULL;
-	m_pFrame1954 = NULL;
-	m_unknown1950 = 0;
-	m_unknown1974 = 0;
-	m_unknown196C = 0;
+	m_pScreenSaver = NULL;
+	m_bScreenSaverActive = 0;
+	m_bKeepAwake = 0;
+	m_bAutoLaunchDisc = 0;
 	m_pSettingsMenu = NULL;
 	m_pClockEditor = NULL;
-	m_pFrame800 = NULL;
+	m_pPassCode = NULL;
 	m_hThread2248 = NULL;
-	m_unknown225C = 0;
-	m_unknown2264 = 1;
+	m_bEditOnYes = 0;
+	m_bShowReleaseNfo = 1;
 	m_bDiscLaunchPending = FALSE;
 }
 
@@ -233,14 +215,14 @@ HRESULT CUnleashX::Cleanup()
 	m_pSkinBrowser = NULL;
 	delete m_pSystemInfo;
 	m_pSystemInfo = NULL;
-	delete m_pFrame1954;
-	m_pFrame1954 = NULL;
+	delete m_pScreenSaver;
+	m_pScreenSaver = NULL;
 	delete m_pSettingsMenu;
 	m_pSettingsMenu = NULL;
 	delete m_pTextEditor;
 	m_pTextEditor = NULL;
-	delete m_pFrame800;
-	m_pFrame800 = NULL;
+	delete m_pPassCode;
+	m_pPassCode = NULL;
 	ReleaseTexture(m_pTexture7D0);
 	ReleaseTexture(m_pTexture7D4);
 	ReleaseTexture(m_pTexture7D8);

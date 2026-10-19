@@ -12,6 +12,8 @@
 #include "XBApp.h"
 
 class CAppFrame;
+class CPassCode;
+class CScreenSaver;
 class CAudioGUI;
 class CSound;
 class CXboxInfo;
@@ -78,7 +80,7 @@ public:
 	int m_unknown7F4;                         // +0x7F4
 	CSound *m_pBackgroundSound;               // +0x7F8 looped in the menu
 	CClockEditor *m_pClockEditor;     // +0x7FC
-	CAppFrame *m_pFrame800;                   // +0x800 TODO: verify the class
+	CPassCode *m_pPassCode;                   // +0x800 asks for the passcode at startup
 	int m_unknown804;                         // +0x804
 	void *m_pDefaultGamepad;                  // +0x808 &m_defaultGamepad
 	void *m_pDefaultIR;                       // +0x80C &m_defaultIR
@@ -105,16 +107,16 @@ public:
 	CSkinBrowser *m_pSkinBrowser;             // +0x1944
 	CXboxInfo *m_pSystemInfo;                 // +0x1948 the System Info screen (mode 7)
 	CNotePad *m_pTextEditor;                  // +0x194C
-	int m_unknown1950;                        // +0x1950
-	CAppFrame *m_pFrame1954;                  // +0x1954 TODO: verify the class
+	BOOL m_bScreenSaverActive;                // +0x1950
+	CScreenSaver *m_pScreenSaver;             // +0x1954
 	CSettingsMenu *m_pSettingsMenu;           // +0x1958
 	BOOL m_bMessageShown;                     // +0x195C
-	int m_unknown1960;                        // +0x1960
+	BOOL m_bPasswordShown;                    // +0x1960 the keyboard asks for the password at startup
 	int m_unknown1964;                        // +0x1964
 	int m_unknown1968;                        // +0x1968
-	int m_unknown196C;                        // +0x196C
-	int m_unknown1970;                        // +0x1970
-	int m_unknown1974;                        // +0x1974
+	BOOL m_bAutoLaunchDisc;                   // +0x196C start a disc when one is inserted
+	BOOL m_bStartMusic;                       // +0x1970 create the music manager (soundtracks)
+	BOOL m_bKeepAwake;                        // +0x1974 no screen saver this frame. TODO: verify
 	CXBMesh m_mesh1978;                       // +0x1978
 	float m_globePath[0x200];                 // +0x1990 <Main Globe>: camera heights the globe sways through
 	int m_nGlobePos;                          // +0x2190 index in m_globePath
@@ -124,9 +126,9 @@ public:
 	HANDLE m_hThread2248;                     // +0x2248
 	CMenuEvent m_menuEvent;                   // +0x224C
 	CSkinEvent m_skinEvent;                   // +0x2254
-	int m_unknown225C;                        // +0x225C
+	BOOL m_bEditOnYes;                        // +0x225C the message box answered Yes opens the text editor
 	BOOL m_bDiscLaunchPending;                // +0x2260 TODO: verify
-	int m_unknown2264;                        // +0x2264 1
+	BOOL m_bShowReleaseNfo;                   // +0x2264 TRUE: show the disc's Release.nfo once
 };
 
 extern CUnleashX *g_pApp;                    // 0x00276204

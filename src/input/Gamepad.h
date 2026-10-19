@@ -3,6 +3,7 @@
 
 #include "../app/XBApp.h"
 #include "../common/Platform.h"
+#include "XBInput.h"
 
 class CXBApplicationEx;
 
@@ -51,52 +52,6 @@ enum InputAction
 	INPUT_IR_0 = 45,
 	INPUT_POINTER_CLICK = 47,  // TODO: verify (selects the item under the pointer)
 };
-
-// The sample framework's XBGAMEPAD (the fields used).
-struct SGamepadState
-{
-	unsigned short wButtons;           // +0x00
-	unsigned char bAnalogButtons[8];   // +0x02 A, B, X, Y, BLACK, WHITE, LTRIGGER, RTRIGGER
-	short sThumbLX, sThumbLY;          // +0x0A
-	short sThumbRX, sThumbRY;          // +0x0E
-	float fX1;                         // +0x14 -1..1
-	float fY1;                         // +0x18
-	float fX2;                         // +0x1C
-	float fY2;                         // +0x20
-};
-
-// The XDK sample framework's device tables (XBInput), by port; library
-// code that fills them in every frame. A gamepad starts with the state
-// above.
-struct XBGAMEPAD : public SGamepadState
-{
-	WORD wLastButtons;                 // +0x24
-	BOOL bLastAnalogButtons[8];        // +0x28
-	WORD wPressedButtons;              // +0x48
-	BOOL bPressedAnalogButtons[8];     // +0x4C
-	int nAction;                       // +0x6C an InputAction (1-14 below) to report. TODO: verify (who sets it)
-	BYTE unknown70[0xD4 - 0x70];
-	HANDLE hDevice;                    // +0xD4 NULL = no gamepad in the port
-	BOOL bInserted;                    // +0xD8
-	BOOL bRemoved;                     // +0xDC
-};
-// An IR remote (the DVD playback kit). 0x84 bytes.
-struct SIRRemote
-{
-	BYTE unknown00[0x0A];
-	WORD wKeyCode;                     // +0x0A the button held, 0 = none
-	BYTE unknown0C[0x28 - 0x0C];
-	HANDLE hDevice;                    // +0x28 NULL = no receiver in the port
-	BYTE unknown2C[0x84 - 0x2C];
-};
-struct SKeyboardState
-{
-	HANDLE hDevice;                    // +0x00 TODO: verify
-	BYTE unknown04[0x10];
-};
-extern XBGAMEPAD g_Gamepads[4];                   // 0x00271B30
-extern SIRRemote g_irRemotes[4];                  // 0x00271ED8
-extern SKeyboardState g_keyboards[4];             // 0x002720EC
 
 // Turns the gamepads and the IR remote into one InputAction per call: the
 // first port with something pressed wins (and is remembered), and held

@@ -29,6 +29,41 @@ enum AppMode
 	MODE_MUSIC = 9,
 };
 
+// Base of the full-screen tools (the text editor, the music player...).
+// The defaults below are the base class's own (empty) ones.
+class CAppFrame
+{
+public:
+	virtual ~CAppFrame() {}                                               // 0x000111EB
+	virtual BOOL Init(CXBFontEx * /*font*/) { return TRUE; }              // 0x000111E1
+	virtual BOOL IsOpen() { return FALSE; }                               // 0x00068291
+	virtual BOOL Render() { return TRUE; }                                // 0x000111E7
+	virtual HRESULT ProcessInput(int * /*action*/, SGamepadState ** /*pad*/) { return S_OK; }   // 0x000326FF
+	virtual void Show() {}                                                // 0x00013D20
+};
+
+// The music player (mode 9). TODO: decompile
+class CAudioGUI : public CAppFrame
+{
+public:
+	CAudioGUI();                                          // 0x00134640
+	virtual ~CAudioGUI();                                 // 0x00011502 (deleting)
+	virtual BOOL Init(CXBFontEx *font);                   // 0x00134283
+	virtual BOOL IsOpen();                                // 0x00130DD5
+	virtual BOOL Render();                                // 0x00134853
+	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00135A99
+	virtual void Show();                                  // 0x00133A5D
+};
+
+// The screen saver (text, video or slideshow). TODO: decompile
+class CScreenSaver
+{
+public:
+	virtual ~CScreenSaver();
+	// (this in ecx, action in eax)
+	HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00139D04
+};
+
 class CFileManager
 {
 public:
@@ -110,11 +145,16 @@ public:
 	std::string m_strSkinPath;                            // +0x58
 };
 
-class CNotePad
+// The text editor (mode 8). Its vtable's Init slot is 0x00024830.
+class CNotePad : public CAppFrame
 {
 public:
 	CNotePad();                                           // 0x00103A0C? TODO: verify
-	virtual ~CNotePad();
+	virtual ~CNotePad();                                  // 0x000248EB (deleting)
+	virtual BOOL IsOpen();                                // 0x00024845
+	virtual BOOL Render();                                // 0x0010496B
+	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00105438
+	using CAppFrame::Init;
 	void Init(int, int, int);                             // 0x00104399
 	void NewFile();                                       // 0x00103D4D
 	HRESULT Open(const char *path);                       // 0x00104181
