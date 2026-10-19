@@ -47,6 +47,9 @@ public:
 	void *GetHead() const { return m_pNodeHead->data; }
 
 	void AddTail(void *newElement);
+	void AddHead(void *newElement);                                // 0x0002A7A9
+	// Inserts before position (at the head if NULL).
+	void InsertBefore(POSITION position, void *newElement);        // 0x0002A7D3
 	void *RemoveHead();
 	void RemoveAt(POSITION position);
 	void RemoveAll();

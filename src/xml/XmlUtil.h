@@ -14,6 +14,9 @@ CXmlElement *CloneElement(CXmlElement *src);                                 // 
 
 // Links child under parent.
 BOOL AddChild(CXmlElement *parent, CXmlElement *child);                      // 0x0002A8F9
+// Like AddChildElement, but right after `after` (at the end if NULL).
+CXmlElement *InsertChildElement(CXmlElement *parent, CXmlElement *after, const char *name, const char *value,
+                                const char *attributes);                     // 0x0002A913
 // Same, and marks the document modified.
 BOOL AppendElement(CXmlElement *parent, CXmlElement *child, CXmlDocument *doc);  // 0x0002AEA9
 

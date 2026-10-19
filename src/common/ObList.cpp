@@ -95,6 +95,36 @@ void CObList::AddTail(void *newElement)
 	m_pNodeTail = node;
 }
 
+// 0x0002A7A9
+void CObList::AddHead(void *newElement)
+{
+	CNode *node = NewNode(NULL, m_pNodeHead);
+	node->data = newElement;
+	if (m_pNodeHead != NULL)
+		m_pNodeHead->pPrev = node;
+	else
+		m_pNodeTail = node;
+	m_pNodeHead = node;
+}
+
+// 0x0002A7D3
+void CObList::InsertBefore(POSITION position, void *newElement)
+{
+	if (position == NULL)
+	{
+		AddHead(newElement);
+		return;
+	}
+	CNode *oldNode = (CNode *)position;
+	CNode *node = NewNode(oldNode->pPrev, oldNode);
+	node->data = newElement;
+	if (oldNode->pPrev != NULL)
+		oldNode->pPrev->pNext = node;
+	else
+		m_pNodeHead = node;
+	oldNode->pPrev = node;
+}
+
 // 0x0001C9A5
 void *CObList::RemoveHead()
 {

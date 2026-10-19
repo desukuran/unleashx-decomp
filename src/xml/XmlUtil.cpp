@@ -2,9 +2,8 @@
 
 #include "../common/StrUtil.h"
 
-// 0x000234C7
-CXmlElement *AddChildElement(CXmlElement *parent, const char *name, const char *value,
-                             const char *attributes)
+// The new element both functions below create.
+static CXmlElement *NewElement(const char *name, const char *value, const char *attributes)
 {
 	CXmlElement *element = new CXmlElement();
 	if (element == NULL)
@@ -24,9 +23,49 @@ CXmlElement *AddChildElement(CXmlElement *parent, const char *name, const char *
 			ParseXmlAttributeList(element, element->m_strAttributes, XML_QUOTES_SIMPLE);
 		}
 	}
+	return element;
+}
 
+// 0x000234C7
+CXmlElement *AddChildElement(CXmlElement *parent, const char *name, const char *value,
+                             const char *attributes)
+{
+	CXmlElement *element = NewElement(name, value, attributes);
+	if (element == NULL)
+		return NULL;
 	element->m_pParent = parent;
 	parent->m_children.AddTail(element);
+	return element;
+}
+
+// 0x0002A913
+// The original repeats AddChildElement's attribute parsing inline.
+CXmlElement *InsertChildElement(CXmlElement *parent, CXmlElement *after, const char *name, const char *value,
+                                const char *attributes)
+{
+	if (after == NULL)
+		return AddChildElement(parent, name, value, attributes);
+
+	CXmlElement *element = NewElement(name, value, attributes);
+	if (element == NULL)
+		return NULL;
+
+	// The node after `after`; at the end if it's last or not a child.
+	POSITION next = NULL;
+	POSITION pos = parent->m_children.GetHeadPosition();
+	while (pos != NULL)
+	{
+		if (parent->m_children.GetNext(pos) == after)
+		{
+			next = pos;
+			break;
+		}
+	}
+	element->m_pParent = parent;
+	if (next == NULL)
+		parent->m_children.AddTail(element);
+	else
+		parent->m_children.InsertBefore(next, element);
 	return element;
 }
 
