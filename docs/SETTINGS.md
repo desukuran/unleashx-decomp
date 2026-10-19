@@ -1,8 +1,20 @@
 # Settings screens (Control Panel)
 
 The settings screen (`Action="Settings"`) shows ten icons from
-`CtlPanel.xpr`; each opens a page. Written from `src/app/SettingsBase.cpp`
-and `src/app/Settings*.cpp`.
+`CtlPanel.xpr`; each opens a page. Written from `src/app/SettingsBase.cpp`,
+`src/app/Settings*.cpp` and the pop-ups (`IPAddressEditor.cpp`,
+`ClockEditor.cpp`, `XboxInfo.cpp`, `src/ui/UpDown.cpp`).
+
+## The icon screen
+
+"Control Panel" lists, in order: AutoLaunch, Date/Time, AutoRun
+(shortcuts), Live Update, Network, Screen Calibration, Music (sounds),
+Storage (Harddisk), System and Display (video). The selected page's icon
+is drawn large and faint behind the list, and becomes the background of the
+page it opens. Up/Down (and the triggers, and the left stick) move, A opens
+the page (it's created the first time), B or BACK closes the screen. A page
+keeps all input until it closes. After Screen Adjust closes, the Control
+Panel lays itself out again, since the visible area may have moved.
 
 ## Pages in general
 
@@ -104,8 +116,69 @@ text; a failure to save the SYST name reports "Unable to set FTP Password".
 
 ## Screen Adjust
 
-A full-screen editor for the visible screen area (TODO: decompile the
-editor, `0x001018DC`).
+A full-screen editor for the visible screen area (`CAppSettings::m_viewport`,
+the area everything is drawn in). The current area is outlined, with its
+corner coordinates, its size and help text.
+
+* **Left trigger:** the d-pad and left stick move the top-left corner (up
+  to 10% of the display in); the bottom-right corner stays put, so the size
+  changes with it. This is the starting mode.
+* **Right trigger:** the d-pad and left stick move the bottom-right corner
+  (between 90% and 100% of the display).
+* **Right stick:** always moves the bottom-right corner.
+* **A or START:** save and close; **B or BACK:** put the area back and
+  close.
+
+Saving copies the area into the current video mode's entry and writes all
+six entries (0x18 bytes each) to `<data>\videoset.dat`; a failure shows
+"An error occured while saving calibration data." Quirk: the whole viewport
+is copied over the entry, so the mode's font scale (the entry's last field)
+gets the viewport's MaxZ.
+
+## Pop-ups
+
+**Spinners** (`CUpDown`): a key-shaped box showing one value; Up/Down (and
+the triggers, and the left stick) step through the values, wrapping and
+skipping blank ones. The focused one is highlighted with pulsing arrows; the
+arrow last used stays lit (until other input, at most every 2 seconds).
+
+**IP address editor:** four spinners (0-255) with dots between them. Left
+and Right move between them (wrapping), A accepts, B or BACK cancels.
+Quirks: an address of 16 characters or more isn't terminated when converted;
+all three dots are placed using the first spinner's width.
+
+**Clock Settings** (also `Action="SetClock"` and the cold boot clock
+prompt): six spinners, the date in the Xbox language's order (m/d/y for
+English and others, y/m/d for Japanese, Korean and Chinese, d.m.y for
+German and Italian, d/m/y for French, Spanish and Portuguese; years
+2000-2099), then hour (1-12), minute and AM/PM. The day spinner is fitted
+to the month (and leap years) when it gets the focus after the month or
+year changed. Under the spinners the chosen time is spelled out ("January
+1, 2004  12:00 AM"). A sets the clock (keeping the current seconds), B or
+BACK cancels. Quirks: opening it before noon leaves AM/PM as it was; the
+spelled-out time uses the 24-hour hour when it opens.
+
+## Xbox Info (System Info)
+
+A scrolling list of labelled lines, opened from System Settings:
+
+* **Xbox Info:** language, game region, video standard and modes, audio,
+  AV cable, parental control, DVD region, version, serial number, HDD key,
+  kernel version, hardware flags/GPU/MCP revisions.
+* **Devices:** the ports with a gamepad, IR receiver or keyboard.
+* **Storage:** C, E, F, G (total, free and percent free; F and G only when
+  enabled), X, Y, Z (in MB, or "Unformatted"), the DVD drive.
+* **Network:** link status, MAC, IP, subnet mask, gateway, DNS 1 and 2.
+* **FTP Statistics:** status, users, connections, bytes/files/failures
+  received and sent.
+* **Misc:** board and CPU temperature, flash chip ID.
+* **UnleashX:** version, launch mode, path, physical location, threads,
+  memory, video buffer size.
+
+Devices, drives, network, FTP and the temperatures refresh every 1.5
+seconds while idle. Up/Down scroll; B, BACK or BLACK close it. Quirks:
+"Sent" is empty until the first refresh; a missing X/Y/Z drive formats
+doubles as strings; there's no check for a missing DVD drive entry.
 
 ## Harddisk Settings
 
@@ -136,7 +209,7 @@ files are reloaded at once.
 
 ## System Settings
 
-* **Xbox Info:** dashboard version, an Xbox Info screen (TODO), and the
+* **Xbox Info:** dashboard version, the Xbox Info screen (below), and the
   Xbox's nickname (saved to the Xbox, at most 32 characters).
 * **File Operation:** Auto Rename, Auto Patch XBE, Abort On Error, default
   backup folder (`<Preference><AutoRename>` etc., `<DefaultFolder>`).
