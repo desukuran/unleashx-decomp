@@ -19,7 +19,7 @@ public:
 	                       float height, int maxVisible);  // vtable slot 1
 	void AddOption(const wchar_t *text, int value);       // 0x000AEA79
 	void Show(int selected);                              // 0x000ADE9E
-	virtual void ProcessInput(int *action, const struct SGamepadState *pad);   // vtable slot 2
+	virtual void ProcessInput(int *action, struct SGamepadState **pad);   // vtable slot 2 (0x000AE6F1)
 	BOOL IsOpen() const;                                  // 0x000AD930
 	int GetSelection() const;                             // 0x000AD946
 
@@ -37,7 +37,7 @@ public:
 	void Init();                                          // 0x0010341C
 	void SetCode(const char *code);                       // 0x00103100
 	void Show();                                          // 0x00102805
-	virtual void ProcessInput();                          // vtable slot 0 TODO: verify
+	virtual void ProcessInput(int *action, struct SGamepadState **pad);   // vtable slot 0
 	BOOL IsClosed() const { return m_bCancelled || m_unknown50; }   // 0x0002208B
 	BOOL IsCorrect();                                     // 0x00021FCE
 
@@ -75,7 +75,7 @@ public:
 	virtual ~CMenuItemEditor();
 	void Init(CXBFont *font, int unknown);                // 0x0010A05B
 	void Edit(CMenuItem *item);                           // 0x0010986F
-	virtual void ProcessInput();                          // vtable slot 2
+	virtual void ProcessInput(int *action, struct SGamepadState **pad);   // vtable slot 2
 	virtual BOOL IsOpen();                                // vtable slot 5
 
 	BYTE m_unknown004[0x290];

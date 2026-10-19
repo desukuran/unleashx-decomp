@@ -102,7 +102,7 @@ public:
 	BOOL CaptureBootImage();                          // 0x0010CE1D
 
 	// Handles one input action (InputAction); may change *action.
-	HRESULT ProcessInput(int *action, const struct SGamepadState *pad);   // 0x001123B9
+	HRESULT ProcessInput(int *action, struct SGamepadState **pad);   // 0x001123B9
 	void Render();                                    // 0x0010D055 TODO: decompile
 
 	// Internal

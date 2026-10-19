@@ -1726,7 +1726,7 @@ HRESULT CMenu::ProcessAction(int *action)
 // One frame of input. Open dialogs (message box, keyboard, passcode, item
 // editor, recent list, context menu) get the input first; a running batch
 // advances one step per frame.
-HRESULT CMenu::ProcessInput(int *action, const SGamepadState *pad)
+HRESULT CMenu::ProcessInput(int *action, SGamepadState **pad)
 {
 	BOOL fileOperation = g_bFileOperationQueued;
 	if (!m_bReady)
@@ -1746,11 +1746,12 @@ HRESULT CMenu::ProcessInput(int *action, const SGamepadState *pad)
 	}
 
 	// The left stick pushed fully up/down is like the D-pad.
-	if (*action == INPUT_LTHUMB && pad != NULL)
+	// (pad itself isn't checked for NULL.)
+	if (*action == INPUT_LTHUMB && *pad != NULL)
 	{
-		if (pad->fY1 == 1.0f)
+		if ((*pad)->fY1 == 1.0f)
 			*action = INPUT_UP;
-		else if (pad->fY1 == -1.0f)
+		else if ((*pad)->fY1 == -1.0f)
 			*action = INPUT_DOWN;
 	}
 
@@ -1834,7 +1835,7 @@ HRESULT CMenu::ProcessInput(int *action, const SGamepadState *pad)
 
 	if (m_bWaitingForPassCode && g_pPendingItem != NULL)
 	{
-		m_pPassCode->ProcessInput();
+		m_pPassCode->ProcessInput(action, pad);
 		BOOL closed = m_pPassCode->IsClosed();
 		m_bWaitingForPassCode = !closed;
 		if (!closed)
@@ -1885,7 +1886,7 @@ HRESULT CMenu::ProcessInput(int *action, const SGamepadState *pad)
 
 	if (m_bItemEditorShown)
 	{
-		m_pItemEditor->ProcessInput();
+		m_pItemEditor->ProcessInput(action, pad);
 		m_bItemEditorShown = m_pItemEditor->IsOpen();
 		if (m_bItemEditorShown)
 			return S_OK;
