@@ -6,7 +6,7 @@ CXXFLAGS ?= -std=c++11 -Wall -Wextra -O1 -g
 COMMON := src/common/StrUtil.cpp src/common/ObList.cpp src/common/PlatformHost.cpp src/common/FileUtil.cpp
 XML := src/xml/XmlDocument.cpp src/xml/XmlUtil.cpp
 SETTINGS := src/settings/AppSettings.cpp src/settings/ConfigLoader.cpp
-SYSTEM := src/system/Drives.cpp
+SYSTEM := src/system/Drives.cpp src/system/Dvd.cpp
 SKIN := src/skin/Skin.cpp src/skin/SkinParser.cpp src/skin/SkinColors.cpp src/skin/SkinDefaults.cpp
 UI := src/ui/Language.cpp
 

@@ -20,3 +20,4 @@ BOOL WriteTextFile(const char *path, const char *, BOOL) { printf("[stub] WriteT
 std::string GetPathDirectory(const char *) { return std::string(); }
 void MakeFatxPath(const char *path, std::string &out) { out = path; }
 std::string GetPersistentDataPath(const wchar_t *, unsigned int) { return std::string(); }
+std::string GetXbeTitleName(const char *) { return std::string(); }

@@ -27,4 +27,5 @@ struct SXbeInfo
 	std::string titleName;     // TODO: verify layout (0x000A608D)
 };
 BOOL ReadXbeInfo(const char *xbePath, SXbeInfo *info);             // 0x000A608D TODO: decompile
+std::string GetXbeTitleName(const char *xbePath);                  // 0x000A5F49 TODO: decompile
 BOOL ExtractXbeTitleImage(const char *xbePath, const char *outFile);   // 0x000A4D10 TODO: decompile
