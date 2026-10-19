@@ -511,3 +511,80 @@ HRESULT DrawTexture(IDirect3DTexture8 *texture, float x, float y, float width, f
 	g_pd3dDevice->SetTexture(0, NULL);
 	return S_OK;
 }
+
+// 0x000A2897
+HRESULT DrawProgressBar(float x, float y, float width, float height, float percent, D3DCOLOR borderColor,
+                        D3DCOLOR backColor, D3DCOLOR fill1, D3DCOLOR fill2, BYTE gradient)
+{
+	BOOL useGradient = gradient & (fill1 != fill2);
+	g_pd3dDevice->SetTexture(0, NULL);
+	// (The original writes these into D3D's texture stage state cache.)
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW);
+
+	float left = x;
+	float right = x + width;
+	float top = y;
+	float bottom = y + height;
+	float empty = 1.0f - (percent > 100.0f ? 1.0f : percent * 0.01f);
+	float cut = 3.0f;
+	// The frame, then the filled part.
+	for (int i = 0; i < 2; i++)
+	{
+		float inset = (float)(i * 3);
+		left += inset;
+		right = right - ((float)i * width * empty + inset);
+		if (!(left < right))
+			right = left + 1.0f;
+		cut -= inset;
+		top += inset;
+		bottom -= inset;
+		float l = left - 0.5f;
+		float t = top - 0.5f;
+		float r = right - 0.5f;
+		float b = bottom - 0.5f;
+		SScreenVertex v[8];
+		SetVertexRhw(&v[0], l + cut, t);
+		SetVertexRhw(&v[1], r - cut, t);
+		SetVertexRhw(&v[2], r, t + cut);
+		SetVertexRhw(&v[3], r, b - cut);
+		SetVertexRhw(&v[4], r - cut, b);
+		SetVertexRhw(&v[5], l + cut, b);
+		SetVertexRhw(&v[6], l, b - cut);
+		SetVertexRhw(&v[7], l, t + cut);
+		if (i == 1)
+		{
+			if (useGradient)
+			{
+				DrawGradientRect(left, top, right - left, bottom - top, fill2, fill1, FALSE, 0);
+			}
+			else
+			{
+				g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, fill1);
+				g_pd3dDevice->DrawVerticesUP(D3DPT_POLYGON, 8, v, sizeof(SScreenVertex));
+			}
+		}
+		else
+		{
+			if (backColor != 0)
+			{
+				g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, backColor);
+				g_pd3dDevice->DrawVerticesUP(D3DPT_POLYGON, 8, v, sizeof(SScreenVertex));
+			}
+			if (borderColor != 0)
+			{
+				g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, borderColor);
+				g_pd3dDevice->DrawVerticesUP(D3DPT_LINELOOP, 8, v, sizeof(SScreenVertex));
+			}
+		}
+	}
+	return S_OK;
+}

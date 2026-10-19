@@ -1,5 +1,5 @@
-// Screen scaling and 2D drawing helpers (0x0009E1D4-0x000A2D02).
-// TODO: decompile
+// Screen scaling and 2D drawing helpers (0x0009E1D4-0x000A2D02). The
+// drawing ones are in Draw.cpp; the screen scaling ones are TODO.
 #pragma once
 
 #include "../common/Platform.h"
@@ -49,7 +49,9 @@ HRESULT DrawGradientRect(float x, float y, float width, float height, D3DCOLOR c
 // NULL = the middle).
 HRESULT DrawTexture(IDirect3DTexture8 *texture, float x, float y, float width, float height, float alpha,
                     float *center, float angle, const float *scale);   // 0x000A246F
-// A bar filled to percent (0-100), fill1 to fill2. TODO: decompile
+// A progress bar: an octagon (3-pixel cuts) in backColor/borderColor, and
+// inside it, 3 pixels in, the filled part (percent 0-100): fill1, or a
+// gradient from fill2 to fill1 when gradient is set and they differ.
 HRESULT DrawProgressBar(float x, float y, float width, float height, float percent, D3DCOLOR borderColor,
                         D3DCOLOR backColor, D3DCOLOR fill1, D3DCOLOR fill2, BYTE gradient);   // 0x000A2897
 // "text..." in a centered box, with animated dots.
