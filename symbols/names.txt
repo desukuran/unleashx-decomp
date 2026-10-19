@@ -1102,3 +1102,11 @@
 00091d29 XKEEPROM::GetDVDRegion
 000394bd XGetAudioFlags
 0003955c XGetParentalControlSetting
+0010246e CScreenAdjuster::CScreenAdjuster
+00101f35 CScreenAdjuster::~CScreenAdjuster
+00101f0e CScreenAdjuster::Init
+001018dc CScreenAdjuster::Reset
+001018fc CScreenAdjuster::Render
+00102165 CScreenAdjuster::HandleInput
+00102066 CScreenAdjuster::Save
+00101f49 CScreenAdjuster::ShowMessage

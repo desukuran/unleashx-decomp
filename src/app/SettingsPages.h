@@ -6,6 +6,7 @@
 // is closed, or the base class used the input), S_OK otherwise.
 #pragma once
 
+#include "../settings/AppSettings.h"
 #include "../xml/XmlDocument.h"
 #include "SettingsBase.h"
 
@@ -150,9 +151,11 @@ public:
 	BOOL Save();                                              // 0x000CA63B
 };
 
-// The screen position editor inside CScreenAdjust: moves and sizes the
-// visible area (CAppSettings::m_viewport) with the d-pad. 0x58 bytes.
-// TODO: decompile (0x001018DC-0x00102514).
+// The screen position editor inside CScreenAdjust: moves the corners of
+// the visible area (CAppSettings::m_viewport) with the d-pad and sticks.
+// The left trigger picks the top-left corner, the right trigger the
+// bottom-right one (the right stick always moves that one). A/START saves
+// it to <data>\videoset.dat, B/BACK puts it back. 0x58 bytes.
 class CScreenAdjuster
 {
 public:
@@ -163,11 +166,36 @@ public:
 	HRESULT Init(CXBFont *font);                              // 0x00101F0E
 	// Takes the current screen area. (this in eax)
 	void Reset();                                             // 0x001018DC
-	void Render();                                            // 0x001018FC (this in ebx)
-	void HandleInput(int *action, SGamepadState **pad);       // 0x00102165 (this in edx)
+	HRESULT Render();                                         // 0x001018FC (this in ebx)
+	// (this in edx, action in eax, pad in ecx)
+	HRESULT HandleInput(int *action, SGamepadState **pad);    // 0x00102165
 
 	BOOL m_bOpen;                   // +0x00 set by Reset, cleared when the editor closes
-	BYTE m_unknown04[0x58 - 0x04];
+	BOOL m_bTopLeft;                // +0x04 the d-pad/left stick moves the top-left corner
+	SViewport m_viewport;           // +0x08 the area when opened (B puts it back)
+	// The top-left corner's limits: 10% of the display (left trigger), or
+	// the display size (right trigger; unused then).
+	int m_nMaxLeft;                 // +0x20
+	int m_nMaxTop;                  // +0x24
+	int m_nUnknown28;               // +0x28 0 / 90% of the width (not read)
+	int m_nUnknown2C;               // +0x2C 0 / 90% of the height (not read)
+	// The bottom-right corner's limits.
+	int m_nMaxRight;                // +0x30 the display size
+	int m_nMaxBottom;               // +0x34
+	int m_nMinRight;                // +0x38 90% of it
+	int m_nMinBottom;               // +0x3C
+	BOOL m_bMessageBoxOpen;         // +0x40
+	CMessageBox *m_pMessageBox;     // +0x44 save errors
+	BOOL m_bChanged;                // +0x48
+	CXBFont *m_pFont;               // +0x4C
+	CXBFont *m_pButtonFont;         // +0x50 XboxDings
+	CAppSettings *m_pSettings;      // +0x54
+
+private:
+	// Writes videoset.dat; TRUE when there was nothing to save. (this in ebx)
+	BOOL Save();                                              // 0x00102066
+	// (this in edi)
+	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x00101F49
 };
 
 // Screen Adjust: a full-screen editor rather than a list. 0x110 bytes,
