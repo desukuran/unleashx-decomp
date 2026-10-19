@@ -165,3 +165,5 @@ float GetFontHeight(CXBFont *font);                                    // 0x0002
 void SetFontCursor(CXBFont *font, float x, float y);                   // 0x00021E58
 // Draws text at the pen position. (font in esi)
 void DrawFontText(CXBFont *font, DWORD color, const wchar_t *text, DWORD flags, float maxWidth);   // 0x00021ECB
+// Draws text at x, y with flags (the callers center it). (font in eax)
+void DrawTextCentered(CXBFont *font, float x, float y, const wchar_t *text, D3DCOLOR color, DWORD flags);   // 0x0002AED1

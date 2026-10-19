@@ -641,3 +641,92 @@ void SetScissorRect(BOOL enable, float x, float y, float width, float height)
 	rect.y2 = (long)bottom;
 	g_pd3dDevice->SetScissors(1, FALSE, &rect);
 }
+
+// A vertex with texel coordinates (D3DFVF_XYZRHW | D3DFVF_TEX1; rhw 0).
+struct STexelVertex
+{
+	float x, y, z, rhw;
+	float u, v;
+};
+
+static void SetTexelVertex(STexelVertex *v, float x, float y, float u, float w)
+{
+	v->x = x;
+	v->y = y;
+	v->z = 1.0f;
+	v->rhw = 0.0f;
+	v->u = u;
+	v->v = w;
+}
+
+// 0x0009FE5C
+// The texture drawn 1:1 from its top left (texel coordinates: a linear
+// texture), at alpha, with the edges snapped to whole pixels.
+HRESULT DrawShade(IDirect3DTexture8 *texture, float x, float y, float width, float height, float alpha)
+{
+	float left = (float)floor(x);
+	float top = (float)floor(y);
+	width = (float)floor(x - left + width);
+	height = (float)floor(y - top + height);
+	STexelVertex v[4];
+	SetTexelVertex(&v[0], left - 0.5f, top - 0.5f, 0.0f, 0.0f);
+	SetTexelVertex(&v[1], left + width - 0.5f, top - 0.5f, width, 0.0f);
+	SetTexelVertex(&v[2], left + width - 0.5f, top + height - 0.5f, width, height);
+	SetTexelVertex(&v[3], left - 0.5f, top + height - 0.5f, 0.0f, height);
+
+	g_pd3dDevice->SetTexture(0, texture);
+	g_pd3dDevice->SetPixelShader(0);
+	// (The original writes these into D3D's texture stage state cache.)
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
+	g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, (DWORD)(int)(alpha * 255.0f) << 24);
+	g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
+	g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_TEX1);
+	g_pd3dDevice->DrawVerticesUP(D3DPT_QUADLIST, 4, v, sizeof(STexelVertex));
+	g_pd3dDevice->SetTexture(0, NULL);
+	return S_OK;
+}
+
+// 0x0009AD67 (left in xmm2, top in xmm3, right in xmm4, fillColor in ebx)
+// Quirks: z is whatever the caller left in xmm5 (every caller clears it),
+// the texture isn't unset (the color comes from the texture factor
+// anyway) and Z testing is turned on.
+HRESULT DrawSelectionBox(float left, float top, float right, float bottom, D3DCOLOR borderColor,
+                         D3DCOLOR fillColor)
+{
+	SScreenVertex v[4];
+	SetVertex(&v[0], left - 0.5f, top - 0.5f);
+	SetVertex(&v[1], right - 0.5f, top - 0.5f);
+	SetVertex(&v[2], right - 0.5f, bottom - 0.5f);
+	SetVertex(&v[3], left - 0.5f, bottom - 0.5f);
+	// (The original writes these into D3D's texture stage state cache.)
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
+	g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW);
+	g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, fillColor);
+	g_pd3dDevice->DrawVerticesUP(D3DPT_QUADLIST, 4, v, sizeof(SScreenVertex));
+	if (fillColor != borderColor)
+	{
+		g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, borderColor);
+		g_pd3dDevice->DrawVerticesUP(D3DPT_LINELOOP, 4, v, sizeof(SScreenVertex));
+	}
+	return S_OK;
+}

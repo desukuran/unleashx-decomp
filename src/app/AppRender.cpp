@@ -123,6 +123,78 @@ void CUnleashX::RenderFileOperation()
 	g_nFileOperationType = 6;
 }
 
+static void SetPointerVertex(SScreenVertex *v, float x, float y)
+{
+	v->x = x;
+	v->y = y;
+	v->z = 0.0f;
+	v->rhw = 1.0f;
+}
+
+// 0x000E0950 (x in ecx, y in eax)
+// The mouse pointer: a white arrow (at alpha) with a black outline, its tip
+// at x, y, kept inside the screen area.
+void DrawPointer(int x, int y, float alpha)
+{
+	const SViewport &screen = g_pSettings->m_viewport;
+	DWORD left = (DWORD)x;
+	DWORD maxX = screen.Width + screen.X - 2;
+	if (left < screen.X)
+		left = screen.X;
+	if (left >= maxX)
+		left = maxX;
+	DWORD top = (DWORD)y;
+	DWORD maxY = screen.Height + screen.Y - 2;
+	if (top < screen.Y)
+		top = screen.Y;
+	if (top >= maxY)
+		top = maxY;
+
+	g_pd3dDevice->SetTexture(0, NULL);
+	// (The original writes these into D3D's texture stage state cache.)
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW);
+
+	float px = (float)left;
+	float py = (float)top;
+	// The arrow as four triangles: the head's two halves and the stem's.
+	SScreenVertex fill[12];
+	SetPointerVertex(&fill[0], px, py);
+	SetPointerVertex(&fill[1], px, py + 18.0f);
+	SetPointerVertex(&fill[2], px + 9.0f, py + 9.0f);
+	SetPointerVertex(&fill[3], px + 9.0f, py + 9.0f);
+	SetPointerVertex(&fill[4], px + 13.0f, py + 13.0f);
+	SetPointerVertex(&fill[5], px + 5.0f, py + 13.0f);
+	SetPointerVertex(&fill[6], px + 7.0f, py + 13.0f);
+	SetPointerVertex(&fill[7], px + 11.0f, py + 20.0f);
+	SetPointerVertex(&fill[8], px + 9.0f, py + 22.0f);
+	SetPointerVertex(&fill[9], px + 7.0f, py + 13.0f);
+	SetPointerVertex(&fill[10], px + 9.0f, py + 22.0f);
+	SetPointerVertex(&fill[11], px + 4.0f, py + 13.0f);
+	// (White with alpha * 255 as its alpha.)
+	g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, 0x00FFFFFF - ((DWORD)(int)(alpha * -255.0f) << 24));
+	g_pd3dDevice->DrawVerticesUP(D3DPT_TRIANGLELIST, 12, fill, sizeof(SScreenVertex));
+
+	SScreenVertex outline[7];
+	SetPointerVertex(&outline[0], px, py);
+	SetPointerVertex(&outline[1], px, py + 18.0f);
+	SetPointerVertex(&outline[2], px + 4.0f, py + 14.0f);
+	SetPointerVertex(&outline[3], px + 9.0f, py + 22.0f);
+	SetPointerVertex(&outline[4], px + 11.0f, py + 20.0f);
+	SetPointerVertex(&outline[5], px + 7.0f, py + 13.0f);
+	SetPointerVertex(&outline[6], px + 13.0f, py + 13.0f);
+	g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, 0xFF000000);
+	g_pd3dDevice->DrawVerticesUP(D3DPT_LINELOOP, 7, outline, sizeof(SScreenVertex));
+}
+
 // 0x000F0097
 HRESULT CUnleashX::Render()
 {

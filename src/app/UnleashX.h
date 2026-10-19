@@ -186,14 +186,14 @@ extern DWORD g_dwShutdownDeadline;           // 0x00276238
 extern HANDLE g_hExitEvent;                  // 0x0027624C
 
 // The pointer's cursor, fading out (alpha). The original takes x in ecx and
-// y in eax. TODO: decompile
+// y in eax. AppRender.cpp
 void DrawPointer(int x, int y, float alpha);         // 0x000E0950
 // A free screenshotN.bmp on Z:, Y: or X: (one with 1MB free), or "".
 // TODO: decompile
 std::string GetScreenshotPath();                     // 0x000A3C39
 extern DWORD g_dwPointerMoveTime;            // 0x0027216C
 
-// Startup work Initialize runs on threads. TODO: decompile
+// Startup work Initialize runs on threads (Resources.cpp, Startup.cpp).
 // Fonts, the resource .xpr and the media; non-zero when something required
 // is missing (the recovery screen follows).
 unsigned __stdcall LoadResources(void *app);        // 0x000E8938
@@ -205,13 +205,12 @@ unsigned __stdcall MonitorThread(void *app);        // 0x000E4188
 // launched something. (action in eax)
 BOOL RunBootShortcut(int action);                   // 0x000E87BD
 // Draws the screen the previous program left (captured at startup).
+// Texture.cpp
 void DrawSavedScreen(IDirect3DTexture8 *texture, DWORD width, DWORD height, float alpha);   // 0x0009AEB8
 // Copies what the previous program left on screen into a new 640x480 texture.
 // The picture the previous program (or the boot animation) left on the
 // screen, as a 640x480 texture. (device isn't used.) Texture.cpp
 HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 *device);   // 0x0009F23D
-// Text centered on x, y. TODO: decompile
-void DrawTextCentered(CXBFont *font, float x, float y, const wchar_t *text, D3DCOLOR color, DWORD flags);   // 0x0002AED1
 // Called by the kernel for each thread created/ended. See Startup.cpp.
 void __stdcall ThreadNotifyRoutine(BOOL create);    // 0x000DFF8C
 

@@ -233,3 +233,10 @@ void DrawFontText(CXBFont *font, DWORD color, const wchar_t *text, DWORD flags, 
 	CXBFontEx *fontEx = (CXBFontEx *)font;
 	fontEx->DrawTextN(font->m_fCursorX, font->m_fCursorY, color, text, (int)wcslen(text), flags, maxWidth);
 }
+
+// 0x0002AED1
+void DrawTextCentered(CXBFont *font, float x, float y, const wchar_t *text, D3DCOLOR color, DWORD flags)
+{
+	CXBFontEx *fontEx = (CXBFontEx *)font;
+	fontEx->DrawTextN(x, y, color, text, (int)wcslen(text), flags, 0.0f);
+}

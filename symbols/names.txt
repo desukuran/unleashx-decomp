@@ -1760,7 +1760,7 @@
 0012889a CollectFolder_copy2
 00126274 DeleteListedThread
 00126296 StartDeleteThread
-0009ad67 DrawGradientBox
+0009ad67 DrawSelectionBox
 000ad997 COptionMenu::SetOptionEnabled
 000af902 CMessageBox::GetChosenButton
 000d70a7 CDropDown::Render

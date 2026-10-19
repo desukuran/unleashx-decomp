@@ -208,6 +208,64 @@ HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 * /*dev
 	return S_OK;
 }
 
+// 0x0009AEB8
+// The captured screen (a linear texture, texel coordinates) over the
+// width x height display at alpha. Afterwards it puts back modulate, wrap
+// and no blending, then turns texturing off.
+void DrawSavedScreen(IDirect3DTexture8 *texture, DWORD width, DWORD height, float alpha)
+{
+	struct STexelVertex
+	{
+		float x, y, z, rhw;
+		float u, v;
+	};
+	float w = (float)(int)width;
+	float h = (float)(int)height;
+	STexelVertex v[4] = {
+		{-0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f},
+		{w - 0.5f, -0.5f, 1.0f, 0.0f, w, 0.0f},
+		{w - 0.5f, h - 0.5f, 1.0f, 0.0f, w, h},
+		{-0.5f, h - 0.5f, 1.0f, 0.0f, 0.0f, h},
+	};
+
+	g_pd3dDevice->SetTexture(0, texture);
+	g_pd3dDevice->SetPixelShader(0);
+	// (The original writes these into D3D's texture stage state cache.)
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
+	g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, (DWORD)(int)(alpha * 255.0f) << 24);
+	g_pd3dDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
+	g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_TEX1);
+	g_pd3dDevice->DrawVerticesUP(D3DPT_QUADLIST, 4, v, sizeof(STexelVertex));
+
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_WRAP);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_WRAP);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+	g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ZERO);
+	g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, 0xFF000000);
+	// Then texturing off again (both stages disabled).
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTexture(0, NULL);
+}
+
 // 0x0009F909
 bool LoadXprTexture(const char *path, IDirect3DTexture8 **texture)
 {

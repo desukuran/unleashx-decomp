@@ -244,7 +244,7 @@ HRESULT CFTPQueue::Render()
 			// to a third.
 			DWORD fade = m_bActive ? g_colorScheme.OPTION_ACTIVEBACKCOLOR
 			                       : ((g_colorScheme.OPTION_ACTIVEBACKCOLOR >> 24) * 2) / 3;
-			DrawGradientBox(x - 1.0f, y - 1.0f, right + 1.0f, y + lineHeight + 1.0f,
+			DrawSelectionBox(x - 1.0f, y - 1.0f, right + 1.0f, y + lineHeight + 1.0f,
 			                g_colorScheme.DIALOG_BORDERCOLOR - (fade << 24),
 			                g_colorScheme.OPTION_ACTIVEBACKCOLOR - (fade << 24));
 			color = m_bActive ? g_colorScheme.OPTION_ACTIVETEXTCOLOR : g_colorScheme.OPTION_TEXTCOLOR;

@@ -1,5 +1,5 @@
 // Screen scaling (Screen.cpp) and 2D drawing helpers (Draw.cpp),
-// 0x0009E1D4-0x000A2D02.
+// 0x0009E1D4-0x000A3744.
 #pragma once
 
 #include "../common/Platform.h"
@@ -19,8 +19,8 @@ struct SScreenRect
 SScreenRect GetScreenRect();                                 // 0x0009E2A8
 // A texture over the whole screen area.
 void DrawTextureFullScreen(IDirect3DTexture8 *texture, float alpha);   // 0x000A282E
-// A texture drawn with whole-pixel edges (the loading picture). TODO:
-// decompile
+// A texture drawn 1:1 from its top left (texel coordinates, so a linear
+// texture) with whole-pixel edges, at alpha: the loading picture.
 HRESULT DrawShade(IDirect3DTexture8 *texture, float x, float y, float width, float height, float alpha);   // 0x0009FE5C
 // DrawShade over the screen area.
 void DrawShadeFullScreen(IDirect3DTexture8 *texture, float alpha);   // 0x000A0371
@@ -56,11 +56,11 @@ HRESULT DrawRect(float x, float y, float width, float height, D3DCOLOR borderCol
                  float alpha, DWORD borderWidth);                            // 0x000A087B
 HRESULT DrawFrame(float x, float y, float width, float height, D3DCOLOR color, DWORD lineWidth);   // 0x000A1D37
 void DimScreen(float alpha);                                                 // 0x000A1A39
-// A rectangle from (left, top) to (right, bottom) shading from top to
-// bottom. TODO: decompile (left in xmm2, top in xmm3, right in xmm4, bottom
-// and topColor on the stack, bottomColor in ebx)
-void DrawGradientBox(float left, float top, float right, float bottom, D3DCOLOR topColor,
-                     D3DCOLOR bottomColor);                                      // 0x0009AD67
+// A filled rectangle from (left, top) to (right, bottom) with an outline
+// when borderColor differs: the file and FTP lists' selection bar.
+// (left in xmm2, top in xmm3, right in xmm4, fillColor in ebx)
+HRESULT DrawSelectionBox(float left, float top, float right, float bottom, D3DCOLOR borderColor,
+                         D3DCOLOR fillColor);                                    // 0x0009AD67
 // Clips drawing to the rectangle (cut at the display's edges); disabled, or
 // an empty rectangle, clears the clipping.
 void SetScissorRect(BOOL enable, float x, float y, float width, float height);   // 0x0009F2B2
@@ -96,17 +96,19 @@ HRESULT DrawProgressBar(float x, float y, float width, float height, float perce
 // "text..." in a centered box, with animated dots.
 HRESULT DrawBusyBox(CXBFont *font, const wchar_t *text);                     // 0x000A1D70
 
-// The FTP manager's progress box: title, up to two lines, the bytes done
-// and a bar (percent; below 0 for none). height 0: fit the lines; width
-// 0: the screen's. It stays above the screen's bottom. TODO: decompile.
-// The original takes font in ebx.
+// The progress boxes (ProgressBox.cpp). A box with a title (with counting
+// dots), up to two lines and a progress bar (percent; below 0 for none),
+// then with showTimes the elapsed and remaining time and the rate.
+// height 0: fit the parts; width 0: the screen's less 70. The original
+// takes font in ebx.
+// The FTP manager's, with the bytes transferred above the bar.
 void DrawTransferBox(CXBFont *font, float x, float y, float width, float height, const wchar_t *title,
-                     const wchar_t *line1, const wchar_t *line2, float percent, BOOL showRate);   // 0x000A3267
-
-// The "please wait" box of file operations: title, current file, a second
-// line and a progress bar (percent); copies and moves also show the
-// overall progress (totalPercent, -1 = none). TODO: decompile. The
-// original takes font in ebx.
+                     const wchar_t *line1, const wchar_t *line2, float percent, BOOL showTimes);   // 0x000A3267
+// The file operations', with a second bar for the overall progress of
+// copies and moves (totalPercent).
 void DrawProgressBox(CXBFont *font, float x, float y, float width, float height, const wchar_t *title,
                      const wchar_t *file, const wchar_t *line2, float percent, float totalPercent,
-                     BOOL showTotal);                                          // 0x000A2D02
+                     BOOL showTimes);                                          // 0x000A2D02
+// Unused: a caption bar over 80% of the width with text in it.
+HRESULT DrawCaptionBar(CXBFont *font, const wchar_t *text, float x, float y, float width,
+                       float height);                                          // 0x000A2163

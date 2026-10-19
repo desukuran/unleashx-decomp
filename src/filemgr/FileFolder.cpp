@@ -677,7 +677,7 @@ HRESULT IFileFolder::Render()
 					if (!m_bActive)
 						fade = ((g_colorScheme.OPTION_ACTIVEBACKCOLOR >> 24) * 2) / 3;
 					float highlightRight = m_bDetails ? m_fDateWidth + right : right;
-					DrawGradientBox(x - 1.0f, y - halfLine - 1.0f, highlightRight + 1.0f, halfLine + y + 1.0f,
+					DrawSelectionBox(x - 1.0f, y - halfLine - 1.0f, highlightRight + 1.0f, halfLine + y + 1.0f,
 					                g_colorScheme.DIALOG_BORDERCOLOR - (fade << 24),
 					                g_colorScheme.OPTION_ACTIVEBACKCOLOR - (fade << 24));
 				}
