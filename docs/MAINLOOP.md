@@ -75,6 +75,7 @@ Each frame clears to the skin's sky color (black without a globe), then:
 5. a text screen saver on top, or the clock prompt;
 6. the pointer cursor, for 5 seconds after it moved, fading out by 10.
 
-A pending screenshot (the menu's screenshot action) is saved from the back
-buffer as `screenshotN.bmp` on the first of Z:, Y:, X: with 1MB free.
+Screenshots: holding the left trigger (not the right) and pressing BLACK,
+or holding BLACK and clicking the left stick, saves the next frame from the
+back buffer as `screenshotN.bmp` on the first of Z:, Y:, X: with 1MB free.
 
