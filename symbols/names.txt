@@ -1220,7 +1220,7 @@
 0010302b CPassCode::CPassCode CPassCode * f(CPassCode *this@edi)
 000bdcbe CXipArchive::Open HRESULT f(void *this@esi, char *path)
 000bdc0f CXipArchive::Close void f(void *this@eax)
-000bdc67 CXipArchive::GetItem HRESULT f(void *this@edx, uint index, SXipItem *item)
+000bdc67 CXipArchive::GetItem HRESULT f(void *this@edx, uint index, void *item)
 000bdac0 CXipArchive::Extract HRESULT f(void *this@ecx, uint index, char *path)
 000bdbdb GetXipName char * f(char *names@eax, int index)
 000134c3 CFileFinder::FindNext
