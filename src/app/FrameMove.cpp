@@ -202,7 +202,7 @@ HRESULT CUnleashX::FrameMove()
 		{
 			g_bShuttingDown = FALSE;
 			Sleep(1000);
-			g_trayMonitor.PowerOff();
+			g_ioSupport.Shutdown();
 		}
 		else
 		{
@@ -659,7 +659,7 @@ void CUnleashX::UpdateScreenSaver(int *action)
 			}
 			else if (powerTimer.GetElapsedTicks() > 1500.0f)
 			{
-				g_trayMonitor.PowerOff();
+				g_ioSupport.Shutdown();
 				powerTimer.StopTicks();
 			}
 		}

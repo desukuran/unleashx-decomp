@@ -42,9 +42,9 @@ struct SDriveInfo
 	int muIndex;                  // +0x73 memory unit index (letter - 'H')
 	DWORD port;                   // +0x77
 	DWORD slot;                   // +0x7B
-	BOOL muOrUsb;                 // +0x7F TODO: verify
-	DWORD dvdUnknown83;           // +0x83 TODO
-	BYTE unknown87[4];            // +0x87
+	BOOL muOrUsb;                 // +0x7F a memory unit is (being) mounted in the slot; cleared for USB storage
+	DWORD trayState;              // +0x83 D: the tray state last seen (CIoSupport::GetTrayState)
+	DWORD previousTrayState;      // +0x87 D: the one before
 	char label[11];               // +0x8B copy of devicePath's start (MU/USB name)
 	BYTE unknown96;               // +0x96
 };
@@ -61,7 +61,7 @@ inline BOOL IsDriveInfoMounted(SDriveInfo *info)
 }
 
 BOOL MountDrive(char drive);                              // 0x000AAC8B
-void UnmountDrive(char drive);                            // 0x000AA99A
+BOOL UnmountDrive(char drive);                            // 0x000AA99A
 void MountAllDrives();                                    // 0x000AB172
 BOOL RemountDrive(SDriveInfo *info);                      // 0x000AB915
 BOOL RemountDriveLetter(char drive);                      // 0x000ABFFE
@@ -70,13 +70,16 @@ BOOL MapFolderToDrive(SDriveInfo *info, char drive, const char *folder);   // 0x
 // Maps U: to E:\UDATA\<title id> for the XBE and writes its TitleImage.xbx
 // and TitleMeta.xbx there if missing.
 void MountTitleDataDrive(const char *xbePath);             // 0x000AB2FF
+// Mounts inserted memory units and forgets removed ones (and their USB
+// partitions). (Storage.cpp)
 void RefreshMemoryUnits();                                // 0x000AB587
-void UpdateDriveSpace(SDriveInfo *info);                  // 0x000AB6D4 TODO: decompile the USB/MU branches
+// (Storage.cpp; info in esi)
+void UpdateDriveSpace(SDriveInfo *info);                  // 0x000AB6D4
 // Memory units once a second, every drive's space every 30 seconds or when
 // the FTP server received a file. force: also when the next update is more
 // than half a second away.
 void RefreshDrives(BOOL force);                           // 0x000AB7F1
-HRESULT FormatDrive(char drive);                          // 0x000A956B TODO: decompile
+HRESULT FormatDrive(char drive);                          // 0x000A956B (Storage.cpp)
 
 // total/free/used bytes of a drive, each divided by unit.
 void GetDiskSpace(char drive, ULONGLONG *total, ULONGLONG *free, ULONGLONG *used, int unit);   // 0x0009D6A3
@@ -111,12 +114,26 @@ enum DiscType
 extern int g_nDiscType;                    // 0x0026BBEC
 extern wchar_t g_szDiscTitle[0x80];        // 0x00276278
 int GetDiscType();                         // 0x000AA903
-// Updates drive D:'s state (media present, sizes) and returns an ID of the
-// disc in it, which changes when the disc does. TODO: decompile
-int CheckDvdMedia(BOOL extended);                       // 0x000AC019
+// The tray flags (see GetTrayStateName). TRUE: the tray is open / was
+// last seen opening / is closed / is empty.
+extern BOOL g_bTrayOpen;                   // 0x00276274 (BYTE)
+extern BOOL g_bTrayOpening;                // 0x00276275 (BYTE)
+extern BOOL g_bTrayClosed;                 // 0x0026BBE8 (BYTE)
+extern BOOL g_bTrayEmpty;                  // 0x0026BBE9 (BYTE)
+// The disc polling (DvdPoll.cpp). Every 333 ms: the tray state; 800 ms
+// after a disc was inserted, its type and title. extended: when the SMC
+// says closed without media, ask the drive itself. TRUE when anything
+// changed.
+BOOL PollDvdDrive(BOOL extended);                        // 0x000AB9D8
+// Unmounts D:, dismounts the drive's file system and mounts D: again.
+HRESULT RemountDvdDrive();                               // 0x000AB930
+// Polls; then D:'s media flag and sizes follow the disc. Returns the tray
+// state the D: slot last recorded (1 without a D: slot).
+int CheckDvdMedia(BOOL extended);                        // 0x000AC019
 BOOL IsDiscPresent();                      // 0x000AA909
 const wchar_t *GetDiscTitleIfPresent();    // 0x000AA91E
 const wchar_t *GetDiscTypeName();          // 0x000AA7E8
 const wchar_t *GetTrayStateName();         // 0x000AA85B
 const wchar_t *GetDiscTitle();             // 0x000AB285
 BOOL GetMemoryUnitsChanged();              // 0x000AA696
+extern BOOL g_bMemoryUnitsChanged;         // 0x00276276 (BYTE)

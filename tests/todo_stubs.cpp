@@ -17,7 +17,7 @@
 BOOL MountMemoryUnit(SDriveInfo *, char) { return FALSE; }
 BOOL UnmountMemoryUnit(SDriveInfo *) { return TRUE; }
 void InitMemoryUnitTable() {}
-HRESULT GetUtilityDriveDevice(char *) { return E_FAIL; }
+HRESULT GetUtilityDriveDevice(const char *, char *) { return E_FAIL; }
 HRESULT FormatDrive(char) { return E_FAIL; }
 
 // SystemInfo.h (Hardware.cpp is Xbox only)

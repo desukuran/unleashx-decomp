@@ -27,8 +27,16 @@ public:
 	LONGLONG Seek(HANDLE file, LONGLONG offset, int whence);            // 0x000B1C0F
 	LONGLONG GetFileSize(HANDLE file);                                  // 0x000B1C02 (this in ecx)
 
+	// The disc's size: the volume's block count times its block size,
+	// unless set at +0xCE8. (this in ecx)
+	ULONGLONG GetDiscSize();                                            // 0x00031564
+	// The primary volume descriptor's volume name. (this in eax)
+	const char *GetVolumeName();                                        // 0x00031551
+
 	BYTE m_reserved[0xCEC];
 };
+// The device handle the reader opened (cleared by its destructor).
+extern HANDLE g_hIso9660Device;   // 0x0027625C
 
 // The data disc's reader, while one is in the drive (set by the DVD media
 // check, 0x000AB9D8). 0x00276380

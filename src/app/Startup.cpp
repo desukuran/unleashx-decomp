@@ -174,7 +174,7 @@ unsigned __stdcall MonitorThread(void *param)
 			Sleep(1000);
 			continue;
 		}
-		// A changed disc wakes the screen saver.
+		// A tray change wakes the screen saver.
 		RefreshDrives(FALSE);
 		int current = CheckDvdMedia(g_pSettings->m_prefs.m_bDVDMediaCheckExtended);
 		if (media != current)

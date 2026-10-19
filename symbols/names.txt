@@ -362,7 +362,7 @@
 0009d6a3 GetDiskSpace void __cdecl f(char drive, ulonglong *total, ulonglong *free, ulonglong *used, int unit)
 000a956b FormatDrive HRESULT __cdecl f(char drive)
 0009de6c GetUtilityDriveDevice
-000315a5 InitMemoryUnitTable
+000315a5 std::vector<CXBMemUnit>::resize
 00018ff7 SXbeInfo::ctor
 0001901a SXbeInfo::dtor
 000a608d ReadXbeInfo
@@ -550,10 +550,10 @@
 0001c81b CXBPackedResource::GetTexture
 00278328 g_virtualKeyboard
 00014242 CVirtualKeyboard::GetResult
-00278658 g_trayMonitor
-000b329c CTrayMonitor::GetTrayState
-000b32ae CTrayMonitor::CloseTray
-000b32c8 CTrayMonitor::OpenTray
+00278658 g_ioSupport
+000b329c CIoSupport::GetTrayState
+000b32ae CIoSupport::CloseTray
+000b32c8 CIoSupport::EjectTray
 0026a62e g_bFtpEnabled
 000a9a30 CopyDVD
 000a9923 CopyFiles
@@ -1187,7 +1187,7 @@
 000e2604 CUnleashX::InstallUpdate
 000e85b3 MusicManagerThread
 0009f342 BuildWorldMatrix
-000b3282 CTrayMonitor::PowerOff
+000b3282 CIoSupport::Shutdown
 0010602c CMusicManager::Pause
 001083b0 CMusicManager::Play
 001084e7 CMusicManager::PlayAudioCD
@@ -2395,11 +2395,11 @@
 0013fc0a dynamic_atexit_destructor_for_g_soundEffects
 0013fc14 dynamic_atexit_destructor_for_g_fonts
 0013fc1f dynamic_atexit_destructor_for_g_textures
-0013fc50 dynamic_atexit_destructor_for_g_trayMonitor
+0013fc50 dynamic_atexit_destructor_for_g_ioSupport
 0013fc69 dynamic_atexit_destructor_for_g_netClients
 0013fc76 dynamic_atexit_destructor_for_g_colorScheme
 0013fc83 dynamic_atexit_destructor_for_g_cdToc
-0013fc8d dynamic_atexit_destructor_for_00278738
+0013fc8d dynamic_atexit_destructor_for_g_memoryUnits
 0013fc9a dynamic_atexit_destructor_for_002788E0
 0013fca4 dynamic_atexit_destructor_for_g_fileList
 0013fcb1 dynamic_atexit_destructor_for_g_strOperationVerb
@@ -2478,3 +2478,47 @@
 00030f11 COptionMenu::SOption::SOption
 0002db5c CDropDown::SItem::SItem
 000193a5 CDropDown::GetCount
+# drives (src/system/Storage.cpp, DvdPoll.cpp)
+00278738 g_memoryUnits
+002788e0 g_storageInfo
+0013fc9a dynamic_atexit_destructor_for_g_storageInfo
+00271ab8 s_driveLock
+00276378 s_nStorageInfos
+000315c3 std::vector<CXBMemUnit>::resize_value
+00278d88 s_bPolling
+0026bbe0 s_dwNextPoll
+00278d84 s_nTrayState
+0026bbe4 s_dwDetectTime
+00278d90 s_bDetecting
+00278d8c s_bUnknown8C
+00278d80 s_nMediaState
+00276274 g_bTrayOpen
+00276275 g_bTrayOpening
+0026bbe8 g_bTrayClosed
+0026bbe9 g_bTrayEmpty
+# the XDK samples' CXBMemUnit
+0009811f CXBMemUnit::GetMask
+0009811c CXBMemUnit::GetPort
+00098118 CXBMemUnit::GetSlot
+00098143 CXBMemUnit::GetDeviceChanges
+00098156 CXBMemUnit::GetDevices
+00098169 CXBMemUnit::GetDrive
+0009816d CXBMemUnit::IsValid
+00098180 CXBMemUnit::operator=
+000981bf CXBMemUnit::IsMounted
+000981d7 CXBMemUnit::Unmount
+000981f2 CXBMemUnit::Mount
+00098233 CXBMemUnit::SetPortSlot
+000982f4 CXBMemUnit::Clear
+# XBMC's CIoSupport
+000b30ef CIoSupport::IsDebug
+000b30f2 CIoSupport::CloseCDROM
+# the FAT32 driver
+0006cc91 Fat32Init
+0006cc03 Fat32Shutdown
+0006d521 Fat32GetVolumeLabel
+0006d282 Fat32GetFreeBytes
+# XBMC's iso9660
+00031564 iso9660::GetDiscSize
+00031551 iso9660::GetVolumeName
+0027625c g_hIso9660Device

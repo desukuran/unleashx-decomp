@@ -7,13 +7,37 @@
 
 struct SDriveInfo;
 
-// Mounts the memory unit (or USB storage device) in info's slot; USB
-// partitions go to P..S. 0x000AAC8B (DRIVE_MU branch) TODO: decompile
-BOOL MountMemoryUnit(SDriveInfo *info, char drive);
-// 0x000AA99A (DRIVE_MU branch) TODO: decompile
-BOOL UnmountMemoryUnit(SDriveInfo *info);
-void InitMemoryUnitTable();                         // 0x000315A5 TODO: decompile
-HRESULT GetUtilityDriveDevice(char *devicePath);    // 0x0009DE6C TODO: decompile
+// The memory unit branches of MountDrive/UnmountDrive (inlined there in
+// the original; Storage.cpp). Mounting tries the slot as a memory unit,
+// then as USB mass storage (its FAT32 partitions go to P..S); FALSE for
+// the latter.
+BOOL MountMemoryUnit(SDriveInfo *info, char drive);   // 0x000AAEAA (in MountDrive)
+BOOL UnmountMemoryUnit(SDriveInfo *info);             // 0x000AAA31 (in UnmountDrive)
+// g_memoryUnits sized for the 8 slots, once (inlined in MountAllDrives).
+void InitMemoryUnitTable();
+// The kernel device the drive's link points to. (drive in eax) Quirk:
+// MountAllDrives passes the letter itself as the pointer.
+HRESULT GetUtilityDriveDevice(const char *drive, char *devicePath);   // 0x0009DE6C
+// Formats a memory unit (H..O) as FAT.
+HRESULT FormatMemoryUnit(char drive);                 // 0x0009DA9B
+// Formats hard disk partition n by linking Z: to it and formatting the
+// utility drive; then Z: is remounted. A status or Win32 error, 0 on
+// success.
+DWORD FormatPartition(int partition);                 // 0x000A94F0
+// Links link (e.g. "\??\Z:") to device, deleting an old link first if
+// replace. (XbeLaunch.cpp)
+LONG MapDriveLink(const char *link, const char *device, BOOL replace);   // 0x000A39D9
+
+// The guard of the drive table: one global instance whose constructor
+// sets up the critical section UpdateDriveSpace takes, and whose
+// destructor frees the DVD's ISO 9660 reader. (Storage.cpp)
+class CStorageInfo
+{
+public:
+	CStorageInfo();               // 0x000AA977 (this in esi)
+	virtual ~CStorageInfo();      // 0x000AA953 (deleting 0x00031589)
+};
+extern CStorageInfo g_storageInfo;   // 0x002788E0
 
 // Fields read from an XBE's header/certificate. 0x78 bytes; constructor
 // 0x00018FF7 and destructor 0x0001901A (this in esi), both implicit.

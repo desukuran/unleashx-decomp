@@ -640,12 +640,12 @@ BOOL CUnleashX::CMenuEvent::OnItemSelected(CXmlElement *item)
 	}
 	if (StrCmpNoCase(cmd, "trayclose") == 0)
 	{
-		g_trayMonitor.CloseTray();
+		g_ioSupport.CloseTray();
 		return TRUE;
 	}
 	if (StrCmpNoCase(cmd, "trayopen") == 0)
 	{
-		g_trayMonitor.OpenTray();
+		g_ioSupport.EjectTray();
 		return TRUE;
 	}
 	if (StrCmpNoCase(cmd, "PrepareHD") == 0)

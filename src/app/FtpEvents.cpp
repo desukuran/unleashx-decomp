@@ -115,7 +115,7 @@ int CFTPEventReceiver::OnSiteCommand(const char *command, std::string *reply)
 	}
 	if (StrCmpNoCase(text.c_str(), "TRAYCLOSE") == 0)
 	{
-		if (g_trayMonitor.CloseTray() < 0)
+		if (g_ioSupport.CloseTray() < 0)
 		{
 			*reply = "Failed to close Tray";
 			return 550;
@@ -126,7 +126,7 @@ int CFTPEventReceiver::OnSiteCommand(const char *command, std::string *reply)
 	if (StrCmpNoCase(text.c_str(), "EJECT") == 0 || StrCmpNoCase(text.c_str(), "TRAYOPEN") == 0)
 	{
 		SmcSetResetOnEject(FALSE);
-		if (g_trayMonitor.OpenTray() < 0)
+		if (g_ioSupport.EjectTray() < 0)
 		{
 			*reply = "Failed to eject Tray";
 			return 550;

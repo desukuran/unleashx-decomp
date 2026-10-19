@@ -12,7 +12,7 @@
 
 BOOL g_bDriveFMapped;                    // 0x0026BBF4
 BOOL g_bDriveGMapped;                    // 0x0027637C
-static BOOL g_bMemoryUnitsChanged;       // 0x00276276
+BOOL g_bMemoryUnitsChanged;              // 0x00276276 (BYTE)
 
 SDriveInfo g_drives[DRIVE_INFO_COUNT];   // 0x00276388
 
@@ -113,35 +113,36 @@ void GetDiskSpace(char drive, ULONGLONG *total, ULONGLONG *free, ULONGLONG *used
 }
 
 // 0x000AA99A
-void UnmountDrive(char drive)
+// TRUE when unmounted or not mounted.
+BOOL UnmountDrive(char drive)
 {
 	drive = (char)toupper(drive);
 	SDriveInfo *info = GetDriveInfo(drive);
 	if (info == NULL)
-		return;
+		return FALSE;
 
 	info->label[0] = 0;
 	if (info->type == DRIVE_MU)
 	{
 		if (!UnmountMemoryUnit(info))
-			return;
+			return FALSE;
 	}
 	else
 	{
 		if (!info->mounted)
-			return;
-		char device[64];
-		if (!GetDriveLinkInfo(drive, device, info->linkName))
-			return;
+			return TRUE;
+		if (!GetDriveLinkInfo(drive, info->devicePath, info->linkName))
+			return FALSE;
 		ANSI_STRING link;
 		InitAnsiString(link, info->linkName);
 		if (IoDeleteSymbolicLink(&link) != 0)
-			return;
+			return FALSE;
 	}
 	info->mounted = FALSE;
 	info->totalBytes = 0;
 	info->freeBytes = 0;
 	info->usedBytes = 0;
+	return TRUE;
 }
 
 // 0x000AAC8B
@@ -153,7 +154,7 @@ BOOL MountDrive(char drive)
 		return FALSE;
 
 	if (info->type == DRIVE_MU)
-		return MountMemoryUnit(info, drive);   // also handles USB storage partitions
+		return MountMemoryUnit(info, drive);   // (inlined; see Storage.cpp)
 
 	if (info->mounted)
 		return TRUE;
@@ -259,7 +260,7 @@ BOOL MapFolderToDrive(SDriveInfo *info, char drive, const char *folder)
 // utility drive is used instead.
 void MountAllDrives()
 {
-	InitMemoryUnitTable();   // 0x000315A5 TODO: verify
+	InitMemoryUnitTable();
 
 	SDriveInfo *slot = g_drives;
 	for (int i = 0; i < 0x17; i++, slot++)
@@ -273,7 +274,9 @@ void MountAllDrives()
 			continue;
 
 		char device[0x29] = { 0 };
-		if (GetUtilityDriveDevice(device) < 0)
+		// Quirk: the letter is passed where a pointer to the drive name
+		// belongs (the device would be read from address 0x5A).
+		if (GetUtilityDriveDevice((const char *)'Z', device) < 0)
 			continue;
 		slot->letter = 'Z';
 		slot->linkName[0] = 0;

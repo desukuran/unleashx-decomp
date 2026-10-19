@@ -12,7 +12,7 @@
 #include "XbeLaunch.h"
 
 // A kernel ANSI_STRING with its own buffer, and a std::string to fill it
-// from. 0x24 bytes. (Also used by MapDriveLink, 0x000A39D9.)
+// from. 0x24 bytes. (Also used by MapDriveLink.)
 class CKernelString
 {
 public:
@@ -73,6 +73,18 @@ BOOL CKernelString::Set(const char *s)
 	m_string.Length = (USHORT)length;
 	m_string.Buffer[length] = '\0';
 	return TRUE;
+}
+
+// 0x000A39D9
+LONG MapDriveLink(const char *link, const char *device, BOOL replace)
+{
+	CKernelString linkName;
+	CKernelString deviceName;
+	deviceName.Text() = device;
+	linkName.Text() = link;
+	if (replace)
+		IoDeleteSymbolicLink(linkName.Get());
+	return IoCreateSymbolicLink(linkName.Get(), deviceName.Get());
 }
 
 // What the launchers return when D: couldn't be mapped (with the status).

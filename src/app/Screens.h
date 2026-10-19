@@ -2,6 +2,8 @@
 // interface the app code uses so far; all TODO: decompile.
 #pragma once
 
+#include "../thirdparty/IoSupport.h"
+
 #include <string>
 #include <vector>
 
@@ -609,14 +611,4 @@ private:
 	void AddButton(const wchar_t *text);                  // 0x000B0F05 (this in edi)
 };
 
-// DVD tray state from the SMC.
-class CTrayMonitor
-{
-public:
-	int GetTrayState();                                   // 0x000B329C 0x10 = open
-	HRESULT CloseTray();                                  // 0x000B32AE
-	HRESULT OpenTray();                                   // 0x000B32C8
-	// Turns the Xbox off (unless the SMC refuses). TODO: decompile
-	HRESULT PowerOff();                                   // 0x000B3282
-};
-extern CTrayMonitor g_trayMonitor;                       // 0x00278658
+// The DVD tray and power: CIoSupport (src/thirdparty/IoSupport.h).

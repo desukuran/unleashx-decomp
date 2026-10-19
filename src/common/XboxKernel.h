@@ -251,6 +251,16 @@ NTSTATUS __stdcall NtCreateFile(HANDLE *FileHandle, ULONG DesiredAccess, POBJECT
 NTSTATUS __stdcall IoCreateSymbolicLink(PSTRING SymbolicLinkName, PSTRING DeviceName);
 NTSTATUS __stdcall IoDeleteSymbolicLink(PSTRING SymbolicLinkName);
 void __stdcall RtlInitAnsiString(PANSI_STRING Destination, const char *Source);
+NTSTATUS __stdcall NtOpenFile(HANDLE *FileHandle, ULONG DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes,
+                              PIO_STATUS_BLOCK IoStatusBlock, ULONG ShareAccess, ULONG OpenOptions);
+// The kernel's critical section (opaque here). 0x1C bytes.
+typedef struct _RTL_CRITICAL_SECTION
+{
+	BYTE opaque[0x1C];
+} RTL_CRITICAL_SECTION;
+void __stdcall RtlInitializeCriticalSection(RTL_CRITICAL_SECTION *section);
+void __stdcall RtlEnterCriticalSection(RTL_CRITICAL_SECTION *section);
+void __stdcall RtlLeaveCriticalSection(RTL_CRITICAL_SECTION *section);
 
 extern PANSI_STRING XeImageFileName;
 extern STRING HalDiskSerialNumber;
@@ -319,6 +329,37 @@ typedef struct _ATA_PASS_THROUGH
 BOOL DeviceIoControl(HANDLE device, DWORD code, void *in, DWORD inSize, void *out, DWORD outSize, DWORD *returned,
                      void *overlapped);
 #endif
+
+#ifndef _XBOX
+// Devices (XDK). The device type is a pointer to XAPI's table.
+struct XPP_DEVICE_TYPE;
+extern XPP_DEVICE_TYPE XDEVICE_TYPE_MEMORY_UNIT_TABLE;
+#define XDEVICE_TYPE_MEMORY_UNIT (&XDEVICE_TYPE_MEMORY_UNIT_TABLE)
+DWORD XGetDevices(XPP_DEVICE_TYPE *type);
+BOOL XGetDeviceChanges(XPP_DEVICE_TYPE *type, DWORD *insertions, DWORD *removals);
+DWORD XUnmountMU(DWORD port, DWORD slot);
+#define MAX_MUNAME 32
+DWORD XMUNameFromDriveLetter(char drive, wchar_t *name, UINT nameLength);
+BOOL XFormatUtilityDrive();
+#define FILE_NON_DIRECTORY_FILE 0x00000040
+#define FILE_NO_INTERMEDIATE_BUFFERING 0x00000008
+#define FILE_SYNCHRONOUS_IO_ALERT 0x00000010
+#define FILE_READ_ATTRIBUTES 0x0080
+#define GENERIC_ALL 0x10000000
+#define FILE_SHARE_DELETE 0x00000004
+#define FSCTL_DISMOUNT_VOLUME 0x00090020
+#endif
+// Internal XAPI (not in the XDK headers).
+// XMountMU without the title's own folder: the whole unit as a drive.
+DWORD __stdcall XMountMURootA(DWORD port, DWORD slot, char *drive);
+// The memory unit (or other mass storage) in a port/slot as a kernel device;
+// name receives its object name.
+NTSTATUS __stdcall MU_CreateDeviceObject(DWORD port, DWORD slot, PANSI_STRING name);   // 0x0022E581
+void __stdcall MU_CloseDeviceObject(DWORD port, DWORD slot);                            // 0x0022E514
+BOOL __stdcall XapiFormatFATVolume(PANSI_STRING volume);                                 // 0x00039B64
+// IOCTL_CDROM_CHECK_VERIFY: is there a readable disc.
+#define IOCTL_CDROM_CHECK_VERIFY 0x00024800
+#define ERROR_UNRECOGNIZED_MEDIA 1785
 
 // XAPI
 BOOL GetDiskFreeSpaceExA(const char *root, ULONGLONG *freeAvailable, ULONGLONG *total, ULONGLONG *totalFree);

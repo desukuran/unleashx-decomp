@@ -1,16 +1,16 @@
-// DVD drive / disc state. The state machine that updates these lives in the
-// disc polling (RefreshDrives in Drives.cpp; PollDvdDrive 0x000AB9D8 TODO: decompile).
+// DVD drive / disc state and its names. PollDvdDrive (DvdPoll.cpp) keeps it
+// up to date.
 #include <cwchar>
 
 #include "Drives.h"
 #include "Storage.h"
 
-int g_nDiscType;                     // 0x0026BBEC DiscType
+int g_nDiscType = -1;                // 0x0026BBEC DiscType (-1 until the first poll)
 wchar_t g_szDiscTitle[0x80];         // 0x00276278
-static BOOL g_bTrayOpen;             // 0x00276274 (BYTE)
-static BOOL g_bTrayOpening;          // 0x00276275 (BYTE)
-static BOOL g_bTrayClosed;           // 0x0026BBE8 (BYTE) TODO: verify
-static BOOL g_bTrayEmpty;            // 0x0026BBE9 (BYTE) TODO: verify
+BOOL g_bTrayOpen;                    // 0x00276274 (BYTE)
+BOOL g_bTrayOpening;                 // 0x00276275 (BYTE)
+BOOL g_bTrayClosed = TRUE;           // 0x0026BBE8 (BYTE)
+BOOL g_bTrayEmpty = TRUE;            // 0x0026BBE9 (BYTE)
 
 // 0x000AA903
 int GetDiscType()
