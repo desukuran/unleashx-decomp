@@ -1089,7 +1089,6 @@
 00137f1f CTextureTable::Add
 002784e8 g_textures
 000360ae WideCharToMultiByte
-000beccd IsLeapYear
 0026a800 s_monthNames
 0026cdc0 s_bDaysValid
 0005e924 _wtoi
