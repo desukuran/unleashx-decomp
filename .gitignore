@@ -1,0 +1,11 @@
+# Original release (copyrighted binary) -- place your own copy here, see README.md
+UnleashX_0_39_0528A/
+
+# Generated
+build/
+__pycache__/
+
+# Local tools (downloaded by tools/setup.sh)
+tools/ghidra_*_PUBLIC/
+tools/venv/
+tools/dl/

@@ -1,0 +1,2 @@
+# Hand-curated symbols. Format: <hex address> <name> [C signature]
+# Overrides symbols/rtti.txt. Keep sorted by address.
