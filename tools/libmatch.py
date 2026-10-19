@@ -397,7 +397,19 @@ def main():
             if fn.name in named_names or not fn.code or len(fn.code) >= MIN_PATTERN and sum(fn.mask) >= MIN_FIXED:
                 continue
             calls = [r for r in fn.relocs if r[1] == IMAGE_REL_I386_REL32 and r[2]]
-            if not calls or len(fn.code) < 5:
+            if len(fn.code) < 5:
+                continue
+            if not calls:
+                # No relocations at all (small getters): the exact bytes,
+                # found only once in the section.
+                if fn.relocs or len(fn.code) < 10:
+                    continue
+                a, b = section_ranges.get(fn.section, (0, 0))
+                p = img.find(fn.code, a, b)
+                if p != -1 and img.find(fn.code, p + 1, b) == -1 and p not in named:
+                    named[p] = (fn.name, fn.lib, 'short')
+                    named_names.add(fn.name)
+                    changed += 1
                 continue
             a, b = section_ranges.get(fn.section, (0, 0))
             aoff, abytes = anchor(fn)

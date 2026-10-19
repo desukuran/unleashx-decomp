@@ -278,10 +278,12 @@
 0003da8b XShaHmacUpdate
 0003da90 XShaHmacComputeFinal
 0003db02 XFONT_Release
+0003db2d XFONT_GetTextHeight
 0003db37 XFONT_SetTextAntialiasLevel
 0003db5f XFONT_SetTextStyle
 0003db87 XFONT_SetTextAlignment
 0003db95 XFONT_SetTextColor
+0003dba3 XFONT_GetIntercharacterSpacing
 0003dbad XFONT_SetClippingRectangle
 0003dbd4 XFONT_GetFontMetrics
 0003dbf5 InitializeCache
@@ -1238,6 +1240,7 @@
 00066e62 _tosnan1 data
 00066eb7 _nan2 data
 00066ef8 _rtindfnpop data
+00066f09 _rttosnpopde data
 00066f1c _startTwoArgErrorHandling
 00066f33 _startOneArgErrorHandling
 00066f70 _twoToTOS
@@ -3418,6 +3421,8 @@
 001b9328 XMVDecoder_DisableAudioStream
 001b9349 XMVDecoder_Reset
 001b93cf XMVDecoder_Play
+001b9584 XMVDecoder_TerminateLoop
+001b958f XMVDecoder_TerminatePlayback
 001b959a XMVDecoder_GetNextFrame
 001b9c17 XMVDecoder_GetTimeFromStart
 001b9c65 XMV::ClearMemory
