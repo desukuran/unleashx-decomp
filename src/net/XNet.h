@@ -119,7 +119,9 @@ DWORD XNetGetEthernetLinkStatus();
 // Host only: whether XNetGetEthernetLinkStatus() reports a link (tests set it).
 extern BOOL g_bHostLinkUp;
 int XNetInAddrToString(IN_ADDR ina, char *text, int textSize);
-int XNetSetSystemLinkPort(WORD port);   // TODO: verify, see Network.cpp
+// Whether other boxes run another version of the title on system link;
+// reset clears it.
+DWORD XNetGetBroadcastVersionStatus(BOOL reset);
 int closesocket(SOCKET s);
 int ioctlsocket(SOCKET s, long cmd, unsigned long *arg);
 int WSAGetLastError();

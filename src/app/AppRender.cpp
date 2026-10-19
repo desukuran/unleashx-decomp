@@ -250,7 +250,7 @@ present:
 		{
 			IDirect3DSurface8 *surface = NULL;
 			g_pd3dDevice->GetBackBuffer(0, 0, &surface);
-			SaveSurfaceToBmp(surface, path.c_str());
+			XGWriteSurfaceToFile(surface, path.c_str());
 			surface->Release();
 		}
 		m_bTakeScreenshot = FALSE;

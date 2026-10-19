@@ -65,7 +65,7 @@ int XNetInAddrToString(IN_ADDR ina, char *text, int textSize)
 	return 0;
 }
 
-int XNetSetSystemLinkPort(WORD)
+DWORD XNetGetBroadcastVersionStatus(BOOL)
 {
 	return 0;
 }

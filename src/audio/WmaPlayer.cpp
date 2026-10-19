@@ -1,6 +1,7 @@
 // CWMAPlayer: WMA files and Xbox soundtrack songs through XACT. The data
-// folder holds a sound bank whose "Cue1" streams one playlist entry; a
-// song is played by giving the cue a new playlist. See AudioPlayer.h.
+// folder holds a sound bank whose "Cue1" plays a WMA playlist; a song is
+// played by making a new (looping) playlist holding just the file, the
+// soundtrack or the soundtrack song. See AudioPlayer.h.
 #include "AudioPlayer.h"
 
 #include <cstdlib>
@@ -13,35 +14,15 @@
 #include "../settings/AppSettings.h"
 #include "../system/FileIO.h"
 
-// XACT notification types the player registers for. TODO: verify the names
-#define XACT_NOTIFY_CUE_PREPARED 0
-#define XACT_NOTIFY_CUE_STOPPED 1
-#define XACT_NOTIFY_CUE_STARTED 3
-
-// The playlist entry types.
-#define PLAYLIST_FILE 2
-#define PLAYLIST_SOUNDTRACK 3
-#define PLAYLIST_SOUNDTRACK_SONG 4
-
 #define WMA_TEMP_COPY "Z:\\tmp.wma"
 
 // The song a whole-soundtrack playlist is on. (Reset to 0 before it's
 // compared, so the seeking it was for never happens.)
 static DWORD s_dwPlayListSong;   // 0x00278D54
 
-// The stream description XactSoundCueGetStreamInfo fills. 0x34 bytes.
-struct SXactStreamInfo
-{
-	DWORD unknown00[9];
-	DWORD sampleRate;      // +0x24
-	DWORD channels;        // +0x28
-	DWORD lengthMs;        // +0x2C
-	DWORD bitRate;         // +0x30
-};
-
 // 0x000D85B8
-// Given to XACT at start-up; always TRUE. TODO: verify what it's for
-static BOOL __stdcall XactCallback(DWORD, DWORD, DWORD, DWORD, DWORD)
+// XACT's read callback: reads nothing, and says it worked.
+static BOOL __stdcall XactReadFile(HANDLE, void *, DWORD, DWORD *, void *)
 {
 	return TRUE;
 }
@@ -58,7 +39,7 @@ CWMAPlayer::CWMAPlayer()
 	m_pEngine = NULL;
 	m_pSoundBankData = NULL;
 	m_pSoundBank = NULL;
-	m_pCue = NULL;
+	m_pPlayList = NULL;
 	m_szArtist[0] = 0;
 	m_szTitle[0] = 0;
 	m_dwLength = 0;
@@ -76,21 +57,21 @@ CWMAPlayer::CWMAPlayer()
 CWMAPlayer::~CWMAPlayer()
 {
 	Stop();
-	if (m_pCue != NULL)
+	if (m_pPlayList != NULL)
 	{
-		XactSoundCueRelease(m_pCue);
-		m_pCue = NULL;
+		IXACTWmaPlayList_Release(m_pPlayList);
+		m_pPlayList = NULL;
 	}
 	if (m_pSoundBank != NULL)
 		m_pSoundBank = NULL;   // (not released)
 	if (m_pSoundSource != NULL)
 	{
-		XactSoundSourceRelease(m_pSoundSource);
+		IXACTSoundSource_Release(m_pSoundSource);
 		m_pSoundSource = NULL;
 	}
 	if (m_pEngine != NULL)
 	{
-		XactEngineRelease(m_pEngine);
+		IXACTEngine_Release(m_pEngine);
 		m_pEngine = NULL;
 	}
 	if (m_pSoundBankData != NULL)
@@ -109,8 +90,8 @@ HRESULT CWMAPlayer::Init(const char *path)
 	params.dwMax3DHwVoices = 0x20;
 	params.dwMaxConcurrentStreams = 0x10;
 	params.dwMaxNotifications = 0;
-	m_pfnFileIo = (void *)XactCallback;
-	XactSetFileIoCallbacks(&m_pfnFileIo);
+	m_fileIo.ReadFileCallback = XactReadFile;
+	XACTEngineSetFileIOCallbacks(&m_fileIo);
 	if (FAILED(XACTEngineCreate(&params, &m_pEngine)))
 		return E_FAIL;
 	DWORD size;
@@ -124,13 +105,13 @@ HRESULT CWMAPlayer::Init(const char *path)
 	memset(&desc, 0, sizeof(desc));
 	desc.pSoundBank = m_pSoundBank;
 	desc.dwSoundCueIndex = m_dwCueIndex;
-	desc.wType = XACT_NOTIFY_CUE_PREPARED;
+	desc.wType = eXACTNotification_Start;
 	desc.wFlags = XACT_FLAG_NOTIFICATION_PERSIST | XACT_FLAG_NOTIFICATION_USE_SOUNDCUE_INDEX;
 	if (FAILED(IXACTEngine_RegisterNotification(m_pEngine, &desc)))
 		return E_FAIL;
-	desc.wType = XACT_NOTIFY_CUE_STOPPED;
+	desc.wType = eXACTNotification_Stop;
 	IXACTEngine_RegisterNotification(m_pEngine, &desc);
-	desc.wType = XACT_NOTIFY_CUE_STARTED;
+	desc.wType = eXACTNotification_StreamDataAvailable;
 	IXACTEngine_RegisterNotification(m_pEngine, &desc);
 	m_bReady = TRUE;
 	m_bStarted = FALSE;
@@ -140,22 +121,22 @@ HRESULT CWMAPlayer::Init(const char *path)
 // 0x000D8AD8
 HRESULT CWMAPlayer::UpdateSongInfo(wchar_t *title, DWORD *length)
 {
-	if (m_pCue == NULL)
+	if (m_pPlayList == NULL)
 		return E_FAIL;
 	if (title == NULL)
 		return S_OK;
 	memset(&m_format, 0, sizeof(m_format));
-	SXactStreamInfo info;
+	XACT_WMASONG_DESCRIPTION info;
 	memset(&info, 0, sizeof(info));
-	DWORD infoSize;
-	XactSoundCueGetStreamInfo(m_pCue, &info, &infoSize);
-	m_format.sampleRate = info.sampleRate;
-	m_format.channels = info.channels;
-	m_format.duration = info.lengthMs / 1000;
-	m_format.bitRate = info.bitRate;
+	IXACTWmaSong *song;
+	IXACTWmaPlayList_GetCurrentSongInfoEx(m_pPlayList, &info, &song);
+	m_format.sampleRate = info.Header.dwSampleRate;
+	m_format.channels = info.Header.dwNumChannels;
+	m_format.duration = info.Header.dwDuration / 1000;
+	m_format.bitRate = info.Header.dwBitrate;
 	if (length != NULL)
-		*length = info.lengthMs;
-	XactSoundCueGetSongName(m_pCue, length, title, 0x40, 0);
+		*length = info.Header.dwDuration;
+	IXACTWmaPlayList_GetCurrentSongInfo(m_pPlayList, length, title, 0x40, NULL);
 	if (title[0] == 0 && !m_bNoFileTitle)
 	{
 		// The file's name.
@@ -178,12 +159,13 @@ HRESULT CWMAPlayer::Open(const char *file)
 {
 	m_dwSoundtrackId = (DWORD)-1;
 	Stop();
-	if (m_pCue != NULL)
+	if (m_pPlayList != NULL)
 	{
-		XactSoundCueRelease(m_pCue);
-		m_pCue = NULL;
+		IXACTWmaPlayList_Release(m_pPlayList);
+		m_pPlayList = NULL;
 	}
-	if (FAILED(XactSoundBankPrepare(m_pSoundBank, m_dwCueIndex, 2, &m_pCue)))
+	if (FAILED(IXACTSoundBank_CreateWmaPlayList(m_pSoundBank, m_dwCueIndex, XACT_FLAG_WMAPLAYLIST_PLAYBACK_LOOP,
+	                                            &m_pPlayList)))
 		return E_FAIL;
 	m_strPath = strdup(file);
 	if (!FileExists(m_strPath.c_str()))
@@ -199,16 +181,16 @@ HRESULT CWMAPlayer::Open(const char *file)
 		if (!FileExists(m_strPath.c_str()))
 			return E_FAIL;
 	}
-	SXactPlayListEntry entry;
+	XACT_WMA_PLAYLIST_ADD entry;
 	memset(&entry, 0, sizeof(entry));
-	entry.type = PLAYLIST_FILE;
-	entry.idOrPath = (DWORD)(uintptr_t)m_strPath.c_str();
-	XactSoundCueSetPlayList(m_pCue, &entry, 0);
-	XactSoundCueNextEntry(m_pCue);
-	SXactPlayListInfo info;
+	entry.dwType = eXACTWmaPlayListAdd_File;
+	entry.pszFileName = m_strPath.c_str();
+	IXACTWmaPlayList_Add(m_pPlayList, &entry, NULL);
+	IXACTWmaPlayList_Next(m_pPlayList);
+	XACT_WMA_PLAYLIST_PROPERTIES info;
 	memset(&info, 0, sizeof(info));
-	XactSoundCueGetPlayListInfo(m_pCue, &info);
-	if (info.count == 0)
+	IXACTWmaPlayList_GetProperties(m_pPlayList, &info);
+	if (info.dwSongEntryCount == 0)
 		return E_FAIL;
 	memset(m_szArtist, 0, sizeof(m_szArtist));
 	memset(m_szTitle, 0, sizeof(m_szTitle));
@@ -223,47 +205,49 @@ HRESULT CWMAPlayer::OpenSoundtrackSong(DWORD soundtrackId, DWORD songId, DWORD i
 	Stop();
 	BOOL wholeSoundtrack = FALSE;
 	s_dwPlayListSong = 0;
-	if (m_pCue != NULL)
+	if (m_pPlayList != NULL)
 	{
-		XactSoundCueRelease(m_pCue);
-		m_pCue = NULL;
+		IXACTWmaPlayList_Release(m_pPlayList);
+		m_pPlayList = NULL;
 	}
-	if (FAILED(XactSoundBankPrepare(m_pSoundBank, m_dwCueIndex, 2, &m_pCue)))
+	if (FAILED(IXACTSoundBank_CreateWmaPlayList(m_pSoundBank, m_dwCueIndex, XACT_FLAG_WMAPLAYLIST_PLAYBACK_LOOP,
+	                                            &m_pPlayList)))
 		return E_FAIL;
-	SXactPlayListEntry entry;
-	entry.idOrPath = soundtrackId;
-	entry.songId = 0;
-	entry.songIndex = 0;
+	XACT_WMA_PLAYLIST_ADD entry;
+	entry.pszFileName = NULL;
+	entry.dwSoundtrackId = soundtrackId;
+	entry.dwSongId = 0;
+	entry.dwSongIndex = 0;
 	if (songId == 0)
 	{
 		wholeSoundtrack = TRUE;
-		entry.type = PLAYLIST_SOUNDTRACK;
+		entry.dwType = eXACTWmaPlayListAdd_Soundtrack;
 	}
 	else
 	{
-		entry.type = PLAYLIST_SOUNDTRACK_SONG;
-		entry.songId = songId;
-		entry.songIndex = index;
+		entry.dwType = eXACTWmaPlayListAdd_SoundtrackSong;
+		entry.dwSongId = songId;
+		entry.dwSongIndex = index;
 	}
-	XactSoundCueSetPlayList(m_pCue, &entry, 0);
+	IXACTWmaPlayList_Add(m_pPlayList, &entry, NULL);
 	if (s_dwPlayListSong == songId || !wholeSoundtrack)
-		XactSoundCueNextEntry(m_pCue);
-	SXactPlayListInfo info;
+		IXACTWmaPlayList_Next(m_pPlayList);
+	XACT_WMA_PLAYLIST_PROPERTIES info;
 	memset(&info, 0, sizeof(info));
-	XactSoundCueGetPlayListInfo(m_pCue, &info);
-	if (info.count == 0)
+	IXACTWmaPlayList_GetProperties(m_pPlayList, &info);
+	if (info.dwSongEntryCount == 0)
 		return E_FAIL;
 	if (wholeSoundtrack && s_dwPlayListSong != songId)
 	{
 		// (Unreachable: both are 0 here.)
 		if (songId == 0)
 		{
-			XactSoundCueSelectEntry(m_pCue, info.firstEntry);
+			IXACTWmaPlayList_SetCurrent(m_pPlayList, info.pFirstSong);
 			s_dwPlayListSong = 0;
 		}
-		else if (songId == info.count - 1)
+		else if (songId == info.dwSongEntryCount - 1)
 		{
-			XactSoundCueSelectEntry(m_pCue, info.lastEntry);
+			IXACTWmaPlayList_SetCurrent(m_pPlayList, info.pLastSong);
 			s_dwPlayListSong = songId;
 		}
 		else if (s_dwPlayListSong < songId)
@@ -271,7 +255,7 @@ HRESULT CWMAPlayer::OpenSoundtrackSong(DWORD soundtrackId, DWORD songId, DWORD i
 			do
 			{
 				s_dwPlayListSong++;
-				XactSoundCueNextEntry(m_pCue);
+				IXACTWmaPlayList_Next(m_pPlayList);
 			} while (s_dwPlayListSong != songId);
 		}
 		else if (songId < s_dwPlayListSong)
@@ -279,7 +263,7 @@ HRESULT CWMAPlayer::OpenSoundtrackSong(DWORD soundtrackId, DWORD songId, DWORD i
 			do
 			{
 				s_dwPlayListSong--;
-				XactSoundCuePrevEntry(m_pCue);
+				IXACTWmaPlayList_Previous(m_pPlayList);
 			} while (s_dwPlayListSong != songId);
 		}
 	}
@@ -303,12 +287,12 @@ HRESULT CWMAPlayer::Play()
 		if (m_pSoundBank == NULL)
 			return E_FAIL;
 		IXACTSoundSource *source = m_mixBins.dwMixBinCount != 0 ? m_pSoundSource : NULL;
-		if (FAILED(XactSoundBankPlay(m_pSoundBank, m_dwCueIndex, source, 0)))
+		if (FAILED(IXACTSoundBank_Play(m_pSoundBank, m_dwCueIndex, source, XACT_FLAG_SOUNDCUE_AUTORELEASE, NULL)))
 			return E_FAIL;
 	}
 	else if (m_nState == PLAYER_PAUSED && m_pEngine != NULL)
 	{
-		XactEnginePause(m_pEngine, 0, FALSE);
+		IXACTEngine_GlobalPause(m_pEngine, 0, FALSE);
 	}
 	m_clock.Start();
 	m_nState = PLAYER_PLAYING;
@@ -323,7 +307,7 @@ HRESULT CWMAPlayer::Stop()
 	if (m_nState == PLAYER_STOPPED)
 		return S_FALSE;
 	if (m_pSoundBank != NULL)
-		XactSoundBankStop(m_pSoundBank, m_dwCueIndex, 0, NULL);
+		IXACTSoundBank_Stop(m_pSoundBank, m_dwCueIndex, 0, NULL);
 	m_clock.played = 0;
 	m_nState = PLAYER_STOPPED;
 	for (int i = 0; i < 100; i++)
@@ -340,7 +324,7 @@ HRESULT CWMAPlayer::Pause()
 	if (m_nState != PLAYER_PLAYING)
 		return S_FALSE;
 	if (m_pEngine != NULL)
-		XactEnginePause(m_pEngine, 0, TRUE);
+		IXACTEngine_GlobalPause(m_pEngine, 0, TRUE);
 	m_nState = PLAYER_PAUSED;
 	return S_OK;
 }
@@ -353,7 +337,7 @@ HRESULT CWMAPlayer::SetVolume(float volume)
 		m_fVolume = -10000.0f;
 	else if (volume > 0.0f)
 		m_fVolume = 0.0f;
-	if (m_pEngine != NULL && SUCCEEDED(XactEngineSetMasterVolume(m_pEngine, 0, (LONG)m_fVolume)))
+	if (m_pEngine != NULL && SUCCEEDED(IXACTEngine_SetMasterVolume(m_pEngine, 0, (LONG)m_fVolume)))
 		return S_OK;
 	return E_FAIL;
 }
@@ -362,7 +346,7 @@ HRESULT CWMAPlayer::SetVolume(float volume)
 // (Nothing is filled in until the length is known.)
 HRESULT CWMAPlayer::GetSongInfo(wchar_t *artist, wchar_t *title, DWORD *length)
 {
-	if (m_pCue == NULL)
+	if (m_pPlayList == NULL)
 		return E_FAIL;
 	if (m_dwLength != 0)
 	{
@@ -395,17 +379,17 @@ HRESULT CWMAPlayer::Process()
 	{
 		if (notification.Header.dwSoundCueIndex != m_dwCueIndex || notification.Header.pSoundBank != m_pSoundBank)
 			continue;
-		if (notification.Header.wType == XACT_NOTIFY_CUE_PREPARED)
+		if (notification.Header.wType == eXACTNotification_Start)
 		{
 			// (In a __try block in the original.)
 			for (int i = 0; i < 500; i++)
 				XACTEngineDoWork();
 		}
-		else if (notification.Header.wType == XACT_NOTIFY_CUE_STOPPED)
+		else if (notification.Header.wType == eXACTNotification_Stop)
 		{
 			return E_FAIL;
 		}
-		else if (notification.Header.wType == XACT_NOTIFY_CUE_STARTED)
+		else if (notification.Header.wType == eXACTNotification_StreamDataAvailable)
 		{
 			m_bStarted = TRUE;
 		}
@@ -425,12 +409,12 @@ void CWMAPlayer::SetSpeakerConfig(const DSMIXBINS *mixBins)
 		m_mixBins.lpMixBinVolumePairs = NULL;
 		if (m_pSoundSource == NULL || m_nState != PLAYER_STOPPED)
 			return;
-		XactSoundSourceDetach(m_pSoundSource);
+		IXACTSoundSource_StopSoundCues(m_pSoundSource);
 	}
 	else if (mixBins == &m_mixBins)
 	{
 		if (m_pSoundSource != NULL)
-			XactSoundSourceApplyMixBins(m_pSoundSource, &m_mixBins);
+			IXACTSoundSource_SetMixBinVolumes(m_pSoundSource, &m_mixBins);
 		return;
 	}
 	else
@@ -441,14 +425,14 @@ void CWMAPlayer::SetSpeakerConfig(const DSMIXBINS *mixBins)
 			m_mixBinPairs[i] = mixBins->lpMixBinVolumePairs[i];
 		m_mixBins.lpMixBinVolumePairs = m_mixBinPairs;
 		if (m_pSoundSource != NULL ||
-		    SUCCEEDED(IXACTEngine_CreateSoundSource(m_pEngine, XACT_SOUNDSOURCE_2D, &m_pSoundSource)))
+		    SUCCEEDED(IXACTEngine_CreateSoundSource(m_pEngine, XACT_FLAG_SOUNDSOURCE_2D, &m_pSoundSource)))
 		{
-			XactSoundSourceSetMixBins(m_pSoundSource, &m_mixBins);
+			IXACTSoundSource_SetMixBins(m_pSoundSource, &m_mixBins);
 			return;
 		}
 		if (m_pSoundSource == NULL)
 			return;
 	}
-	XactSoundSourceRelease(m_pSoundSource);
+	IXACTSoundSource_Release(m_pSoundSource);
 	m_pSoundSource = NULL;
 }

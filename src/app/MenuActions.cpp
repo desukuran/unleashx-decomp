@@ -178,7 +178,7 @@ BOOL LaunchXbe(const char *path, const char *name, int region, const char *args)
 	DWORD gameRegion = info.gameRegion;
 	if (prefs.m_bAutoVideoMode && gameRegion != 0 && gameRegion <= 7)
 	{
-		int current = GetVideoRegionSetting();
+		int current = XGetGameRegion();
 		int target = 0;
 		switch (gameRegion)
 		{
@@ -306,7 +306,7 @@ static BOOL LaunchItem(CUnleashX *app, CXmlElement *item, std::string &path)
 // VideoMode Arg1="NTSC M|NTSC|NTSC J|PAL50|PAL60|PAL" [Arg2="60"]
 static BOOL SetVideoModeAction(const std::string &mode, const std::string &arg2)
 {
-	int current = GetVideoRegionSetting();
+	int current = XGetGameRegion();
 	BOOL pal60 = FALSE;
 	int target;
 	if (StrCmpNoCase(mode, "NTSC M") == 0 || StrCmpNoCase(mode, "NTSC") == 0)

@@ -156,7 +156,7 @@ Process fails, the song is over and the next one starts.
 
 | Player | Songs | How |
 |---|---|---|
-| `CWMAPlayer` | WMA files, Xbox soundtrack songs | XACT: the data folder's sound bank has a streaming cue, `Cue1`, that is given a one-entry playlist (a file, or a soundtrack song). |
+| `CWMAPlayer` | WMA files, Xbox soundtrack songs | XACT: each song gets a new looping WMA playlist on the data folder's sound bank cue `Cue1`, holding just the file, the soundtrack or the soundtrack song. Playback timing starts with XACT's "stream data available" notification. |
 | `CMP3Player` | MP3 | `CAudioDecoder`: libmad frames, dithered to 16 bits (madplay's linear dither) and written into a looping DirectSound buffer about a second ahead. |
 | `CWAVPlayer` | WAV | Up to 64 KB of data in one buffer (`CAudioBuf`); longer files are streamed from disk (`CFilePump`, 4 packets of 8 KB). |
 | `CDDAPlayer` | audio CD tracks | `XCDPlayer` reads the raw sectors (16 at a time) into a 4-second stream. |

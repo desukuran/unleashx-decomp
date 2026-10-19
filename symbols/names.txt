@@ -377,7 +377,6 @@
 # XNet API wrappers (load the stack's context into ecx, jump to the implementation)
 001e2c43 XNetInAddrToString
 001e2c70 XNetGetTitleXnAddr
-001e2c7b XNetSetSystemLinkPort
 001e2c86 socket
 001e2c91 closesocket
 001e2c9c shutdown
@@ -471,7 +470,6 @@
 # XAPI
 0003842e XFindFirstNicknameW
 000380e7 GlobalMemoryStatus
-00036557 swprintf_
 0009029c IdentifyDevice
 00090752 OpenSmartDisk
 00090453 GetSmartAttribute
@@ -508,7 +506,6 @@
 000e48b4 CUnleashX::PrepareHardDisk
 000e99fd CUnleashX::LaunchDVD
 000ec903 StartNetworkThread
-00039507 GetVideoRegionSetting
 000bcf48 SetVideoRegion
 00277f70 g_strLoadingPreview
 00276236 g_bLaunching
@@ -849,7 +846,6 @@
 0009e08a ReadXbeHeader
 0009d319 SetLedPattern
 000ab7f1 RefreshDrives
-0016fd40 SaveSurfaceToBmp
 00019113 StrFormatV
 000192d4 StrTrimRightChars
 0001efbd StrMakeUpper
@@ -1222,10 +1218,10 @@
 000e0411 CUnleashX::CreateOrbBuffer
 00094645 CXBStopWatch::Resume void f(CXBStopWatch *this@esi)
 0010302b CPassCode::CPassCode CPassCode * f(CPassCode *this@edi)
-000bdcbe CXipArchive::Open HRESULT f(CXipArchive *this@esi, char *path)
-000bdc0f CXipArchive::Close void f(CXipArchive *this@eax)
-000bdc67 CXipArchive::GetItem HRESULT f(CXipArchive *this@edx, uint index, SXipItem *item)
-000bdac0 CXipArchive::Extract HRESULT f(CXipArchive *this@ecx, uint index, char *path)
+000bdcbe CXipArchive::Open HRESULT f(void *this@esi, char *path)
+000bdc0f CXipArchive::Close void f(void *this@eax)
+000bdc67 CXipArchive::GetItem HRESULT f(void *this@edx, uint index, SXipItem *item)
+000bdac0 CXipArchive::Extract HRESULT f(void *this@ecx, uint index, char *path)
 000bdbdb GetXipName char * f(char *names@eax, int index)
 000134c3 CFileFinder::FindNext
 0001352d CFileFinder::Close void f(CFileFinder *this@eax)
@@ -1241,8 +1237,8 @@
 0009906e CXBFont::CXBFont CXBFont * f(CXBFont *this@edx)
 00099051 CXBFont::~CXBFont void f(CXBFont *this@eax)
 000e9cce MenuLoaderThread
-000dfef4 IsFormatConfirmed BOOL f(XBGAMEPAD *pad@eax)
-000dfed7 IsFormatSkipped BOOL f(XBGAMEPAD *pad@eax)
+000dfef4 IsFormatConfirmed BOOL f(void *pad@eax)
+000dfed7 IsFormatSkipped BOOL f(void *pad@eax)
 0009171d XKEEPROM::ReadFromXBOX void f(XKEEPROM *this@esi)
 000ac019 CheckDvdMedia
 000ea56c CUnleashX::UpdateScreenSaver void f(CUnleashX *this@ebx, int *action)
@@ -1268,7 +1264,7 @@
 0027a360 s_fTextY
 00278d10 s_nTextFade
 00105fb7 CMusicManager::GetVolume float f(CMusicManager *this@eax)
-00105fec CMusicManager::GetUserSoundtrackCount UINT f(CMusicManager *this@eax)
+00105fec CMusicManager::GetUserSoundtrackCount uint f(CMusicManager *this@eax)
 00106010 CMusicManager::IsRandom BOOL f(CMusicManager *this@eax)
 0010605f CMusicManager::StopPlayer void f(CMusicManager *this@esi)
 001060c8 CMusicManager::IsGlobal BOOL f(CMusicManager *this@eax)
@@ -1276,7 +1272,7 @@
 00106113 CMusicManager::SeedRandom
 0010615a CMusicManager::SetMute void f(CMusicManager *this@eax, BOOL mute@ecx)
 00106189 CMusicManager::GetSoundtrackName void f(CMusicManager *this@eax, WORD *name)
-0010619b CMusicManager::GetSongCount UINT f(CMusicManager *this@eax)
+0010619b CMusicManager::GetSongCount uint f(CMusicManager *this@eax)
 00106225 CMusicManager::GetAlbumArt void * f(CMusicManager *this@eax)
 00106283 CMusicManager::~CMusicManager void f(CMusicManager *this@edi)
 001063dd CMusicManager::ShuffleSongs
@@ -1285,9 +1281,9 @@
 001065fc CMusicManager::AddFolderSongs
 0010693b CMusicManager::ScanMusicFolder
 00106d35 CMusicManager::CMusicManager CMusicManager * f(CMusicManager *this@esi, BOOL useSoundtracks, BOOL useFolder, char *folder)
-00106ef1 CMusicManager::SetSoundtrackTitle BOOL f(CMusicManager *this@edi, UINT index@ecx, char *title)
-00107256 CMusicManager::PlaySong HRESULT f(CMusicManager *this@ebx, UINT index, BOOL shuffled)
-00107560 CMusicManager::PlaySongAt HRESULT f(CMusicManager *this@ebx, UINT index)
+00106ef1 CMusicManager::SetSoundtrackTitle BOOL f(CMusicManager *this@edi, uint index@ecx, char *title)
+00107256 CMusicManager::PlaySong HRESULT f(CMusicManager *this@ebx, uint index, BOOL shuffled)
+00107560 CMusicManager::PlaySongAt HRESULT f(CMusicManager *this@ebx, uint index)
 0010756e CMusicManager::NextSong HRESULT f(CMusicManager *this@eax)
 001075dd CMusicManager::LoadSoundtrack
 00107fda CMusicManager::SelectSoundtrack
@@ -1345,7 +1341,7 @@
 000dbb12 KeyboardToUpper WORD f(WORD ch@ax)
 000dbb39 CVirtualKeyboard::ApplyCase WORD f(CVirtualKeyboard *this@eax, int ch)
 000dbb67 CVirtualKeyboard::DrawTextShadow
-000dbbd5 KeyboardHasInput BOOL f(XBGAMEPAD *pad@eax)
+000dbbd5 KeyboardHasInput BOOL f(void *pad@eax)
 000dbe8c CVirtualKeyboard::SetLanguage void f(CVirtualKeyboard *this@ecx, int language@eax)
 000dbeb2 CVirtualKeyboard::PlayClick void f(CVirtualKeyboard *this@eax)
 000dc05a GetKeyboardGamepad
@@ -2186,25 +2182,7 @@
 000d85b8 XactCallback
 00278d54 s_dwPlayListSong
 00092b01 LoadFileToMemory
-0002db07 XactSoundBankPlay
-0022221e XactEngineRelease
-002222b8 XactEngineSetMasterVolume
-002222f7 XactEnginePause
-00222416 XactSoundBankStop
-0022244d XactSoundBankPrepare
-002224a2 XactSoundCueGetSongName
-00224f08 XactSoundCueSetPlayList
-002252e7 XactSoundCueGetPlayListInfo
-00225459 XactSoundCueGetStreamInfo
-002258b1 XactSoundCueSelectEntry
-00225915 XactSoundCueNextEntry
-00225978 XactSoundCuePrevEntry
-00225a1e XactSoundCueRelease
-00225c9f XactSoundSourceDetach
-00225daa XactSoundSourceSetMixBins
-00225df0 XactSoundSourceApplyMixBins
-00226824 XactSoundSourceRelease
-0022339a XactSetFileIoCallbacks
+0002db07 IXACTSoundBank_Play HRESULT f(void *bank, DWORD cueIndex, void *source, void **cue, DWORD flags@eax)
 0006e184 CAudioDecoder::CAudioDecoder
 0006ed7c CAudioDecoder::~CAudioDecoder
 0006f16c CAudioDecoder::Stop

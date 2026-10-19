@@ -194,7 +194,7 @@ HRESULT CXboxInfo::Init(CXBFont *font)
 
 	memset(text, 0, sizeof(text));
 	name = NULL;
-	switch (GetVideoRegionSetting())
+	switch (XGetGameRegion())
 	{
 	case 1: name = L"Region 1 (North America)"; break;
 	case 2: name = L"Region 2 (Japan)"; break;

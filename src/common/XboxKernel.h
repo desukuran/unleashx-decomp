@@ -87,8 +87,8 @@ DWORD XGetLanguage();
 DWORD XGetAudioFlags();                          // 0x000394BD
 // XC_PARENTAL_CONTROL_GAMES: 0 all games ... 6 early childhood.
 DWORD XGetParentalControlSetting();              // 0x0003955C
-// XGetGameRegion: 1 North America, 2 Japan, 4 rest of the world.
-DWORD GetVideoRegionSetting();                   // 0x00039507 1 NTSC-M, 2 NTSC-J, 4 PAL
+// The console's game region: 1 North America, 2 Japan, 4 rest of the world.
+DWORD XGetGameRegion();                          // 0x00039507
 
 // The kernel's XboxHardwareInfo export.
 struct XBOX_HARDWARE_INFO

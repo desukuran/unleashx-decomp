@@ -253,13 +253,9 @@ private:
 	HRESULT UpdateSongInfo(wchar_t *artist, wchar_t *title, DWORD *length);   // 0x00109320
 };
 
-struct IXACTEngine;
-struct IXACTSoundBank;
-struct IXACTSoundCue;
-struct IXACTSoundSource;
-
-// WMA files and Xbox soundtrack songs: an XACT sound bank's "Cue1" with a
-// one-entry playlist. vtable 0x0025675C, 0x1D8 bytes.
+// WMA files and Xbox soundtrack songs: an XACT WMA playlist (on the sound
+// bank's "Cue1") holding the file, the soundtrack or the song. vtable
+// 0x0025675C, 0x1D8 bytes.
 class CWMAPlayer : public CAudioPlayer
 {
 public:
@@ -299,15 +295,17 @@ public:
 	void *m_pSoundBankData;                // +0x144 the file, malloc'd
 	IXACTSoundBank *m_pSoundBank;          // +0x148
 	DWORD m_dwCueIndex;                    // +0x14C "Cue1"
-	IXACTSoundCue *m_pCue;                 // +0x150
+	IXACTWmaPlayList *m_pPlayList;         // +0x150
 	IXACTSoundSource *m_pSoundSource;      // +0x154 for 5.1
 	CAppSettings *m_pSettings;             // +0x158
-	void *m_pfnFileIo;                     // +0x15C a callback given to XACT (0x000D85B8) TODO: verify
-	int m_unknown160;                      // +0x160
+	// Given to XACTEngineSetFileIOCallbacks: a read callback that reads
+	// nothing, and an overlapped-result callback never set. (XACT only uses
+	// them for streaming wave banks, which UnleashX has none of.)
+	XACT_FILEIO_CALLBACKS m_fileIo;        // +0x15C
 	std::string m_strPath;                 // +0x164
 	BOOL m_bNoFileTitle;                   // +0x180 never set: a title from the file name is always allowed
 	BOOL m_bReady;                         // +0x184
-	BOOL m_bStarted;                       // +0x188 the cue sent its start notification
+	BOOL m_bStarted;                       // +0x188 the stream's first data arrived
 	DSMIXBINS m_mixBins;                   // +0x18C
 	DSMIXBINVOLUMEPAIR m_mixBinPairs[8];   // +0x194
 	DWORD m_dwSoundtrackId;                // +0x1D4 -1 for a file

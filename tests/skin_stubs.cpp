@@ -54,7 +54,7 @@ BOOL CWMVideoPlayer::Open(const char *) { return TRUE; }
 // XBE title images (Xbox-only XbeImage.cpp): FTP SITE TITLES, the game scan
 BOOL LoadXbeIcon(const char *, IDirect3DTexture8 **texture) { *texture = NULL; return FALSE; }
 BOOL ExtractXbeTitleImage(const char *, const char *) { return FALSE; }
-HRESULT SaveSurfaceToBmp(IDirect3DSurface8 *, const char *) { return E_FAIL; }
+HRESULT XGWriteSurfaceToFile(IDirect3DSurface8 *, const char *) { return E_FAIL; }
 void Get2DSurfaceDesc(D3DResource *, DWORD, D3DSURFACE_DESC *desc) { memset(desc, 0, sizeof(*desc)); }
 HRESULT IDirect3DDevice8::CreateTexture(UINT, UINT, UINT, DWORD, D3DFORMAT, DWORD, IDirect3DTexture8 **texture)
 {

@@ -147,12 +147,15 @@ struct IXACTEngine;
 struct IXACTSoundBank;
 struct IXACTSoundSource;
 struct IXACTSoundCue;
+struct IXACTWmaPlayList;
+struct IXACTWmaSong;
 struct XACT_RUNTIME_PARAMETERS
 {
 	DWORD dwMax2DHwVoices;
 	DWORD dwMax3DHwVoices;
 	DWORD dwMaxConcurrentStreams;
 	DWORD dwMaxNotifications;
+	DWORD dwInteractiveAudioLookaheadTime;
 };
 struct XACT_NOTIFICATION_DESCRIPTION
 {
@@ -169,64 +172,122 @@ struct XACT_NOTIFICATION
 	XACT_NOTIFICATION_DESCRIPTION Header;
 	BYTE Data[0x30];
 };
-#define XACT_NOTIFICATION_TYPE_CUESTART 0
-#define XACT_NOTIFICATION_TYPE_CUESTOP 1
-#define XACT_NOTIFICATION_TYPE_MARKER 3
-#define XACT_FLAG_NOTIFICATION_USE_SOUNDCUE_INDEX 0x0002   // TODO: verify
-#define XACT_FLAG_NOTIFICATION_PERSIST 0x8000              // TODO: verify
-#define XACT_FLAG_SOUNDCUE_AUTORELEASE 0x0002              // TODO: verify
-#define XACT_SOUNDSOURCE_2D 1                              // TODO: verify
+enum XACT_NOTIFICATION_TYPE
+{
+	eXACTNotification_Start = 0,
+	eXACTNotification_Stop,
+	eXACTNotification_Marker,
+	eXACTNotification_StreamDataAvailable,
+};
+#define XACT_FLAG_NOTIFICATION_USE_SOUNDCUE_INDEX 0x0002
+#define XACT_FLAG_NOTIFICATION_PERSIST 0x8000
+#define XACT_FLAG_SOUNDCUE_AUTORELEASE 0x0001
+#define XACT_FLAG_SOUNDSOURCE_2D 0x00000001
+#define XACT_FLAG_WMAPLAYLIST_PLAYBACK_LOOP 0x00000002
+struct XACT_FILEIO_CALLBACKS
+{
+	BOOL(__stdcall *ReadFileCallback)(HANDLE file, void *buffer, DWORD size, DWORD *read, void *overlapped);
+	BOOL(__stdcall *GetOverlappedResultCallback)(HANDLE file, void *overlapped, DWORD *transferred, BOOL wait);
+};
+struct XACT_PREPARE_SOUNDCUE
+{
+	DWORD dwFlags;
+	DWORD dwCueIndex;
+	IXACTSoundSource *pSoundSource;
+	const void *pParameterControls;
+};
+// What a WMA playlist entry is.
+enum XACT_WMA_PLAYLIST_ADD_TYPE
+{
+	eXACTWmaPlayListAdd_Directory = 1,
+	eXACTWmaPlayListAdd_File,
+	eXACTWmaPlayListAdd_Soundtrack,
+	eXACTWmaPlayListAdd_SoundtrackSong,
+};
+struct XACT_WMA_PLAYLIST_ADD
+{
+	DWORD dwType;
+	const char *pszFileName;
+	DWORD dwSoundtrackId;
+	DWORD dwSongId;
+	DWORD dwSongIndex;
+};
+struct XACT_WMA_PLAYLIST_PROPERTIES
+{
+	DWORD dwPlaybackFlags;
+	DWORD dwSongEntryCount;
+	IXACTWmaSong *pFirstSong;
+	IXACTWmaSong *pLastSong;
+};
+#pragma pack(push, 1)
+struct WMAXMOFileContDesc
+{
+	WORD wTitleLength;
+	WORD wAuthorLength;
+	WORD wCopyrightLength;
+	WORD wDescriptionLength;
+	WORD wRatingLength;
+	wchar_t *pTitle;
+	wchar_t *pAuthor;
+	wchar_t *pCopyright;
+	wchar_t *pDescription;
+	wchar_t *pRating;
+};
+#pragma pack(pop)
+struct WMAXMOFileHeader
+{
+	DWORD dwVersion;
+	DWORD dwSampleRate;
+	DWORD dwNumChannels;
+	DWORD dwDuration;   // ms
+	DWORD dwBitrate;
+};
+struct XACT_WMASONG_DESCRIPTION
+{
+	WMAXMOFileContDesc Content;
+	WMAXMOFileHeader Header;
+};
 
 HRESULT XACTEngineCreate(const XACT_RUNTIME_PARAMETERS *params, IXACTEngine **engine);
 void XACTEngineDoWork();
-HRESULT IXACTEngine_CreateSoundBank(IXACTEngine *engine, const void *data, DWORD size, IXACTSoundBank **bank);
+void XACTEngineSetFileIOCallbacks(const XACT_FILEIO_CALLBACKS *callbacks);
+ULONG IXACTEngine_Release(IXACTEngine *engine);
+HRESULT IXACTEngine_CreateSoundBank(IXACTEngine *engine, void *data, DWORD size, IXACTSoundBank **bank);
 HRESULT IXACTEngine_CreateSoundSource(IXACTEngine *engine, DWORD flags, IXACTSoundSource **source);
+HRESULT IXACTEngine_SetMasterVolume(IXACTEngine *engine, WORD category, LONG volume);
+HRESULT IXACTEngine_GlobalPause(IXACTEngine *engine, WORD category, BOOL pause);
 HRESULT IXACTEngine_RegisterNotification(IXACTEngine *engine, const XACT_NOTIFICATION_DESCRIPTION *desc);
 HRESULT IXACTEngine_GetNotification(IXACTEngine *engine, const XACT_NOTIFICATION_DESCRIPTION *desc,
                                     XACT_NOTIFICATION *notification);
 HRESULT IXACTSoundBank_GetSoundCueIndexFromFriendlyName(IXACTSoundBank *bank, const char *name, DWORD *index);
+HRESULT IXACTSoundBank_PlayEx(IXACTSoundBank *bank, const XACT_PREPARE_SOUNDCUE *prepare, IXACTSoundCue **cue);
+// An inline in <xact.h>: PlayEx with {flags, cueIndex, source, NULL}.
+// (UnleashX has an out-of-line copy at 0x0002DB07, flags in eax.)
+inline HRESULT IXACTSoundBank_Play(IXACTSoundBank *bank, DWORD cueIndex, IXACTSoundSource *source, DWORD flags,
+                                   IXACTSoundCue **cue)
+{
+	XACT_PREPARE_SOUNDCUE prepare;
+	prepare.dwFlags = flags;
+	prepare.dwCueIndex = cueIndex;
+	prepare.pSoundSource = source;
+	prepare.pParameterControls = NULL;
+	return IXACTSoundBank_PlayEx(bank, &prepare, cue);
+}
+HRESULT IXACTSoundBank_Stop(IXACTSoundBank *bank, DWORD cueIndex, DWORD flags, IXACTSoundCue *cue);
+HRESULT IXACTSoundBank_CreateWmaPlayList(IXACTSoundBank *bank, DWORD cueIndex, DWORD playbackFlags,
+                                         IXACTWmaPlayList **playList);
+ULONG IXACTSoundSource_Release(IXACTSoundSource *source);
+HRESULT IXACTSoundSource_SetMixBins(IXACTSoundSource *source, const DSMIXBINS *mixBins);
+HRESULT IXACTSoundSource_SetMixBinVolumes(IXACTSoundSource *source, const DSMIXBINS *mixBins);
+HRESULT IXACTSoundSource_StopSoundCues(IXACTSoundSource *source);
+ULONG IXACTWmaPlayList_Release(IXACTWmaPlayList *playList);
+HRESULT IXACTWmaPlayList_Add(IXACTWmaPlayList *playList, const XACT_WMA_PLAYLIST_ADD *desc, IXACTWmaSong **song);
+HRESULT IXACTWmaPlayList_SetCurrent(IXACTWmaPlayList *playList, IXACTWmaSong *song);
+HRESULT IXACTWmaPlayList_Next(IXACTWmaPlayList *playList);
+HRESULT IXACTWmaPlayList_Previous(IXACTWmaPlayList *playList);
+HRESULT IXACTWmaPlayList_GetCurrentSongInfo(IXACTWmaPlayList *playList, DWORD *length, wchar_t *name, DWORD size,
+                                            IXACTWmaSong **song);
+HRESULT IXACTWmaPlayList_GetCurrentSongInfoEx(IXACTWmaPlayList *playList, XACT_WMASONG_DESCRIPTION *desc,
+                                              IXACTWmaSong **song);
+HRESULT IXACTWmaPlayList_GetProperties(IXACTWmaPlayList *playList, XACT_WMA_PLAYLIST_PROPERTIES *properties);
 #endif
-
-// XACT internals the WMA player calls directly (XACTENG section; not in
-// the symbol database). The names are reconstructed from how they're
-// used. TODO: verify
-ULONG XactEngineRelease(IXACTEngine *engine);                                             // 0x0022221E
-HRESULT XactEngineSetMasterVolume(IXACTEngine *engine, DWORD unused, LONG volume);        // 0x002222B8
-HRESULT XactEnginePause(IXACTEngine *engine, DWORD unused, BOOL pause);                   // 0x002222F7
-HRESULT XactSoundBankStop(IXACTSoundBank *bank, DWORD cueIndex, DWORD flags, IXACTSoundCue *cue);   // 0x00222416
-HRESULT XactSoundBankPrepare(IXACTSoundBank *bank, DWORD cueIndex, DWORD flags, IXACTSoundCue **cue);   // 0x0022244D
-// The playing song's title (up to length characters).
-HRESULT XactSoundCueGetSongName(IXACTSoundCue *cue, DWORD *length, wchar_t *name, DWORD size, DWORD flags);   // 0x002224A2
-// A cue's playlist entry: a file, a whole soundtrack, or one song.
-struct SXactPlayListEntry
-{
-	DWORD type;            // +0x00 2 file, 3 soundtrack, 4 soundtrack song
-	DWORD idOrPath;        // +0x04 the soundtrack ID, or the path
-	DWORD songId;          // +0x08
-	DWORD songIndex;       // +0x0C
-};
-struct SXactPlayListInfo
-{
-	DWORD unknown00;       // +0x00
-	DWORD count;           // +0x04
-	DWORD firstEntry;      // +0x08
-	DWORD lastEntry;       // +0x0C
-};
-HRESULT XactSoundCueSetPlayList(IXACTSoundCue *cue, const SXactPlayListEntry *entry, DWORD flags);   // 0x00224F08
-HRESULT XactSoundCueGetPlayListInfo(IXACTSoundCue *cue, SXactPlayListInfo *info);         // 0x002252E7
-// The current entry's stream format and length (0x34 bytes, see
-// CWMAPlayer::UpdateSongInfo).
-HRESULT XactSoundCueGetStreamInfo(IXACTSoundCue *cue, void *info, DWORD *size);           // 0x00225459
-HRESULT XactSoundCueSelectEntry(IXACTSoundCue *cue, DWORD entry);                         // 0x002258B1
-HRESULT XactSoundCueNextEntry(IXACTSoundCue *cue);                                        // 0x00225915
-HRESULT XactSoundCuePrevEntry(IXACTSoundCue *cue);                                        // 0x00225978
-ULONG XactSoundCueRelease(IXACTSoundCue *cue);                                            // 0x00225A1E
-// (Before releasing it for stereo.)
-HRESULT XactSoundSourceDetach(IXACTSoundSource *source);                                 // 0x00225C9F
-HRESULT XactSoundSourceSetMixBins(IXACTSoundSource *source, const DSMIXBINS *mixBins);    // 0x00225DAA
-// (With the player's own mix bins again.)
-HRESULT XactSoundSourceApplyMixBins(IXACTSoundSource *source, const DSMIXBINS *mixBins);  // 0x00225DF0
-ULONG XactSoundSourceRelease(IXACTSoundSource *source);                                   // 0x00226824
-HRESULT XactSetFileIoCallbacks(void *callbacks);                                          // 0x0022339A
-// IXACTSoundBank_Play, inlined: PlayEx with {1, cueIndex, source, NULL}.
-HRESULT XactSoundBankPlay(IXACTSoundBank *bank, DWORD cueIndex, IXACTSoundSource *source, DWORD flags);   // 0x0002DB07

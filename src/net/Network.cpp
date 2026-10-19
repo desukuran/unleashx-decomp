@@ -454,7 +454,7 @@ static void InitNetworkStack()
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
 		return;
-	XNetSetSystemLinkPort(1);   // TODO: verify, the wrapper at 0x001E2C7B
+	XNetGetBroadcastVersionStatus(TRUE);   // (clears it)
 	g_bNetworkStarted = 1;
 	StartNetworkStatusThread();
 	StartLinkMonitor();

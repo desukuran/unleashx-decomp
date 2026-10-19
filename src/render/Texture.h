@@ -59,8 +59,6 @@ BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture);  // 0x0009FA
 // Writes a copy of texture's top level as an .xpr file (creating its
 // folder). (texture in a register; XbeImage.cpp)
 BOOL SaveTextureToXpr(const char *path, IDirect3DTexture8 *texture);   // 0x000A4225
-// Writes a surface as a .bmp file. TODO: decompile (library code?)
-HRESULT SaveSurfaceToBmp(IDirect3DSurface8 *surface, const char *path);   // 0x0016FD40
 // A texture from an .xpr file holding one texture (the MS dashboard's .xbx
 // files), read straight into it.
 bool LoadXprTexture(const char *path, IDirect3DTexture8 **texture);   // 0x0009F909

@@ -1473,7 +1473,7 @@ void CFTPConnection::SaveTitleImage(const char *folder, DWORD titleId)
 		    D3DXLoadSurfaceFromSurface(destination, NULL, NULL, source, NULL, NULL, D3DX_FILTER_NONE, 0) >= 0)
 		{
 			StrFormat(path, "%s\\%08x.bmp", m_strTitleImageDir.c_str(), titleId);
-			if (SaveSurfaceToBmp(destination, path.c_str()) < 0)
+			if (XGWriteSurfaceToFile(destination, path.c_str()) < 0)
 				Sleep(5);
 			destination->Release();
 		}

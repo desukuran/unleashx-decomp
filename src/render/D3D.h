@@ -322,7 +322,9 @@ void D3DXSetDXT3DXT5(BOOL set);
 BOOL XGIsSwizzledFormat(D3DFORMAT format);
 HRESULT D3DXCreateTextureFromFileA(IDirect3DDevice8 *device, const char *file,
                                    IDirect3DTexture8 **texture);   // 0x001542A1
-// D3DX math (matrices are 4x4 floats).
+// D3DX math (matrices are 4x4 floats). The linker kept XGraphics'
+// identical XGMatrix*/XGVec3Transform copies, so that's what the addresses
+// are named in symbols/xdklib.txt.
 float *D3DXMatrixLookAtLH(float *out, const float *eye, const float *at, const float *up);   // 0x0003E5F3
 float *D3DXMatrixPerspectiveFovLH(float *out, float fovY, float aspect, float zNear, float zFar);   // 0x0003E6DE
 float *D3DXMatrixRotationYawPitchRoll(float *out, float yaw, float pitch, float roll);         // 0x0003E5BA
@@ -343,6 +345,8 @@ void XBUtil_SetMediaPath(const char *path);   // 0x000930A7 (path in eax)
 // XDK sample framework: diffuse and ambient set to the color. (material in edx)
 void XBUtil_InitMaterial(D3DMATERIAL8 *material, float r, float g, float b, float a);       // 0x00092EEF
 HRESULT XGWriteSurfaceOrTextureToXPR(void *resource, const char *path, BOOL writeSurfaceAsTexture);   // 0x0003E84B
+// Writes a surface as a .bmp file (XGraphics).
+HRESULT XGWriteSurfaceToFile(IDirect3DSurface8 *surface, const char *path);   // 0x0016FD40
 HRESULT D3DXCreateTextureFromFileExA(IDirect3DDevice8 *device, const char *file, UINT width, UINT height,
                                      UINT mipLevels, DWORD usage, D3DFORMAT format, DWORD pool, DWORD filter,
                                      DWORD mipFilter, D3DCOLOR colorKey, void *srcInfo, void *palette,
