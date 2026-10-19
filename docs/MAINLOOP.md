@@ -9,9 +9,14 @@ and what `FrameMove` (`src/app/FrameMove.cpp`) and `Render`
 1. **Drives.** The drive UnleashX runs from is mounted (running from F: or
    G: turns those drives on), then C:. Run from DVD, E: and the Z: cache
    are mounted too; if neither C:\ nor E:\ exists, there's no hard disk.
-2. **Loading.** The skin resources (`LoadResources`) and `Config.xml`
-   load on threads, then a startup thread runs. Run from DVD, a Z: cache
-   with under 5 MB free is formatted first.
+2. **Loading.** Three threads do the loading:
+   * `LoadResources` (`src/app/Resources.cpp`) loads the resources.
+   * The config loader reads `Config.xml`.
+   * The startup thread (`src/app/Startup.cpp`) builds the menu: its own
+     `<Menu>`, plus the game folders from the `items.xml` cache, which it
+     rechecks against the disk. It also loads the ambient sound.
+
+   Run from DVD, a Z: cache with under 5 MB free is formatted first.
 3. **Splash.** Meanwhile, whatever the previous program left on screen is
    shown, fading out over 80 frames. If there's nothing,
    `E:\UDATA\9e115330\0064122817A8\Splash.jpg` (or `UXSplash.jpg` there)
@@ -66,6 +71,64 @@ and what `FrameMove` (`src/app/FrameMove.cpp`) and `Render`
     the device is reset. Finally the screen calibration from `videoset.dat`
     is applied when it fits the display: the top-left corner within 10%,
     and the bottom-right past 90%.
+
+### Where the resources come from
+
+The fonts, `resource.xpr` (the CellWall, EarthEnvMap and Orb textures)
+and the globe meshes (`OuterSphere.xbg`, `CrossHair.xbg`) load from a
+media folder:
+
+* **Run from DVD:** `D:\Media`. A `Splash.jpg` there becomes the loading
+  image.
+* **Otherwise:** a "Media" save game folder on U: (else on the utility
+  drive X:). It's filled from a zip built into the XBE (section
+  `MEDIA_FILE`). `iMedia.dat` records which version was unpacked, so
+  this only happens once per release. Your own `UXSplash.jpg` there is
+  never overwritten.
+
+When a small (under 900 MB) X: drive has less than 100 MB free, it is
+formatted.
+
+UnleashX also borrows textures from the MS dashboard: `cellwall.xbx`,
+`xboxlogo.xbx` (or `xboxlogow.xbx` above 640 pixels wide) and `xbox4.xbx`.
+They come from the XIP archives `default.xip` and `mainmenu5.xip` in
+`C:\xboxdashdata.*` (`src/system/XipArchive.cpp`). The logo becomes the
+default loading image, and `xbox4.xbx` replaces the menu's orb.
+
+If something is still missing, the whole step is retried once.
+
+### New hard disk wizard
+
+Run from DVD on an Xbox with neither C:\ nor E:\, a wizard
+(`PrepareHardDisk`) steps through setting up the drive. Each step needs
+both triggers held plus START:
+
+1. It formats C:, E:, X:, Y: and Z:.
+2. It asks about F: (BACK with both triggers skips it). G: is offered too
+   when F: is larger than about 134 GB.
+3. It copies `D:\CDrive` (or `D:\CBackup`) to C:, and likewise for E:, F:
+   and G:. Without an E: image, it creates `E:\TData` and `E:\UData`
+   instead.
+4. If they're missing, it copies the DVD's `default.xbe` to
+   `C:\evoxdash.xbe` and `C:\xboxdash.xbe`.
+
+### Monitor thread
+
+Once the first frame is drawn, the monitor thread does the following:
+
+1. It reads the EEPROM.
+2. If soundtracks are on, it waits up to 5 seconds for the music to start.
+3. Until something is launched, it keeps watching (but not while a file
+   operation or an FTP transfer is running):
+   * **DVD drive:** a new disc wakes the screen saver. It also tracks
+     whether a disc is in, which FrameMove's autostart uses.
+   * **CPU temperature** (every 15 s, when a threshold is set): over the
+     threshold, the fan speeds up by 5, then by 1 every 30 s, up to 40.
+     Once it has cooled down, the fan goes back to the configured speed
+     (10 means automatic).
+
+The thread counter behind the `$Thread$` skin text counts the running
+threads through a thread notify routine.
 
 ## Input
 
