@@ -1027,3 +1027,5 @@
 00078582 urarlib_list
 00078811 urarlib_get
 0007850e urarlib_freelist
+000c66fd CNetworkSetting::Save
+000c0107 CNetworkSetting::ShowAddresses

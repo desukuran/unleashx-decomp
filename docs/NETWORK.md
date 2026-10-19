@@ -8,8 +8,7 @@ FTP server has its own page, [FTP.md](FTP.md).
 
 ```xml
 <Settings>
-  <Network Enable="Yes">
-    <DHCP>Yes</DHCP>
+  <Network Enable="Yes" Type="Static">   <!-- or Type="DHCP" -->
     <IP>192.168.0.5</IP>
     <Subnet>255.255.255.0</Subnet>
     <Gateway>192.168.0.1</Gateway>

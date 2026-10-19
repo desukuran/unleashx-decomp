@@ -155,10 +155,10 @@ void CAppSettings::SetDefaults()
 	m_ftp.m_nMinPasvPort = 1024;
 	m_ftp.m_nMaxPasvPort = 0x10000;
 	m_ftp.m_strSyst.clear();
-	m_ftp.m_unknown90 = 0x10000;
+	m_ftp.m_nClientMaxPort = 0x10000;
 	m_ftp.m_bBoost = TRUE;
-	m_ftp.m_unknown8C = 0;
-	m_ftp.m_unknown94 = 1;
+	m_ftp.m_nClientMinPort = 0;
+	m_ftp.m_bClientDetectPeers = TRUE;
 
 	StrFormat(m_strMSDashboard, "C:%s", "\\XboxDash.xbe");
 

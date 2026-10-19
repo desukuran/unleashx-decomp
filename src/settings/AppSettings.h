@@ -158,9 +158,9 @@ struct SFTPSettings
 	int m_nMaxPasvPort;         // +0x68
 	std::string m_strSyst;      // +0x6C reply to SYST
 	BOOL m_bBoost;              // +0x88
-	int m_unknown8C;            // +0x8C
-	int m_unknown90;            // +0x90 0x10000
-	int m_unknown94;            // +0x94 1
+	int m_nClientMinPort;       // +0x8C <FTPClient MinPort> (the FTP browser)
+	int m_nClientMaxPort;       // +0x90 0x10000, <FTPClient MaxPort>
+	BOOL m_bClientDetectPeers;  // +0x94 1, <FTPClient DetectPeer>
 };
 
 // <Preference>. At CAppSettings+0x16FC.

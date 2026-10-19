@@ -232,3 +232,65 @@ public:
 	CXmlDocument m_versionDoc;      // +0xF4 Version.xml
 	CXmlElement *m_pMirror;         // +0x210 the <URL> being tried after a 404
 };
+
+// Network Settings: the network, FTP server, FTP client and HTTP proxy.
+// 0xB8 bytes, vtable 0x0025684C.
+class CNetworkSetting : public CSettingsBase
+{
+public:
+	enum
+	{
+		ITEM_CURRENT_IP,        // read-only, refreshed every few seconds
+		ITEM_LINK_STATUS,
+		ITEM_MAC_ADDRESS,
+		ITEM_ENABLE,            // <Network Enable>
+		ITEM_TYPE,              // DHCP / Static
+		ITEM_IP,                // IP address pop-up for these five
+		ITEM_SUBNET,
+		ITEM_GATEWAY,
+		ITEM_DNS1,
+		ITEM_DNS2,
+		ITEM_FTP_HEADER,
+		ITEM_FTP_ENABLE,
+		ITEM_FTP_USER,          // keyboard for user ... SYST
+		ITEM_FTP_PASSWORD,
+		ITEM_FTP_PORT,
+		ITEM_FTP_MAX_USERS,
+		ITEM_FTP_ALLOW_ANON,
+		ITEM_FTP_MIN_PASV_PORT,
+		ITEM_FTP_MAX_PASV_PORT,
+		ITEM_FTP_SYST,
+		ITEM_FTP_BOOST,
+		ITEM_AUTO_DETECT,       // <Network><AutoDetect>
+		ITEM_CLIENT_HEADER,
+		ITEM_CLIENT_MIN_PORT,
+		ITEM_CLIENT_MAX_PORT,
+		ITEM_CLIENT_DETECT_PEERS,
+		ITEM_HTTP_HEADER,
+		ITEM_PROXY_ENABLE,
+		ITEM_PROXY,             // IP address pop-up
+		ITEM_PROXY_PORT,
+		ITEM_SAVE_HEADER,
+		ITEM_SAVE,
+		ITEM_RESET,
+		ITEM_EXIT,
+	};
+
+	CNetworkSetting() {}                                      // 0x000C1B2E
+	virtual ~CNetworkSetting();                               // 0x000C1B1A
+	virtual HRESULT Init(CXBFont *font);                      // 0x000CF410
+	virtual HRESULT HandleInput(int *action, SGamepadState **pad);   // 0x000CEC23
+	// Enables the lines that depend on the switch at index (0 = all of
+	// them, from the settings).
+	virtual void SetItemEnabled(int index, BOOL enabled);     // 0x000BED3F
+
+	BOOL Save();                                              // 0x000C66FD
+	// Shows the address settings (FALSE) or the configuration in use
+	// (TRUE) in the IP ... DNS 2 lines. (this in esi)
+	void ShowAddresses(BOOL current);                         // 0x000C0107
+};
+
+// Checks a value typed on the Network page for the line index. On failure
+// text is reset to the default and message says why. (index in eax, text
+// in edi)
+BOOL ValidateSettingValue(int index, wchar_t *text, char *message);   // 0x000BEF1A
