@@ -212,7 +212,7 @@ void DrawSavedScreen(IDirect3DTexture8 *texture, DWORD width, DWORD height, floa
 HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 *device);   // 0x0009F23D
 // Text centered on x, y. TODO: decompile
 void DrawTextCentered(CXBFont *font, float x, float y, const wchar_t *text, D3DCOLOR color, DWORD flags);   // 0x0002AED1
-// Called by the kernel for each thread created/ended. TODO: decompile
+// Called by the kernel for each thread created/ended. See Startup.cpp.
 void __stdcall ThreadNotifyRoutine(BOOL create);    // 0x000DFF8C
 
 // Creates g_pMusicManager (on a thread; directly if that fails). See Startup.cpp.

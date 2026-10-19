@@ -2457,3 +2457,18 @@
 000986b9 XBInput_GetIR_RemoteInput
 000985aa XBInput_CreateKeyboard
 00098478 XBInput_GetKeyboardInput
+# leftovers with callers
+# (the HDD password from XboxHDKey and the drive's model and serial numbers; LockHdd/UnlockHdd)
+00090c19 ComputeHddPassword
+# XDK samples: "Xbox MU <port><slot> (<name>)"
+00098265 CXBMemUnit::GetName
+# unrar: attribute has FILE_ATTRIBUTE_DIRECTORY (and isn't -1)
+00079e71 IsDirAttribute
+# first packet slot (of 0x40) that isn't E_PENDING. TODO: verify
+0009b53e CWmvSamplePlayer::FindReadyPacket
+# the view rectangle: saved once from the first viewer, then scaled to the screen
+001184f3 CImageViewer::InitViewRect
+# multibyte strrchr (lead-byte table). TODO: verify
+00072e3e MbsFindLastChar
+# XMV: the shared open (textures, audio)
+0008f34c CXMVPlayer::OpenCommon

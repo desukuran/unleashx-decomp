@@ -1,5 +1,5 @@
 // DVD drive / disc state. The state machine that updates these lives in the
-// disc polling thread (TODO: decompile 0x000AB7F1 / 0x000AB9D8).
+// disc polling (RefreshDrives in Drives.cpp; PollDvdDrive 0x000AB9D8 TODO: decompile).
 #include <cwchar>
 
 #include "Drives.h"
