@@ -6,7 +6,7 @@
 #include "../src/common/XboxKernel.h"
 #include "../src/system/FileIO.h"
 
-class CHostFile : public CFile
+class CHostFile : public IFile
 {
 public:
 	CHostFile() : m_file(NULL), m_bufferSize(0), m_next(0), m_data(NULL), m_pending(0), m_hasPending(FALSE),
@@ -125,7 +125,7 @@ private:
 	BOOL m_eof;
 };
 
-class CHostDir : public CDir
+class CHostDir : public CDirectory
 {
 public:
 	BOOL FindClose(HANDLE find) { return CloseHandle(find); }
@@ -133,12 +133,12 @@ public:
 	BOOL FindNext(HANDLE find, WIN32_FIND_DATAA *data) { return FindNextFileA(find, data); }
 };
 
-CFile *CreateFileObject(const char *)
+IFile *CreateFileObject(const char *)
 {
 	return new CHostFile;
 }
 
-CDir *CreateDirObject(const char *)
+CDirectory *CreateDirObject(const char *)
 {
 	return new CHostDir;
 }

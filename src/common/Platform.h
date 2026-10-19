@@ -156,6 +156,7 @@ BOOL MoveFileA(LPCSTR existingFileName, LPCSTR newFileName);
 #define GENERIC_READ 0x80000000
 #endif
 #define GENERIC_WRITE 0x40000000
+#define CREATE_NEW 1
 #define CREATE_ALWAYS 2
 #define OPEN_EXISTING 3
 #define OPEN_ALWAYS 4
@@ -166,6 +167,9 @@ BOOL MoveFileA(LPCSTR existingFileName, LPCSTR newFileName);
 #define FILE_SHARE_WRITE 0x00000002
 #endif
 #define FILE_BEGIN 0
+#define FILE_CURRENT 1
+#define FILE_END 2
+#define INVALID_SET_FILE_POINTER ((DWORD)-1)
 HANDLE CreateFileA(LPCSTR fileName, DWORD access, DWORD shareMode, void *security, DWORD creationDisposition,
                    DWORD flags, HANDLE templateFile);
 BOOL ReadFile(HANDLE file, void *buffer, DWORD size, DWORD *read, void *overlapped);
@@ -201,4 +205,12 @@ FILE *HostFopen(const char *path, const char *mode);
 #ifndef UNLEASHX_PLATFORM_HOST_IMPL
 #define fopen HostFopen
 #endif
+#endif
+
+// Where the BIOS flash is mapped (the top 16 MB of the address space). NULL
+// on hosts, where there's nothing to read.
+#ifdef _XBOX
+#define BIOS_FLASH_BASE ((const void *)0xFF000000)
+#else
+#define BIOS_FLASH_BASE ((const void *)0)
 #endif

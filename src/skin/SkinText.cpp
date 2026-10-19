@@ -372,7 +372,7 @@ static void UpdateBiosTexts()
 	if (md5 != NULL)
 	{
 		// The BIOS flash is mapped at the top 16 MB; the first MB is hashed.
-		if (md5->HashMemory((const void *)0xFF000000, 0x100000))
+		if (md5->HashMemory(BIOS_FLASH_BASE, 0x100000))
 		{
 			std::string str;
 			StrFormat(str, "0x%s", md5->m_szHex);

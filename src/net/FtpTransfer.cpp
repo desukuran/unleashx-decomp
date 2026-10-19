@@ -330,7 +330,7 @@ std::string CFTPConnection::ListDirectory(BOOL namesOnly, const char *arg)
 
 	listing = namesOnly ? "..\r\n" : "drw-r--r--   1 XBOX      XBOX        0 Nov 15 08:00 ..\r\n";
 
-	CDir *dir = CreateDirObject(xboxPath.c_str());
+	CDirectory *dir = CreateDirObject(xboxPath.c_str());
 	if (dir != NULL)
 	{
 		WIN32_FIND_DATAA data;
@@ -422,7 +422,7 @@ HRESULT CFTPConnection::SendFile(const char *path, DWORD offset)
 		return E_FAIL;
 	}
 
-	CFile *file = CreateFileObject(path);
+	IFile *file = CreateFileObject(path);
 	if (file == NULL)
 	{
 		Reply(550, "Internal Server Error.");
@@ -762,7 +762,7 @@ HRESULT CFTPConnection::ReceiveFileBuffered(std::string path, BOOL resume)
 	if (m_dwRestOffset == 0 && resume)
 		resume = FALSE;
 
-	CFile *file = CreateFileObject(path.c_str());
+	IFile *file = CreateFileObject(path.c_str());
 	if (file != NULL)
 	{
 		if (!file->OpenWrite(path.c_str(), kBoostBufferSize, 0, 0, resume ? OPEN_ALWAYS : CREATE_ALWAYS))

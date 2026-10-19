@@ -109,6 +109,46 @@ void XSetProcessQuantumLength(DWORD quantum);
 void SetLastError(DWORD error);
 BOOL SetEndOfFile(HANDLE file);
 BOOL CreateDirectoryA(LPCSTR path, void *security);
+
+struct OVERLAPPED
+{
+	uintptr_t Internal;
+	uintptr_t InternalHigh;
+	DWORD Offset;
+	DWORD OffsetHigh;
+	HANDLE hEvent;
+};
+#define FILE_FLAG_OVERLAPPED 0x40000000
+#define FILE_FLAG_NO_BUFFERING 0x20000000
+#define MEM_COMMIT 0x00001000
+#define MEM_RELEASE 0x00008000
+#define MEM_NOZERO 0x00800000
+#define PAGE_READWRITE 0x04
+#define ERROR_HANDLE_EOF 38
+#define ERROR_IO_INCOMPLETE 996
+#define ERROR_IO_PENDING 997
+#define ERROR_NOT_ENOUGH_MEMORY 8
+#define ERROR_OUTOFMEMORY 14
+#define MOVEFILE_COPY_ALLOWED 0x00000002
+#define COPY_FILE_FAIL_IF_EXISTS 0x00000001
+#define PROGRESS_CONTINUE 0
+#define PROGRESS_CANCEL 1
+#define PROGRESS_STOP 2
+#define PROGRESS_QUIET 3
+#define THREAD_PRIORITY_ABOVE_NORMAL 1
+BOOL GetOverlappedResult(HANDLE file, OVERLAPPED *overlapped, DWORD *transferred, BOOL wait);
+BOOL GetFileSizeEx(HANDLE file, LARGE_INTEGER *size);
+DWORD GetFileSize(HANDLE file, DWORD *high);
+HANDLE CreateMutexA(void *security, BOOL initialOwner, LPCSTR name);
+BOOL ReleaseMutex(HANDLE mutex);
+DWORD GetCurrentThreadId();
+BOOL MoveFileExA(LPCSTR existingFileName, LPCSTR newFileName, DWORD flags);
+BOOL MoveFileWithProgressA(LPCSTR existingFileName, LPCSTR newFileName, void *progress, void *data, DWORD flags);
+BOOL CopyFileExA(LPCSTR existingFileName, LPCSTR newFileName, void *progress, void *data, BOOL *cancel,
+                 DWORD flags);
+LONG __stdcall NtAllocateVirtualMemory(void **baseAddress, uintptr_t zeroBits, DWORD *regionSize,
+                                       DWORD allocationType, DWORD protect);
+LONG __stdcall NtFreeVirtualMemory(void **baseAddress, DWORD *regionSize, DWORD freeType);
 int _mbsicmp(const char *a, const char *b);
 int _stricmp(const char *a, const char *b);
 char *_strdup(const char *s);

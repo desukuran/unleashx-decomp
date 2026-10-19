@@ -12,8 +12,9 @@ SFileListItem::SFileListItem(const std::string &itemPath, BOOL folder, DWORD ite
 {
 }
 
-// 0x000F57E4 (path, list, dir on the stack)
-static void CollectFolder(const char *path, std::vector<SFileListItem> *list, CDir *dir)
+// 0x000F57E4 (path, list, dir on the stack; LTCG copies at 0x00082AB0,
+// 0x000A5705, 0x00109980, 0x0012889A)
+static void CollectFolder(const char *path, std::vector<SFileListItem> *list, CDirectory *dir)
 {
 	if (g_bCancelOperation)
 		return;
@@ -55,9 +56,9 @@ static void CollectFolder(const char *path, std::vector<SFileListItem> *list, CD
 	find = dir->FindFirst(pattern, &data);
 	if (find != INVALID_HANDLE_VALUE)
 	{
-		// A CDir whose search handle is always 1 keeps one search at a time,
-		// so after each subfolder the search is started again and walked
-		// back to where it was.
+		// A CDirectory whose search handle is always 1 keeps one search at
+		// a time, so after each subfolder the search is started again and
+		// walked back to where it was.
 		BOOL sharedSearch = (find == (HANDLE)1);
 		do
 		{
@@ -97,7 +98,7 @@ void CollectFiles(const char *path, std::vector<SFileListItem> *list)
 		return;
 	if (list == NULL)
 		list = &g_fileList;
-	CDir *dir = CreateDirObject(path);
+	CDirectory *dir = CreateDirObject(path);
 	if (dir == NULL)
 		return;
 	CollectFolder(path, list, dir);
