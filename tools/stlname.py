@@ -43,6 +43,7 @@ class Func:
         self.calls = []         # targets, in order
         self.backjump = False   # a loop
         self.refs = set()       # immediates and absolute addresses used
+        self.recursive = False
         self.strings = []
         self.role = None        # e.g. 'vector::push_back'
         self.elem = None        # element size
@@ -80,14 +81,19 @@ def load():
                 if f.addr <= ins.operands[0].imm <= ins.address:
                     f.backjump = True
             if ins.mnemonic in ('call', 'jmp') and ins.operands and ins.operands[0].type == X86_OP_IMM:
-                if ins.operands[0].imm in funcs and ins.operands[0].imm != f.addr:
+                if ins.operands[0].imm == f.addr and ins.mnemonic == 'call':
+                    f.recursive = True
+                elif ins.operands[0].imm in funcs and ins.operands[0].imm != f.addr:
                     f.calls.append(ins.operands[0].imm)
+    # Strings by the addresses each function uses (names change as symbols
+    # get applied).
+    texts = {}
     for line in open(os.path.join(ROOT, 'build/export/strings.tsv')):
         p = line.rstrip('\n').split('\t')
         if len(p) >= 3:
-            for user in p[1].split(','):
-                for a in by_name.get(user.strip(), []):
-                    funcs[a].strings.append(p[2])
+            texts[int(p[0], 16)] = p[2]
+    for f in funcs.values():
+        f.strings = [texts[r] for r in sorted(f.refs) if r in texts]
     return funcs
 
 
@@ -189,9 +195,24 @@ def main():
             p = line.split()
             if len(p) >= 2 and not line.startswith('#'):
                 known.add(int(p[0], 16))
-    scope = [f for a, f in sorted(funcs.items()) if PART1[0] <= a < PART1[1] and a not in done and a not in known
-             and f.name.startswith(('FUN_', 'thunk_FUN_'))]
+    # This tool's own earlier output (already applied in Ghidra) counts as
+    # unnamed.
+    previous = set()
+    own = os.path.join(ROOT, 'symbols/stl.txt')
+    if os.path.exists(own):
+        for line in open(own):
+            p = line.split()
+            if len(p) >= 2 and not line.startswith('#'):
+                previous.add(int(p[0], 16))
+    for a in previous:
+        if a in funcs:
+            funcs[a].name = 'FUN_%08x' % a
+    # Roles are worked out for all of part 1 (decompiled wrappers and named
+    # functions take part in the call relations); only unnamed functions
+    # without source get names.
+    scope = [f for a, f in sorted(funcs.items()) if PART1[0] <= a < PART1[1] and a not in known]
     free = {f.addr for f in scope}
+    nameable = {f.addr for f in scope if f.addr not in done and f.name.startswith(('FUN_', 'thunk_FUN_'))}
     names = {}                                       # address -> name
 
     def give(f, role, elem=None):
@@ -209,7 +230,7 @@ def main():
             give(f, 'vector::' + sc[0], sc[1])
             continue
         cls = scalar_deleting(f, funcs)
-        if cls:
+        if cls and f.addr in nameable:
             names[f.addr] = '%s::scalar_deleting_destructor' % cls
             continue
         for s in f.strings:
@@ -224,6 +245,14 @@ def main():
 
     def role(a):
         return funcs[a].role if a in funcs else None
+
+    all_callers = collections.defaultdict(set)
+    for g in funcs.values():
+        for c in g.calls:
+            all_callers[c].add(g.addr)
+
+    def callers_of(a):
+        return sorted(all_callers[a])
 
     def is_tag_dispatch(f):
         """std::_Uninitialized_copy and friends: pass the arguments on with a
@@ -304,9 +333,152 @@ def main():
                 if role(last) not in ('tree::_Lrotate', 'tree::_Rrotate'):
                     n += give(funcs[last], 'tree::_Destval')
         for f in scope:
-            if f.role is None and f.addr in f.calls and any(role(c) == 'tree::_Destval' for c in f.calls):
+            if f.role is None and f.recursive and any(role(c) == 'tree::_Destval' for c in f.calls):
                 n += give(f, 'tree::_Erase')
+        for f in scope:
+            if f.role is not None:
+                continue
+            rs = [role(c) for c in f.calls]
+            names_ = [funcs[c].name for c in f.calls]
+            # clear(): _Erase(_Root()) and reset the head.
+            if rs == ['tree::_Erase'] and f.size < 48:
+                n += give(f, 'tree::clear')
+            # erase(first, last): clear() for everything, else erase(it++).
+            elif 'tree::const_iterator::_Inc' in rs and 'tree::erase' in rs and f.size < 120:
+                n += give(f, 'tree::erase')
+                for c in f.calls:
+                    if c in free and role(c) is None and c != f.addr:
+                        n += give(funcs[c], 'tree::clear')
+                        break
+            # _Tidy(): erase(begin(), end()), delete the head.
+            elif len(f.calls) == 2 and names_[1] == 'operator_delete' and f.size < 48 and \
+                    funcs[f.calls[0]].role == 'tree::erase' and funcs[f.calls[0]].size < 120:
+                n += give(f, 'tree::_Tidy')
+            # insert(value): _Insert, and --_Where (_Dec) in between.
+            elif 'tree::_Insert' in rs and f.size < 400:
+                n += give(f, 'tree::insert')
+                for c in distinct(f.calls):
+                    if c in free and role(c) is None and not funcs[c].calls and funcs[c].size < 80:
+                        n += give(funcs[c], 'tree::const_iterator::_Dec')
         return n
+
+    def chain(a, names_):
+        """Follow single-call forwarders from a, naming them in order."""
+        n = 0
+        for r in names_:
+            if a not in funcs or a not in free:
+                break
+            f = funcs[a]
+            n += give(f, r)
+            inner = [c for c in distinct(f.calls) if c in nameable and not (role(c) or '').startswith('T::')]
+            if len(inner) != 1:
+                break
+            a = inner[0]
+        return n
+
+    def sort_slots():
+        """std::sort (VC7.1): _Sort is recursive and calls
+        _Unguarded_partition, itself, make_heap, sort_heap and
+        _Insertion_sort; _Unguarded_partition starts with _Median, which
+        calls _Med3; _Med3 compares and calls iter_swap."""
+        n = 0
+        for f in scope:
+            if f.role is None and f.recursive:
+                others = [c for c in distinct(f.calls) if c in free]
+                if len(others) == 4 and f.size > 120:
+                    n += give(f, 'std::_Sort')
+            if f.role != 'std::_Sort':
+                continue
+            part, mk, srt, ins = [c for c in distinct(f.calls) if c in free][:4]
+            n += give(funcs[part], 'std::_Unguarded_partition') + give(funcs[ins], 'std::_Insertion_sort')
+            n += chain(mk, ['std::make_heap', 'std::_Make_heap', 'std::_Adjust_heap', 'std::_Push_heap'])
+            n += chain(srt, ['std::sort_heap', 'std::pop_heap', 'std::_Pop_heap_0', 'std::_Pop_heap'])
+            for c in callers_of(f.addr):
+                g = funcs[c]
+                if g.addr in free and g.role is None and len(distinct(g.calls)) == 1 and g.size < 64:
+                    n += give(g, 'std::sort')
+        for f in scope:
+            if f.role == 'std::_Unguarded_partition':
+                inner = [c for c in distinct(f.calls) if c in free]
+                if inner:
+                    n += give(funcs[inner[0]], 'std::_Median')
+                    for c in inner[1:]:
+                        if funcs[c].role is None and any(role(x) and role(x).startswith('T::') or
+                                                         funcs[x].name.endswith(('::operator=', '_copy'))
+                                                         for x in funcs[c].calls):
+                            n += give(funcs[c], 'std::iter_swap')
+            elif f.role == 'std::_Median':
+                counts = collections.Counter(c for c in f.calls if c in free)
+                if counts:
+                    n += give(funcs[counts.most_common(1)[0][0]], 'std::_Med3')
+            elif f.role == 'std::_Med3':
+                for c in distinct(f.calls):
+                    if role(c) == 'std::iter_swap' or (c in free and funcs[c].role is None and any(
+                            funcs[x].name.endswith(('::operator=', '_copy')) or (role(x) or '').startswith('T::')
+                            for x in funcs[c].calls)):
+                        n += give(funcs[c], 'std::iter_swap')
+            elif f.role == 'std::_Insertion_sort':
+                for c in distinct(f.calls):
+                    g = funcs[c]
+                    if c not in nameable or g.role is not None:
+                        continue
+                    if is_tag_dispatch(g):
+                        n += slot(c, 'copy_backward', None)
+                    # rotate(first, mid, last): checks, then _Rotate (the
+                    # random-access one: gcd cycles, idiv).
+                    elif len(g.calls) == 1 and g.size < 48 and g.calls[0] in nameable and \
+                            any(t.startswith('idiv') for t in funcs[g.calls[0]].text):
+                        n += give(g, 'std::rotate') + give(funcs[g.calls[0]], 'std::_Rotate')
+        return n
+
+    def more_members():
+        """vector reserve/_Insert_n/operator=/copy constructor, map
+        _Lbound/find/operator[], use_facet."""
+        n = 0
+        for f in scope:
+            if f.role is not None or f.addr not in nameable:
+                continue
+            rs = [role(c) for c in f.calls]
+            names_ = [funcs[c].name for c in f.calls]
+            vec = [c for c in f.calls if role(c) in ('vector::size', 'vector::capacity')]
+            elem = funcs[vec[0]].elem if vec else None
+            if 'vector::_Xlen' in rs and 'vector::capacity' in rs and 'operator_new' in names_:
+                if rs.index('vector::_Xlen') < rs.index('vector::capacity'):
+                    # reserve(n): max_size check, capacity, allocate, _Ucopy...
+                    n += give(f, 'vector::reserve', elem)
+                elif 'vector::size' in rs:
+                    n += give(f, 'vector::_Insert_n', elem)
+                continue
+            if any('bad cast' in x for x in f.strings) and '_Lockit' in ' '.join(names_):
+                n += give(f, 'std::use_facet')
+                continue
+            by = [funcs[c].name for c in all_callers[f.addr]]
+            if vec and rs.count('vector::size') >= 2 and any(x.endswith('::operator=') for x in by):
+                n += give(f, 'vector::operator=', elem)
+            elif vec and names_ and names_[0] == '__EH_prolog' and \
+                    any(re.match(r'(\w+)::\1$', x) for x in by) and f.size < 160:
+                n += give(f, 'vector::vector', elem)
+        # map lookups: _Lbound (a compare loop down the tree), find,
+        # operator[] (_Lbound, then insert).
+        for f in scope:
+            if f.role is not None or f.addr not in nameable:
+                continue
+            rs = [role(c) for c in f.calls]
+            lb = [c for c in f.calls if is_lbound(funcs[c])]
+            if lb and 'tree::insert' in rs and f.size < 160:
+                n += give(f, 'tree::operator[]') + give(funcs[lb[0]], 'tree::_Lbound')
+            elif lb and f.size < 140 and len(distinct(f.calls)) <= 4 and \
+                    any(x in ('CSoundEffects::Find', 'CImageManager::Find') or x.endswith('::Find')
+                        for x in (funcs[c].name for c in all_callers[f.addr])):
+                n += give(f, 'tree::find') + give(funcs[lb[0]], 'tree::_Lbound')
+        return n
+
+    def is_lbound(g):
+        """_Lbound: down the tree comparing keys until the nil node."""
+        if g.size > 100 or not g.backjump or (g.calls and any(
+                funcs[c].name not in ('std::string::compare',) for c in g.calls)):
+            return False
+        return any(re.match(r'cmp byte ptr \[e\w\w \+ 0x\w+\], 0', t) for t in g.text)
 
     def standalone_helpers():
         """The std:: helpers by their own shape, wherever they're used:
@@ -433,21 +605,31 @@ def main():
                 changed += give(f, 'vector::_Tidy', funcs[f.calls[0]].elem)
         changed += standalone_helpers()
         changed += tree_slots()
+        changed += sort_slots()
+        changed += more_members()
         if not changed:
             break
 
     members, globals_ = class_members()
     infer_types(funcs, scope, element_types(), members, globals_)
     infer_tree_types(funcs, scope)
+    infer_sort_types(funcs, scope, element_types(), members)
+    # Members of T (and helpers) shared by instantiations of different sizes:
+    # no size.
     for f in scope:
-        if f.role and f.addr not in names:
+        if f.role and f.role.startswith(('T::', 'std::')):
+            sizes_ = {funcs[c].elem for c in all_callers[f.addr] if funcs[c].role and funcs[c].elem}
+            if len(sizes_) > 1:
+                f.elem, f.typ = None, None
+    for f in scope:
+        if f.role and f.addr not in names and f.addr in nameable:
             names[f.addr] = ghidra_safe(format_name(f))
     with open(args.out, 'w') as out:
         out.write('# Generated by tools/stlname.py -- do not edit; put overrides in symbols/names.txt\n')
         for a in sorted(names):
             out.write('%08x %s\n' % (a, names[a]))
-    roles = collections.Counter(f.role for f in scope if f.role)
-    print('%d functions in scope, %d named: %s' % (len(scope), len(names), dict(roles)), file=sys.stderr)
+    roles = collections.Counter(f.role for f in scope if f.role and f.addr in names)
+    print('%d unnamed functions, %d named: %s' % (len(nameable), len(names), dict(roles)), file=sys.stderr)
     if args.verbose:
         for a in sorted(names):
             print('%08x %5d %s' % (a, funcs[a].size, names[a]))
@@ -503,7 +685,10 @@ def infer_types(funcs, scope, table, members, globals_):
     for f in funcs.values():
         for c in f.calls:
             callers[c].add(f.addr)
-    roled = [f for f in scope if f.role and f.elem and f.role not in ('vector::_Xlen', 'list::_Xlen')]
+    # T's members and the std:: helpers can be shared between same-size
+    # types: they're typed below, only when all their callers agree.
+    roled = [f for f in scope if f.role and f.elem and f.role not in ('vector::_Xlen', 'list::_Xlen')
+             and not f.role.startswith(('T::', 'std::'))]
 
     def own_type(f):
         cands = set(table.get(f.elem, []))
@@ -567,12 +752,14 @@ def infer_types(funcs, scope, table, members, globals_):
                     changed = True
         if not changed:
             break
-    # T's own members: typed when every caller agrees.
-    for f in scope:
-        if f.role and f.role.startswith('T::') and not f.typ:
-            types = {funcs[c].typ for c in callers[f.addr] if funcs[c].role}
-            if len(types) == 1 and None not in types:
-                f.typ = types.pop()
+    # T's members and the std:: helpers: typed when every caller in the
+    # program agrees (callers without a role count as unknown).
+    for _ in range(4):
+        for f in scope:
+            if f.role and f.role.startswith(('T::', 'std::')) and not f.typ:
+                types = {funcs[c].typ for c in callers[f.addr]}
+                if len(types) == 1 and None not in types:
+                    f.typ = types.pop()
 
 
 MAP_TYPE = r'std::map<[^;{}()]*?>(?=\s*(?:\w|::|\*|&|>))'
@@ -625,12 +812,95 @@ def infer_tree_types(funcs, scope):
                     stack.append(p)
         if len(found) == 1:
             f.typ = found.pop()
-    # Their own callees when not shared.
+    # Along the tree's own calls, both ways; the rotations and iterator
+    # steps are shared between trees.
+    SHARED = ('tree::_Lrotate', 'tree::_Rrotate', 'tree::const_iterator::_Inc', 'tree::const_iterator::_Dec')
+    own = [f for f in scope if f.role and f.role.startswith('tree::') and f.role not in SHARED]
+    for _ in range(6):
+        for f in own:
+            if f.typ:
+                continue
+            near = [funcs[c] for c in list(callers[f.addr]) + f.calls]
+            types = {g.typ for g in near if g.role and g.role.startswith('tree::') and g.role not in SHARED}
+            types.discard(None)
+            if len(types) == 1:
+                f.typ = types.pop()
     for f in scope:
-        if f.role and f.role.startswith('tree::') and not f.typ:
+        if f.role in SHARED and not f.typ:
             types = {funcs[c].typ for c in callers[f.addr] if funcs[c].role and funcs[c].role.startswith('tree::')}
             if len(types) == 1 and None not in types:
                 f.typ = types.pop()
+
+
+# std::sort calls whose element type the decompiled source already
+# records (the std::sort copy itself is inlined or documented at the call).
+SORT_SITES = {
+    0x00020D23: 'SGameEntry*',     # CGameManager's game scan: std::sort(m_games...) (GameManager.h)
+    0x000274D4: 'SSkinDrawItem',   # CSkin draw orders: std::sort(..., CompareSkinZIndex) (SkinParser.cpp)
+}
+
+SORT_FAMILY = ('std::sort', 'std::_Sort', 'std::_Unguarded_partition', 'std::_Median', 'std::_Med3', 'std::iter_swap',
+               'std::_Insertion_sort', 'std::make_heap', 'std::_Make_heap', 'std::_Adjust_heap', 'std::_Push_heap',
+               'std::sort_heap', 'std::pop_heap', 'std::_Pop_heap_0', 'std::_Pop_heap', 'std::rotate', 'std::_Rotate',
+               'std::copy_backward', 'std::_Copy_backward_opt')
+
+
+def infer_sort_types(funcs, scope, table, members):
+    """A std::sort instantiation's element type: T's members or the
+    comparator it calls (X::X, X::operator=, X::operator_less, ...), else
+    the classes and functions that call std::sort."""
+    callers = collections.defaultdict(set)
+    for f in funcs.values():
+        for c in f.calls:
+            callers[c].add(f.addr)
+    known_types = {t for ts in table.values() for t in ts}
+    votes = collections.defaultdict(set)
+    for top in [f for f in scope if f.role == 'std::_Sort']:
+        family, todo = {top.addr}, [top.addr]
+        while todo:
+            a = todo.pop()
+            for c in funcs[a].calls:
+                if c not in family and funcs[c].role in SORT_FAMILY:
+                    family.add(c)
+                    todo.append(c)
+        sorts = [c for c in callers[top.addr] if funcs[c].role == 'std::sort']
+        family.update(sorts)
+        evidence = set()
+        for a in family:
+            for c in funcs[a].calls:
+                n = funcs[c].name
+                m = re.match(r'(\w+)::', n)
+                if m and m.group(1) in {t.rstrip('*') for t in known_types}:
+                    evidence.add(m.group(1))
+                if funcs[c].typ:
+                    evidence.add(funcs[c].typ)
+                elif (funcs[c].role or '').startswith('T::'):
+                    # What T's typed callers elsewhere agree on.
+                    seen = {funcs[x].typ for x in callers[c] if x not in family} - {None}
+                    if len(seen) == 1:
+                        evidence |= seen
+        types = {t for t in known_types if t.rstrip('*') in evidence or t in evidence}
+        pick = None
+        sites = {SORT_SITES[c] for a in [top.addr] + sorts for c in callers[a] if c in SORT_SITES}
+        owned = set()
+        for sfn in sorts + [top.addr]:
+            for c in callers[sfn]:
+                if c in family:
+                    continue
+                n = funcs[c].name
+                for key in (n, n.split('::')[0], n.split('::')[-1]):
+                    owned |= {t for t in members.get(key, set()) if t in known_types}
+        if len(sites) == 1:
+            pick = sites.pop()
+        elif len(owned) == 1:
+            pick = owned.pop()
+        elif len(types) == 1:
+            pick = types.pop()
+        for a in family:
+            votes[a].add(pick)
+    for a, v in votes.items():
+        if len(v) == 1 and None not in v:
+            funcs[a].typ = v.pop()
 
 
 def ghidra_safe(name):

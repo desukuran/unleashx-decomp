@@ -677,6 +677,7 @@ void CSkin::ParseImages(CXmlElement *parent, const char *tag, std::vector<SSkinI
 	}
 }
 
+// 0x000F8EC6 (the items come by value)
 bool CompareSkinZIndex(const SSkinDrawItem &a, const SSkinDrawItem &b)
 {
 	return a.zIndex < b.zIndex;
