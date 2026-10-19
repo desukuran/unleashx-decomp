@@ -204,7 +204,7 @@ BOOL XSetupDriveFolder(const char *drive, const wchar_t *name);   // 0x000373FB
 // Called by the kernel for each thread created/ended. TODO: decompile
 void __stdcall ThreadNotifyRoutine(BOOL create);    // 0x000DFF8C
 
-// Creates g_pMusicManager (on a thread; directly if that fails). TODO: decompile
+// Creates g_pMusicManager (on a thread; directly if that fails). See Startup.cpp.
 unsigned __stdcall MusicManagerThread(void *app);  // 0x000E85B3
 // Set by Render after each frame (FrameMove waits for the first one).
 extern BOOL g_bFrameDrawn;                   // 0x00276218

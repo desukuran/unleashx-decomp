@@ -104,6 +104,9 @@ void OutputDebugStringA(LPCSTR text);
 void Sleep(DWORD ms);
 int MultiByteToWideChar(unsigned codePage, DWORD flags, const char *src, int srcLen, wchar_t *dst, int dstLen);
 #define INFINITE 0xFFFFFFFF
+#ifndef WAIT_OBJECT_0
+#define WAIT_OBJECT_0 0
+#endif
 #define INVALID_HANDLE_VALUE ((HANDLE)-1)
 #define THREAD_PRIORITY_ABOVE_NORMAL 1
 #ifndef __stdcall

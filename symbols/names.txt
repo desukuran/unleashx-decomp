@@ -1261,3 +1261,54 @@
 0027a364 s_fTextX
 0027a360 s_fTextY
 00278d10 s_nTextFade
+00105fb7 CMusicManager::GetVolume float f(CMusicManager *this@eax)
+00105fec CMusicManager::GetUserSoundtrackCount UINT f(CMusicManager *this@eax)
+00106010 CMusicManager::IsRandom BOOL f(CMusicManager *this@eax)
+0010605f CMusicManager::StopPlayer void f(CMusicManager *this@esi)
+001060c8 CMusicManager::IsGlobal BOOL f(CMusicManager *this@eax)
+001060cf CMusicManager::FindPlayer CAudioPlayer * f(CMusicManager *this@esi, int type)
+00106113 CMusicManager::SeedRandom
+0010615a CMusicManager::SetMute void f(CMusicManager *this@eax, BOOL mute@ecx)
+00106189 CMusicManager::GetSoundtrackName void f(CMusicManager *this@eax, WORD *name)
+0010619b CMusicManager::GetSongCount UINT f(CMusicManager *this@eax)
+00106225 CMusicManager::GetAlbumArt void * f(CMusicManager *this@eax)
+00106283 CMusicManager::~CMusicManager void f(CMusicManager *this@edi)
+001063dd CMusicManager::ShuffleSongs
+001064a1 CMusicManager::AddSoundtrack BOOL f(CMusicManager *this@eax, char *path, WORD *name@ebx)
+0010656e CMusicManager::FindAlbumArt
+001065fc CMusicManager::AddFolderSongs
+0010693b CMusicManager::ScanMusicFolder
+00106d35 CMusicManager::CMusicManager CMusicManager * f(CMusicManager *this@esi, BOOL useSoundtracks, BOOL useFolder, char *folder)
+00106ef1 CMusicManager::SetSoundtrackTitle BOOL f(CMusicManager *this@edi, UINT index@ecx, char *title)
+00107256 CMusicManager::PlaySong HRESULT f(CMusicManager *this@ebx, UINT index, BOOL shuffled)
+00107560 CMusicManager::PlaySongAt HRESULT f(CMusicManager *this@ebx, UINT index)
+0010756e CMusicManager::NextSong HRESULT f(CMusicManager *this@eax)
+001075dd CMusicManager::LoadSoundtrack
+00107fda CMusicManager::SelectSoundtrack
+001081ae CMusicManager::NextSoundtrack HRESULT f(CMusicManager *this@eax)
+00108297 CMusicManager::Run
+00108523 CMusicManager::PlayFile BOOL f(CMusicManager *this@eax, char *path, BOOL folder)
+00108855 CMusicManager::PrevSong HRESULT f(CMusicManager *this@eax)
+001088dc CMusicManager::PrevSoundtrack HRESULT f(CMusicManager *this@eax)
+00108a75 CMusicManager::LoadSoundtracks
+00108cf2 CMusicManager::Init
+000aa3b8 Thread::ThreadProc
+000aa416 Thread::Start HANDLE f(Thread *this@esi, uint stackSize, bool suspended@al)
+000aa385 Thread::Resume DWORD f(Thread *this@eax)
+000aa39a Thread::Suspend DWORD f(Thread *this@eax)
+000aa46a Thread::Join void f(Thread *this@eax)
+000234b4 Thread::Stop void f(Thread *this@eax)
+000aa404 Thread::CloseThread void f(Thread *this@esi)
+0009df2c StrWideToUtf8 void f(WORD *src@edi, char *dst@esi, uint size)
+00278748 g_cdToc
+0007f5fb CdTocOpen
+0007f46d CdTocClose
+0007f4a4 CdTocGetTrackLength
+000386cd XFindFirstSoundtrack
+000386ae XFindNextSoundtrack
+0003761c XFindClose
+00038784 XGetSoundtrackSongInfo
+000d8f85 CWMAPlayer::CWMAPlayer
+001096d3 CMP3Player::CMP3Player
+0013062d CWAVPlayer::CWAVPlayer
+00130af7 CDDAPlayer::CDDAPlayer

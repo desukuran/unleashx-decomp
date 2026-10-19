@@ -413,7 +413,7 @@ static BOOL UpdateSongTexts()
 	}
 
 	const wchar_t *channels;
-	if (!g_pMusicManager->m_bFromHdd)
+	if (g_pMusicManager->m_nSoundtrack == SOUNDTRACK_CD)
 		channels = L"CD Stereo";
 	else if (format->channels == 1)
 		channels = L"Mono";

@@ -32,6 +32,9 @@ public:
 	const char *FindFirst(const char *dir, const char *pattern);   // 0x00013338
 	const char *FindNext();                               // 0x000134C3
 	void Close();                                         // 0x0001352D (this in eax)
+	// The current match (the find data, read directly by the callers).
+	const char *GetName() const { return (const char *)m_findData + 0x2C; }
+	DWORD GetAttributes() const { return *(const DWORD *)m_findData; }
 
 	HANDLE m_hFind;                                       // +0x000
 	std::string m_strPattern;                             // +0x004

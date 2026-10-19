@@ -424,3 +424,63 @@ void CUnleashX::PrepareHardDisk()
 	g_bCancelOperation = FALSE;
 	g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xFF000000, 1.0f, 0);
 }
+
+// 0x000E85B3
+// Creates g_pMusicManager (from FrameMove, on a thread): soundtracks for
+// <SoundTrack> modes 1 and 3, the music folder for modes 2 and 3; then
+// random/global play, 5.1, the volume and the menu's background sound.
+// Exit code 1 if Init failed.
+unsigned __stdcall MusicManagerThread(void *param)
+{
+	CUnleashX *app = (CUnleashX *)param;
+	unsigned result = 0;
+	if (app == NULL)
+		return result;
+	app->m_bStartMusic = FALSE;
+	if (g_bLaunching || g_pMusicManager != NULL)
+		return result;
+
+	SAudioSettings &audio = g_pSettings->m_audio;
+	int mode = audio.m_nSoundTrackMode;
+	g_pMusicManager = new CMusicManager(mode == 1 || mode == 3, 1 < (unsigned)mode, audio.m_strMusicPath.c_str());
+	if (g_pMusicManager == NULL)
+		return result;
+	// Quirk: "global" only takes effect with random play.
+	if (audio.m_bRandom)
+	{
+		g_pMusicManager->SetRandom(TRUE);
+		g_pMusicManager->SetGlobal(audio.m_bGlobal);
+	}
+	else
+	{
+		g_pMusicManager->SetGlobal(FALSE);
+	}
+	// The players get the data folder's sample.xsb.
+	std::string path = g_pSettings->m_strDataPath;
+	StrReplaceAll(path, "U:\\", "E:\\UDATA\\");
+	path.append("\\sample.xsb");
+	StrReplaceAll(path, "\\\\", "\\");
+	if (g_pMusicManager->Init(path.c_str()) < 0)
+	{
+		delete g_pMusicManager;
+		g_pMusicManager = NULL;
+		return 1;
+	}
+	try
+	{
+		if (audio.m_bEnable51)
+		{
+			audio.SetEnable51(TRUE);
+			if (audio.m_bEnable51)
+				g_pMusicManager->SetSpeakerConfig(audio.m_bEnable51 ? g_pSettings->m_unknownAudio : NULL);
+		}
+	}
+	catch (...)
+	{
+	}
+	g_pMusicManager->SetVolume((float)g_pSettings->GetMusicVolume());
+	Sleep(500);
+	app->PlayBackgroundSound(audio.m_nSoundTrackMode == 0);
+	app->m_bStartMusic = TRUE;
+	return result;
+}

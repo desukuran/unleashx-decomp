@@ -35,6 +35,19 @@ struct MEMORYSTATUS
 };
 
 void GlobalMemoryStatus(MEMORYSTATUS *status);
+// Xbox soundtracks (the ones ripped by the MS dashboard).
+struct XSOUNDTRACK_DATA
+{
+	UINT uSoundtrackId;
+	UINT uSongCount;
+	UINT uSoundtrackLength;
+	wchar_t szName[32];
+};
+HANDLE XFindFirstSoundtrack(XSOUNDTRACK_DATA *data);
+BOOL XFindNextSoundtrack(HANDLE find, XSOUNDTRACK_DATA *data);
+BOOL XGetSoundtrackSongInfo(DWORD soundtrackId, UINT index, DWORD *songId, DWORD *songLength, wchar_t *name,
+                            UINT nameLength);
+BOOL XFindClose(HANDLE find);
 HANDLE XFindFirstNicknameW(BOOL titleNicknamesOnly, wchar_t *nickname, unsigned size);
 // XGetLanguage values (XDK)
 #define XC_LANGUAGE_ENGLISH 1
