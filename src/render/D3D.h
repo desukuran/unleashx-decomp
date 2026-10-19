@@ -13,7 +13,9 @@ typedef DWORD D3DCOLOR;
 
 #define D3DFMT_A8R8G8B8 0x06
 #define D3DFMT_DXT1 0x0C
+#define D3DFMT_LIN_R5G6B5 0x11
 #define D3DFMT_LIN_A8R8G8B8 0x12
+#define D3DX_FILTER_NONE 1
 
 #define D3DRTYPE_TEXTURE 3
 #define D3DLOCK_READONLY 0x80   // TODO: verify (LockRect flags 0x80 in the original)
@@ -165,6 +167,9 @@ struct IDirect3DDevice8
 IDirect3DSurface8 *AvGetSavedDataAddress();
 
 DWORD D3DResource_GetType(D3DResource *resource);
+HRESULT D3DXLoadSurfaceFromSurface(IDirect3DSurface8 *destination, const void *destPalette, const void *destRect,
+                                   IDirect3DSurface8 *source, const void *sourcePalette, const void *sourceRect,
+                                   DWORD filter, D3DCOLOR colorKey);
 void Get2DSurfaceDesc(D3DResource *resource, DWORD level, D3DSURFACE_DESC *desc);
 
 HRESULT D3DXCreateTextureFromFileExA(IDirect3DDevice8 *device, const char *file, UINT width, UINT height,

@@ -20,6 +20,12 @@ void SmcSetLedAuto();                                // 0x0008FA1C
 void SmcSetLed(BYTE sequence);                       // 0x0008FA31
 void SmcSetResetOnEject(BOOL reset);                 // 0x0008F947 / 0x0008F95C
 
+// Shows a LedColor (AppSettings.h) from the <LED> settings. LED_DEFAULT
+// restores <LEDColor> (or the SMC's automatic mode). An activity color
+// replaces the default until SetLedPattern(LED_DEFAULT, FALSE) restores it.
+// Returns TRUE if the LED was set.
+BOOL SetLedPattern(int pattern, BOOL force);         // 0x0009D319
+
 // Reboots into the default dashboard (XLaunchNewImage(NULL, ...)).
 HRESULT RebootToDashboard();                         // 0x0009A240
 void LaunchDefaultDashboard();                       // 0x0008FA6A

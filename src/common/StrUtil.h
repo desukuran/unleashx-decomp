@@ -3,6 +3,7 @@
 // they're expressed here as plain functions. Names are reconstructed.
 #pragma once
 
+#include <cstdarg>
 #include <string>
 
 #include "Platform.h"
@@ -28,11 +29,21 @@ inline int StrCmpNoCase(const std::string &a, const char *b)                  //
 
 // sprintf into a std::string (tries buffers of 2K, 4K, ... 12K).
 std::string &StrFormat(std::string &out, const char *fmt, ...);              // 0x0001ADD6
+std::string &StrFormatV(std::string &out, const char *fmt, va_list args);    // 0x00019113
 
 // Position of s in str at or after pos, or -1.                    (0x000191A9 / 0x000191C2)
 int StrFind(const std::string &str, const char *s, int pos = 0);
 // Last position of s in str at or before pos (-1 = end), or -1.   (0x00012AF5)
 int StrReverseFind(const std::string &str, const char *s, int pos = -1);
+// Position of c in str, or -1.                                    (0x0001EF9B)
+int StrFindChar(const std::string &str, char c);
+void StrAppend(std::string &s, const char *text);                // 0x000117FD
+// Removes trailing characters that are in chars (all of them if the
+// string consists only of those).                                 (0x000192D4)
+std::string &StrTrimRightChars(std::string &s, const char *chars);
+std::string &StrTrimRightChar(std::string &s, char c);           // 0x0002FC7D
+// Uppercases with the C++ locale's ctype<char>::toupper.            (0x0001EFBD)
+void StrMakeUpper(std::string &s);
 // Appends '\' unless the string already ends with one.            (0x000A41DF)
 void StrAddBackslash(std::string &s);
 // Lowercased copy (the original uses _strdup + _mbslwr and leaks the copy).

@@ -18,6 +18,7 @@ typedef uint32_t DWORD;
 typedef uint32_t ULONG;
 typedef unsigned int UINT;
 typedef uint64_t ULONGLONG;
+typedef int64_t LONGLONG;
 typedef int32_t LONG;
 typedef int32_t HRESULT;
 typedef void *HANDLE;
@@ -33,6 +34,7 @@ typedef const char *LPCSTR;
 #define FAILED(hr) ((HRESULT)(hr) < 0)
 #define E_FAIL ((HRESULT)0x80004005)
 
+#define FILE_ATTRIBUTE_READONLY 0x00000001
 #define FILE_ATTRIBUTE_DIRECTORY 0x00000010
 #define FILE_ATTRIBUTE_NORMAL 0x00000080
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
@@ -126,7 +128,11 @@ BOOL MoveFileA(LPCSTR existingFileName, LPCSTR newFileName);
 #define GENERIC_READ 0x80000000
 #endif
 #define GENERIC_WRITE 0x40000000
+#define CREATE_ALWAYS 2
 #define OPEN_EXISTING 3
+#define OPEN_ALWAYS 4
+#define FILE_FLAG_SEQUENTIAL_SCAN 0x08000000
+#define ERROR_DIR_NOT_EMPTY 145
 #ifndef FILE_SHARE_READ
 #define FILE_SHARE_READ 0x00000001
 #define FILE_SHARE_WRITE 0x00000002

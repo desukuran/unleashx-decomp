@@ -1,9 +1,13 @@
 // Host (non-Xbox) stand-ins for XNet: the network never comes up.
 #ifndef _XBOX
+#define UNLEASHX_XNET_HOST_IMPL
 #include "XNet.h"
 
 #include <cstdio>
 #include <cstring>
+#include <cerrno>
+#include <cstdlib>
+#include <fcntl.h>
 #include <unistd.h>
 
 extern "C" {
@@ -67,9 +71,48 @@ int closesocket(SOCKET s)
 	return close(s);
 }
 
-int ioctlsocket(SOCKET, long, unsigned long *)
+int ioctlsocket(SOCKET s, long cmd, unsigned long *arg)
 {
+	if ((unsigned long)cmd == (unsigned long)FIONBIO)
+	{
+		int flags = fcntl(s, F_GETFL, 0);
+		fcntl(s, F_SETFL, *arg ? flags | O_NONBLOCK : flags & ~O_NONBLOCK);
+	}
 	return 0;
+}
+
+int WSAGetLastError()
+{
+	switch (errno)
+	{
+	case EWOULDBLOCK:
+	case EINPROGRESS:
+		return WSAEWOULDBLOCK;
+	case ECONNRESET:
+	case EPIPE:
+		return WSAECONNRESET;
+	case ENOTCONN:
+		return WSAENOTCONN;
+	case ESHUTDOWN:
+		return WSAESHUTDOWN;
+	case ETIMEDOUT:
+		return WSAETIMEDOUT;
+	}
+	return errno;
+}
+
+int XNetRandom(BYTE *buffer, UINT size)
+{
+	for (UINT i = 0; i < size; i++)
+		buffer[i] = (BYTE)rand();
+	return 0;
+}
+
+// Winsock ignores select()'s first argument; POSIX needs the highest
+// descriptor + 1.
+int HostSelect(int, fd_set *readSet, fd_set *writeSet, fd_set *exceptSet, struct timeval *timeout)
+{
+	return select(FD_SETSIZE, readSet, writeSet, exceptSet, timeout);
 }
 
 DWORD GetLastError()
@@ -77,13 +120,4 @@ DWORD GetLastError()
 	return 0;
 }
 
-HANDLE CreateEventA(void *, BOOL, BOOL, LPCSTR)
-{
-	return (HANDLE)1;
-}
-
-BOOL SetEvent(HANDLE)
-{
-	return TRUE;
-}
 #endif

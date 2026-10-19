@@ -13,8 +13,16 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <fnmatch.h>
+#include <errno.h>
+#include <mutex>
+#include <sched.h>
 #include <set>
 #include <strings.h>
+#include <thread>
+#include <condition_variable>
+#include <chrono>
+
+#include "XboxKernel.h"
 
 // Maps "X:\dir\file" to a host path: drive letters become directories under
 // $UNLEASHX_ROOT (default "."), backslashes become slashes.
@@ -68,6 +76,9 @@ BOOL GetFileAttributesExA(LPCSTR fileName, GET_FILEEX_INFO_LEVELS, void *info)
 	unsigned long long t = ((unsigned long long)st.st_mtime + 11644473600ull) * 10000000ull;
 	data->ftLastWriteTime.dwLowDateTime = (DWORD)t;
 	data->ftLastWriteTime.dwHighDateTime = (DWORD)(t >> 32);
+	data->ftCreationTime = data->ftLastWriteTime;
+	data->dwFileAttributes = S_ISDIR(st.st_mode) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
+	data->nFileSizeLow = (DWORD)st.st_size;
 	return TRUE;
 }
 
@@ -114,13 +125,134 @@ void OutputDebugStringA(LPCSTR text)
 	fputs(text, stderr);
 }
 
-void Sleep(DWORD)
+// Threads and events. By default threads aren't started and every wait
+// succeeds at once, which is what the module tests want; a test that runs
+// the threaded code (the FTP server) sets g_bHostThreads.
+BOOL g_bHostThreads = FALSE;
+
+void Sleep(DWORD ms)
 {
+	if (g_bHostThreads)
+		std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
-DWORD WaitForSingleObject(HANDLE, DWORD)
+struct HostWaitable
+{
+	std::mutex mutex;
+	std::condition_variable changed;
+	bool signaled;
+	bool manualReset;
+	bool isThread;
+	bool started;       // threads: released by ResumeThread
+	DWORD exitCode;
+	unsigned (__stdcall *start)(void *);
+	void *arg;
+};
+static std::mutex s_handleMutex;
+static std::set<HostWaitable *> s_waitables;
+
+static HostWaitable *FindWaitable(HANDLE handle)
+{
+	std::lock_guard<std::mutex> lock(s_handleMutex);
+	return s_waitables.count((HostWaitable *)handle) != 0 ? (HostWaitable *)handle : NULL;
+}
+
+HANDLE CreateEventA(void *, BOOL manualReset, BOOL initialState, LPCSTR)
+{
+	HostWaitable *event = new HostWaitable;
+	event->signaled = initialState != FALSE;
+	event->manualReset = manualReset != FALSE;
+	event->isThread = false;
+	event->started = true;
+	event->exitCode = 0;
+	std::lock_guard<std::mutex> lock(s_handleMutex);
+	s_waitables.insert(event);
+	return (HANDLE)event;
+}
+
+BOOL SetEvent(HANDLE handle)
+{
+	HostWaitable *event = FindWaitable(handle);
+	if (event != NULL)
+	{
+		std::lock_guard<std::mutex> lock(event->mutex);
+		event->signaled = true;
+		event->changed.notify_all();
+	}
+	return TRUE;
+}
+
+BOOL ResetEvent(HANDLE handle)
+{
+	HostWaitable *event = FindWaitable(handle);
+	if (event != NULL)
+	{
+		std::lock_guard<std::mutex> lock(event->mutex);
+		event->signaled = false;
+	}
+	return TRUE;
+}
+
+DWORD WaitForSingleObject(HANDLE handle, DWORD ms)
+{
+	HostWaitable *object = FindWaitable(handle);
+	if (object == NULL)
+		return 0;
+	std::unique_lock<std::mutex> lock(object->mutex);
+	if (ms == INFINITE)
+		object->changed.wait(lock, [object] { return object->signaled; });
+	else if (!object->changed.wait_for(lock, std::chrono::milliseconds(ms), [object] { return object->signaled; }))
+		return 0x102;   // WAIT_TIMEOUT
+	if (!object->manualReset && !object->isThread)
+		object->signaled = false;
+	return 0;
+}
+
+static void HostThreadMain(HostWaitable *thread)
+{
+	{
+		std::unique_lock<std::mutex> lock(thread->mutex);
+		thread->changed.wait(lock, [thread] { return thread->started; });
+	}
+	DWORD code = thread->start(thread->arg);
+	std::lock_guard<std::mutex> lock(thread->mutex);
+	thread->exitCode = code;
+	thread->signaled = true;
+	thread->changed.notify_all();
+}
+
+DWORD SuspendThread(HANDLE)
 {
 	return 0;
+}
+
+BOOL SwitchToThread()
+{
+	sched_yield();
+	return TRUE;
+}
+
+HANDLE GetCurrentThread()
+{
+	return (HANDLE)-2;
+}
+
+int GetThreadPriority(HANDLE)
+{
+	return 0;
+}
+
+BOOL GetExitCodeThread(HANDLE handle, DWORD *exitCode)
+{
+	HostWaitable *thread = FindWaitable(handle);
+	if (thread == NULL)
+	{
+		*exitCode = 0;
+		return FALSE;
+	}
+	std::lock_guard<std::mutex> lock(thread->mutex);
+	*exitCode = thread->signaled ? thread->exitCode : STILL_ACTIVE;
+	return TRUE;
 }
 
 // File and find handles are tracked so CloseHandle knows what to close.
@@ -135,6 +267,19 @@ static std::set<HostFind *> s_openFinds;
 
 BOOL CloseHandle(HANDLE handle)
 {
+	{
+		// threads keep running detached; their state object is leaked
+		std::lock_guard<std::mutex> lock(s_handleMutex);
+		if (s_waitables.count((HostWaitable *)handle) != 0)
+		{
+			HostWaitable *object = (HostWaitable *)handle;
+			s_waitables.erase(object);
+			if (!object->isThread)
+				delete object;
+			return TRUE;
+		}
+	}
+	std::lock_guard<std::mutex> lock(s_handleMutex);
 	if (s_openFiles.erase((FILE *)handle) != 0)
 		fclose((FILE *)handle);
 	else if (s_openFinds.erase((HostFind *)handle) != 0)
@@ -148,11 +293,18 @@ BOOL CloseHandle(HANDLE handle)
 HANDLE CreateFileA(LPCSTR fileName, DWORD access, DWORD, void *, DWORD creationDisposition, DWORD, HANDLE)
 {
 	const char *mode = "rb";
+	std::string path = HostPath(fileName);
 	if (access & GENERIC_WRITE)
+	{
 		mode = creationDisposition == OPEN_EXISTING ? "r+b" : "w+b";
-	FILE *fp = fopen(HostPath(fileName).c_str(), mode);
+		struct stat st;
+		if (creationDisposition == OPEN_ALWAYS && stat(path.c_str(), &st) == 0)
+			mode = "r+b";
+	}
+	FILE *fp = fopen(path.c_str(), mode);
 	if (fp == NULL)
 		return INVALID_HANDLE_VALUE;
+	std::lock_guard<std::mutex> lock(s_handleMutex);
 	s_openFiles.insert(fp);
 	return (HANDLE)fp;
 }
@@ -208,6 +360,10 @@ static BOOL HostFindNext(HostFind *find, WIN32_FIND_DATAA *data)
 		{
 			data->dwFileAttributes = S_ISDIR(st.st_mode) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
 			data->nFileSizeLow = (DWORD)st.st_size;
+			unsigned long long t = ((unsigned long long)st.st_mtime + 11644473600ull) * 10000000ull;
+			data->ftLastWriteTime.dwLowDateTime = (DWORD)t;
+			data->ftLastWriteTime.dwHighDateTime = (DWORD)(t >> 32);
+			data->ftCreationTime = data->ftLastWriteTime;
 		}
 		return TRUE;
 	}
@@ -243,8 +399,103 @@ BOOL RemoveDirectoryA(LPCSTR path)
 	return rmdir(HostPath(path).c_str()) == 0;
 }
 
-DWORD ResumeThread(HANDLE)
+BOOL CreateDirectoryA(LPCSTR path, void *)
 {
+	return mkdir(HostPath(path).c_str(), 0777) == 0;
+}
+
+BOOL MoveFileA(LPCSTR existingFileName, LPCSTR newFileName)
+{
+	return rename(HostPath(existingFileName).c_str(), HostPath(newFileName).c_str()) == 0;
+}
+
+BOOL SetEndOfFile(HANDLE file)
+{
+	FILE *fp = (FILE *)file;
+	fflush(fp);
+	return ftruncate(fileno(fp), ftell(fp)) == 0;
+}
+
+static DWORD s_lastError;
+
+void SetLastError(DWORD error)
+{
+	s_lastError = error;
+}
+
+int _mbsicmp(const char *a, const char *b)
+{
+	return strcasecmp(a, b);
+}
+
+int _stricmp(const char *a, const char *b)
+{
+	return strcasecmp(a, b);
+}
+
+char *_strdup(const char *s)
+{
+	return strdup(s);
+}
+
+void GetLocalTime(SYSTEMTIME *st)
+{
+	time_t now = time(NULL);
+	struct tm tm;
+	localtime_r(&now, &tm);
+	st->wYear = (WORD)(tm.tm_year + 1900);
+	st->wMonth = (WORD)(tm.tm_mon + 1);
+	st->wDayOfWeek = (WORD)tm.tm_wday;
+	st->wDay = (WORD)tm.tm_mday;
+	st->wHour = (WORD)tm.tm_hour;
+	st->wMinute = (WORD)tm.tm_min;
+	st->wSecond = (WORD)tm.tm_sec;
+	st->wMilliseconds = 0;
+}
+
+void *XPhysicalAlloc(size_t size, uintptr_t, uintptr_t, DWORD)
+{
+	return malloc(size);
+}
+
+void XPhysicalFree(void *address)
+{
+	free(address);
+}
+
+static DWORD s_fileCacheSize = 0x400000;
+static DWORD s_quantum = 20;
+
+DWORD XGetFileCacheSize()
+{
+	return s_fileCacheSize;
+}
+
+BOOL XSetFileCacheSize(DWORD size)
+{
+	s_fileCacheSize = size;
+	return TRUE;
+}
+
+DWORD XGetProcessQuantumLength()
+{
+	return s_quantum;
+}
+
+void XSetProcessQuantumLength(DWORD quantum)
+{
+	s_quantum = quantum;
+}
+
+DWORD ResumeThread(HANDLE handle)
+{
+	HostWaitable *thread = FindWaitable(handle);
+	if (thread != NULL && thread->isThread)
+	{
+		std::lock_guard<std::mutex> lock(thread->mutex);
+		thread->started = true;
+		thread->changed.notify_all();
+	}
 	return 0;
 }
 
@@ -265,10 +516,26 @@ int _wcsicmp(const wchar_t *a, const wchar_t *b)
 	return wcscasecmp(a, b);
 }
 
-// No threads on the host: the start routine isn't run.
-uintptr_t _beginthreadex(void *, unsigned, unsigned(__stdcall *)(void *), void *, unsigned, unsigned *)
+// Without g_bHostThreads the start routine isn't run.
+uintptr_t _beginthreadex(void *, unsigned, unsigned(__stdcall *start)(void *), void *arg, unsigned flags,
+                         unsigned *)
 {
-	return 0;
+	if (!g_bHostThreads)
+		return 0;
+	HostWaitable *thread = new HostWaitable;
+	thread->signaled = false;
+	thread->manualReset = true;
+	thread->isThread = true;
+	thread->started = (flags & CREATE_SUSPENDED) == 0;
+	thread->exitCode = STILL_ACTIVE;
+	thread->start = start;
+	thread->arg = arg;
+	{
+		std::lock_guard<std::mutex> lock(s_handleMutex);
+		s_waitables.insert(thread);
+	}
+	std::thread(HostThreadMain, thread).detach();
+	return (uintptr_t)thread;
 }
 
 BOOL SetThreadPriority(HANDLE, int)

@@ -5,6 +5,7 @@
 #include "../src/common/FileUtil.h"
 #include "../src/system/Drives.h"
 #include "../src/system/Storage.h"
+#include "../src/system/FileOps.h"
 #include "../src/system/SystemInfo.h"
 #include "../src/thirdparty/XKUtils.h"
 #include "../src/audio/MusicManager.h"
@@ -24,7 +25,7 @@ HRESULT FormatDrive(char) { return E_FAIL; }
 BOOL CreateDirectoryTree(const char *) { return FALSE; }
 BOOL WriteTextFile(const char *path, const char *, BOOL) { printf("[stub] WriteTextFile(%s)\n", path); return TRUE; }
 std::string GetPathDirectory(const char *) { return std::string(); }
-void MakeFatxPath(const char *path, std::string &out) { out = path; }
+BOOL MakeFatxPath(const char *path, std::string &out) { out = path; return FALSE; }
 std::string GetPersistentDataPath(const wchar_t *, unsigned int) { return std::string(); }
 
 // SystemInfo.h (Hardware.cpp is Xbox only)
@@ -55,3 +56,11 @@ float CMusicManager::GetSongPosition() { return 0.0f; }
 // Newsfeed.h
 std::string CNewsfeed::GetUrl(int) { return std::string(); }
 std::string CNewsfeed::GetContent(const char *) { return std::string(); }
+
+// FileOps.h
+BOOL g_bFileOperationQueued = FALSE;
+void ZipFiles(const char *source, const char *zipFile, int) { printf("[stub] ZipFiles(%s, %s)\n", source, zipFile); }
+
+// Drives.h
+void RefreshMemoryUnits() {}
+void UpdateDriveSpace(SDriveInfo *) {}

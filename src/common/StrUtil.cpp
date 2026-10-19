@@ -139,12 +139,9 @@ int StrCmpNoCase(const char *a, const char *b)
 	return (int)ca - (int)cb;
 }
 
-// 0x0001ADD6 (body at 0x00019113)
-std::string &StrFormat(std::string &out, const char *fmt, ...)
+// 0x00019113
+std::string &StrFormatV(std::string &out, const char *fmt, va_list args)
 {
-	va_list args;
-	va_start(args, fmt);
-
 	// The original formats into an alloca() buffer and retries with a bigger one
 	// while _vsnprintf reports truncation: 2K, 6K, 12K, 20K, 30K, 42K. If even
 	// that fails it keeps the truncated text.
@@ -170,9 +167,18 @@ std::string &StrFormat(std::string &out, const char *fmt, ...)
 		}
 		step += 0x800;
 	}
-	va_end(args);
 
 	out.assign(&buf[0], len);
+	return out;
+}
+
+// 0x0001ADD6
+std::string &StrFormat(std::string &out, const char *fmt, ...)
+{
+	va_list args;
+	va_start(args, fmt);
+	StrFormatV(out, fmt, args);
+	va_end(args);
 	return out;
 }
 
@@ -188,6 +194,44 @@ int StrReverseFind(const std::string &str, const char *s, int pos)
 {
 	std::string::size_type found = str.rfind(s, pos == -1 ? std::string::npos : (std::string::size_type)pos);
 	return found == std::string::npos ? -1 : (int)found;
+}
+
+// 0x0001EF9B
+int StrFindChar(const std::string &str, char c)
+{
+	std::string::size_type found = str.find(c);
+	return found == std::string::npos ? -1 : (int)found;
+}
+
+// 0x000117FD
+void StrAppend(std::string &s, const char *text)
+{
+	s.append(text);
+}
+
+// 0x000192D4
+std::string &StrTrimRightChars(std::string &s, const char *chars)
+{
+	std::string::size_type last = s.find_last_not_of(chars);
+	s.erase(last == std::string::npos ? 0 : last + 1);
+	return s;
+}
+
+// 0x0002FC7D
+std::string &StrTrimRightChar(std::string &s, char c)
+{
+	std::string::size_type last = s.find_last_not_of(c);
+	s.erase(last == std::string::npos ? 0 : last + 1);
+	return s;
+}
+
+// 0x0001EFBD
+void StrMakeUpper(std::string &s)
+{
+	std::locale loc;
+	const std::ctype<char> &ct = std::use_facet<std::ctype<char> >(loc);
+	for (std::string::iterator it = s.begin(); it != s.end(); ++it)
+		*it = ct.toupper(*it);
 }
 
 // 0x000A41DF

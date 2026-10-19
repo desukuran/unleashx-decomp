@@ -4,6 +4,7 @@
 #include <cstring>
 
 #include "../common/XboxKernel.h"
+#include "../settings/AppSettings.h"
 
 #define SMBUS_SMC 0x20
 
@@ -118,6 +119,61 @@ void SmcSetLed(BYTE sequence)
 	Sleep(5);
 	SmcWrite(SMC_LED_MODE, 1);
 	Sleep(5);
+}
+
+static BOOL s_bLedPatternActive;       // 0x00278D98
+static int s_nLedPatternQueued;        // 0x00278D94 never set
+int g_nLedPattern;                     // 0x00277658
+
+// 0x0009D319
+BOOL SetLedPattern(int pattern, BOOL force)
+{
+	if (!force)
+	{
+		if (pattern != 0)
+		{
+			if (s_bLedPatternActive && s_nLedPatternQueued != 0)
+				return FALSE;
+			goto apply;
+		}
+		if (!s_bLedPatternActive)
+			return FALSE;
+		if (s_nLedPatternQueued == 0)
+			goto apply;
+		pattern = s_nLedPatternQueued;
+	}
+	s_nLedPatternQueued = 0;
+
+apply:
+	s_bLedPatternActive = TRUE;
+	g_nLedPattern = pattern;
+	BYTE sequence;
+	switch (pattern)
+	{
+	case LED_DEFAULT:
+		// The settings pointer here is a separate copy (0x002788E4).
+		if (CAppSettings::GetInstance()->m_prefs.m_nLEDDefault == 0)
+			SmcSetLedAuto();
+		else
+			SetLedPattern(CAppSettings::GetInstance()->m_prefs.m_nLEDDefault, TRUE);
+		s_bLedPatternActive = FALSE;
+		return TRUE;
+	case LED_RED: sequence = 0xF0; break;
+	case LED_ORANGE: sequence = 0xFF; break;
+	case LED_OFF: sequence = 0x00; break;
+	case LED_GREEN: sequence = 0x0F; break;
+	case LED_FLASHING_RED: sequence = 0xC0; break;
+	case LED_FLASHING_ORANGE: sequence = 0xCC; break;
+	case LED_FLASHING_GREEN: sequence = 0x0C; break;
+	case LED_GREEN_ORANGE: sequence = 0x3F; break;
+	case LED_ORANGE_RED: sequence = 0xF3; break;
+	case LED_RED_GREEN: sequence = 0xC3; break;
+	default:
+		SmcSetLedAuto();
+		return FALSE;
+	}
+	SmcSetLed(sequence);
+	return TRUE;
 }
 
 // 0x0008F947 (enable) / 0x0008F95C (disable)

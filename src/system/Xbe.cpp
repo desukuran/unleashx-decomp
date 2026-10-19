@@ -50,8 +50,8 @@ static std::string ReadTitleName(HANDLE file, DWORD offset)
 }
 
 // 0x000A608D
-// Without a title name, the XBE's folder name is used ("E:\Games\Halo\
-// default.xbe" -> "Halo"). Regions above 7 count as 0.
+// Without a title name, the XBE's folder name is used
+// ("E:\Games\Halo\default.xbe" -> "Halo"). Regions above 7 count as 0.
 BOOL ReadXbeInfo(const char *xbePath, SXbeInfo *info)
 {
 	if (xbePath == NULL || strlen(xbePath) == 0)
@@ -125,4 +125,25 @@ std::string GetXbeTitleName(const char *xbePath)
 	}
 	StrTrimRight(StrTrimLeft(title));
 	return title;
+}
+
+// 0x0009E08A
+BOOL ReadXbeHeader(const char *xbePath, SXbeHeaderInfo *info)
+{
+	memset(info, 0, sizeof(*info));
+	BOOL ok = FALSE;
+	HANDLE file = CreateFileA(xbePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_READONLY, NULL);
+	if (file != INVALID_HANDLE_VALUE)
+	{
+		DWORD read;
+		SetFilePointer(file, 0, NULL, FILE_BEGIN);
+		if (ReadFile(file, info, 0x178, &read, NULL))
+		{
+			SetFilePointer(file, info->sizeOfImageHeader, NULL, FILE_BEGIN);
+			if (ReadFile(file, &info->certificate, 0x1D0, &read, NULL) == TRUE)
+				ok = TRUE;
+		}
+		CloseHandle(file);
+	}
+	return ok;
 }

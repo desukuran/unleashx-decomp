@@ -41,6 +41,7 @@ int __stdcall XNetSaveConfigParams(const XNetConfigParams *params);
 typedef int socklen_t;
 #else
 #include <netinet/in.h>
+#include <sys/select.h>
 #include <sys/socket.h>
 
 #define MAKEWORD(lo, hi) ((WORD)(((BYTE)(lo)) | ((WORD)((BYTE)(hi))) << 8))
@@ -50,6 +51,10 @@ typedef int SOCKET;
 #define SOCKET_ERROR (-1)
 #define SD_BOTH 2
 #define WSAEWOULDBLOCK 10035
+#define WSAECONNRESET 10054
+#define WSAENOTCONN 10057
+#define WSAESHUTDOWN 10058
+#define WSAETIMEDOUT 10060
 #ifndef FIONBIO
 #define FIONBIO 0x8004667E
 #endif
@@ -114,6 +119,12 @@ int XNetInAddrToString(IN_ADDR ina, char *text, int textSize);
 int XNetSetSystemLinkPort(WORD port);   // TODO: verify, see Network.cpp
 int closesocket(SOCKET s);
 int ioctlsocket(SOCKET s, long cmd, unsigned long *arg);
+int WSAGetLastError();
+int XNetRandom(BYTE *buffer, UINT size);
+int HostSelect(int count, fd_set *readSet, fd_set *writeSet, fd_set *exceptSet, struct timeval *timeout);
+#ifndef UNLEASHX_XNET_HOST_IMPL
+#define select HostSelect
+#endif
 
 HANDLE CreateEventA(void *attributes, BOOL manualReset, BOOL initialState, LPCSTR name);
 BOOL SetEvent(HANDLE event);

@@ -1,0 +1,36 @@
+# CFTPServer: the FTP server (src/net/FtpServer.h). One global, g_ftpServer (0x002784F8).
+struct CFTPServer 0x158
+0x000 void* vftable
+0x00c void* m_connectionsHead            # std::list<CFTPConnection*> (+0x8 allocator)
+0x010 int m_nConnections
+0x030 int m_listenSocket
+0x034 void* m_pEvents                    # CFTPEventSink
+0x038 BYTE m_activityTimer[0x20]         # CXBStopWatch
+0x058 int m_nPort
+0x05c int m_nMaxUsers
+0x060 std_string m_strWelcome
+0x07c std_string m_strGoodbye
+0x09c BOOL m_bRunning
+0x0a0 std_string m_strUser
+0x0bc std_string m_strPassword
+0x0d8 DWORD m_dwBytesReceived
+0x0dc DWORD m_dwBytesSent
+0x0e0 int m_nCurrentUsers
+0x0e4 DWORD m_dwTotalConnections
+0x0e8 DWORD m_dwFilesSent
+0x0ec DWORD m_dwFilesReceived
+0x0f0 DWORD m_dwFailedSends
+0x0f4 DWORD m_dwFailedReceives
+0x0f8 DWORD m_dwPasvPortMin
+0x0fc DWORD m_dwPasvPortMax
+0x100 std_string m_strSyst
+0x11c BOOL m_bBoost
+0x120 int m_nActiveTransfers
+0x124 BOOL m_bPaused
+0x128 HANDLE m_hPauseEvent
+0x12c HANDLE m_hStopEvent
+0x130 HANDLE m_hThread
+0x134 void* m_pSettings
+0x138 BYTE m_bStopping
+0x139 BYTE m_bAllowAnonymous
+0x13c std_string m_strAnonymousHome

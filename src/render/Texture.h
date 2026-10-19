@@ -6,6 +6,7 @@
 
 struct IDirect3DDevice8;
 struct IDirect3DTexture8;
+struct IDirect3DSurface8;
 
 struct SImageInfo
 {
@@ -29,5 +30,7 @@ float GetScreenWidth(int unused);                                   // 0x0009F14
 
 // The title image ($$XTIMAGE section) of an XBE: an XPR texture or a DDS.
 BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture);  // 0x0009FAAF TODO: decompile
+// Writes a surface as a .bmp file. TODO: decompile (library code?)
+HRESULT SaveSurfaceToBmp(IDirect3DSurface8 *surface, const char *path);   // 0x0016FD40
 // The first texture of an .xpr file, copied with black as the color key.
 BOOL LoadXprFileTexture(const char *path, IDirect3DTexture8 **texture);   // 0x000A2371 TODO: decompile

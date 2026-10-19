@@ -8,13 +8,13 @@
 #include "../common/StrUtil.h"
 #include "../common/XboxKernel.h"
 #include "Storage.h"
+#include "../net/FtpServer.h"
 
 BOOL g_bDriveFMapped;                    // 0x0026BBF4
 BOOL g_bDriveGMapped;                    // 0x0027637C
 static BOOL g_bMemoryUnitsChanged;       // 0x00276276
 
-// One slot per letter C..W (see GetDriveInfo for the mapping). 0x00276388
-static SDriveInfo g_drives[0x17];
+SDriveInfo g_drives[DRIVE_INFO_COUNT];   // 0x00276388
 
 // Letters MountAllDrives() walks. 0x0026BBF8
 static const char kAllDrives[] = "CDEFGHIJKLMNOPQRSTUVXYZ";
@@ -379,4 +379,39 @@ void MountTitleDataDrive(const char *xbePath)
 		}
 	}
 	LeaveFileLock();   // 0x0001901A TODO: verify
+}
+
+// 0x000AB7F1
+void RefreshDrives(BOOL force)
+{
+	static DWORD s_nextSpaceUpdate = GetTickCount() + 30000;                  // 0x0027A3FC
+	static DWORD s_lastFilesReceived = g_ftpServer.m_dwFilesReceived;         // 0x0027A3F8
+	static DWORD s_nextUnitCheck = GetTickCount() + 1000;                     // 0x0027A3F4
+
+	DWORD now = GetTickCount();
+	int distance = (int)(now - s_nextSpaceUpdate);
+	if (!force || (distance < 0 ? -distance : distance) < 0x1F5)
+	{
+		if (s_lastFilesReceived != g_ftpServer.m_dwFilesReceived)
+		{
+			s_lastFilesReceived = g_ftpServer.m_dwFilesReceived;
+			s_nextSpaceUpdate = 0;
+		}
+	}
+	else
+	{
+		s_nextSpaceUpdate = 0;
+	}
+
+	if (s_nextUnitCheck < now || s_nextSpaceUpdate == 0)
+	{
+		s_nextUnitCheck = now + 1000;
+		RefreshMemoryUnits();
+	}
+	if (s_nextSpaceUpdate <= now)
+	{
+		s_nextSpaceUpdate = now + 30000;
+		for (int i = 0; i < DRIVE_INFO_COUNT; i++)
+			UpdateDriveSpace(&g_drives[i]);
+	}
 }

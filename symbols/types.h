@@ -5,6 +5,7 @@ typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
 typedef int BOOL;
+typedef void *HANDLE;
 typedef long HRESULT;
 
 typedef struct SYSTEMTIME {

@@ -1,0 +1,38 @@
+# CFTPConnection: one FTP control connection (src/net/FtpServer.h).
+struct CFTPConnection 0x544
+0x000 BYTE* m_pBoostBuffer[2]
+0x008 int m_nBoostBuffer
+0x00c BOOL m_bBoostReceiveDone
+0x010 HANDLE m_hBoostEvent
+0x018 BOOL m_bAbort
+0x01c void* m_pServer                     # CFTPServer
+0x020 std_string m_strCwd
+0x03c std_string m_strRenameFrom
+0x058 char m_recvBuffer[0x400]
+0x458 BYTE* m_pTransferBuffer
+0x45c BYTE m_clientIp[4]
+0x460 BYTE m_clientPort[2]
+0x462 BYTE m_localIp[4]
+0x466 BYTE m_localDataPort[2]
+0x468 HANDLE m_hThread
+0x46c int m_nRefCount
+0x470 std_string m_strPassword
+0x48c std_string m_strUser
+0x4a8 std_string m_strHome
+0x4c4 WORD m_wDataPort
+0x4c6 BYTE m_bConnected
+0x4c7 BYTE m_bPassive
+0x4c8 BYTE m_bCanDelete
+0x4c9 BYTE m_bAnonymous
+0x4ca WORD m_wPasvPort
+0x4cc DWORD m_dwRestOffset
+0x4d0 int m_ctrlSocket
+0x4d4 int m_dataSocket
+0x4d9 BYTE m_bPriorityRaised
+0x4dc std_vector m_files                 # SFtpFileEntry, 0x2c bytes each
+0x4fc BOOL m_bBoostMode
+0x500 int m_nActiveTransfers
+0x504 std_string m_strUnknown504
+0x520 std_string m_strTitleImageDir
+0x53c DWORD m_dwBoostTotalBytes
+0x540 void* m_pSettings

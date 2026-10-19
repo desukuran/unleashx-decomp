@@ -50,6 +50,10 @@ struct SDriveInfo
 };
 #pragma pack(pop)
 
+// One slot per letter C..W (see GetDriveInfo for the mapping).
+#define DRIVE_INFO_COUNT 0x17
+extern SDriveInfo g_drives[DRIVE_INFO_COUNT];             // 0x00276388
+
 SDriveInfo *GetDriveInfo(char drive);                     // 0x000AA69E
 inline BOOL IsDriveInfoMounted(SDriveInfo *info)
 {
@@ -68,6 +72,10 @@ BOOL MapFolderToDrive(SDriveInfo *info, char drive, const char *folder);   // 0x
 void MountTitleDataDrive(const char *xbePath);             // 0x000AB2FF
 void RefreshMemoryUnits();                                // 0x000AB587
 void UpdateDriveSpace(SDriveInfo *info);                  // 0x000AB6D4 TODO: decompile the USB/MU branches
+// Memory units once a second, every drive's space every 30 seconds or when
+// the FTP server received a file. force: also when the next update is more
+// than half a second away.
+void RefreshDrives(BOOL force);                           // 0x000AB7F1
 HRESULT FormatDrive(char drive);                          // 0x000A956B TODO: decompile
 
 // total/free/used bytes of a drive, each divided by unit.

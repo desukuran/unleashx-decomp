@@ -43,6 +43,35 @@ void GetSystemTime(SYSTEMTIME *systemTime);
 void GetLocalTime(SYSTEMTIME *systemTime);
 DWORD XLaunchNewImageA(LPCSTR imagePath, PLAUNCH_DATA launchData);
 
+// threads, events, memory and the file cache
+#define STILL_ACTIVE 0x103
+#define THREAD_PRIORITY_NORMAL 0
+#define THREAD_PRIORITY_HIGHEST 2
+#define PAGE_READWRITE 0x04
+#define MAXULONG_PTR (~(uintptr_t)0)
+DWORD SuspendThread(HANDLE thread);
+BOOL SwitchToThread();
+HANDLE GetCurrentThread();
+int GetThreadPriority(HANDLE thread);
+BOOL GetExitCodeThread(HANDLE thread, DWORD *exitCode);
+BOOL ResetEvent(HANDLE event);
+HANDLE CreateEventA(void *attributes, BOOL manualReset, BOOL initialState, LPCSTR name);
+BOOL SetEvent(HANDLE event);
+// Host builds only: run threads for real (see PlatformHost.cpp).
+extern BOOL g_bHostThreads;
+void *XPhysicalAlloc(size_t size, uintptr_t highestAddress, uintptr_t alignment, DWORD protect);
+void XPhysicalFree(void *address);
+DWORD XGetFileCacheSize();
+BOOL XSetFileCacheSize(DWORD size);
+DWORD XGetProcessQuantumLength();
+void XSetProcessQuantumLength(DWORD quantum);
+void SetLastError(DWORD error);
+BOOL SetEndOfFile(HANDLE file);
+BOOL CreateDirectoryA(LPCSTR path, void *security);
+int _mbsicmp(const char *a, const char *b);
+int _stricmp(const char *a, const char *b);
+char *_strdup(const char *s);
+
 struct EXCEPTION_RECORD
 {
 	DWORD ExceptionCode;

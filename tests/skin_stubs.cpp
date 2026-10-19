@@ -1,8 +1,10 @@
 // Host stand-ins for rendering/media pieces the skin code calls.
 #include <cstdio>
+#include <cstring>
 
 #include "../src/media/WMVideoPlayer.h"
 #include "../src/render/Fonts.h"
+#include "../src/render/D3D.h"
 #include "../src/render/Texture.h"
 #include "../src/skin/Skin.h"
 #include "../src/skin/SkinColors.h"
@@ -41,3 +43,21 @@ void CWMVideoPlayer::SetAudio(BOOL) {}
 void CWMVideoPlayer::SetRect(int, int, int, int) {}
 BOOL CWMVideoPlayer::Open(const char *) { return TRUE; }
 
+
+// FTP SITE TITLES title images
+BOOL LoadXbeIcon(const char *, IDirect3DTexture8 **texture) { *texture = NULL; return FALSE; }
+HRESULT SaveSurfaceToBmp(IDirect3DSurface8 *, const char *) { return E_FAIL; }
+void Get2DSurfaceDesc(D3DResource *, DWORD, D3DSURFACE_DESC *desc) { memset(desc, 0, sizeof(*desc)); }
+HRESULT IDirect3DDevice8::CreateTexture(UINT, UINT, UINT, DWORD, D3DFORMAT, DWORD, IDirect3DTexture8 **texture)
+{
+	*texture = NULL;
+	return E_FAIL;
+}
+HRESULT IDirect3DTexture8::GetSurfaceLevel(UINT, IDirect3DSurface8 **surface) { *surface = NULL; return E_FAIL; }
+ULONG IDirect3DTexture8::Release() { return 0; }
+ULONG IDirect3DSurface8::Release() { return 0; }
+HRESULT D3DXLoadSurfaceFromSurface(IDirect3DSurface8 *, const void *, const void *, IDirect3DSurface8 *, const void *,
+                                   const void *, DWORD, D3DCOLOR)
+{
+	return E_FAIL;
+}
