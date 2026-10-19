@@ -142,6 +142,9 @@ void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime);
 NTSTATUS __stdcall HalReadSMBusValue(UCHAR address, UCHAR command, BOOLEAN readWord, ULONG *value);
 NTSTATUS __stdcall HalWriteSMBusValue(UCHAR address, UCHAR command, BOOLEAN writeWord, ULONG value);
 NTSTATUS __stdcall NtSetSystemTime(LARGE_INTEGER *newTime, LARGE_INTEGER *previousTime);
+NTSTATUS __stdcall ExQueryNonVolatileSetting(ULONG valueIndex, ULONG *type, void *value, ULONG valueLength,
+                                            ULONG *resultLength);
+NTSTATUS __stdcall ExSaveNonVolatileSetting(ULONG valueIndex, ULONG type, void *value, ULONG valueLength);
 typedef enum _FIRMWARE_REENTRY
 {
 	ReturnFirmwareHalt,

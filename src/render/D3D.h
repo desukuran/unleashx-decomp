@@ -11,6 +11,7 @@
 typedef DWORD D3DFORMAT;
 typedef DWORD D3DCOLOR;
 
+#define D3DFMT_X1R5G5B5 0x03
 #define D3DFMT_A8R8G8B8 0x06
 #define D3DFMT_DXT1 0x0C
 #define D3DFMT_LIN_R5G6B5 0x11
@@ -150,8 +151,25 @@ struct IDirect3DTexture8
 	HRESULT LockRect(UINT level, D3DLOCKED_RECT *locked, const void *rect, DWORD flags);
 };
 
+struct D3DVIEWPORT8
+{
+	DWORD X;
+	DWORD Y;
+	DWORD Width;
+	DWORD Height;
+	float MinZ;
+	float MaxZ;
+};
+
+struct SPresentParameters;   // D3DPRESENT_PARAMETERS, see app/XBApp.h
+
 struct IDirect3DDevice8
 {
+	HRESULT Reset(SPresentParameters *params);
+	HRESULT SetViewport(const D3DVIEWPORT8 *viewport);
+	HRESULT Swap(DWORD flags);
+	HRESULT SetSoftDisplayFilter(BOOL enable);
+	HRESULT SetFlickerFilter(DWORD level);
 	HRESULT CreateTexture(UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, DWORD pool,
 	                      IDirect3DTexture8 **texture);
 	HRESULT SetTexture(DWORD stage, IDirect3DTexture8 *texture);

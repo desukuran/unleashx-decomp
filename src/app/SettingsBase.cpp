@@ -13,7 +13,38 @@
 #include "../skin/SkinColors.h"
 #include "../ui/Language.h"
 #include "../ui/StringIds.h"
+#include "../xml/XmlDocument.h"
+#include "../xml/XmlUtil.h"
 #include "Screens.h"
+
+// 0x0002DD70
+BOOL IsYesW(const wchar_t *text)
+{
+	if (text == NULL)
+		return FALSE;
+	return _wcsicmp(L"Yes", text) == 0 || _wcsicmp(L"True", text) == 0 || _wcsicmp(L"1", text) == 0;
+}
+
+// 0x0002039A
+BOOL IsNoW(const wchar_t *text)
+{
+	if (text == NULL)
+		return FALSE;
+	return _wcsicmp(L"No", text) == 0 || _wcsicmp(L"False", text) == 0 || _wcsicmp(L"0", text) == 0;
+}
+
+// 0x000C5E51
+BOOL GetOrAddChildElement(const char *name, CXmlElement *parent, CXmlElement **element)
+{
+	if (parent == NULL)
+		return FALSE;
+	if (*element == NULL)
+	{
+		AddChildElement(parent, name, NULL, NULL);
+		*element = parent->FindFirstChild(name);
+	}
+	return *element != NULL;
+}
 
 // The height of a line of text in the page's font.
 static float LineHeight(const CXBFont *font)
@@ -37,6 +68,13 @@ CSettingItem::CSettingItem(std::wstring label, std::wstring value, int type, BOO
 	m_bChanged = FALSE;
 	if (m_bHeader)
 		m_bEnabled = FALSE;
+}
+
+// 0x000C00A2
+void CSettingItem::SetValue(const wchar_t *text)
+{
+	if (text != NULL && m_strValue != text)
+		m_strValue = text;
 }
 
 // 0x000C05DD
@@ -122,6 +160,35 @@ BOOL CSettingsBase::IsSelectedSelectable()
 {
 	CSettingItem item = m_items[m_nSelected];
 	return !item.m_bHeader && item.m_bVisible;
+}
+
+// 0x00020455
+BOOL CSettingsBase::IsSelectedDisabled()
+{
+	CSettingItem item = m_items[m_nSelected];
+	return !item.m_bEnabled || item.m_bHeader || !item.m_bVisible;
+}
+
+// 0x000C004C
+void CSettingsBase::SetItemValue(CSettingItem *item, const wchar_t *text, BOOL changed)
+{
+	if (item == NULL || text == NULL || item->m_strValue == text)
+		return;
+	// Quirk: the original assigns a _wcsdup() copy of the text and never
+	// frees it.
+	if (wcslen(text) != 0)
+		item->m_strValue = text;
+	else
+		item->m_strValue.clear();
+	if (changed)
+	{
+		item->m_bChanged = TRUE;
+		m_bModified = TRUE;
+	}
+	else
+	{
+		item->m_bChanged = FALSE;
+	}
 }
 
 // 0x000BF231. A line that wasn't changed takes its current value as the

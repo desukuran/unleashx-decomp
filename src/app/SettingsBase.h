@@ -11,6 +11,7 @@
 #include "../input/Gamepad.h"
 
 class CClockEditor;
+class CXmlElement;
 class CFileBrowser;
 class CIPAddressEditor;
 class CMessageBox;
@@ -26,6 +27,10 @@ public:
 	             int value2, BOOL password);                 // 0x000203D8
 	// The copy constructor (0x000204E7) and destructor (0x0002053C) are the
 	// compiler's.
+
+	// Sets the shown value without marking the line changed. The original
+	// takes this in eax.
+	void SetValue(const wchar_t *text);                       // 0x000C00A2
 
 	std::wstring m_strLabel;        // +0x00
 	std::wstring m_strValue;        // +0x1C the text shown on the right
@@ -56,8 +61,20 @@ public:
 	virtual void SetItemEnabled(int index, BOOL enabled);     // 0x000204C8
 
 	void SetTitle(const wchar_t *title);                      // 0x00020499
+	// Appends a line (the pages construct and push_back a CSettingItem).
+	void AddItem(const wchar_t *label, const wchar_t *value, int type, BOOL header, BOOL enabled,
+	             BOOL visible = TRUE, int value2 = 0, BOOL password = FALSE)
+	{
+		m_items.push_back(CSettingItem(label, value, type, header, enabled, visible, value2, password));
+	}
 	void LoadSounds();                                        // 0x000C17F0
 	BOOL IsSelectedSelectable();                              // 0x0002DDFC
+	// The selected line can't be changed (disabled, a header or hidden).
+	BOOL IsSelectedDisabled();                                // 0x00020455
+	// Sets a line's value (if it differs); changed marks the line and the page
+	// as modified, else the line's changed mark is cleared. The original
+	// takes item in edi and text in ebx.
+	void SetItemValue(CSettingItem *item, const wchar_t *text, BOOL changed);   // 0x000C004C
 	void RevertChanges();                                     // 0x000BF231
 	void ClearChanged();                                      // 0x000BEEFA
 	void FreePopups();                                        // 0x000C1816
@@ -98,3 +115,11 @@ public:
 	std::vector<CSettingItem> m_items;  // +0xA4
 	float m_fLabelWidth;            // +0xB4 widest label + 20, worked out on the first Render
 };
+
+// "Yes", "True" or "1" / "No", "False" or "0" (any case). NULL is neither.
+// The originals take text in esi.
+BOOL IsYesW(const wchar_t *text);                             // 0x0002DD70
+BOOL IsNoW(const wchar_t *text);                              // 0x0002039A
+// *element, or (if NULL) a new child of parent called name. FALSE if parent
+// is NULL or the child couldn't be made. The original takes element in esi.
+BOOL GetOrAddChildElement(const char *name, CXmlElement *parent, CXmlElement **element);   // 0x000C5E51

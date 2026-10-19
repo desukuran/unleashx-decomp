@@ -516,6 +516,11 @@ int _wcsicmp(const wchar_t *a, const wchar_t *b)
 	return wcscasecmp(a, b);
 }
 
+long _wtol(const wchar_t *s)
+{
+	return wcstol(s, NULL, 10);
+}
+
 // Without g_bHostThreads the start routine isn't run.
 uintptr_t _beginthreadex(void *, unsigned, unsigned(__stdcall *start)(void *), void *arg, unsigned flags,
                          unsigned *)

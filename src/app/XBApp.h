@@ -70,6 +70,8 @@ public:
 };
 
 extern CXBApplicationEx *g_pApplication;     // 0x00277660 set by the constructor
+extern SPresentParameters *g_pPresentParams; // 0x00277668 &g_pApplication->m_d3dpp, set by Create()
+extern DWORD g_dwVideoFlags;                 // 0x0027766C XGetVideoFlags(), set by Create()
 
 // High-resolution timer. 0x20 bytes.
 class CXBStopWatch

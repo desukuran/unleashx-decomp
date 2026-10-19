@@ -82,6 +82,13 @@ typedef LAUNCH_DATA *PLAUNCH_DATA;
 #define XC_VIDEO_STANDARD_NTSC_J 2
 #define XC_VIDEO_STANDARD_PAL_I 3
 
+#define XC_AV_PACK_SCART 0
+#define XC_AV_PACK_HDTV 1
+#define XC_AV_PACK_VGA 2
+#define XC_AV_PACK_RFU 3
+#define XC_AV_PACK_SVIDEO 4
+#define XC_AV_PACK_STANDARD 6
+
 BOOL SetFileAttributesA(LPCSTR fileName, DWORD attributes);
 DWORD GetFileAttributesA(LPCSTR fileName);
 BOOL GetFileAttributesExA(LPCSTR fileName, GET_FILEEX_INFO_LEVELS level, void *info);
@@ -119,6 +126,7 @@ uintptr_t _beginthreadex(void *security, unsigned stackSize, unsigned (__stdcall
                          unsigned flags, unsigned *threadId);
 int stricmp(const char *a, const char *b);
 int _wcsicmp(const wchar_t *a, const wchar_t *b);
+long _wtol(const wchar_t *s);
 DWORD WaitForSingleObject(HANDLE handle, DWORD ms);
 BOOL CloseHandle(HANDLE handle);
 DWORD GetTickCount();
