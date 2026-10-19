@@ -56,9 +56,10 @@ void GetSmartAttribute(unsigned index, DWORD *id, DWORD *value, DWORD *worst);  
 class CMD5
 {
 public:
-	CMD5(const void *data, int length);                 // 0x0009845B TODO: decompile; hashes data unless NULL, length -1 = strlen
-	BOOL HashMemory(const void *data, int length);      // 0x00098307 TODO: decompile
-	BOOL HashFile(const char *path);                    // 0x0009837B TODO: decompile
+	// Hashes data unless NULL; length -1 = strlen. (Md5.cpp)
+	CMD5(const void *data, int length);                 // 0x0009845B
+	BOOL HashMemory(const void *data, int length);      // 0x00098307
+	BOOL HashFile(const char *path);                    // 0x0009837B
 
 	BYTE m_digest[16];      // +0x00
 	bool m_bValid;          // +0x10

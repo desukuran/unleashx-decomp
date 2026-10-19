@@ -35,9 +35,6 @@ void GetIdeFirmware(BOOL, char *out, unsigned) { strcpy(out, "3.10"); }
 WORD GetHddSecurityStatus() { return HDD_SECURITY_SUPPORTED | HDD_SECURITY_ENABLED; }
 BYTE GetHddTemperature() { return 0; }
 void GetSmartAttribute(unsigned, DWORD *, DWORD *, DWORD *) {}
-CMD5::CMD5(const void *, int) { m_bValid = false; }
-BOOL CMD5::HashMemory(const void *, int) { return FALSE; }
-CMD5 g_md5(NULL, -1);
 
 // XKUtils.h
 XKEEPROM g_eeprom;

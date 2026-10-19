@@ -6,7 +6,7 @@ CXXFLAGS ?= -std=c++11 -Wall -Wextra -O1 -g
 COMMON := src/common/StrUtil.cpp src/common/ObList.cpp src/common/PlatformHost.cpp src/common/FileUtil.cpp
 XML := src/xml/XmlDocument.cpp src/xml/XmlUtil.cpp
 SETTINGS := src/settings/AppSettings.cpp src/settings/ConfigLoader.cpp
-SYSTEM := src/system/Drives.cpp src/system/Dvd.cpp src/system/SystemInfo.cpp src/system/Xbe.cpp src/system/XipArchive.cpp
+SYSTEM := src/system/Md5.cpp src/thirdparty/Md5.cpp src/system/Drives.cpp src/system/Dvd.cpp src/system/SystemInfo.cpp src/system/Xbe.cpp src/system/XipArchive.cpp
 NET := src/net/Network.cpp src/net/XNetHost.cpp src/net/FtpServer.cpp src/net/FtpConnection.cpp src/net/FtpTransfer.cpp src/net/Socket.cpp src/net/Http.cpp src/net/Sntp.cpp
 SKIN := src/skin/Skin.cpp src/skin/SkinText.cpp src/skin/SkinParser.cpp src/skin/SkinColors.cpp src/skin/SkinDefaults.cpp
 UI := src/ui/Language.cpp src/ui/MenuScan.cpp

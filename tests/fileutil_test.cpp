@@ -1,8 +1,9 @@
-// MakeFatxPath / IsFatxName / GetPathDirectory on a few names.
+// MakeFatxPath / IsFatxName / GetPathDirectory on a few names, and CMD5.
 #include <cstdio>
 #include <cstring>
 
 #include "../src/common/FileUtil.h"
+#include "../src/system/SystemInfo.h"
 
 static int s_failures;
 
@@ -46,6 +47,22 @@ int main()
 	{
 		printf("IsFatxName\n");
 		s_failures++;
+	}
+	const char *md5Cases[][2] = {
+		{ "", "d41d8cd98f00b204e9800998ecf8427e" },
+		{ "abc", "900150983cd24fb0d6963f7d28e17f72" },
+		{ "The quick brown fox jumps over the lazy dog", "9e107d9d372bb6826bd81d3542a419d6" },
+		{ "12345678901234567890123456789012345678901234567890123456789012345678901234567890",
+		  "57edf4a22be3c955ac49da2e2107b67a" },
+	};
+	for (int i = 0; i < 4; i++)
+	{
+		CMD5 md5(NULL, -1);
+		if (!md5.HashMemory(md5Cases[i][0], -1) || strcmp(md5.m_szHex, md5Cases[i][1]) != 0)
+		{
+			printf("CMD5(\"%s\") = %s\n", md5Cases[i][0], md5.m_szHex);
+			s_failures++;
+		}
 	}
 	printf(s_failures == 0 ? "fileutil_test passed\n" : "fileutil_test failed\n");
 	return s_failures != 0;
