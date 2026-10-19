@@ -132,6 +132,39 @@ void FormatIntW(wchar_t *out, int n)
 }
 
 // 0x000A3A5A
+// 0x000A3B09
+std::string FormatInt(int n)
+{
+	wchar_t text[100];
+	FormatIntW(text, n);
+	return StrFromWide(text);
+}
+
+// 0x000A2C2B
+std::string FormatNumberA(ULONGLONG n)
+{
+	// The digits, then a separator before every third from the right.
+	char digits[0x64];
+	memset(digits, 0, sizeof(digits));
+	int length = 0;
+	do
+	{
+		digits[length++] = (char)('0' + (int)(n % 10));
+		n /= 10;
+	} while (n != 0);
+	char text[0x64];
+	int out = 0;
+	char separator = (char)GetThousandsSeparator();
+	for (int i = length - 1; i >= 0; i--)
+	{
+		text[out++] = digits[i];
+		if (i != 0 && i % 3 == 0)
+			text[out++] = separator;
+	}
+	text[out] = 0;
+	return std::string(text);
+}
+
 std::string FormatDouble(int decimals, double v)
 {
 	wchar_t text[102];

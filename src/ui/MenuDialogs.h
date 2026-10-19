@@ -25,6 +25,8 @@ public:
 	virtual void ProcessInput(int *action, struct SGamepadState **pad);   // vtable slot 2 (0x000AE6F1)
 	virtual void Render();                                // vtable slot 3 (0x000ADF2C)
 	BOOL IsOpen() const;                                  // 0x000AD930
+	// Greys out (or enables) the entry at index. (index in eax, this in edi)
+	void SetOptionEnabled(int index, BOOL enabled);       // 0x000AD997
 	int GetSelection() const;                             // 0x000AD946
 
 	BYTE m_unknown04[0x7C];
@@ -106,6 +108,8 @@ public:
 	void Show(float x, float y);                          // 0x000D6F8A
 	void ProcessInput(int *action);                       // 0x000D7539
 	BOOL IsOpen() const { return !m_bCancelled && !m_bChosen; }   // 0x00013584
+	void Render();                                        // 0x000D70A7
+	int GetCount() const;                                 // 0x000193A5 (the items vector at +0x14)
 
 	BYTE m_unknown04[0x20];
 	int m_nSelection;                                     // +0x24 -1 = none

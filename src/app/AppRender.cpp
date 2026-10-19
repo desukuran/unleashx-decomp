@@ -18,6 +18,7 @@
 #include "../ui/StringIds.h"
 #include "FtpEvents.h"
 #include "Screens.h"
+#include "../filemgr/FileManager.h"
 #include "SettingsPages.h"
 #include "UnleashX.h"
 

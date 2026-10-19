@@ -21,6 +21,7 @@
 #include "../ui/Language.h"
 #include "../ui/MenuDialogs.h"
 #include "../ui/StringIds.h"
+#include "../filemgr/FileManager.h"
 #include "SettingsPages.h"
 
 CUnleashX *g_pApp;                         // 0x00276204

@@ -21,6 +21,7 @@
 #include "../system/SystemControl.h"
 #include "../ui/Language.h"
 #include "../ui/StringIds.h"
+#include "../filemgr/FileManager.h"
 #include "../xml/XmlDocument.h"
 
 std::string g_strLoadingPreview;          // 0x00277F70
@@ -455,7 +456,7 @@ static void OpenFileManager(CUnleashX *app, CXmlElement *item)
 			app->m_pFileIcon = app->m_resource.GetTexture("File.png");
 		if (app->m_pFolderIcon == NULL)
 			app->m_pFolderIcon = app->m_resource.GetTexture("Folder.png");
-		fm->Init(0, 0, app->m_pFolderIcon, app->m_pFileIcon);
+		fm->Init(&app->m_fonts[4], 0, 0, NULL, app->m_pFolderIcon, app->m_pFileIcon);
 		Sleep(5);
 	}
 

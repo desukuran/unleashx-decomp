@@ -564,6 +564,11 @@ int _wcsicmp(const wchar_t *a, const wchar_t *b)
 	return wcscasecmp(a, b);
 }
 
+int _wcsnicmp(const wchar_t *a, const wchar_t *b, size_t count)
+{
+	return wcsncasecmp(a, b, count);
+}
+
 long _wtol(const wchar_t *s)
 {
 	return wcstol(s, NULL, 10);

@@ -31,10 +31,16 @@ public:
 	// and height in esi.
 	// The whole text's size; either output can be NULL. (height in esi)
 	HRESULT GetTextExtent(const wchar_t *text, float *width, float *height, BOOL firstLineOnly);   // 0x00098FC3 (XDK sample)
+	// vtable slot 2 (0x00098E35; CXBFontEx 0x001377E1 sets a TrueType
+	// font's cell height). The vtable itself (0x0025B224: draw to a surface,
+	// -, SetTextHeight, SetTextColor, an integer GetTextExtent; no virtual
+	// destructor) isn't reproduced here. TODO: decompile
+	HRESULT SetTextHeight(int height);
 	HRESULT GetTextExtentN(const wchar_t *text, int length, BOOL firstLineOnly, float *width,
 	                       float *height);                             // 0x00098E9E (XDK sample)
 
-	BYTE m_reserved04[0x0C];
+	float m_fCellHeight;                                               // +0x04 TODO: verify (the file manager's line spacing)
+	BYTE m_reserved08[0x08];
 	float m_fFontHeight;                                               // +0x10
 	float m_fScaleFactorX;                                             // +0x14
 	float m_fScaleFactorY;                                             // +0x18

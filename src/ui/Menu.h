@@ -238,6 +238,8 @@ extern BOOL g_bPointerActive;                        // 0x00272144
 extern BOOL g_bPointerClicked;                       // 0x00272148
 extern BOOL g_bPointerMoved;                         // 0x00272164
 extern BOOL g_bPointerEvent;                         // 0x0027213C set by CXBApplicationEx::Run
+extern BOOL g_bPointerDoubleClick;                   // 0x00272168 TODO: verify
+extern BOOL g_bPointerSecondButton;                  // 0x0027214C TODO: verify (opens menus)
 extern int g_nPointerX;                              // 0x0027215C
 extern int g_nPointerY;                              // 0x00272160
 // x, y, width, height

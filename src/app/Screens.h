@@ -61,6 +61,8 @@ public:
 	virtual BOOL Render();                                // 0x00134853
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00135A99
 	virtual void Show();                                  // 0x00133A5D
+	// Plays one file (the file manager's music). TODO: decompile
+	BOOL OpenFile(const char *path);                      // 0x00135A18
 };
 
 // A slideshow of a picture folder (and its subfolders), in random order:
@@ -173,28 +175,8 @@ private:
 	BYTE m_reserved8C[4];              // +0x8C
 };
 
-class CFileManager
-{
-public:
-	CFileManager();                                       // 0x00122BA8? TODO: verify
-	virtual ~CFileManager();
-	HRESULT Init(int unknown1, int unknown2, IDirect3DTexture8 *folderIcon,
-	             IDirect3DTexture8 *fileIcon);            // 0x001294E2
-	void OpenPath(const char *path);                      // 0x00128C01
-	void Reset();                                         // 0x0002B4C9
-	void SetBackground(IDirect3DTexture8 *texture);       // 0x0002B4A1
-	void ProcessInput(int *action, SGamepadState **pad);  // 0x0012C91D TODO: decompile
-	void Render();                                        // 0x00127052 TODO: decompile (this in eax)
-
-	BYTE m_unknown004[0x8B0 - 0x4];
-	BOOL m_bOpen;                                         // +0x8B0
-	BYTE m_unknown8B4[0x8DC - 0x8B4];
-	BOOL m_bInitialized;                                  // +0x8DC
-	int m_unknown8E0;                                     // +0x8E0
-	BOOL m_bSafeBorder;                                   // +0x8E4
-	BOOL m_bDrawBorder;                                   // +0x8E8
-	IDirect3DTexture8 *m_pBackground;                     // +0x8EC
-};
+// The file manager: src/filemgr/FileManager.h.
+class CFileManager;
 
 // Game saves / game list manager ("SavesManager", "GameManager"). 0x210 bytes.
 class CGameManager
@@ -607,6 +589,8 @@ public:
 	HRESULT ProcessInput(int *action);                    // 0x000AF925
 	BOOL IsOpen() const;                                  // 0x000AF8E9 (this in eax)
 	int GetResult();                                      // 0x000AFA59 MSGBOX_* (this in eax)
+	// The button chosen with A (not a cancel), else -1. (this in esi)
+	int GetChosenButton();                                // 0x000AF902
 	void SetSelection(int button);                        // 0x000AF8CF (this in esi, button in edi)
 	HRESULT Render();                                     // 0x000AFC64
 	// Word-wraps text into m_lines, widening the box for long words.
