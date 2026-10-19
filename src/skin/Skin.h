@@ -227,6 +227,12 @@ public:
 	// The <LoadingScreen> background, loaded on first use; NULL for
 	// "GameIcon" (the launched item's icon is shown instead).
 	IDirect3DTexture8 *GetLoadingBackground();        // 0x000F9B25
+	// The <FileManager><BackGround> image, loaded on first use.
+	IDirect3DTexture8 *GetFileManagerBackground();    // 0x000F99A7
+	// Whether a preview video is playing (keeps the background sound off).
+	BOOL IsPreviewPlaying() const;                    // 0x000F9145
+	// Plays file in the <Menu><Preview> area (NULL or "" stops it).
+	void PlayPreview(const char *file);               // 0x000FD563 TODO: decompile
 	void BeginLoad(const char *path);                 // 0x00101743
 	void SetDefaultMainLayout();                      // 0x000FCEA6 TODO: decompile
 	void SetDefaultMusicPlayerLayout();               // 0x000FA219 TODO: decompile
@@ -269,7 +275,7 @@ public:
 	BOOL m_bLoadingShowInfo;            // +0x2A8 <LoadingScreen ShowInfo=...>
 	CWMVideoPlayer *m_pBackgroundVideo; // +0x2AC <Main><BackGround> .wmv/.xmv
 	CWMVideoPlayer *m_pPreviewVideo;    // +0x2B0 <Main><Menu><Preview>
-	std::string m_strUnknown2B4;        // +0x2B4
+	std::string m_strPreviewFile;       // +0x2B4 the preview being played
 	std::string m_strIntroMovie;        // +0x2D0 <IntroMovie>
 	CXBFontEx *m_pMenuFont;             // +0x2EC <Main><Menu><Font>
 	CXBFont *m_pInfoFont;               // +0x2F0 <Main><InfoFont>

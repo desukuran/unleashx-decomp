@@ -234,6 +234,8 @@ public:
 
 	void SetDefaults();                      // 0x000AC39B
 	void InitPaths(std::string xbePath);     // 0x000ACA86
+	// DirectSound volume (hundredths of dB) for effects. TODO: decompile
+	LONG GetSoundVolume();                   // 0x000AC21A
 
 	static CAppSettings *s_pInstance;        // 0x0027626C
 
@@ -255,7 +257,7 @@ public:
 	int m_unknown11CC;                       // +0x11CC
 	IDirect3DTexture8 *m_pLoadingIcon;       // +0x11D0 loading screen image of the launched item
 	std::string m_strUnknown11D4;            // +0x11D4
-	int m_unknown11F0;                       // +0x11F0 1
+	BOOL m_bLoadingShowInfo;                 // +0x11F0 1, <LoadingScreen ShowInfo>
 	wchar_t m_szDiscTitle[0x80];             // +0x11F4 from D:\DiscTitle.txt
 	int m_nDisplayWidth;                     // +0x12F4 640. TODO: verify
 	int m_nDisplayHeight;                    // +0x12F8 480

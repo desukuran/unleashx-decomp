@@ -65,10 +65,17 @@ public:
 	virtual ~CMenu();                                 // 0x0010CF0B
 
 	// doc: the menu document; fonts for normal and selected items (selected
-	// defaults to normal). fontItemHeight: see m_bFontItemHeight.
+	// defaults to normal).
 	HRESULT Create(CXmlDocument *doc, CXBFont *font, CXBFont *selectedFont, CMenuEventSink *sink,
-	               BOOL fontItemHeight, int unknownF18, IDirect3DTexture8 *texture70,
+	               BOOL noIcons, int borderWidth, IDirect3DTexture8 *texture70,
 	               IDirect3DTexture8 *texture74);    // 0x00111F27
+
+	// The skin's <Menu> settings (CUnleashX::CSkinEvent::OnSkinLoaded).
+	void SetArea(float x, float y, float width, float height);   // 0x0010CBF9
+	void SetFont(CXBFont *font);                      // 0x0002B662
+	void SetHorizontal(BOOL horizontal);              // 0x0002B67E
+	// Free item placement (<Menu><Item Left Top ...>, up to 20).
+	void SetItemPositions(unsigned count, const struct SSkinItemPos *positions);   // 0x0002B701
 
 	// Fills m_items from a <List> (NULL = the menu root).
 	void LoadList(CXmlElement *list);                 // 0x00110F47
@@ -157,8 +164,8 @@ public:
 	CXBStopWatch m_previewTimer;              // +0x140 the preview starts 500 ms after the selection settles
 	BOOL m_bHorizontal;                       // +0x160 left/right move the selection
 	int m_unknown164;                         // +0x164
-	int m_nSkinVisibleItems;                  // +0x168 0 = fit the area
-	int m_unknown16C;                         // +0x16C
+	int m_nSkinVisibleItems;                  // +0x168 item position count; 0 = a list that fits the area
+	const struct SSkinItemPos *m_pItemPositions;   // +0x16C
 	CDropDown *m_pContextMenu;                // +0x170 START (Select/Play, Launch in NTSC mode, ...)
 	BOOL m_bContextMenuShown;                 // +0x174
 	float m_fContextMenuX;                    // +0x178
@@ -191,20 +198,20 @@ public:
 	int m_nItemCount;                         // +0xE58
 	CMenuEventSink *m_pSink;                  // +0xE5C
 	SMenuInput m_input;                       // +0xE60
-	int m_unknownF08;                         // +0xF08 1
-	BOOL m_bFontItemHeight;                   // +0xF0C set: lines are as tall as the font
+	BOOL m_bShowArrows;                       // +0xF08 1
+	BOOL m_bNoIcons;                          // +0xF0C the skin has ShowIcon off: lines are as tall as the font
 	int m_unknownF10;                         // +0xF10 1
-	int m_unknownF14;                         // +0xF14 12
-	int m_unknownF18;                         // +0xF18
+	DWORD m_dwTextAlign;                      // +0xF14 XBFONT_* flags, 12 = left
+	int m_nBorderWidth;                       // +0xF18
 	int m_nItemSpacing;                       // +0xF1C 2, added above and below each line
 	float m_fUnknownF20;                      // +0xF20 1.0
 	float m_fUnknownF24;                      // +0xF24 1.0
 	float m_fTextScale;                       // +0xF28 grows the text when lines are tall
 	int m_nMaxVisibleItems;                   // +0xF2C 0 = no limit
-	bool m_bWrap;                             // +0xF30 the selection wraps around
-	bool m_bPageScroll;                       // +0xF31 TODO: verify (scroll animation even without paging)
-	int m_unknownF34;                         // +0xF34
-	int m_unknownF38;                         // +0xF38
+	bool m_bWrap;                             // +0xF30 <Menu Rotate>: the selection wraps around
+	bool m_bFixed;                            // +0xF31 <Menu Fixed>: the list scrolls under a fixed selection row
+	int m_nFixAt;                             // +0xF34 that row
+	BOOL m_bScrollText;                       // +0xF38 <Menu Scroll> TODO: verify
 	DWORD m_dwIconLoadTime;                   // +0xF3C
 	float m_fUnknownF40;                      // +0xF40
 };

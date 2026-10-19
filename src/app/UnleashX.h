@@ -11,6 +11,10 @@
 #include "Screens.h"
 #include "XBApp.h"
 
+class CAppFrame;
+class CAudioGUI;
+class CSound;
+class CFtpSiteList;
 class CXmlElement;
 
 // 0x2268 bytes
@@ -25,7 +29,11 @@ public:
 	virtual HRESULT Render();                         // 0x000F0097 TODO: decompile
 	virtual HRESULT Cleanup();                        // 0x000E1B1E TODO: decompile
 
-	void SetMode(int mode);                           // 0x000E568F TODO: decompile
+	void SetMode(int mode);                           // 0x000E568F
+	// Starts or stops the background sound (only in the menu, without
+	// soundtrack music or a preview with sound).
+	void PlayBackgroundSound(BOOL play);              // 0x000E045B
+	void InitOrb();                                   // 0x000E0662 TODO: decompile
 	// Message box with OK; text is ANSI.
 	void ShowMessage(const char *text, const wchar_t *title, int flags = 0);   // 0x000E2153
 	BOOL CreateTextEditor();                          // 0x000E2853
@@ -47,46 +55,80 @@ public:
 	class CSkinEvent : public CSkinEventSink
 	{
 	public:
+		virtual void OnSkinLoaded();                  // slot 2, 0x000E5824
+
 		CUnleashX *m_pApp;                            // +0x04
 	};
 
 	CXBPackedResource m_resource;             // +0x220 UnleashX's own .xpr (icons)
 	CXBFontEx m_fonts[6];                     // +0x238 0xE4 each
 	CXBMesh m_meshes[2];                      // +0x790 CXBMeshEx
-	BYTE m_unknown7D0[0x10];                  // +0x7D0
+	IDirect3DTexture8 *m_pTexture7D0;         // +0x7D0
+	IDirect3DTexture8 *m_pTexture7D4;         // +0x7D4
+	IDirect3DTexture8 *m_pTexture7D8;         // +0x7D8
+	IDirect3DTexture8 *m_pTexture7DC;         // +0x7DC
 	IDirect3DTexture8 *m_pFileIcon;           // +0x7E0 File.png
 	IDirect3DTexture8 *m_pFolderIcon;         // +0x7E4 Folder.png
-	BYTE m_unknown7E8[0x14];                  // +0x7E8
+	IDirect3DTexture8 *m_pDefaultLoadingIcon; // +0x7E8 when the skin has no loading image
+	IDirect3DTexture8 *m_pTexture7EC;         // +0x7EC
+	IDirect3DTexture8 *m_pTexture7F0;         // +0x7F0
+	int m_unknown7F4;                         // +0x7F4
+	CSound *m_pBackgroundSound;               // +0x7F8 looped in the menu
 	CDateTimeSetting *m_pDateTimeSetting;     // +0x7FC
-	BYTE m_unknown800[0x8];                   // +0x800
+	CAppFrame *m_pFrame800;                   // +0x800 TODO: verify the class
+	int m_unknown804;                         // +0x804
 	void *m_pDefaultGamepad;                  // +0x808 &m_defaultGamepad
 	void *m_pDefaultIR;                       // +0x80C &m_defaultIR
 	CXBStopWatch m_timer;                     // +0x810
 	int m_nMode;                              // +0x830 AppMode
 	int m_nPrevMode;                          // +0x834
 	CXBStopWatch m_timers[2];                 // +0x838
-	float m_unknown878;                       // +0x878
-	BYTE m_unknown87C[0x174];                 // +0x87C
+	float m_unknown878;                       // +0x878 0.2
+	BYTE m_unknown87C[0x144];                 // +0x87C view/projection matrices (+0x8C0, +0x900, +0x940)
+	int m_unknown9C0;                         // +0x9C0
+	float m_fSplashAlpha;                     // +0x9C4
+	BOOL m_bSplashIsVideo;                    // +0x9C8 TODO: verify
+	int m_unknown9CC;                         // +0x9CC
+	IDirect3DTexture8 *m_pSplash;             // +0x9D0
+	int m_unknown9D4;                         // +0x9D4
+	IDirect3DTexture8 *m_pTexture9D8;         // +0x9D8
+	BYTE m_unknown9DC[0x8];                   // +0x9DC
+	IDirect3DTexture8 *m_pTexture9E4;         // +0x9E4
+	BYTE m_unknown9E8[0x8];                   // +0x9E8
 	CMenu m_menu;                             // +0x9F0
 	CGameManager *m_pGameManager;             // +0x1938
 	CFileManager *m_pFileManager;             // +0x193C
 	CMessageBox *m_pMessageBox;               // +0x1940
 	CSkinBrowser *m_pSkinBrowser;             // +0x1944
-	void *m_pFtpSites;                        // +0x1948 TODO: class
+	CFtpSiteList *m_pFtpSites;                // +0x1948
 	CNotePad *m_pTextEditor;                  // +0x194C
-	BYTE m_unknown1950[0x8];                  // +0x1950
+	int m_unknown1950;                        // +0x1950
+	CAppFrame *m_pFrame1954;                  // +0x1954 TODO: verify the class
 	CSettingsMenu *m_pSettingsMenu;           // +0x1958
 	BOOL m_bMessageShown;                     // +0x195C
-	BYTE m_unknown1960[0x18];                 // +0x1960
+	int m_unknown1960;                        // +0x1960
+	int m_unknown1964;                        // +0x1964
+	int m_unknown1968;                        // +0x1968
+	int m_unknown196C;                        // +0x196C
+	int m_unknown1970;                        // +0x1970
+	int m_unknown1974;                        // +0x1974
 	CXBMesh m_mesh1978;                       // +0x1978
-	BYTE m_unknown1998[0x2264 - 0x1998 - 0x1C];
+	BYTE m_unknown1998[0x2190 - 0x1998];      // +0x1998
+	int m_unknown2190;                        // +0x2190
+	int m_unknown2194;                        // +0x2194 1
+	BOOL m_bNoHardDisk;                       // +0x2198 C:\ and E:\ both missing at startup
+	BYTE m_unknown219C[0x2248 - 0x219C];      // +0x219C
+	HANDLE m_hThread2248;                     // +0x2248
 	CMenuEvent m_menuEvent;                   // +0x224C
 	CSkinEvent m_skinEvent;                   // +0x2254
+	int m_unknown225C;                        // +0x225C
 	BOOL m_bDiscLaunchPending;                // +0x2260 TODO: verify
 	int m_unknown2264;                        // +0x2264 1
 };
 
 extern CUnleashX *g_pApp;                    // 0x00276204
+extern CAudioGUI *g_pAudioGUI;               // 0x00276228 the music player screen (mode 9)
+extern HANDLE g_hNetworkThread;              // 0x0026A630
 
 // Set when the clock was invalid at boot (or by the SetClock action): the
 // date/time screen is shown.

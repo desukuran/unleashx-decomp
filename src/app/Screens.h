@@ -26,13 +26,19 @@ class CFileManager
 {
 public:
 	CFileManager();                                       // 0x00122BA8? TODO: verify
+	virtual ~CFileManager();
 	HRESULT Init(int unknown1, int unknown2, IDirect3DTexture8 *folderIcon,
 	             IDirect3DTexture8 *fileIcon);            // 0x001294E2
 	void OpenPath(const char *path);                      // 0x00128C01
+	void Reset();                                         // 0x0002B4C9
+	void SetBackground(IDirect3DTexture8 *texture);       // 0x0002B4A1
 
-	BYTE m_unknown000[0x8DC];
+	BYTE m_unknown004[0x8D8];
 	BOOL m_bInitialized;                                  // +0x8DC
-	BYTE m_unknown8E0[0x10];
+	int m_unknown8E0;                                     // +0x8E0
+	BOOL m_bSafeBorder;                                   // +0x8E4
+	BOOL m_bDrawBorder;                                   // +0x8E8
+	IDirect3DTexture8 *m_pBackground;                     // +0x8EC
 };
 
 // Game saves / game list manager ("SavesManager", "GameManager"). 0x210 bytes.
@@ -50,6 +56,7 @@ class CSettingsMenu
 {
 public:
 	CSettingsMenu();                                      // 0x000BEBFD
+	virtual ~CSettingsMenu();
 	HRESULT Init(CXBFontEx *font);                        // 0x000C18A3
 	void Show();                                          // 0x0002B530
 };
@@ -59,11 +66,12 @@ class CSkinBrowser
 {
 public:
 	CSkinBrowser();                                       // 0x000F6597
+	virtual ~CSkinBrowser();
 	HRESULT Init(IDirect3DTexture8 *checked, IDirect3DTexture8 *unchecked,
 	             CXBFontEx *font);                        // 0x000F5DEC
 	void Show();                                          // 0x000F6791
 
-	BYTE m_unknown00[0x58];
+	BYTE m_unknown04[0x54];
 	std::string m_strSkinPath;                            // +0x58
 };
 
@@ -71,6 +79,7 @@ class CNotePad
 {
 public:
 	CNotePad();                                           // 0x00103A0C? TODO: verify
+	virtual ~CNotePad();
 	void Init(int, int, int);                             // 0x00104399
 	void NewFile();                                       // 0x00103D4D
 	HRESULT Open(const char *path);                       // 0x00104181

@@ -43,11 +43,11 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_fUnknownF24 = 1.0f;
 	m_pSink = NULL;
 	m_nItemSpacing = 2;
-	m_unknownF18 = 0;
+	m_nBorderWidth = 0;
 	m_pFont = NULL;
 	m_pSelectedFont = NULL;
 	m_pMenuDoc = NULL;
-	m_unknownF08 = 1;
+	m_bShowArrows = TRUE;
 	m_bMessageShown = FALSE;
 	m_nSelected = 0;
 	m_nFirstVisible = 0;
@@ -66,9 +66,9 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_pTexture74 = NULL;
 	m_nMaxVisibleItems = 0;
 	m_bWrap = false;
-	m_bPageScroll = false;
-	m_unknownF34 = 0;
-	m_unknownF14 = 12;
+	m_bFixed = false;
+	m_nFixAt = 0;
+	m_dwTextAlign = 12;
 	m_bWaitingForKeyboard = FALSE;
 	m_bMessageShown = FALSE;
 	m_pMessageBox = NULL;
@@ -89,7 +89,7 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_pCurrentList = NULL;
 	m_bHorizontal = FALSE;
 	m_nSkinVisibleItems = 0;
-	m_unknown16C = 0;
+	m_pItemPositions = NULL;
 	m_unknown164 = 0;
 	m_pContextMenu = NULL;
 	m_bContextMenuShown = FALSE;
@@ -97,7 +97,7 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_fContextMenuY = 0.0f;
 	m_bShowPreviews = FALSE;
 	m_unknownF10 = 1;
-	m_bFontItemHeight = FALSE;
+	m_bNoIcons = FALSE;
 	m_pPassCode = NULL;
 	m_bWaitingForPassCode = FALSE;
 	m_dwListOpenTime = 0;
@@ -106,7 +106,7 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_pRecentMenu = NULL;
 	m_bRecentMenuShown = FALSE;
 	memset(m_recent, 0, sizeof(m_recent));
-	m_unknownF38 = 0;
+	m_bScrollText = FALSE;
 	m_dwIconLoadTime = GetTickCount() + 2000;
 	m_fUnknownF40 = 0.0f;
 	m_pItemEditor = NULL;
@@ -198,21 +198,21 @@ void CMenu::UpdateSoundVolume()
 
 // 0x00111F27
 HRESULT CMenu::Create(CXmlDocument *doc, CXBFont *font, CXBFont *selectedFont, CMenuEventSink *sink,
-                      BOOL fontItemHeight, int unknownF18, IDirect3DTexture8 *texture70,
+                      BOOL noIcons, int borderWidth, IDirect3DTexture8 *texture70,
                       IDirect3DTexture8 *texture74)
 {
 	if (doc == NULL || font == NULL)
 		return E_FAIL;
 
 	m_pSink = sink;
-	m_unknownF18 = unknownF18;
+	m_nBorderWidth = borderWidth;
 	m_pMenuDoc = doc;
 	m_pFont = font;
 	m_pSelectedFont = selectedFont != NULL ? selectedFont : font;
 	m_fUnknownF20 = 1.0f;
 	m_fUnknownF24 = 1.0f;
-	m_bFontItemHeight = fontItemHeight;
-	if (!fontItemHeight)
+	m_bNoIcons = noIcons;
+	if (!noIcons)
 		m_nItemHeight = kDefaultItemHeight;
 	if (texture70 != NULL)
 	{
@@ -354,7 +354,7 @@ void CMenu::LoadList(CXmlElement *list)
 	}
 
 	// Line height and text scale from the font.
-	if (!m_bFontItemHeight)
+	if (!m_bNoIcons)
 	{
 		m_nItemHeight = kDefaultItemHeight;
 		if (GetFontHeight(m_pFont) > (float)m_nItemHeight)
@@ -1122,7 +1122,7 @@ void CMenu::StartScroll(int direction)
 	m_nScrollDirection = direction;
 	m_dwScrollStart = GetTickCount();
 	float fps = g_fFrameRate < 50.0f ? 50.0f : g_fFrameRate;
-	if (m_nSkinVisibleItems == 0 || m_unknown16C == 0)
+	if (m_nSkinVisibleItems == 0 || m_pItemPositions == NULL)
 		m_fScrollSpeed = 1200.0f / fps;
 	else
 		m_fScrollSpeed = fps * 1.2f;
@@ -1164,7 +1164,7 @@ HRESULT CMenu::SelectPrevious()
 			m_nLastVisible = m_nVisibleItems - 1 + m_nFirstVisible;
 			StartScroll(-1);
 		}
-		else if (m_bPageScroll)
+		else if (m_bFixed)
 		{
 			StartScroll(-1);
 		}
@@ -1205,7 +1205,7 @@ HRESULT CMenu::SelectNext()
 			} while ((unsigned)m_nLastVisible < (unsigned)m_nSelected);
 			StartScroll(1);
 		}
-		else if (m_bPageScroll)
+		else if (m_bFixed)
 		{
 			StartScroll(1);
 		}
@@ -2092,4 +2092,109 @@ void CMenu::DrawDeleteProgress()
 			percent = 100;
 	}
 	DrawProgressBox(x, y, width, height, L"Deleting. Please Wait", g_szOperationFile, NULL, (float)percent, 1.0f, 0);
+}
+
+// --- Skin settings ------------------------------------------------------------
+
+// 0x0010CBF9
+// Zero width/height mean the whole screen; the area is kept on screen.
+void CMenu::SetArea(float x, float y, float width, float height)
+{
+	m_fAreaY = y < 0.0f ? 0.0f : y;
+	m_fAreaX = x > 0.0f ? x : 0.0f;
+	float screenWidth = 640.0f, screenHeight = 480.0f;
+	GetScreenSize(&screenWidth, &screenHeight);
+	if (width == 0.0f)
+		width = screenWidth;
+	if (height == 0.0f)
+		height = screenHeight;
+	if (width > 0.0f)
+		m_fAreaWidth = width > screenWidth ? screenWidth : width;
+	if (height > 0.0f)
+		m_fAreaHeight = height > screenHeight ? screenHeight : height;
+
+	if (m_nItemHeight <= 0)
+	{
+		m_nVisibleItems = 1;
+	}
+	else
+	{
+		m_nVisibleItems = (int)(m_fAreaHeight / (float)(m_nItemHeight + m_nItemSpacing * 2));
+		if (m_nSkinVisibleItems != 0)
+			m_nVisibleItems = m_nSkinVisibleItems;
+		if ((unsigned)m_nItemCount < (unsigned)m_nVisibleItems)
+			m_nVisibleItems = m_nItemCount;
+		if (m_nMaxVisibleItems != 0 && (unsigned)m_nMaxVisibleItems < (unsigned)m_nVisibleItems)
+			m_nVisibleItems = m_nMaxVisibleItems;
+	}
+	m_fContextMenuX = m_fAreaX;
+	m_fContextMenuY = m_fAreaY;
+}
+
+// 0x0002B662
+void CMenu::SetFont(CXBFont *font)
+{
+	if (font == NULL)
+		return;
+	m_pFont = font;
+	m_fUnknownF20 = font->m_fScaleFactorX;
+	m_fUnknownF24 = font->m_fScaleFactorY;
+}
+
+// 0x0002B67E
+// A horizontal menu: one row, starting 35 from the left by default, and the
+// selection stays in place.
+void CMenu::SetHorizontal(BOOL horizontal)
+{
+	m_bHorizontal = horizontal;
+	if (!horizontal)
+		return;
+	m_unknown164 = 0;
+	if (m_fAreaX == 0.0f)
+		m_fAreaX = 35.0f;
+	if (m_fAreaWidth == 0.0f)
+	{
+		GetScreenSize(&m_fAreaWidth, NULL);
+		m_fAreaWidth -= m_fAreaX + 40.0f;
+	}
+	m_dwTextAlign = (m_dwTextAlign & 1) | 0x0C;
+	m_bFixed = true;
+	m_nFixAt = 1;
+}
+
+// 0x0002B701
+// The area becomes the items' bounding box plus 20 around it. Quirk: width
+// and height get the right and bottom edges, not the size.
+void CMenu::SetItemPositions(unsigned count, const SSkinItemPos *positions)
+{
+	m_nSkinVisibleItems = count;
+	if (count < 2 || count > 20)
+	{
+		m_pItemPositions = NULL;
+		m_nSkinVisibleItems = 0;
+		return;
+	}
+	m_pItemPositions = positions;
+	float left = (float)positions[0].x;
+	float top = (float)positions[0].y;
+	float right = (float)positions[0].width + left;
+	float bottom = (float)positions[0].height + top;
+	for (unsigned i = 1; i < count; i++)
+	{
+		const SSkinItemPos &p = positions[i];
+		if ((float)p.x < left)
+			left = (float)p.x;
+		if ((float)p.y < top)
+			top = (float)p.y;
+		if (right < (float)(p.x + p.width))
+			right = (float)p.width + (float)p.x;
+		if (bottom < (float)(p.height + p.y))
+			bottom = (float)p.height + (float)p.y;
+	}
+	left -= 20.0f;
+	m_fAreaX = left < 0.0f ? 0.0f : left;
+	top -= 20.0f;
+	m_fAreaY = top >= 0.0f ? top : 0.0f;
+	m_fAreaWidth = right + 20.0f;
+	m_fAreaHeight = bottom + 20.0f;
 }

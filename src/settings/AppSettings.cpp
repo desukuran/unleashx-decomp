@@ -219,7 +219,7 @@ void CAppSettings::SetDefaults()
 	m_prefs.m_bAbortOnError = TRUE;
 	m_prefs.m_strDefaultFolder.clear();
 
-	m_unknown11F0 = 1;
+	m_bLoadingShowInfo = 1;
 
 	// <Newsfeed>
 	m_bNewsfeedEnable = FALSE;

@@ -247,3 +247,24 @@ IDirect3DTexture8 *CSkin::GetLoadingBackground()
 	}
 	return m_pLoadingBackground;
 }
+
+// 0x000F99A7
+// "U:\" in the path means UnleashX's own title data folder.
+IDirect3DTexture8 *CSkin::GetFileManagerBackground()
+{
+	if (m_pFileManagerBackground == NULL && m_strFileManagerBackground.size() != 0)
+	{
+		StrReplaceAll(m_strFileManagerBackground, "U:\\", "E:\\UDATA\\9e115330\\");
+		if (!LoadTextureFromFile(m_strFileManagerBackground.c_str(), g_pd3dDevice, &m_pFileManagerBackground, 1, 1,
+		                         NULL))
+			m_pFileManagerBackground = NULL;
+		m_strFileManagerBackground.clear();
+	}
+	return m_pFileManagerBackground;
+}
+
+// 0x000F9145
+BOOL CSkin::IsPreviewPlaying() const
+{
+	return m_bPreviewPlaying && m_pPreviewVideo != NULL && m_strPreviewFile.size() != 0;
+}

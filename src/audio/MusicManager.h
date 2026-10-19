@@ -13,16 +13,26 @@ struct SSongFormat
 	DWORD duration;        // +0x0C seconds
 };
 
+enum MusicState
+{
+	MUSIC_STOPPED = 0,
+	MUSIC_PAUSED = 1,      // TODO: verify
+	MUSIC_PLAYING = 2,
+};
+
 class CMusicManager
 {
 public:
+	virtual ~CMusicManager();
+	int GetState() const;               // 0x00105FCE MusicState
+	void Stop();                        // 0x001061A5 TODO: decompile
 	// Names of the current soundtrack and song, and the song length (ms).
 	// Any can be NULL.
 	HRESULT GetSongInfo(wchar_t *soundtrack, wchar_t *song, DWORD *length);   // 0x00106FA9 TODO: decompile
 	SSongFormat *GetSongFormat();       // 0x00105FD5 TODO: decompile; NULL if nothing plays
 	float GetSongPosition();            // 0x00106017 TODO: decompile; seconds
 
-	BYTE m_unknown000[0x1A0];
+	BYTE m_unknown004[0x19C];
 	BOOL m_bFromHdd;                    // +0x1A0 FALSE while playing an audio CD TODO: verify
 };
 
