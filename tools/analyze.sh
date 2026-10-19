@@ -19,5 +19,6 @@ python3 -I "$ROOT/tools/xbe.py" layout "$XBE" "$BUILD/layout.txt"
 	-processor x86:LE:32:default -cspec windows \
 	-scriptPath "$ROOT/tools/ghidra_scripts" \
 	-preScript XbeSetup.java "$BUILD/layout.txt" \
+	-postScript ApplyTypes.java "$ROOT/symbols/types.h" \
 	-postScript ApplySymbols.java $SYMBOLS \
 	-postScript ExportAll.java "$BUILD/export"

@@ -9,5 +9,6 @@ BUILD=$ROOT/build
 "$GHIDRA/support/analyzeHeadless" "$BUILD/ghidra" UnleashX \
 	-process default.flat -noanalysis \
 	-scriptPath "$ROOT/tools/ghidra_scripts" \
+	-postScript ApplyTypes.java "$ROOT/symbols/types.h" \
 	-postScript ApplySymbols.java "$ROOT/symbols/rtti.txt" "$ROOT/symbols/names.txt" \
 	-postScript ExportAll.java "$BUILD/export"

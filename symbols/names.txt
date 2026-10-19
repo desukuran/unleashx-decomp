@@ -1,2 +1,116 @@
 # Hand-curated symbols. Format: <hex address> <name> [C signature]
 # Overrides symbols/rtti.txt. Keep sorted by address.
+# "@reg" after a parameter name pins it to a register (LTCG custom conventions);
+# other parameters go on the stack in order. See tools/ghidra_scripts/ApplySymbols.java.
+
+# ---- std::string (VC7.1 Dinkumware, LTCG-specialized copies) ----
+000110a9 std::string::assign_str std_string * f(std_string *self@esi, std_string *right@edi)
+000110e1 std::string::assign_cstr std_string * f(std_string *self@edi, char *s@ecx)
+0001115e std::string::append_cstr std_string * f(std_string *self@eax, char *s)
+00011685 std::string::clear void f(std_string *self@eax)
+000117e4 std::string::ctor_cstr std_string * f(std_string *self@eax, char *s)
+00011812 StrRight std_string * f(std_string *src@edx, std_string *out, int count)
+00011949 std::string::append_substr std_string * f(std_string *self@esi, std_string *right@eax, DWORD pos, DWORD count)
+00011af7 std::string::erase_range char ** f(std_string *self@esi, char **result, char *first, char *last)
+00011b42 std::string::compare_cstr int __thiscall f(char *s)
+00011d9c std::wstring::_Tidy void f(std_wstring *self@ebx, BYTE built, DWORD newsize)
+00012a1d StrLeft std_string * __thiscall f(std_string *out, int count)
+00012a90 StrMid std_string * f(int start@ecx, int count@eax, std_string *src, std_string *out)
+0001904b std::string::append_chars std_string * f(std_string *self@esi, DWORD count@ebx, char c)
+0001918f StrCmpNoCase_str int f(std_string *self@eax, char *s)
+00019215 StrReplaceAll int f(char *replacement@eax, std_string *str, char *find)
+00019300 std::vector_string::size int f(std_vector *self@eax)
+00019316 std::vector_string::push_back void f(std_vector *self@eax, std_string *value)
+000196b4 std::vector_string::_Tidy void f(std_vector *self@esi)
+0001aa3c StrCmpNoCase int f(char *a@ecx, char *b@eax)
+0001add6 StrFormat std_string * __cdecl f(std_string *out, char *fmt, ...)
+0001f029 StrTrimLeft std_string * f(std_string *self@eax)
+0001f096 StrTrimRight std_string * f(std_string *self@esi)
+
+# ---- std::vector<T*> ----
+00020c8b std::vector_ptr::size int f(std_vector *self@eax)
+00020c9e std::vector_ptr::erase void ** f(std_vector *self@esi, void ***result@ebx, void **where)
+00026d11 std::vector_ptr::_Tidy void f(std_vector *self@esi)
+00033c95 std::vector_ptr::push_back void f(std_vector *self@eax, void **value@esi)
+
+# ---- XAPI (xapilib) ----
+00035af3 CloseHandle BOOL __stdcall f(void *handle)
+00035c4e WaitForSingleObjectEx DWORD __stdcall f(void *handle, DWORD ms, BOOL alertable)
+00035d59 SleepEx DWORD __stdcall f(DWORD ms, BOOL alertable)
+00035dab WaitForSingleObject DWORD __stdcall f(void *handle, DWORD ms)
+00035dd7 Sleep void __stdcall f(DWORD ms)
+0003656a GetLastError DWORD __stdcall f(void)
+00036592 SetLastError void __stdcall f(DWORD error)
+000365c0 XapiSetLastNTError DWORD __stdcall f(DWORD status)
+000395b4 GetProcessHeap void * __stdcall f(void)
+0003959d HeapFree BOOL __stdcall f(void *heap, DWORD flags, void *mem)
+000395d7 LocalFree void * __stdcall f(void *mem)
+00039f3a XMemAlloc void * __stdcall f(DWORD size, DWORD attributes)
+00039fda XMemFree void __stdcall f(void *mem, DWORD attributes)
+00034971 GetTickCount DWORD __stdcall f(void)
+
+# ---- CRT (libcmt) ----
+0005d73c _wcslen int __cdecl f(unsigned short *s)
+0005d844 operator_delete void __cdecl f(void *p)
+0005dcb6 _free void __cdecl f(void *p)
+0005e06d __mbsicmp int __cdecl f(char *a, char *b)
+00060a20 __alloca_probe
+00060b50 __ftol2
+00061670 __EH_prolog
+
+# ---- src/common/ObList.cpp ----
+0001c956 CPlex::Create
+0001c972 CPlex::FreeDataChain
+0001c9a5 CObList::RemoveHead
+0001c9c8 CObList::AddTail
+0001c9f1 CObList::RemoveAll
+0001ca0d CObList::RemoveAt
+0001ca3c CObList::NewNode
+0001ca8f CObList::FreeNode
+
+# ---- src/xml/XmlDocument.cpp ----
+0001cb7c CXmlAttribute::SetValue
+0001cc44 CXmlAttribute::GetEscapedValue
+0001ccd0 CXmlElement::RebuildAttributeText
+0001cd9d CXmlElement::CXmlElement
+0001cebc CXmlElement::DeleteAttributes
+0001cee9 CXmlElement::GetEscapedValue
+0001cf59 CXmlElement::SetAttribute
+0001cfff CXmlElement::FindFirstChild
+0001d052 CXmlElement::FindNextChild
+0001d09c CXmlElement::GetComment
+0001d0d5 CXmlElement::FindAttribute
+0001d14d CXmlElement::GetAttribute
+0001d178 CXmlElement::GetFirstChild
+0001d193 CXmlElement::RemoveAttribute
+0001d202 CXmlElement::SetValue
+0001d2ea CXmlElement::AddComment
+0001d3bd CXmlDocument::ToString
+0001d446 CXmlDocument::Parse
+0001dd1a CXmlDocument::RemoveElement
+0001dd78 CXmlDocument::Load
+0001de81 CXmlDocument::LoadFromString
+0001def4 CXmlDocument::Refresh
+0001df31 CXmlDocument::Save
+0001df5e CXmlDocument::SaveAs
+0001e041 CXmlDocument::FindElement
+0001e0aa CXmlDocument::Clear
+0001e115 CXmlDocument::ParseTag
+0001e1c9 CXmlDocument::SerializeElement
+0026c614 g_nXmlElementCount
+
+# ---- more string helpers ----
+000117fd StrAppend
+000190fc std::string::push_back
+000191a9 std::string::find_cstr
+000191c2 std::string::find_cstr_from
+000191dd StrRemoveChar
+0001ef7e std::string::erase_at
+0001ef9b StrFindChar
+0001efd9 StrReplaceChar
+00019960 std::string::find_n
+
+# ---- more CRT / XAPI ----
+0005e001 _strdup
+00036736 SetFileAttributesA
+00036d18 OutputDebugStringA
