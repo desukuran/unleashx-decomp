@@ -302,3 +302,12 @@
 000ad398 SColorScheme::Load void f(void *self@ecx, CXmlDocument *doc@eax)
 000ac201 SColorScheme::~SColorScheme void f(void *self@esi)
 000aa69e GetDriveInfo
+
+# ---- src/ui/Language ----
+0013a631 LookupLanguageKey char * __cdecl f(char *key)
+0013a679 GetDefaultString char * f(int id@eax)
+0013d242 GetStringA char * f(int id@eax)
+0013d299 GetString WORD * __cdecl f(int id)
+00278024 g_stringCacheA
+00278030 g_stringCacheW
+0009df0d StrIsNotEmpty BOOL f(char *s@eax)

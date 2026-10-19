@@ -1,0 +1,1402 @@
+[
+{
+"id": 0,
+"key": "BROWSE_FOLDER",
+"text": "Browse Folder"
+},
+{
+"id": 1,
+"key": "NEW_FOLDER",
+"text": "New Folder"
+},
+{
+"id": 2,
+"key": "CREATE_FOLDER",
+"text": "Create Folder"
+},
+{
+"id": 4,
+"key": "OK",
+"text": "OK"
+},
+{
+"id": 5,
+"key": "CANCEL",
+"text": "Cancel"
+},
+{
+"id": 6,
+"key": "ABORT",
+"text": "Abort"
+},
+{
+"id": 7,
+"key": "RETRY",
+"text": "Retry"
+},
+{
+"id": 8,
+"key": "IGNORE",
+"text": "Ignore"
+},
+{
+"id": 9,
+"key": "YES",
+"text": "Yes"
+},
+{
+"id": 10,
+"key": "NO",
+"text": "No"
+},
+{
+"id": 11,
+"key": "ACCEPT",
+"text": "Accept"
+},
+{
+"id": 12,
+"key": "CHECKING",
+"text": "Checking"
+},
+{
+"id": 13,
+"key": "SELECT",
+"text": "Select"
+},
+{
+"id": 14,
+"key": "ROOT_FOLDER",
+"text": "Root Folder"
+},
+{
+"id": 15,
+"key": "SORT",
+"text": "Sort..."
+},
+{
+"id": 16,
+"key": "FILENAME",
+"text": "Filename"
+},
+{
+"id": 17,
+"key": "DATE",
+"text": "Date"
+},
+{
+"id": 18,
+"key": "SIZE",
+"text": "Size"
+},
+{
+"id": 19,
+"key": "SELECT_ALL",
+"text": "Select All"
+},
+{
+"id": 20,
+"key": "CLEAR_SELECTION",
+"text": "Clear Selection"
+},
+{
+"id": 21,
+"key": "INVERSE_SELECTION",
+"text": "Inverse Selection"
+},
+{
+"id": 22,
+"key": "COPY",
+"text": "Copy..."
+},
+{
+"id": 23,
+"key": "COPY_RESUME",
+"text": "Copy/Resume..."
+},
+{
+"id": 24,
+"key": "MOVE",
+"text": "Move..."
+},
+{
+"id": 25,
+"key": "DELETE",
+"text": "Delete..."
+},
+{
+"id": 26,
+"key": "RENAME",
+"text": "Rename..."
+},
+{
+"id": 27,
+"key": "CALC_USED_SPACE",
+"text": "Calc. Used Space"
+},
+{
+"id": 28,
+"key": "COPY_DISC",
+"text": "Copy Disc"
+},
+{
+"id": 29,
+"key": "QUICK_COPY_DISK",
+"text": "Quick Copy Disc"
+},
+{
+"id": 30,
+"key": "ADD_TO_ZIP_FILE",
+"text": "Add to Zip File"
+},
+{
+"id": 31,
+"key": "PATCH_XBE_FILE",
+"text": "Patch XBE File"
+},
+{
+"id": 32,
+"key": "RENAME_XBE_TITLE",
+"text": "Rename XBE Title"
+},
+{
+"id": 33,
+"key": "NEW_TEXT_DOCUMENT",
+"text": "New Text Document"
+},
+{
+"id": 34,
+"key": "OPEN_WITH_TEXT_EDITOR",
+"text": "Open with Text Editor"
+},
+{
+"id": 35,
+"key": "FORMAT_DRIVE",
+"text": "Format Drive..."
+},
+{
+"id": 36,
+"key": "SWITCH_TO_FTP",
+"text": "Switch to FTP Browser..."
+},
+{
+"id": 37,
+"key": "MSG_FORMAT_DRIVE_ASK",
+"text": "Are you sure that you want to format Drive %s?\nAll Data will be lost."
+},
+{
+"id": 38,
+"key": "ERROR",
+"text": "Error"
+},
+{
+"id": 39,
+"key": "CONFIRM",
+"text": "Confirm"
+},
+{
+"id": 40,
+"key": "SUCCESS",
+"text": "Success"
+},
+{
+"id": 41,
+"key": "INFORMATION",
+"text": "Information"
+},
+{
+"id": 42,
+"key": "WARNING",
+"text": "Warning"
+},
+{
+"id": 43,
+"key": "MSG_INVALID_SELECTION",
+"text": "Invalid selection. Please select at least one file to %s."
+},
+{
+"id": 44,
+"key": "MSG_INSUFFICIENTSPACE",
+"text": "Insufficient Disk Space.\nAvailable Space: %s\nRequired Space: %s"
+},
+{
+"id": 45,
+"key": "MSG_ABOUT_TO_COPY",
+"text": "You are about to copy %s File(s) and %s Folder(s) totaling %s %s."
+},
+{
+"id": 46,
+"key": "MSG_COPYING",
+"text": "Copying selected files...\n\nPlease DO NOT turn off your xbox."
+},
+{
+"id": 47,
+"key": "MSG_COPY_SUCCESS",
+"text": "Successfully copied %s File(s) and %s Folder(s)."
+},
+{
+"id": 48,
+"key": "MSG_COPY_ERROR",
+"text": "An error occurred while copying file(s).\nError Code: %d"
+},
+{
+"id": 49,
+"key": "MSG_COPY_INVALID",
+"text": "Source and Destination can not be the same.\nPlease select another destination."
+},
+{
+"id": 50,
+"key": "MSG_COPY_CHECK",
+"text": "Preparing to copy files...\n\nPlease DO NOT turn off your xbox.\n\nChecking..."
+},
+{
+"id": 51,
+"key": "MSG_NO_DESTINATION",
+"text": "Destination is not available.\nPlease select another destination."
+},
+{
+"id": 52,
+"key": "MSG_ABOUT_TO_MOVE",
+"text": "You are about to move %s File(s) and %s Folder(s) totaling %s %s."
+},
+{
+"id": 53,
+"key": "MSG_MOVING",
+"text": "Moving selected files...\n\nPlease DO NOT turn off your xbox."
+},
+{
+"id": 54,
+"key": "MSG_MOVE_SUCCESS",
+"text": "Successfully moved %s File(s) and %s Folder(s)."
+},
+{
+"id": 55,
+"key": "MSG_MOVE_ERROR",
+"text": "An error occurred while moving file(s).\nError Code: %d"
+},
+{
+"id": 56,
+"key": "MSG_MOVE_CHECK",
+"text": "Preparing to move files...\n\nPlease DO NOT turn off your xbox.\n\nChecking..."
+},
+{
+"id": 57,
+"key": "MSG_ABOUT_TO_DELETE",
+"text": "You are about to delete %s File(s) and %s Folder(s) totaling %s %s."
+},
+{
+"id": 58,
+"key": "MSG_DELETING",
+"text": "Deleting selected files...\n\nPlease DO NOT turn off your xbox."
+},
+{
+"id": 59,
+"key": "MSG_DELETE_SUCCESS",
+"text": "Successfully deleted %s File(s) and %s Folder(s)."
+},
+{
+"id": 60,
+"key": "MSG_DELETE_ERROR",
+"text": "An error occurred while deleting file(s).\nError Code: %d"
+},
+{
+"id": 61,
+"key": "MSG_DELETE_CHECK",
+"text": "Preparing to delete files...\n\nPlease DO NOT turn off your xbox.\n\nChecking..."
+},
+{
+"id": 62,
+"key": "MSG_ZIPPING",
+"text": "Compressing selected files...\n\nPlease DO NOT turn off your xbox."
+},
+{
+"id": 63,
+"key": "MSG_ZIP_SUCCESS",
+"text": "Successfully compressed %s File(s) and %s Folder(s)."
+},
+{
+"id": 64,
+"key": "MSG_ZIP_ERROR",
+"text": "An error occurred while compressing file(s).\nError Code: %d"
+},
+{
+"id": 65,
+"key": "MSG_ZIP_CHECK",
+"text": "Checking files to add...\n\nPlease DO NOT turn off your xbox.\n\nChecking..."
+},
+{
+"id": 66,
+"key": "MSG_CALC_SPACE",
+"text": "Disk space used by %s File(s) in %s Folder(s): %s %s / %s %s"
+},
+{
+"id": 67,
+"key": "MSG_CALC_CHECK",
+"text": "Calculating files...\n\nPlease DO NOT turn off your xbox.\n\nChecking..."
+},
+{
+"id": 68,
+"key": "MSG_DVD_COPYING",
+"text": "Copying DVD Disc...\n\nPlease DO NOT turn off your xbox."
+},
+{
+"id": 69,
+"key": "MSG_DVD_COPY_SUCCESS",
+"text": "Successfully copied DVD disc."
+},
+{
+"id": 70,
+"key": "MSG_XBEPATCH_SOURCE_ERR",
+"text": "Only XBE file found on Harddisk can be patch."
+},
+{
+"id": 71,
+"key": "MSG_XBEPATCH_ERROR",
+"text": "Unable to patch XBE file. It may have already been patched or does not require patching."
+},
+{
+"id": 72,
+"key": "MSG_XBEPATCH_SUCCESS",
+"text": "XBE file successfully patched."
+},
+{
+"id": 73,
+"key": "MSG_XBERENAME_SUCCESS",
+"text": "XBE Title changed successfully."
+},
+{
+"id": 74,
+"key": "MSG_XBERENAME_ERROR",
+"text": "Unable to change XBE Title."
+},
+{
+"id": 75,
+"key": "MSG_RENAME_ERROR",
+"text": "An error occurred while renaming %s to %s.\nError Code: %d"
+},
+{
+"id": 76,
+"key": "MSG_CREATEFOLDER_ERROR",
+"text": "An error occurred while creating new folder.\nError Code: %d"
+},
+{
+"id": 77,
+"key": "MSG_GAMESAVES_CAPTION",
+"text": "Save Games"
+},
+{
+"id": 78,
+"key": "MSG_GAMESAVES_SEARCH",
+"text": "Searching for Save games.\nPlease Wait..."
+},
+{
+"id": 79,
+"key": "MSG_GAMESAVES_DELETE_ERROR",
+"text": "An error occurred while trying to delete '%s'.\nError Code: %d"
+},
+{
+"id": 80,
+"key": "MSG_GAMESAVES_DELETE_SUCCESS",
+"text": "'%s' was deleted successfully."
+},
+{
+"id": 81,
+"key": "MSG_GAMESAVES_CONTENT",
+"text": "You can not copy XBL content from this module.\nPlease use the File manager to copy the content of:\n'%s'"
+},
+{
+"id": 82,
+"key": "MSG_GAMESAVES_NO_DEST",
+"text": "Destination full or does not exists."
+},
+{
+"id": 83,
+"key": "MSG_GAMESSAVES_BAD_DEST",
+"text": "Not enough space on destination drive."
+},
+{
+"id": 84,
+"key": "MSG_GAMESAVES_INSERT_MU",
+"text": "Please insert a memory unit."
+},
+{
+"id": 85,
+"key": "MSG_GAMESAVES_DELETE",
+"text": "You are about to delete the following game saves:\n%s\nNo. of Blocks: %u\nContaining %u saves and %u contents\nAre you sure you want to continue?"
+},
+{
+"id": 86,
+"key": "MSG_GAMESAVES_DELETE_ITEM",
+"text": "You are about to delete the following game saves:\n%s\nNo. of Blocks: %u\nAre you sure you want to continue?"
+},
+{
+"id": 87,
+"key": "MSG_GAMESAVES_COPY_ERROR",
+"text": "An error occurred while copying '%s'.\nError Code: %d"
+},
+{
+"id": 88,
+"key": "MSG_GAMESAVES_NO_SAVES",
+"text": "Can't find Game Saves for '%s'"
+},
+{
+"id": 89,
+"key": "GAMESAVES_DOWNLOAD",
+"text": "Download Game Saves"
+},
+{
+"id": 90,
+"key": "GAMESAVES_RELOAD",
+"text": "Reload Game Saves"
+},
+{
+"id": 91,
+"key": "GAMESAVES_INVALID_FORMAT",
+"text": "Downloaded file is not in the correct format."
+},
+{
+"id": 92,
+"key": "HTTP_ERROR",
+"text": "HTTP Error"
+},
+{
+"id": 93,
+"key": "HTTP_OPENING",
+"text": "Opening"
+},
+{
+"id": 94,
+"key": "HTTP_CONNECTING",
+"text": "Connecting"
+},
+{
+"id": 95,
+"key": "HTTP_CONNECTED",
+"text": "Connected"
+},
+{
+"id": 96,
+"key": "HTTP_RETRIEVING",
+"text": "Retrieving"
+},
+{
+"id": 97,
+"key": "HTTP_FINISHED",
+"text": "Done"
+},
+{
+"id": 98,
+"key": "MSG_HTTP_FETCH_ERROR",
+"text": "Unable to retrieve file: HTTP STATUS %d"
+},
+{
+"id": 99,
+"key": "MSG_INVALID_FILE_FORMAT",
+"text": "The file '%s' is not a valid %s file."
+},
+{
+"id": 100,
+"key": "MSG_MENU_BATCH_ERROR",
+"text": "Batch process failed.\nThe last item was: %s.\nAction: %s"
+},
+{
+"id": 101,
+"key": "MSG_MENU_DELETE_GAME",
+"text": "The following title will be deleted from your hard disk?\nXbox Title:\t%s\nAre you sure you want to continue?"
+},
+{
+"id": 102,
+"key": "MSG_MENU_FORMAT_SUCCESS",
+"text": "Finished formatting Drive %s"
+},
+{
+"id": 103,
+"key": "MSG_MENU_FORMAT_ERROR",
+"text": "Failed to format Drive %s"
+},
+{
+"id": 104,
+"key": "MSG_MENU_SEARCH",
+"text": "Searching for Xbox Titles.\nPlease Wait..."
+},
+{
+"id": 105,
+"key": "MSG_TEXTEDITOR_SAVE_ERROR",
+"text": "An error occurred while saving %s.\nError Code: %d"
+},
+{
+"id": 106,
+"key": "MSG_TEXTEDITOR_OPEN_ERROR",
+"text": "An error occurred while trying to open '%s'.\nError Code: %d"
+},
+{
+"id": 107,
+"key": "MSG_TEXTEDITOR_SAVE_ASK",
+"text": "You have made changes to your document.\nDo you want to save the changes?"
+},
+{
+"id": 108,
+"key": "MSG_TEXTEDITOR_DEST_EXIST",
+"text": "'%s' Already Exists."
+},
+{
+"id": 109,
+"key": "MSG_LOADING",
+"text": "LOADING..."
+},
+{
+"id": 110,
+"key": "MSG_COPY_CANCELED",
+"text": "Copy operation has been Canceled."
+},
+{
+"id": 111,
+"key": "INVALID_PASSWORD",
+"text": "Invalid Password"
+},
+{
+"id": 112,
+"key": "MSG_INVALID_PASSWORD",
+"text": "The password you entered is incorrect!"
+},
+{
+"id": 113,
+"key": "MSG_MAX_INVALID_PASSWORD",
+"text": "You have reached the maximum number of tries allowed to enter a valid password.\nYour Xbox will now shutdown."
+},
+{
+"id": 114,
+"key": "INVALID_PASSCODE",
+"text": "Invalid Passcode"
+},
+{
+"id": 115,
+"key": "MSG_INVALID_PASSCODE",
+"text": "The passcode you entered is incorrect!"
+},
+{
+"id": 116,
+"key": "MSG_MAX_INVALID_PASSCODE",
+"text": "You have reached the maximum number of tries allowed to enter a valid passcode.\nYour Xbox will now shutdown."
+},
+{
+"id": 117,
+"key": "MSG_SHUTTING_DOWN",
+"text": "Preparing to shutdown your Xbox."
+},
+{
+"id": 118,
+"key": "MSG_DASHUPDATE_SUCCESS",
+"text": "You have successfully upgraded your dashboard.\nOld version has been renamed to:\n\t\"%s\".\nPress OK to reboot."
+},
+{
+"id": 119,
+"key": "MSG_DASHUPDATE_FAILED",
+"text": "Live Update Failed.\nPress OK to reboot."
+},
+{
+"id": 120,
+"key": "MSG_DASHUPDATE_CHECK",
+"text": "Validating update.\nPlease DO NOT turn off your xbox."
+},
+{
+"id": 121,
+"key": "MSG_DASHUPDATE_PASS",
+"text": "Update is validated.\nKeep this running a few more minutes.\nPress OK to proceed with the upgrade."
+},
+{
+"id": 122,
+"key": "MSG_BAD_CONFIGFILE",
+"text": "Your Config file is either corrupt or damaged.\nPlease fix this config.xml to avoid this problem.\nYou can safely ignore this warning and reboot to apply your settings."
+},
+{
+"id": 123,
+"key": "MSG_BAD_SKINFILE",
+"text": "The current skin you are using caused UnleashX to lock on startup.\nPlease fix this skin to avoid this problem.\nYou can safely ignore this message and reboot to apply your current skin."
+},
+{
+"id": 124,
+"key": "MSG_NEWHARDDISK",
+"text": "UnleashX has detected a new Harddisk.\nDo you want to format your new drive?\n\nPress both Triggers and Start Button to Continue..."
+},
+{
+"id": 125,
+"key": "MSG_NEWHD_WARNING",
+"text": "WARNING!!!\nALL DATA ON NON-REMOVABLE DISK WILL BE LOST.\n\nPress both Triggers and Start Button to Continue..."
+},
+{
+"id": 126,
+"key": "MSG_NEWHD_FINISHED",
+"text": "UnleashX has finished preparing your new drive.\n\nPress both Triggers and Start Button to Continue..."
+},
+{
+"id": 127,
+"key": "MSG_SETTING_SAVE_ERROR",
+"text": "Unable to Save settings. Error Code: %d"
+},
+{
+"id": 128,
+"key": "MSG_SETTING_FAILED",
+"text": "Unable to set %s. Error Code: %d"
+},
+{
+"id": 129,
+"key": "MSG_SETTING_RESTART",
+"text": "You need to restart your xbox for the settings to take effect."
+},
+{
+"id": 130,
+"key": "MSG_SETTING_SUCCESS",
+"text": "Settings was saved successfully."
+},
+{
+"id": 131,
+"key": "MSG_SETTING_NOCONFIG",
+"text": "Critical Error. Unable to load Configuration from XML file."
+},
+{
+"id": 132,
+"key": "MSG_ASK_SAVE",
+"text": "Your settings has changed.\nIf you exit, your changes will be lost.\n\nDo you want to save the changes?"
+},
+{
+"id": 133,
+"key": "AUTOLAUNCH",
+"text": "AutoLaunch"
+},
+{
+"id": 134,
+"key": "DATETIME",
+"text": "Date and Time"
+},
+{
+"id": 135,
+"key": "SHORTCUT",
+"text": "Gamepad/IR Shortcut"
+},
+{
+"id": 136,
+"key": "LIVEUPDATE",
+"text": "Live Update"
+},
+{
+"id": 137,
+"key": "NETWORK",
+"text": "Network"
+},
+{
+"id": 138,
+"key": "SCRCALIBRATION",
+"text": "Screen Calibration"
+},
+{
+"id": 139,
+"key": "MUSIC",
+"text": "Sound and Audio"
+},
+{
+"id": 140,
+"key": "STORAGE",
+"text": "Storage"
+},
+{
+"id": 141,
+"key": "SYSTEM",
+"text": "System"
+},
+{
+"id": 142,
+"key": "DISPLAY",
+"text": "Video Display"
+},
+{
+"id": 143,
+"key": "AUTOLAUNCH_GAME",
+"text": "AutoLaunch Game"
+},
+{
+"id": 144,
+"key": "AUTOLAUNCH_DVD",
+"text": "AutoLaunch DVD"
+},
+{
+"id": 145,
+"key": "DVD_PLAYER",
+"text": "DVD Player"
+},
+{
+"id": 146,
+"key": "AUTOLAUNCH_AUDIO",
+"text": "AutoLaunch Audio CD"
+},
+{
+"id": 147,
+"key": "CDAUDIO_PLAYER",
+"text": "Audio CD Player"
+},
+{
+"id": 148,
+"key": "AUTOLAUNCH_DATA",
+"text": "AutoLaunch Data"
+},
+{
+"id": 149,
+"key": "FILE_MANAGER",
+"text": "File Manager"
+},
+{
+"id": 150,
+"key": "GAMEPAD",
+"text": "Game Pad"
+},
+{
+"id": 151,
+"key": "INFRARED_RCONTROL",
+"text": "InfraRed Remote Control"
+},
+{
+"id": 152,
+"key": "AUTO_CHECK",
+"text": "Auto-Check"
+},
+{
+"id": 153,
+"key": "CHECK_UPDATE",
+"text": "Check Update"
+},
+{
+"id": 154,
+"key": "SERVER",
+"text": "Server"
+},
+{
+"id": 155,
+"key": "ENABLE",
+"text": "Enable"
+},
+{
+"id": 156,
+"key": "CLOCK_SETTINGS",
+"text": "Clock Settings"
+},
+{
+"id": 157,
+"key": "CLOCK_24HFormat",
+"text": "24H Format"
+},
+{
+"id": 158,
+"key": "AUTOSET_CLOCK",
+"text": "Autoset Clock"
+},
+{
+"id": 159,
+"key": "SNTP_SERVER",
+"text": "SNTP Server"
+},
+{
+"id": 160,
+"key": "PORT",
+"text": "Port"
+},
+{
+"id": 161,
+"key": "ALLOW_HTTP",
+"text": "Allow HTTP"
+},
+{
+"id": 162,
+"key": "FORMAT",
+"text": "Format"
+},
+{
+"id": 163,
+"key": "ENABLE_480P",
+"text": "Enable 480p"
+},
+{
+"id": 164,
+"key": "ENABLE_720P",
+"text": "Enable 720p"
+},
+{
+"id": 165,
+"key": "ENABLE_1080I",
+"text": "Enable 1080i"
+},
+{
+"id": 166,
+"key": "ENABLE_PAL60",
+"text": "Enable PAL-60"
+},
+{
+"id": 167,
+"key": "FASTER_REFRESH_RATE",
+"text": "Faster Refresh Rate"
+},
+{
+"id": 168,
+"key": "TEXTURE_COMPRESSION",
+"text": "Compress Texture"
+},
+{
+"id": 169,
+"key": "TEST",
+"text": "Test"
+},
+{
+"id": 170,
+"key": "QUALITY",
+"text": "Quality"
+},
+{
+"id": 171,
+"key": "COLOR",
+"text": "Color"
+},
+{
+"id": 172,
+"key": "SOFTEN",
+"text": "Soften"
+},
+{
+"id": 173,
+"key": "FILTER_LEVEL",
+"text": "Filter Level"
+},
+{
+"id": 174,
+"key": "AUTO_SWITCH",
+"text": "Auto Switch"
+},
+{
+"id": 175,
+"key": "MULTI_REGION_MODE",
+"text": "Multi-Region Mode"
+},
+{
+"id": 176,
+"key": "FORCE_PAL60",
+"text": "Force PAL60"
+},
+{
+"id": 177,
+"key": "ENABLE_DRIVE_F",
+"text": "Enable Drive F"
+},
+{
+"id": 178,
+"key": "ENABLE_DRIVE_G",
+"text": "Enable Drive G"
+},
+{
+"id": 179,
+"key": "HARD_DRIVE_INFO",
+"text": "Hard Drive Info"
+},
+{
+"id": 180,
+"key": "MODEL",
+"text": "Model"
+},
+{
+"id": 181,
+"key": "SERIAL_NO",
+"text": "Serial No."
+},
+{
+"id": 182,
+"key": "STATUS",
+"text": "Status"
+},
+{
+"id": 183,
+"key": "DVD_DRIVE_INFO",
+"text": "DVD Drive Info"
+},
+{
+"id": 184,
+"key": "DVD_DRIVE",
+"text": "DVD Drive"
+},
+{
+"id": 185,
+"key": "MEDIA_CHECK",
+"text": "Media Check"
+},
+{
+"id": 186,
+"key": "CURRENT_IP",
+"text": "Current IP"
+},
+{
+"id": 187,
+"key": "LINK_STATUS",
+"text": "Link Status"
+},
+{
+"id": 188,
+"key": "MAC_ADDRESS",
+"text": "MAC Address"
+},
+{
+"id": 189,
+"key": "TYPE",
+"text": "Type"
+},
+{
+"id": 190,
+"key": "IP_ADDRESS",
+"text": "IP Address"
+},
+{
+"id": 191,
+"key": "SUBNET_MASK",
+"text": "Subnet Mask"
+},
+{
+"id": 192,
+"key": "GATEWAY",
+"text": "Gateway"
+},
+{
+"id": 193,
+"key": "FTP_SERVER",
+"text": "FTP Server"
+},
+{
+"id": 194,
+"key": "USER",
+"text": "User"
+},
+{
+"id": 195,
+"key": "PASSWORD",
+"text": "Password"
+},
+{
+"id": 196,
+"key": "MAX_NO_USER",
+"text": "Max. No. of User"
+},
+{
+"id": 197,
+"key": "ALLOW_ANON",
+"text": "Allow Anonymous"
+},
+{
+"id": 198,
+"key": "MIN_PASV_PORT",
+"text": "Min. PASV Port"
+},
+{
+"id": 199,
+"key": "MAX_PASV_PORT",
+"text": "Max. PASV Port"
+},
+{
+"id": 200,
+"key": "SYST_NAME",
+"text": "SYST Name"
+},
+{
+"id": 201,
+"key": "BOOST_MODE",
+"text": "Boost Mode"
+},
+{
+"id": 202,
+"key": "AUTO_DETECT",
+"text": "Auto-Detect"
+},
+{
+"id": 203,
+"key": "FTP_CLIENT",
+"text": "FTP Client"
+},
+{
+"id": 204,
+"key": "MIN_PORT",
+"text": "Min. Port"
+},
+{
+"id": 205,
+"key": "MAX_PORT",
+"text": "Max. Port"
+},
+{
+"id": 206,
+"key": "DETECT_PEERS",
+"text": "Detect Peers"
+},
+{
+"id": 207,
+"key": "HTTP_CONNECTION",
+"text": "HTTP Connection"
+},
+{
+"id": 208,
+"key": "ENABLE_PROXY",
+"text": "Enable Proxy"
+},
+{
+"id": 209,
+"key": "PROXY",
+"text": "Proxy"
+},
+{
+"id": 210,
+"key": "PLAY_MUSIC",
+"text": "Play Music"
+},
+{
+"id": 211,
+"key": "RANDOM_MUSIC",
+"text": "Random Music"
+},
+{
+"id": 212,
+"key": "GLOBAL",
+"text": "Global"
+},
+{
+"id": 213,
+"key": "MUSIC_PATH",
+"text": "Music Path"
+},
+{
+"id": 214,
+"key": "SURROUND",
+"text": "Surround 5.1"
+},
+{
+"id": 215,
+"key": "MUSIC_VOLUME",
+"text": "Music Volume"
+},
+{
+"id": 216,
+"key": "SOUND",
+"text": "Sound"
+},
+{
+"id": 217,
+"key": "SOUND_VOLUME",
+"text": "Sound Volume"
+},
+{
+"id": 218,
+"key": "SOUND_EFFECTS",
+"text": "Sound Effects"
+},
+{
+"id": 219,
+"key": "XBOX_INFO",
+"text": "Xbox Info"
+},
+{
+"id": 220,
+"key": "DASH_VERSION",
+"text": "Dash Version"
+},
+{
+"id": 221,
+"key": "XBOX_NAME",
+"text": "Xbox Name"
+},
+{
+"id": 222,
+"key": "FILE_OPERATION",
+"text": "File Operation"
+},
+{
+"id": 223,
+"key": "AUTO_RENAME",
+"text": "Auto-Rename"
+},
+{
+"id": 224,
+"key": "AUTO_PATCH_XBE",
+"text": "Auto-Patch XBE"
+},
+{
+"id": 225,
+"key": "ABORT_ON_ERROR",
+"text": "Abort On Error"
+},
+{
+"id": 226,
+"key": "DEF_BACKUP_FOLDER",
+"text": "Def. Backup Folder"
+},
+{
+"id": 227,
+"key": "CONTEXT_MENU",
+"text": "Context Menu"
+},
+{
+"id": 228,
+"key": "ALLOW_UNINSTALL",
+"text": "Allow Uninstall"
+},
+{
+"id": 229,
+"key": "ALLOW_MENU_EDIT",
+"text": "Allow Menu Edit"
+},
+{
+"id": 230,
+"key": "ALLOW_RECENT_LIST",
+"text": "Allow Recent List"
+},
+{
+"id": 231,
+"key": "OPEN_GAME_FOLDER",
+"text": "Open Game Folder"
+},
+{
+"id": 232,
+"key": "OPEN_SAVES_FOLDER",
+"text": "Open Saves Folder"
+},
+{
+"id": 233,
+"key": "FONT",
+"text": "Font"
+},
+{
+"id": 234,
+"key": "FONT_SCALE",
+"text": "Font Scale"
+},
+{
+"id": 235,
+"key": "SCROLL_SPEED",
+"text": "Scroll Speed"
+},
+{
+"id": 236,
+"key": "TEMPERATURE",
+"text": "Temperature"
+},
+{
+"id": 237,
+"key": "MB_TEMP",
+"text": "M/B Temp"
+},
+{
+"id": 238,
+"key": "CPU_TEMP",
+"text": "CPU Temp"
+},
+{
+"id": 239,
+"key": "USE_FAHRENHEIT",
+"text": "Use Fahrenheit"
+},
+{
+"id": 240,
+"key": "TEMP_THRESHOLD",
+"text": "Temp. Threshold"
+},
+{
+"id": 241,
+"key": "FAN_SPEED",
+"text": "Fan Speed"
+},
+{
+"id": 242,
+"key": "MISC",
+"text": "Miscellaneous"
+},
+{
+"id": 243,
+"key": "LANGUAGE_FILE",
+"text": "Language File"
+},
+{
+"id": 244,
+"key": "LED_COLOR",
+"text": "LED Color"
+},
+{
+"id": 245,
+"key": "AUTO_TURN_OFF",
+"text": "Auto Turn-Off (Min.)"
+},
+{
+"id": 246,
+"key": "SCREEN_SAVER",
+"text": "Screen Saver"
+},
+{
+"id": 247,
+"key": "SS_WAIT",
+"text": "Wait"
+},
+{
+"id": 248,
+"key": "SS_TEXT",
+"text": "Screen Saver Text"
+},
+{
+"id": 249,
+"key": "SS_VIDEO",
+"text": "Video File"
+},
+{
+"id": 250,
+"key": "SS_PATH",
+"text": "Slideshow Path"
+},
+{
+"id": 251,
+"key": "ENABLE_BGM",
+"text": "Enable BGM"
+},
+{
+"id": 252,
+"key": "SKIN",
+"text": "Skin"
+},
+{
+"id": 253,
+"key": "SKINS_PATH",
+"text": "Skins Path"
+},
+{
+"id": 254,
+"key": "CURRENT_SKIN",
+"text": "Current Skin"
+},
+{
+"id": 255,
+"key": "RSS_NEWSFEED",
+"text": "RSS Newsfeed"
+},
+{
+"id": 256,
+"key": "INTERVAL",
+"text": "Interval (sec.)"
+},
+{
+"id": 257,
+"key": "CONTINUOUS",
+"text": "Continuous"
+},
+{
+"id": 258,
+"key": "SEPARATOR",
+"text": "Separator"
+},
+{
+"id": 259,
+"key": "AUDIO_OPTIONS",
+"text": "Audio Options"
+},
+{
+"id": 260,
+"key": "AUDIO_PLAYDISC",
+"text": "Play Disc"
+},
+{
+"id": 261,
+"key": "AUDIO_MANAGETRACKS",
+"text": "Manage Tracks"
+},
+{
+"id": 262,
+"key": "AUDIO_OPENFILE",
+"text": "Open File..."
+},
+{
+"id": 263,
+"key": "AUDIO_OPENPLAYLIST",
+"text": "Open Playlist"
+},
+{
+"id": 264,
+"key": "AUDIO_SELECTOPTION",
+"text": "Select Audio Track"
+},
+{
+"id": 265,
+"key": "AUDIO_CD",
+"text": "Audio CD"
+},
+{
+"id": 266,
+"key": "AUDIO_PLAY",
+"text": "Play"
+},
+{
+"id": 267,
+"key": "EDIT",
+"text": "Edit"
+},
+{
+"id": 268,
+"key": "MOVE_UP",
+"text": "Move Up"
+},
+{
+"id": 269,
+"key": "MOVE_DOWN",
+"text": "Move Down"
+},
+{
+"id": 270,
+"key": "AUDIO_NEWTRACK",
+"text": "New Soundtrack..."
+},
+{
+"id": 271,
+"key": "MSG_DELETEST_ASK",
+"text": "Are you sure that you want to delete '%s'?"
+},
+{
+"id": 272,
+"key": "MSG_HDUNLOCKABLE",
+"text": "Locking/Unlocking Not Supported"
+},
+{
+"id": 273,
+"key": "MSG_HDUNLOCK_ASK",
+"text": "WARNING!!!\nUnlocking a hard disk on a 'softmodded' Xbox will render your Xbox unusable.\nAre you sure you want to UNLOCK your Hard Disk?"
+},
+{
+"id": 274,
+"key": "MSG_HDLOCK_ASK",
+"text": "Are you sure you want to LOCK your Hard Disk?"
+},
+{
+"id": 275,
+"key": "MSG_HDLOCK_SUCCESS",
+"text": "You Hard Disk was locked successfully"
+},
+{
+"id": 276,
+"key": "MSG_HDUNLOCK_SUCCESS",
+"text": "You Hard Disk was unlocked successfully"
+},
+{
+"id": 277,
+"key": "MSG_HDUNLOCK_FAILED",
+"text": "An error has occured trying to lock/unlock your Hard Disk"
+},
+{
+"id": 278,
+"key": "SAVE",
+"text": "Save"
+},
+{
+"id": 279,
+"key": "RESET",
+"text": "Reset"
+},
+{
+"id": 280,
+"key": "EXIT",
+"text": "Exit"
+}
+]

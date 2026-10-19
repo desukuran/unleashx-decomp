@@ -21,13 +21,18 @@ build/skin_test: tests/skin_test.cpp tests/skin_stubs.cpp $(SKIN) $(SETTINGS) $(
 	@mkdir -p build
 	$(CXX) $(CXXFLAGS) -o $@ tests/skin_test.cpp tests/skin_stubs.cpp tests/stubs.cpp $(SKIN) $(SETTINGS) $(XML) $(COMMON)
 
-test: build/xml_roundtrip build/config_test build/skin_test
+build/language_test: tests/language_test.cpp src/ui/Language.cpp src/ui/StringTable.inc $(XML) $(COMMON) src/common/FileUtil.cpp src/settings/AppSettings.cpp $(wildcard src/*/*.h)
+	@mkdir -p build
+	$(CXX) $(CXXFLAGS) -o $@ tests/language_test.cpp src/ui/Language.cpp $(XML) $(COMMON) src/common/FileUtil.cpp src/settings/AppSettings.cpp
+
+test: build/xml_roundtrip build/config_test build/skin_test build/language_test
 	build/xml_roundtrip UnleashX_0_39_0528A/Config.xml > /dev/null
 	build/xml_roundtrip UnleashX_0_39_0528A/English.xml > /dev/null
 	rm -rf build/testroot && mkdir -p build/testroot/E/dash
 	cp UnleashX_0_39_0528A/Config.xml build/testroot/E/dash/config.xml
 	UNLEASHX_ROOT=build/testroot build/config_test
 	build/skin_test build/skin
+	build/language_test UnleashX_0_39_0528A/French.xml
 	@echo ok
 
 .PHONY: test
