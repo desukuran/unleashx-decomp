@@ -12,6 +12,7 @@ This is not a matching decomp. The aim is source that you can read, understand a
 | `symbols/rtti.txt` | Generated names (classes, vtables, ctors/dtors) from MSVC RTTI. Regenerate, don't edit |
 | `symbols/xdklib.txt` | Generated names of the statically linked XDK library code (CRT, STL, XAPI, D3D, DirectSound, XACT, XNet, ...), matched against the XDK's own `.lib` files. Regenerate, don't edit |
 | `symbols/thirdparty.txt` | Generated names of the bundled third-party code (unrar, XZip/XUnzip, XKUtils, iso9660, the FAT32 driver, the XDK samples). Regenerate, don't edit |
+| `symbols/stl.txt` | Generated names of the STL template instantiations (`std::vector<SFileItem>::push_back`, ...). Regenerate, don't edit |
 | `symbols/xdk.txt` | Generated XDK names and signatures from XbSymbolDatabase (overrides `xdklib.txt`) |
 | `symbols/names.txt` | Hand-curated names and signatures (overrides everything else) |
 | `tools/xbe.py` | XBE parser: header info, flat memory image, section extraction |
@@ -20,6 +21,7 @@ This is not a matching decomp. The aim is source that you can read, understand a
 | `tools/libmatch.py` | Generates `symbols/xdklib.txt` from a local XDK's `lib/` folder |
 | `tools/msvcname.py` | Readable names from MSVC decorated names (used by `libmatch.py`) |
 | `tools/srcmatch.py` | Matches bundled third-party code against its public source (strings, call order, callers) |
+| `tools/stlname.py` | Generates `symbols/stl.txt`: the STL template instantiations (vector, map members and helpers) by shape and calls, with element types from `src/` |
 | `tools/gen_thirdparty_symbols.py` | Generates `symbols/thirdparty.txt` with `srcmatch.py`, plus `<library>_sub_<address>` labels |
 | `tools/ghidra_scripts/` | Headless Ghidra scripts: XBE setup, apply symbols, export |
 | `tools/data/xboxkrnl_ordinals.txt` | Kernel export ordinals/conventions (from nxdk, CC0) |
