@@ -50,20 +50,7 @@ public:
 	virtual void Show() {}                                                // 0x00013D20
 };
 
-// The music player (mode 9). TODO: decompile
-class CAudioGUI : public CAppFrame
-{
-public:
-	CAudioGUI();                                          // 0x00134640
-	virtual ~CAudioGUI();                                 // 0x00011502 (deleting)
-	virtual BOOL Init(CXBFontEx *font);                   // 0x00134283
-	virtual BOOL IsOpen();                                // 0x00130DD5
-	virtual BOOL Render();                                // 0x00134853
-	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00135A99
-	virtual void Show();                                  // 0x00133A5D
-	// Plays one file (the file manager's music). TODO: decompile
-	BOOL OpenFile(const char *path);                      // 0x00135A18
-};
+// The music player (mode 9): CAudioGUI, src/musicplayer/AudioGUI.h.
 
 // A slideshow of a picture folder (and its subfolders), in random order:
 // the screen saver's and the file manager's. A thread lists the pictures;

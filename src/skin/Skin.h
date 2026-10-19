@@ -351,7 +351,8 @@ public:
 	// Index (among music-player buttons) of each button shape, 0xFF = none.
 	int m_nButtonPrev, m_nButtonPlay, m_nButtonPause, m_nButtonStop, m_nButtonNext;  // +0x578
 	int m_nButtonPrevTrack, m_nButtonNextTrack, m_nButtonRandom, m_nButtonMute;     // +0x58C
-	BYTE m_unknown59C[8];               // +0x59C
+	// (Not set from <MusicPlayer>: 0xFF, or 9 and 10 in the default layout.)
+	int m_nButtonVolume, m_nButtonProgress;                                         // +0x59C
 	BOOL m_bMusicPlayerRelative;        // +0x5A4 element positions are relative to the player
 	std::vector<SSkinShape> m_mainShapes;          // +0x5A8 <Main><Shape>
 	std::vector<SSkinText> m_mainTexts;            // +0x5B8 <Main><Text>
@@ -384,6 +385,9 @@ extern CSkin g_skin;   // 0x00277968
 // Loads an image's file the first time. (image in eax)
 void LoadSkinImage(SSkinImage *image);                       // 0x000F910C
 // A skin rectangle on the screen.
+// A skin rectangle as floats. (y in ecx, width in edx, height in esi, x
+// on the stack)
+void SkinRectToFloats(int left, int top, int width, int height, float *x, float *y, float *w, float *h);   // 0x0009E312
 void SkinRectToScreen(int left, int top, int width, int height, float *x, float *y, float *w, float *h);   // 0x0009E312 + ScaleToScreen
 // The texts' scale: the screen's (the smaller of the two directions) cut
 // to two decimals, at least 1.

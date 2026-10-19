@@ -6,6 +6,7 @@
 #include "../audio/MusicManager.h"
 #include "../common/StrUtil.h"
 #include "../media/WMVideoPlayer.h"
+#include "../musicplayer/AudioGUI.h"
 #include "Viewers.h"
 
 // The viewers are CAppFrame screens; the video player isn't one, but its

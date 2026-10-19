@@ -86,3 +86,64 @@ These only work when the music volume is 5 or more.
 The screen saver pauses the music, unless `<ScreenSaver BGM>` is on. A
 video screen saver only plays its own sound when BGM is on and no music
 was playing (see `src/app/ScreenSaver.cpp`).
+
+## The music player screen
+
+`src/musicplayer/` (`CAudioGUI`, mode 9). The skin's `<MusicPlayer>`
+section draws it (see `SKIN_FORMAT.md`). Its button shapes, state icons,
+level meter and bars are drawn by the player:
+
+* Button shapes `Prev`..`Mute` use one texture map: the skin's
+  `<ButtonMap>`, else `MPlayer.png` from the media folder. It's an 8x8
+  grid of cells, each 1/8 of the texture:
+  * rows 0-1: the buttons previous song, play, pause, stop, next song,
+    previous soundtrack and next soundtrack, in columns 0-6. Column 7
+    holds Random (row 0) over Mute (row 1).
+  * rows 2-3: the same, lit. These are drawn over the play, pause or stop
+    button that matches the music's state, and in place of Random/Mute
+    when they're on.
+  * rows 4-5: the same, focused.
+  * row 6: the song progress bar, with the empty track in the left half
+    and the filled part in the right half.
+  * row 7: the volume bar, laid out the same way.
+* Disabled buttons are drawn at half opacity. Previous/next song needs two
+  or more songs. Previous/next soundtrack needs two or more of your own
+  soundtracks.
+* The bars fill in the shape's `Direction`. The default is left to right;
+  `Down` fills from the top, `Left` from the right, and the fourth from the
+  bottom. The bar picture is rotated to match.
+* The level meter shows 12 bars of DirectSound's output levels, from -60
+  to 0 dB. It's only drawn while music plays.
+* Texts only scroll while music plays.
+
+### Keys
+
+| Input | Action |
+|---|---|
+| Left / right | move the focus between the skin's buttons (disabled ones are skipped) |
+| A (or a pointer click on a button) | press the focused button |
+| Up / down on the volume button, remote up / down, right stick | volume |
+| Up / down, triggers | previous / next soundtrack; with the song list shown, move in the list |
+| Right stick click | show / hide the song list |
+| START | the options menu |
+| B, BACK, BLACK | close |
+| WHITE + d-pad, remote transport keys, other keys | the music manager's keys (above) |
+
+* On Play with the song list shown, the selected song plays.
+* The options menu has Play Disc (enabled with an audio CD in the drive),
+  Manage Soundtracks (`CAudioTrackOption`, not decompiled yet), Open File
+  (WMA/MP3/WAV) and Browse Folder (all songs under a folder). The last two
+  play through the Media Player soundtrack. The menu opens by itself when
+  a disc is inserted while the player is open.
+* The song list (`CSongListControl`) shows the current soundtrack's songs
+  with their lengths and marks the playing one with `»`. It uses the
+  skin's `<PlayList>` box and picture. Without a picture it draws a
+  built-in panel.
+
+Quirks:
+
+* The player saves the music's state before Open File, so that B could
+  restore it, but the flag that would allow the restore is never cleared.
+* The menu also disables a sixth option that doesn't exist.
+* There's an unused built-in player window (`0x00135089`), drawn from the
+  layout `Show` computes.

@@ -19,6 +19,7 @@
 #include "FtpEvents.h"
 #include "Screens.h"
 #include "../filemgr/FileManager.h"
+#include "../musicplayer/AudioGUI.h"
 #include "SettingsPages.h"
 #include "UnleashX.h"
 

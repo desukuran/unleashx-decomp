@@ -29,7 +29,10 @@ public:
 	void SetOptionEnabled(int index, BOOL enabled);       // 0x000AD997
 	int GetSelection() const;                             // 0x000AD946
 
-	BYTE m_unknown04[0x7C];
+	BYTE m_unknown04[0x54];
+	int m_nSelection;                                     // +0x58
+	BYTE m_unknown5C[0x20];
+	BOOL m_bCancelled;                                    // +0x7C
 	BOOL m_bChosen;                                       // +0x80
 	BYTE m_unknown84[0x10];                               // (0x94 bytes in all)
 };

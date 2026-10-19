@@ -23,13 +23,19 @@ void LoadSkinImage(SSkinImage *image)
 	memset(image->fileName, 0, sizeof(image->fileName));
 }
 
-// 0x0009E312, then ScaleToScreen
-void SkinRectToScreen(int left, int top, int width, int height, float *x, float *y, float *w, float *h)
+// 0x0009E312
+void SkinRectToFloats(int left, int top, int width, int height, float *x, float *y, float *w, float *h)
 {
 	*x = (float)left;
 	*y = (float)top;
 	*w = (float)width;
 	*h = (float)height;
+}
+
+// (0x0009E312, then ScaleToScreen)
+void SkinRectToScreen(int left, int top, int width, int height, float *x, float *y, float *w, float *h)
+{
+	SkinRectToFloats(left, top, width, height, x, y, w, h);
 	ScaleToScreen(x, w, y, h, FALSE);
 }
 

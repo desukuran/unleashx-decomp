@@ -20,6 +20,7 @@
 #include "../ui/Language.h"
 #include "../ui/StringIds.h"
 #include "../ui/VirtualKeyboard.h"
+#include "../musicplayer/AudioGUI.h"
 #include "FtpManager.h"
 #include "Viewers.h"
 

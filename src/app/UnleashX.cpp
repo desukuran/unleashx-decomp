@@ -10,6 +10,7 @@
 #include "../common/StrUtil.h"
 #include "../audio/MusicManager.h"
 #include "../media/WMVideoPlayer.h"
+#include "../musicplayer/AudioGUI.h"
 #include "../render/Draw.h"
 #include "../audio/Sound.h"
 #include "../net/FtpServer.h"

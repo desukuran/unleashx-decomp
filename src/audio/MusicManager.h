@@ -113,6 +113,11 @@ public:
 	// index in ecx)
 	BOOL SetSoundtrackTitle(UINT index, const char *title);  // 0x00106EF1
 
+	// The playing song's index in m_songs: m_nSongNumber with random play,
+	// else m_nSong. (this in ecx)
+	UINT GetCurrentSong() const { return m_bRandom ? m_nSongNumber : m_nSong; }   // 0x00011487
+	// m_songs[index], NULL past the end. (this in edi, index in eax)
+	SSong *GetSong(UINT index) { return index < m_songs.size() ? &m_songs[index] : NULL; }   // 0x000114A0
 	BOOL IsPlaying();                                        // 0x00106173 (this in ecx)
 	BOOL IsRandom() const { return m_bRandom; }              // 0x00106010 (this in eax)
 	BOOL IsGlobal() const { return m_bGlobal; }              // 0x001060C8 (this in eax)
@@ -138,6 +143,7 @@ public:
 	HRESULT LoadSoundtrack(UINT index, BOOL reshuffle);      // 0x001075DD
 	// The Xbox soundtrack with this ID. (this on the stack)
 	HRESULT SelectSoundtrack(DWORD soundtrackId);            // 0x00107FDA
+	HRESULT PlaySongAt(UINT index) { return PlaySong(index, FALSE); }   // 0x00107560 (this in ebx)
 	HRESULT NextSong();                                      // 0x0010756E (this in eax)
 	HRESULT PrevSong();                                      // 0x00108855 (this in eax)
 	HRESULT NextSoundtrack();                                // 0x001081AE (this in eax)
@@ -216,7 +222,6 @@ private:
 	void ScanMusicFolder(const char *path, const wchar_t *name);   // 0x0010693B
 	// (this in ebx)
 	HRESULT PlaySong(UINT index, BOOL shuffled);             // 0x00107256
-	HRESULT PlaySongAt(UINT index) { return PlaySong(index, FALSE); }   // 0x00107560 (this in ebx)
 	HRESULT LoadSoundtracks();                               // 0x00108A75 (this on the stack)
 };
 
