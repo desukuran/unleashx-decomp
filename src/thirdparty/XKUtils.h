@@ -12,6 +12,8 @@ public:
 	void GetMACAddressString(char *mac, DWORD *length);       // 0x00091DC1
 	void GetSerialNumberString(char *serial, DWORD *length);  // 0x00091DFD
 	void GetHDKeyString(char *key, DWORD *length);            // 0x00092007
+	// The DVD playback region (0 when the EEPROM wasn't read). (this in esi)
+	int GetDVDRegion();                                       // 0x00091D29
 };
 
 extern XKEEPROM g_eeprom;   // 0x00277840

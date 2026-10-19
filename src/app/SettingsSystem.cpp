@@ -198,7 +198,7 @@ void CSystemSetting::ShowXboxInfo()
 	if (m_pXboxInfo == NULL)
 	{
 		m_pXboxInfo = new CXboxInfo;
-		if (m_pXboxInfo != NULL && FAILED(m_pXboxInfo->Init(m_pFont, 0)))
+		if (m_pXboxInfo != NULL && FAILED(m_pXboxInfo->Init(NULL)))
 		{
 			delete m_pXboxInfo;
 			m_pXboxInfo = NULL;

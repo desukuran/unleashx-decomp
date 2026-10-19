@@ -47,6 +47,23 @@ HANDLE XFindFirstNicknameW(BOOL titleNicknamesOnly, wchar_t *nickname, unsigned 
 #define XC_LANGUAGE_TCHINESE 8
 #define XC_LANGUAGE_PORTUGUESE 9
 DWORD XGetLanguage();
+// XC_AUDIO_FLAGS: the low word is stereo (0), mono (1) or surround (2);
+// 0x10000 Dolby Digital, 0x20000 DTS.
+DWORD XGetAudioFlags();                          // 0x000394BD
+// XC_PARENTAL_CONTROL_GAMES: 0 all games ... 6 early childhood.
+DWORD XGetParentalControlSetting();              // 0x0003955C
+// XGetGameRegion: 1 North America, 2 Japan, 4 rest of the world.
+DWORD GetVideoRegionSetting();                   // 0x00039507
+
+// The kernel's XboxHardwareInfo export.
+struct XBOX_HARDWARE_INFO
+{
+	ULONG Flags;
+	BYTE GpuRevision;
+	BYTE McpRevision;
+	BYTE reserved[2];
+};
+extern XBOX_HARDWARE_INFO *XboxHardwareInfo;     // import thunk 0x00235730
 BOOL XSetNicknameW(const wchar_t *nickname, BOOL preserveCase);
 BOOL SystemTimeToFileTime(const SYSTEMTIME *systemTime, FILETIME *fileTime);
 BOOL LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime);

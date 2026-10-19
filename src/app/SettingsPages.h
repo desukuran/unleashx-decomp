@@ -414,22 +414,49 @@ public:
 	BOOL Save();                                              // 0x000CE1B9
 };
 
-// The System page's "Xbox Info" screen (controller ports, drive space, ...).
-// No vtable; 0x48 bytes. TODO: decompile (Init 0x000D2D87, Show 0x000BEC78,
-// ProcessInput 0x000D2200, Render 0x000BF326).
+// One line of the Xbox Info screen. 0x44 bytes. (The label and value sit
+// where CSettingItem has them, so CSettingItem::SetValue works on it too.)
+struct SInfoLine
+{
+	SInfoLine(const std::wstring &label, const std::wstring &value, int id, BOOL header, BOOL visible);   // 0x0002DDAE
+
+	std::wstring label;             // +0x00
+	std::wstring value;             // +0x1C
+	BOOL header;                    // +0x38 a centered section title
+	int id;                         // +0x3C its index
+	BOOL visible;                   // +0x40 (Drive F/G only when enabled)
+};
+
+// The System page's "Xbox Info" screen: hardware, settings, drives, network,
+// FTP statistics... The live values refresh every 1.5s. No vtable; 0x48
+// bytes.
 class CXboxInfo
 {
 public:
 	CXboxInfo();                                              // 0x000C00CC (this in eax)
-	~CXboxInfo();                                             // 0x0002C6F2 (scalar deleting)
-	HRESULT Init(CXBFont *font, int unknown);                 // 0x000D2D87
-	void Show();                                              // 0x000BEC78
-	void ProcessInput(SGamepadState **pad, int *action);      // 0x000D2200
-	void Render();                                            // 0x000BF326 (this in edi)
+	~CXboxInfo();                                             // 0x000BF855 (this in eax)
+	// font NULL = SmallFont. Does nothing once initialized.
+	HRESULT Init(CXBFont *font);                              // 0x000D2D87
+	void Show();                                              // 0x000BEC78 (this in ebx)
+	// B/BACK/BLACK closes. (pad in edx)
+	HRESULT ProcessInput(SGamepadState **pad, int *action);   // 0x000D2200
+	HRESULT Render();                                         // 0x000BF326 (this in edi)
 
-	BYTE m_unknown00[0x40];
-	BOOL m_bClosed;                 // +0x40
-	DWORD m_unknown44;
+	std::vector<SInfoLine> m_lines;  // +0x00
+	int m_nSelected;                 // +0x10
+	CXBFont *m_pFont;                // +0x14
+	CSound *m_pSound;                // +0x18 "Scroll"
+	int m_nLastMove;                 // +0x1C 1 down, -1 up (unused)
+	int m_nFirstVisible;             // +0x20
+	int m_nLastVisible;              // +0x24
+	int m_nVisibleCount;             // +0x28 found by Render
+	BOOL m_bInitialized;             // +0x2C
+	float m_fY;                      // +0x30
+	float m_fX;                      // +0x34
+	float m_fWidth;                  // +0x38
+	float m_fHeight;                 // +0x3C
+	BOOL m_bClosed;                  // +0x40
+	IDirect3DTexture8 *m_pBackground;   // +0x44 drawn instead of the box (nothing sets it)
 };
 
 // System Settings: Xbox info, file operations, context menu, font,

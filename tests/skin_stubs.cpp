@@ -19,7 +19,13 @@ BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *, IDirect3DTexture8
 	return FALSE;
 }
 void ReleaseTexture(IDirect3DTexture8 *&texture) { texture = NULL; }
-float GetScreenWidth(int) { return 640.0f; }
+void GetDisplaySize(float *width, float *height, BOOL)
+{
+	if (width != NULL)
+		*width = 640.0f;
+	if (height != NULL)
+		*height = 480.0f;
+}
 
 CXBFont::CXBFont() {}
 CXBFont::~CXBFont() {}

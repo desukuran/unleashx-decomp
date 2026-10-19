@@ -68,6 +68,29 @@ public:
 	int GetAction();     // 0x0002B080 TODO: decompile
 };
 
+// The XDK sample framework's device tables (XBInput), by port. Only the
+// device handles are read outside the input code. TODO: decompile the input
+// layer.
+struct XBGAMEPAD
+{
+	BYTE unknown00[0xD4];
+	HANDLE hDevice;                    // +0xD4 NULL = no gamepad in the port
+	BYTE unknownD8[0x08];
+};
+struct SIRRemoteState
+{
+	HANDLE hDevice;                    // +0x00 TODO: verify
+	BYTE unknown04[0x80];
+};
+struct SKeyboardState
+{
+	HANDLE hDevice;                    // +0x00 TODO: verify
+	BYTE unknown04[0x10];
+};
+extern XBGAMEPAD g_Gamepads[4];                   // 0x00271B30
+extern SIRRemoteState g_irRemotes[4];             // 0x00271F00
+extern SKeyboardState g_keyboards[4];             // 0x002720EC
+
 extern CGamepadInput g_gamepadInput;                 // 0x00278280
 
 // Merges the four controllers into the application's combined gamepad state.

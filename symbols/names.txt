@@ -268,7 +268,7 @@
 00277e70 g_bSkinGameIcon
 00277664 g_pd3dDevice
 0009ecb3 LoadTextureFromFile BOOL f(char *path@ecx, void *device, void **texture, int width, int height, void *info)
-0009f14b GetScreenWidth
+0009f14b GetDisplaySize
 00099ec9 CXBFont::Create HRESULT f(char *fileName@eax, void *self, DWORD offset)
 00098feb CXBFont::SetScaleFactors
 00137841 CXBFontEx::CreateFromTTF
@@ -1092,3 +1092,13 @@
 0026a800 s_monthNames
 0026cdc0 s_bDaysValid
 0005e924 _wtoi
+000bf855 CXboxInfo::~CXboxInfo
+0002ddae SInfoLine::SInfoLine
+00278d70 s_dwNextRefresh
+00278d6c s_fLabelWidth
+00271b30 g_Gamepads
+00271f00 g_irRemotes
+002720ec g_keyboards
+00091d29 XKEEPROM::GetDVDRegion
+000394bd XGetAudioFlags
+0003955c XGetParentalControlSetting

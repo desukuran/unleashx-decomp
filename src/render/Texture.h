@@ -25,8 +25,10 @@ BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *device, IDirect3DTe
 // D3DResource_Release (XDK) and clear the pointer.
 void ReleaseTexture(IDirect3DTexture8 *&texture);   // inlined everywhere in the original
 
-// Width of the current render target in pixels.
-float GetScreenWidth(int unused);                                   // 0x0009F14B TODO: decompile
+// The display mode's size (cached: read again when refresh is set or no
+// height was cached yet). Either pointer may be NULL. The original takes
+// width in esi and height in edi.
+void GetDisplaySize(float *width, float *height, BOOL refresh);    // 0x0009F14B TODO: decompile
 
 // The title image ($$XTIMAGE section) of an XBE: an XPR texture or a DDS.
 BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture);  // 0x0009FAAF TODO: decompile

@@ -248,7 +248,8 @@ static SSkinText MakeSkinText(int left, int top, int width, int height, int sour
 	else
 	{
 		t.align |= SKIN_ALIGN_TRUNCATED;
-		float screenWidth = GetScreenWidth(0);
+		float screenWidth;
+		GetDisplaySize(&screenWidth, NULL, FALSE);
 		if (screenWidth < (float)(unsigned)(width + left))
 			width = (int)screenWidth - left;
 	}

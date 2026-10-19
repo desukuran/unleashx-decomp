@@ -28,13 +28,13 @@ void DimScreen(float alpha);                                                 // 
 // Dialog frame: a box with cut corners.
 void DrawBevelBox(float x, float y, float width, float height, D3DCOLOR borderColor, D3DCOLOR fillColor,
                   float alpha, DWORD lineWidth);                             // 0x000A1BBF
-// direction: 1 up, 2 down, 3 left, 4 right
 // A dialog window: the outer box, and an inner panel between the caption
 // (captionHeight) and the button row (footerHeight). TODO: decompile; what
 // inset does exactly. The original takes width in xmm7.
 void DrawWindowFrame(float x, float y, float width, float height, float inset, float captionHeight,
                      float footerHeight, D3DCOLOR borderColor, D3DCOLOR fillColor, D3DCOLOR innerBorderColor,
                      D3DCOLOR innerFillColor, DWORD borderWidth, DWORD innerBorderWidth);   // 0x000A10D2
+// direction: 1 up, 2 down, 3 left, 4 right
 HRESULT DrawTriangle(float x, float y, float width, float height, int direction, D3DCOLOR borderColor,
                      D3DCOLOR fillColor, float alpha);                       // 0x000A0D78
 HRESULT DrawGradientRect(float x, float y, float width, float height, D3DCOLOR color1, D3DCOLOR color2,
