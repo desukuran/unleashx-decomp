@@ -63,3 +63,13 @@ struct SKeystroke
 };
 // The last debug keyboard keystroke (XBInput). (0x002720E8)
 SKeystroke *GetKeystroke();                       // 0x000985A4
+
+// The XBInput functions CXBApplicationEx::Create/Run and UpdateGamepads call
+// (library code, not reconstructed). NULL means the global table.
+HRESULT XBInput_CreateGamepads(XBGAMEPAD **gamepads);            // 0x00098A46
+void XBInput_RefreshDeviceList(XBGAMEPAD *gamepads);              // 0x00098943 (port changes)
+void XBInput_GetInput(XBGAMEPAD *gamepads);                       // 0x00098B11
+HRESULT XBInput_CreateIR_Remotes(SIRRemote **remotes);            // 0x0009888E
+void XBInput_GetIR_RemoteInput(SIRRemote *remotes, float time);   // 0x000986B9
+HRESULT XBInput_CreateKeyboard(SKeyboardState **keyboards);       // 0x000985AA (the debug keyboard queue)
+HRESULT XBInput_GetKeyboardInput(SKeystroke *keystroke);          // 0x00098478

@@ -2449,3 +2449,11 @@
 0007f849 DashResolveRelativePath
 0007f946 DashUrlToPath
 0007fa38 DashResolveRelativePaths
+# XDK samples XBInput (gamepads, IR remotes and the debug keyboard; library code)
+00098a46 XBInput_CreateGamepads
+00098943 XBInput_RefreshDeviceList
+00098b11 XBInput_GetInput
+0009888e XBInput_CreateIR_Remotes
+000986b9 XBInput_GetIR_RemoteInput
+000985aa XBInput_CreateKeyboard
+00098478 XBInput_GetKeyboardInput
