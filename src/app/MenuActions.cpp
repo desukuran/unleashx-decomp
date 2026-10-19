@@ -131,7 +131,7 @@ BOOL CUnleashX::CreateTextEditor()
 	{
 		m_pTextEditor = new CNotePad;
 		if (m_pTextEditor != NULL)
-			m_pTextEditor->Init(0, 0, 0);
+			m_pTextEditor->Init(&m_fonts[4], NULL, NULL, NULL);
 	}
 	return m_pTextEditor != NULL;
 }

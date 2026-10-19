@@ -596,3 +596,27 @@ void DrawTextureFullScreen(IDirect3DTexture8 *texture, float alpha)
 	DrawTexture(texture, (float)(int)screen.x, (float)(int)screen.y, (float)(int)screen.width,
 	            (float)(int)screen.height, alpha, NULL, 0.0f, NULL);
 }
+
+// 0x0009F2B2
+void SetScissorRect(BOOL enable, float x, float y, float width, float height)
+{
+	if (!enable || width <= 0.0f || height <= 0.0f)
+	{
+		g_pd3dDevice->SetScissors(0, FALSE, NULL);
+		return;
+	}
+	float displayWidth, displayHeight;
+	GetDisplaySize(&displayWidth, &displayHeight, FALSE);
+	float right = x + width;
+	if (right > displayWidth)
+		right = displayWidth;
+	float bottom = y + height;
+	if (bottom > displayHeight)
+		bottom = displayHeight;
+	D3DRECT rect;
+	rect.x1 = (long)x;
+	rect.y1 = (long)y;
+	rect.x2 = (long)right;
+	rect.y2 = (long)bottom;
+	g_pd3dDevice->SetScissors(1, FALSE, &rect);
+}

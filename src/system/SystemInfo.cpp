@@ -109,6 +109,28 @@ void FormatNumberW(wchar_t *out, ULONGLONG n)
 	}
 }
 
+// 0x0009A060
+void FormatIntW(wchar_t *out, int n)
+{
+	swprintf(out, 12, L"%d", n);   // _itow(n, out, 10) TODO: verify (_itow or _ultow)
+	int len = (int)wcslen(out);
+	int separators = (len - 1) / 3;
+	if (separators <= 0)
+		return;
+	wchar_t separator = GetThousandsSeparator();
+	// Like FormatNumberW, but the terminator lands in the right place.
+	wchar_t *src = out + len;
+	wchar_t *dst = out + len + separators;
+	for (int i = 0; i < len; i++)
+	{
+		*dst = *src;
+		if (i != 0 && i % 3 == 0)
+			*--dst = separator;
+		dst--;
+		src--;
+	}
+}
+
 // 0x000A3A5A
 std::string FormatDouble(int decimals, double v)
 {

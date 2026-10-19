@@ -41,6 +41,9 @@ HRESULT DrawRect(float x, float y, float width, float height, D3DCOLOR borderCol
                  float alpha, DWORD borderWidth);                            // 0x000A087B
 HRESULT DrawFrame(float x, float y, float width, float height, D3DCOLOR color, DWORD lineWidth);   // 0x000A1D37
 void DimScreen(float alpha);                                                 // 0x000A1A39
+// Clips drawing to the rectangle (cut at the display's edges); disabled, or
+// an empty rectangle, clears the clipping.
+void SetScissorRect(BOOL enable, float x, float y, float width, float height);   // 0x0009F2B2
 // Dialog frame: a box with cut corners.
 void DrawBevelBox(float x, float y, float width, float height, D3DCOLOR borderColor, D3DCOLOR fillColor,
                   float alpha, DWORD lineWidth);                             // 0x000A1BBF

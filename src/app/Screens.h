@@ -8,6 +8,7 @@
 #include "../common/Platform.h"
 #include "XBApp.h"
 #include "../ui/UpDown.h"
+#include "../ui/MenuDialogs.h"
 #include "../ui/VirtualKeyboard.h"
 
 class CXBFontEx;
@@ -223,21 +224,131 @@ public:
 	BOOL m_bClosing;                                      // +0x94
 };
 
-// The text editor (mode 8). Its vtable's Init slot is 0x00024830.
+class CMessageBox;
+class CFileBrowser;
+struct SKeystroke;
+
+// The text editor (mode 8, NotePad.cpp): a window with the file name, the
+// text (one std::wstring per line), a "Ln/Col" and size status line and an
+// embedded on-screen keyboard. START opens the menu (New, Open, Save, Save
+// As, Exit); file names are typed on the global keyboard. 0x328 bytes.
 class CNotePad : public CAppFrame
 {
 public:
-	CNotePad();                                           // 0x00103A0C? TODO: verify
-	virtual ~CNotePad();                                  // 0x000248EB (deleting)
-	virtual BOOL IsOpen();                                // 0x00024845
+	CNotePad();                                           // 0x00104605 (this in ebx)
+	virtual ~CNotePad();                                  // 0x00103FB6 (deleting 0x000248EB)
+	// Init(font, NULL, NULL, NULL).
+	virtual BOOL Init(CXBFontEx *font);                   // 0x00024830
+	virtual BOOL IsOpen() { return m_bActive; }           // 0x00024845
 	virtual BOOL Render();                                // 0x0010496B
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00105438
-	using CAppFrame::Init;
-	void Init(int, int, int);                             // 0x00104399
+
+	// Sets up the fonts (the dialog font is the settings' one, else font),
+	// the keyboard (its key texture, else "Keyboard" from resource or the
+	// app's own .xpr; the IR remote if given) and the START menu. Only the
+	// first call does anything but reopening it. (font in eax, this in esi)
+	HRESULT Init(CXBFont *font, IDirect3DTexture8 *keys, CXBPackedResource *resource, SIRRemote *ir);   // 0x00104399
+	// An empty document, "New Text Document". (this in esi)
 	void NewFile();                                       // 0x00103D4D
-	HRESULT Open(const char *path);                       // 0x00104181
-	// Loads a file for viewing (the file operation log). TODO: decompile
-	BOOL Load(const char *path);                          // 0x00103B58
+	// Loads a text file. Only fails for an empty path. (this on the stack)
+	BOOL Open(const char *path);                          // 0x00104181
+	// Shows text that isn't a file (the file operation log). FALSE if
+	// it's empty. (this on the stack)
+	BOOL Load(const char *text);                          // 0x00103B58
+
+	// What a message box or the file name keyboard answers (m_nPending).
+	enum
+	{
+		PENDING_NONE = 1,
+		PENDING_NEW = 2,             // "save changes?" before New
+		PENDING_OPEN = 3,            // ... before Open
+		PENDING_SAVE = 4,            // (never set)
+		PENDING_SAVE_AS = 5,         // a file name to save as
+		PENDING_SAVE_EXIT = 6,       // a file name, then exit
+		PENDING_SAVE_OPEN = 7,       // a file name, then Open
+		PENDING_SAVE_NEW = 8,        // a file name, then New
+		PENDING_EXIT = 9,            // "save changes?" before exiting
+	};
+
+	// The embedded keyboard's keys. (RTTI CNotePad::KeyboardCharEvent)
+	class KeyboardCharEvent : public CVirtualKeyboardEvent
+	{
+	public:
+		virtual void OnChar(wchar_t ch);                  // 0x001038AE
+		virtual void OnDelete();                          // 0x001037E7
+		virtual void OnBackspace();                       // 0x00103950
+		virtual void OnKey(int virtualKey);               // 0x0010473E
+
+		CNotePad *m_pOwner;                               // +0x04
+	};
+
+	UINT m_nCol;                           // +0x004 the cursor
+	std::vector<std::wstring> m_lines;     // +0x008
+	UINT m_nLine;                          // +0x018 the cursor
+	UINT m_nColOffset;                     // +0x01C only ever reset to 0
+	BOOL m_bKeyboardOpen;                  // +0x020 typing a file name (g_virtualKeyboard)
+	int m_unknown24;                       // +0x024
+	CVirtualKeyboard m_keyboard;           // +0x028 embedded
+	int m_unknown174;                      // +0x174
+	BOOL m_bShowKeyboard;                  // +0x178 WHITE toggles it
+	float m_fY;                            // +0x17C the window
+	float m_fX;                            // +0x180
+	float m_fWidth;                        // +0x184
+	float m_fHeight;                       // +0x188
+	BOOL m_bModified;                      // +0x18C
+	std::string m_strPath;                 // +0x190 "" until saved
+	UINT m_nChars;                         // +0x1AC the size: the characters plus 2 per line break
+	UINT m_nLastLine;                      // +0x1B0 the lines - 1
+	UINT m_nTopLine;                       // +0x1B4
+	UINT m_nVisibleLines;                  // +0x1B8 19 until the first Render
+	COptionMenu m_menu;                    // +0x1BC START
+	CMessageBox *m_pMessageBox;            // +0x250
+	BOOL m_bMessageShown;                  // +0x254
+	BOOL m_bMenuOpen;                      // +0x258
+	BOOL m_bKeyboardFocus;                 // +0x25C the right stick's click: everything goes to the keyboard
+	CXBFont *m_pFont;                      // +0x260 the text
+	CXBFont *m_pDialogFont;                // +0x264 the title
+	BOOL m_bActive;                        // +0x268 FALSE = closed
+	float m_fKeyboardHeight;               // +0x26C 0 when hidden
+	CXBStopWatch m_cursorTimer;            // +0x270 the cursor's blink
+	wchar_t m_szTitle[0x2C];               // +0x290 the file name
+	CXBStopWatch m_stickTimer;             // +0x2E8 the left stick's repeat (keyboard shown)
+	float m_unknown308;                    // +0x308
+	int m_nPending;                        // +0x30C PENDING_*
+	CFileBrowser *m_pFileBrowser;          // +0x310 "Open Text File"
+	BOOL m_bFileBrowserOpen;               // +0x314
+	SKeystroke *m_pKeystroke;              // +0x318 the debug keyboard's
+	KeyboardCharEvent m_keyEvents;         // +0x31C
+	CAppSettings *m_pSettings;             // +0x324
+
+private:
+	// Clears the text and the cursor. (this in edi)
+	void Reset();                                         // 0x00103910
+	// The 640x480 window, scaled to the screen. (this in eax)
+	void ResetWindow();                                   // 0x0002484C
+	// m_nChars and m_nLastLine from the lines. (this in esi)
+	void Recount();                                       // 0x001036F6
+	// Puts the cursor back on the line. (this in eax)
+	void ClampColumn();                                   // 0x001036D5
+	void MoveUp();                                        // 0x00103741 (this in eax)
+	void MoveLeft();                                      // 0x00103765 (this in eax)
+	void MoveDown();                                      // 0x001037AD (this in eax)
+	void MoveRight();                                     // 0x00103867 (this in eax)
+	// Enter: splits the line at the cursor.
+	void SplitLine();                                     // 0x00103A4F (this on the stack)
+	// The text as narrow text (each line through "%S"), CRLF between
+	// lines. (out in ebx, this in edi)
+	void GetText(std::string *out);                       // 0x00103F23
+	// (path in ecx, this on the stack)
+	BOOL Save(const char *path);                          // 0x0010403F
+	// Opens g_virtualKeyboard for a file name: path, else the first free
+	// C:\FileNNNN.txt. (this on the stack)
+	void AskFileName(const wchar_t *title, const char *path);   // 0x00103E0D
+	void ShowOpenBrowser();                               // 0x0010538A (this in edi)
+	// (this in edi)
+	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x001044BE
+	void ShowSaveError(const char *path);                 // (inlined)
+	std::wstring *CurrentLine() { return m_lines.empty() ? NULL : &m_lines[m_nLine]; }
 };
 
 // The "SetClock" screen: six CUpDown spinners (the date in the language's

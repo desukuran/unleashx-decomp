@@ -1367,3 +1367,26 @@
 00102765 CPassCode::DrawTextBox void f(CPassCode *this@eax)
 001027b8 CPassCode::DrawFrame void f(CPassCode *this@eax)
 00102c48 CPassCode::DrawText
+00104605 CNotePad::CNotePad
+00103fb6 CNotePad::~CNotePad
+00024830 CNotePad::InitFont
+0002484c CNotePad::ResetWindow
+00103910 CNotePad::Reset
+001036f6 CNotePad::Recount
+001036d5 CNotePad::ClampColumn
+00103741 CNotePad::MoveUp
+00103765 CNotePad::MoveLeft
+001037ad CNotePad::MoveDown
+00103867 CNotePad::MoveRight
+00103a4f CNotePad::SplitLine
+00103e0d CNotePad::AskFileName
+00103f23 CNotePad::GetText
+0010403f CNotePad::Save
+0010538a CNotePad::ShowOpenBrowser
+001044be CNotePad::ShowMessage
+001038ae CNotePad::KeyboardCharEvent::OnChar
+001037e7 CNotePad::KeyboardCharEvent::OnDelete
+00103950 CNotePad::KeyboardCharEvent::OnBackspace
+0010473e CNotePad::KeyboardCharEvent::OnKey
+0009a060 FormatIntW
+0027a404 s_fNotePadTextWidth

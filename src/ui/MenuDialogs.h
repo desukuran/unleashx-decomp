@@ -19,10 +19,11 @@ public:
 	COptionMenu();                                        // 0x000AEADE
 	virtual ~COptionMenu();
 	virtual HRESULT Create(CXBFont *font, const wchar_t *title, float x, float y, float width,
-	                       float height, int maxVisible);  // vtable slot 1
+	                       float height, int maxVisible);  // vtable slot 1 (0x000AE9AD)
 	void AddOption(const wchar_t *text, int value);       // 0x000AEA79
 	void Show(int selected);                              // 0x000ADE9E
 	virtual void ProcessInput(int *action, struct SGamepadState **pad);   // vtable slot 2 (0x000AE6F1)
+	virtual void Render();                                // vtable slot 3 (0x000ADF2C)
 	BOOL IsOpen() const;                                  // 0x000AD930
 	int GetSelection() const;                             // 0x000AD946
 

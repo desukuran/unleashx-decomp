@@ -10,6 +10,8 @@ wchar_t GetThousandsSeparator();                      // 0x00099F10
 wchar_t GetDecimalSeparator();                        // 0x00099F3A
 // n with thousands separators, e.g. "8,042,401,792". out holds 100 chars.
 void FormatNumberW(wchar_t *out, ULONGLONG n);        // 0x000A1A7F
+// The same for an int (the text editor's size). (out in eax)
+void FormatIntW(wchar_t *out, int n);                 // 0x0009A060
 // v with the given number of decimals and separators.
 std::string FormatDouble(int decimals, double v);     // 0x000A3A5A
 std::string FormatIPAddress(DWORD addr);              // 0x000A385E
