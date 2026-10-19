@@ -1,5 +1,5 @@
-// Screen scaling and 2D drawing helpers (0x0009E1D4-0x000A2D02). The
-// drawing ones are in Draw.cpp; the screen scaling ones are TODO.
+// Screen scaling (Screen.cpp) and 2D drawing helpers (Draw.cpp),
+// 0x0009E1D4-0x000A2D02.
 #pragma once
 
 #include "../common/Platform.h"
@@ -12,12 +12,21 @@ typedef DWORD D3DCOLOR;
 void GetScreenOrigin(float *x, float *y);                    // 0x0009E1D4
 void GetScreenSize(float *width, float *height);             // 0x0009E216
 void GetScreenEnd(float *right, float *bottom);              // 0x0009E258
+struct SScreenRect
+{
+	DWORD x, y, width, height;
+};
+SScreenRect GetScreenRect();                                 // 0x0009E2A8
 
 // Skin coordinates (laid out for m_nSkinWidth x m_nSkinHeight) to screen
 // coordinates. Any pointer can be NULL. With base640x480 the sizes are
 // relative to 640x480 instead. Quirk: nothing changes (not even the
 // offset) when the screen is the skin's size; zero sizes stay zero.
 void ScaleToScreen(float *x, float *width, float *y, float *height, BOOL base640x480);   // 0x0009E34E
+// The same for whole numbers (zeros stay zero).
+void ScaleToScreenInt(DWORD *x, DWORD *y, DWORD *width, DWORD *height);  // 0x0009E4D4
+// x, y, width, height; the position rounds down, the size up.
+void ScaleRectToScreen(int *rect);                                       // 0x0009FDCC
 
 // Flat-colored primitives (Draw.cpp). Colors are ARGB; a color of 0 skips
 // that part. alpha (0..1) replaces or scales the fill's alpha.
