@@ -120,6 +120,11 @@ DWORD GetTickCount()
 	return (DWORD)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
 }
 
+int _wcsicmp(const wchar_t *a, const wchar_t *b)
+{
+	return wcscasecmp(a, b);
+}
+
 // No threads on the host: the start routine isn't run.
 uintptr_t _beginthreadex(void *, unsigned, unsigned(__stdcall *)(void *), void *, unsigned, unsigned *)
 {
@@ -180,6 +185,21 @@ NTSTATUS __stdcall NtQuerySymbolicLinkObject(HANDLE, PSTRING, PULONG)
 {
 	return (NTSTATUS)0xC0000001;
 }
+STRING HalDiskSerialNumber = {9, 10, (char *)"HOSTDISK1"};
+BYTE XboxHDKey[16];
+
+void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime)
+{
+	// 100 ns units since 1601
+	currentTime->QuadPart = ((long long)time(NULL) + 11644473600LL) * 10000000LL;
+}
+
+NTSTATUS __stdcall HalReadSMBusValue(UCHAR, UCHAR, BOOLEAN, ULONG *value)
+{
+	*value = 0;
+	return 0;
+}
+
 NTSTATUS __stdcall NtClose(HANDLE)
 {
 	return 0;
@@ -198,6 +218,25 @@ void __stdcall RtlInitAnsiString(PANSI_STRING dst, const char *src)
 	dst->Length = (USHORT)(src != NULL ? strlen(src) : 0);
 	dst->MaximumLength = (USHORT)(dst->Length + 1);
 }
+}
+
+void GlobalMemoryStatus(MEMORYSTATUS *status)
+{
+	memset(status, 0, sizeof(*status));
+	status->dwLength = sizeof(*status);
+	status->dwTotalPhys = 64 << 20;
+	status->dwAvailPhys = 40 << 20;
+}
+
+HANDLE XFindFirstNicknameW(BOOL, wchar_t *nickname, unsigned)
+{
+	nickname[0] = 0;
+	return INVALID_HANDLE_VALUE;
+}
+
+DWORD XGetLanguage()
+{
+	return 1;   // XC_LANGUAGE_ENGLISH
 }
 
 BOOL GetDiskFreeSpaceExA(const char *, ULONGLONG *freeAvailable, ULONGLONG *total, ULONGLONG *totalFree)

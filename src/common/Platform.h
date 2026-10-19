@@ -111,6 +111,7 @@ BOOL SetThreadPriority(HANDLE thread, int priority);
 uintptr_t _beginthreadex(void *security, unsigned stackSize, unsigned (__stdcall *start)(void *), void *arg,
                          unsigned flags, unsigned *threadId);
 int stricmp(const char *a, const char *b);
+int _wcsicmp(const wchar_t *a, const wchar_t *b);
 DWORD WaitForSingleObject(HANDLE handle, DWORD ms);
 BOOL CloseHandle(HANDLE handle);
 DWORD GetTickCount();

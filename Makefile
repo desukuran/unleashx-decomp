@@ -8,7 +8,7 @@ XML := src/xml/XmlDocument.cpp src/xml/XmlUtil.cpp
 SETTINGS := src/settings/AppSettings.cpp src/settings/ConfigLoader.cpp
 SYSTEM := src/system/Drives.cpp src/system/Dvd.cpp
 NET := src/net/Network.cpp src/net/XNetHost.cpp
-SKIN := src/skin/Skin.cpp src/skin/SkinParser.cpp src/skin/SkinColors.cpp src/skin/SkinDefaults.cpp
+SKIN := src/skin/Skin.cpp src/skin/SkinText.cpp src/skin/SkinParser.cpp src/skin/SkinColors.cpp src/skin/SkinDefaults.cpp
 UI := src/ui/Language.cpp
 
 # Everything above, plus stand-ins for what isn't decompiled yet.
@@ -16,7 +16,7 @@ LIBS := $(COMMON) $(XML) $(SETTINGS) $(SYSTEM) $(NET) $(SKIN) $(UI)
 STUBS := tests/stubs.cpp tests/todo_stubs.cpp tests/skin_stubs.cpp
 HEADERS := $(wildcard src/*/*.h) src/ui/StringTable.inc
 
-TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test
+TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test
 
 all: $(TESTS)
 
@@ -32,6 +32,7 @@ test: $(TESTS)
 	UNLEASHX_ROOT=build/testroot build/config_test
 	build/skin_test build/skin
 	build/language_test UnleashX_0_39_0528A/French.xml
+	build/skintext_test
 	@echo ok
 
 .PHONY: all test

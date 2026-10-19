@@ -11,6 +11,33 @@ typedef unsigned long ULONG;
 typedef char *PCHAR;
 typedef HANDLE *PHANDLE;
 typedef ULONG *PULONG;
+typedef unsigned char UCHAR;
+typedef unsigned char BOOLEAN;
+typedef union _LARGE_INTEGER
+{
+	struct
+	{
+		DWORD LowPart;
+		LONG HighPart;
+	} u;
+	long long QuadPart;
+} LARGE_INTEGER;
+
+struct MEMORYSTATUS
+{
+	DWORD dwLength;
+	DWORD dwMemoryLoad;
+	DWORD dwTotalPhys;
+	DWORD dwAvailPhys;
+	DWORD dwTotalPageFile;
+	DWORD dwAvailPageFile;
+	DWORD dwTotalVirtual;
+	DWORD dwAvailVirtual;
+};
+
+void GlobalMemoryStatus(MEMORYSTATUS *status);
+HANDLE XFindFirstNicknameW(BOOL titleNicknamesOnly, wchar_t *nickname, unsigned size);
+DWORD XGetLanguage();
 #endif
 
 extern "C" {
@@ -42,6 +69,10 @@ NTSTATUS __stdcall IoDeleteSymbolicLink(PSTRING SymbolicLinkName);
 void __stdcall RtlInitAnsiString(PANSI_STRING Destination, const char *Source);
 
 extern PANSI_STRING XeImageFileName;
+extern STRING HalDiskSerialNumber;
+extern BYTE XboxHDKey[16];
+void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime);
+NTSTATUS __stdcall HalReadSMBusValue(UCHAR address, UCHAR command, BOOLEAN readWord, ULONG *value);
 
 }
 
