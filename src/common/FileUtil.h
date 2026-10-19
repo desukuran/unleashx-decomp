@@ -24,8 +24,12 @@ BOOL WriteTextFile(const char *path, const char *text, BOOL append);   // 0x000A
 std::string GetPathDirectory(const char *path);                       // 0x000A4B0E TODO: decompile
 BOOL CreateDirectoryTree(const char *path);                           // 0x000A3F51 TODO: decompile
 // Fixes up a path for FATX (name length/characters). TODO: verify
-// The path with its file name made FATX-legal (allowed characters, at most
-// 42); returns TRUE if it had to be changed.
-BOOL MakeFatxPath(const char *path, std::string &out);                // 0x000A4630 TODO: decompile
+// Whether name is a legal FATX file name: 1-42 characters from the allowed
+// set (characters >= 0x80 pass too).
+BOOL IsFatxName(const char *name);                                    // 0x0009F0CA
+// If the file name in path isn't FATX-legal: out = path with disallowed
+// characters removed and the name shortened to 42 characters, and TRUE.
+// Otherwise FALSE and out is left alone.
+BOOL MakeFatxPath(const char *path, std::string &out);                // 0x000A4630
 // Per-title persistent folder for name (flags as XapiMapLetterToDirectory). TODO: verify
 std::string GetPersistentDataPath(const wchar_t *name, unsigned int flags);   // 0x000A6D44 TODO: decompile

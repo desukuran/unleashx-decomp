@@ -25,7 +25,6 @@ HRESULT FormatDrive(char) { return E_FAIL; }
 BOOL CreateDirectoryTree(const char *) { return FALSE; }
 BOOL WriteTextFile(const char *path, const char *, BOOL) { printf("[stub] WriteTextFile(%s)\n", path); return TRUE; }
 std::string GetPathDirectory(const char *) { return std::string(); }
-BOOL MakeFatxPath(const char *path, std::string &out) { out = path; return FALSE; }
 std::string GetPersistentDataPath(const wchar_t *, unsigned int) { return std::string(); }
 
 // SystemInfo.h (Hardware.cpp is Xbox only)

@@ -16,7 +16,7 @@ LIBS := $(COMMON) $(XML) $(SETTINGS) $(SYSTEM) $(NET) $(SKIN) $(UI)
 STUBS := tests/stubs.cpp tests/todo_stubs.cpp tests/skin_stubs.cpp tests/fileio_host.cpp
 HEADERS := $(wildcard src/*/*.h) src/ui/StringTable.inc
 
-TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test build/xbe_test build/menuscan_test build/ftp_test
+TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test build/xbe_test build/menuscan_test build/ftp_test build/fileutil_test
 
 # Syntax-checked but not linked: hardware access, or too much of what they
 # call isn't decompiled yet.
@@ -42,6 +42,7 @@ test: $(TESTS)
 	build/language_test UnleashX_0_39_0528A/French.xml
 	build/skintext_test
 	build/xbe_test
+	build/fileutil_test
 	rm -rf build/testroot/E/Games && mkdir -p build/testroot/E/Games/A build/testroot/E/Games/B
 	cp UnleashX_0_39_0528A/Default.xbe build/testroot/E/Games/A/default.xbe
 	cp UnleashX_0_39_0528A/Default.xbe build/testroot/E/Games/B/default.xbe

@@ -197,3 +197,121 @@ void ResolvePath(const char *path, std::string &out)
 
 	StrRemoveChar(out, '"');
 }
+
+// The characters FATX allows in names (plus '\\' and ':' for whole paths).
+// 0x0025AF78, through the pointer at 0x0026BC5C
+static const char *const s_fatxCharacters =
+	" !#$%&'()-.@[]^_`{}~0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\\:";
+
+// 0x0009F0CA
+BOOL IsFatxName(const char *name)
+{
+	if (name == NULL || strlen(name) == 0 || strlen(name) > 42)
+		return FALSE;
+	for (; *name != '\0'; name++)
+	{
+		if (*name < 0)
+			continue;   // characters >= 0x80 aren't checked
+		if (strchr(s_fatxCharacters, *name) == NULL)
+			return FALSE;
+	}
+	return TRUE;
+}
+
+// 0x000A4630
+// The name is shortened by cutting it at the last space, then the last '.',
+// '-', ':' or ',' (the extension is kept aside), and finally hard at the
+// limit. Quirks: the character filter runs over the whole path, so folder
+// names lose their illegal characters too (and characters >= 0x80, which
+// IsFatxName() accepts, are dropped); ".." and "\\\\" are collapsed
+// afterwards.
+BOOL MakeFatxPath(const char *path, std::string &out)
+{
+	std::string clean;
+	std::string dir;
+	std::string name = path;
+	int slash = StrReverseFind(name, "\\", -1);
+	if (slash != -1)
+	{
+		dir = StrLeft(name, slash + 1);
+		name = StrMid(name, slash + 1, name.size() - (slash + 1));
+	}
+	if (IsFatxName(name.c_str()))
+		return FALSE;
+
+	for (const char *p = path; *p != '\0'; p++)
+	{
+		// (characters >= 0x80 never match)
+		if (strchr(s_fatxCharacters, *p) != NULL)
+			clean.append(1, *p);
+	}
+	slash = StrReverseFind(clean, "\\", -1);
+	if (slash != -1)
+	{
+		dir = StrLeft(clean, slash + 1);
+		clean = StrMid(clean, slash + 1, clean.size() - (slash + 1));
+	}
+
+	if ((int)clean.size() <= 42)
+	{
+		std::string joined;
+		StrFormat(joined, "%s%s", dir.c_str(), clean.c_str());
+		clean = joined;
+	}
+	else
+	{
+		std::string extension;
+		int limit = 42;
+		int dot = StrReverseFind(clean, ".", -1);
+		if (dot != -1)
+		{
+			extension = StrMid(clean, dot, clean.size() - dot);
+			clean = StrLeft(clean, dot);
+			limit = 42 - (int)extension.size();
+		}
+
+		int pos;
+		while ((pos = StrReverseFind(clean, " ", -1)) != -1 && (int)clean.size() > limit)
+			clean = StrLeft(clean, pos);
+		if ((int)clean.size() > 38)
+		{
+			while ((pos = StrReverseFind(clean, ".", -1)) != -1 && (int)clean.size() > limit)
+				clean = StrLeft(clean, pos);
+			if ((int)clean.size() > 38)
+			{
+				const char *separators[3] = { "-", ":", "," };
+				BOOL done = FALSE;
+				for (int i = 0; i < 3 && !done; i++)
+				{
+					while ((pos = StrReverseFind(clean, separators[i], -1)) != -1)
+					{
+						if ((int)clean.size() <= limit)
+						{
+							done = TRUE;
+							break;
+						}
+						clean = StrLeft(clean, pos);
+					}
+					if ((int)clean.size() <= limit)
+						done = TRUE;
+				}
+				if (!done)
+				{
+					if (extension.size() != 0)
+						clean = StrLeft(clean, limit);
+					else if ((int)clean.size() > 42)
+						clean = StrLeft(clean, 42);
+				}
+			}
+		}
+		std::string joined;
+		StrFormat(joined, "%s%s%s", dir.c_str(), clean.c_str(), extension.c_str());
+		clean = joined;
+	}
+
+	StrReplaceAll(clean, "..", ".");
+	StrReplaceAll(clean, "\\\\", "\\");
+	out = clean;
+	return TRUE;
+}
+
