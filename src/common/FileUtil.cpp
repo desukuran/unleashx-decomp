@@ -7,9 +7,7 @@
 #include "../settings/AppSettings.h"
 #include "StrUtil.h"
 
-#ifdef _XBOX
 #include "XboxKernel.h"
-#endif
 
 // 0x0009DE34
 BOOL FileExists(const char *path)
@@ -76,7 +74,6 @@ std::string ReadTextFile(const char *path)
 // e.g. 'E' -> "\Device\Harddisk0\Partition1".
 HRESULT GetDriveDevicePath(char drive, std::string &devicePath)
 {
-#ifdef _XBOX
 	HRESULT hr = E_FAIL;
 	if (isalpha(drive))
 	{
@@ -107,11 +104,6 @@ HRESULT GetDriveDevicePath(char drive, std::string &devicePath)
 	}
 	devicePath = "";
 	return hr;
-#else
-	(void)drive;
-	devicePath = "";
-	return E_FAIL;
-#endif
 }
 
 // 0x000A3934
@@ -120,9 +112,8 @@ HRESULT GetDriveDevicePath(char drive, std::string &devicePath)
 std::string GetXbePath()
 {
 	std::string path;
-#ifdef _XBOX
-	path = XeImageFileName->Buffer;
-#endif
+	if (XeImageFileName != NULL)
+		path = XeImageFileName->Buffer;
 	StrReplaceAll(path, ".Xbe", ".xbe");
 	StrReplaceAll(path, ".XBE", ".xbe");
 	int ext = StrFind(path, ".xbe");

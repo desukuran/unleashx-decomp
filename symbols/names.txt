@@ -301,7 +301,7 @@
 000ac19c SColorScheme::SetName void f(void *self@edi, char *name)
 000ad398 SColorScheme::Load void f(void *self@ecx, CXmlDocument *doc@eax)
 000ac201 SColorScheme::~SColorScheme void f(void *self@esi)
-000aa69e GetDriveInfo
+000aa69e GetDriveInfo void * __cdecl f(char drive)
 
 # ---- src/ui/Language ----
 0013a631 LookupLanguageKey char * __cdecl f(char *key)
@@ -311,3 +311,36 @@
 00278024 g_stringCacheA
 00278030 g_stringCacheW
 0009df0d StrIsNotEmpty BOOL f(char *s@eax)
+
+# ---- src/system/Drives ----
+00276388 g_drives
+0026bbf8 kAllDrives
+00276276 g_bMemoryUnitsChanged
+0026bbec g_nDiscType
+00276278 g_szDiscTitle
+000aa512 GetDriveLinkInfo BOOL f(char drive@al, char *devicePath@edi, char *linkName)
+000aaa8a MapFolderToDrive BOOL f(char *folder@eax, void *info@ecx, char drive)
+000ab172 MountAllDrives void f(void)
+000ab285 GetDiscTitle WORD * f(void)
+000ab2ff MountTitleDataDrive void __cdecl f(char *xbePath)
+000ab587 RefreshMemoryUnits void f(void)
+000ab6d4 UpdateDriveSpace void f(void *info@esi)
+000ab915 RemountDrive BOOL f(void *info@esi)
+000abffe RemountDriveLetter BOOL __cdecl f(char drive)
+000aa696 GetMemoryUnitsChanged
+000aa7e8 GetDiscTypeName
+000aa85b GetTrayStateName
+000aa903 GetDiscType
+000aa909 IsDiscPresent
+000aa91e GetDiscTitleIfPresent
+0009d6a3 GetDiskSpace void __cdecl f(char drive, ULONGLONG *total, ULONGLONG *free, ULONGLONG *used, int unit)
+000a956b FormatDrive HRESULT __cdecl f(char drive)
+0009de6c GetUtilityDriveDevice
+000315a5 InitMemoryUnitTable
+00018ff7 EnterFileLock
+0001901a LeaveFileLock
+000a608d ReadXbeInfo
+000a4d10 ExtractXbeTitleImage
+00038c16 GetVolumeInformationA
+00038b22 GetDiskFreeSpaceExA
+0005f698 tolower

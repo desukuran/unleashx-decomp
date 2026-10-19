@@ -15,6 +15,7 @@ typedef int BOOL;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef uint32_t DWORD;
+typedef uint64_t ULONGLONG;
 typedef int32_t LONG;
 typedef int32_t HRESULT;
 typedef void *HANDLE;

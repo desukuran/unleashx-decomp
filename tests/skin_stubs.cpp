@@ -41,7 +41,3 @@ void CWMVideoPlayer::SetAudio(BOOL) {}
 void CWMVideoPlayer::SetRect(int, int, int, int) {}
 BOOL CWMVideoPlayer::Open(const char *) { return TRUE; }
 
-
-struct SDriveInfo { int dummy; };
-SDriveInfo *GetDriveInfo(char) { return NULL; }
-BOOL IsDriveInfoMounted(SDriveInfo *) { return FALSE; }

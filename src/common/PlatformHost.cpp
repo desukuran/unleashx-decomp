@@ -154,3 +154,54 @@ DWORD XGetAVPack()
 	return 0;
 }
 #endif
+
+#ifndef _XBOX
+#include "XboxKernel.h"
+
+extern "C" {
+PANSI_STRING XeImageFileName = NULL;
+NTSTATUS __stdcall NtOpenSymbolicLinkObject(PHANDLE handle, POBJECT_ATTRIBUTES)
+{
+	*handle = NULL;
+	return (NTSTATUS)0xC0000034;   // STATUS_OBJECT_NAME_NOT_FOUND
+}
+NTSTATUS __stdcall NtQuerySymbolicLinkObject(HANDLE, PSTRING, PULONG)
+{
+	return (NTSTATUS)0xC0000001;
+}
+NTSTATUS __stdcall NtClose(HANDLE)
+{
+	return 0;
+}
+NTSTATUS __stdcall IoCreateSymbolicLink(PSTRING, PSTRING)
+{
+	return 0;
+}
+NTSTATUS __stdcall IoDeleteSymbolicLink(PSTRING)
+{
+	return 0;
+}
+void __stdcall RtlInitAnsiString(PANSI_STRING dst, const char *src)
+{
+	dst->Buffer = (PCHAR)src;
+	dst->Length = (USHORT)(src != NULL ? strlen(src) : 0);
+	dst->MaximumLength = (USHORT)(dst->Length + 1);
+}
+}
+
+BOOL GetDiskFreeSpaceExA(const char *, ULONGLONG *freeAvailable, ULONGLONG *total, ULONGLONG *totalFree)
+{
+	*freeAvailable = *total = *totalFree = 0;
+	return FALSE;
+}
+
+BOOL GetVolumeInformationA(const char *, char *, DWORD, DWORD *, DWORD *, DWORD *, char *, DWORD)
+{
+	return FALSE;
+}
+
+DWORD XMountUtilityDrive(BOOL)
+{
+	return 0;
+}
+#endif
