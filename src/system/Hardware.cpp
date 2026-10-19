@@ -3,10 +3,12 @@
 // host test build uses stand-ins.
 #include "SystemInfo.h"
 
+#include <cstdio>
 #include <cstring>
 
 #include "../common/StrUtil.h"
 #include "../common/XboxKernel.h"
+#include "../thirdparty/XKUtils.h"
 
 // SMBus addresses
 #define SMBUS_SMC 0x20
@@ -179,6 +181,178 @@ WORD GetHddSecurityStatus()
 	if (security & 0x10)
 		status |= HDD_SECURITY_COUNT_EXPIRED;
 	return status;
+}
+
+// 0x0009048B
+// Quirks: both print IDENTIFY's bit masks, not mode numbers (word 64's
+// supported PIO modes; word 88's high byte, the selected Ultra DMA mode as
+// a bit: "Ultra DMA Mode 32" for mode 5).
+void GetHddInfoText(int kind, char *out)
+{
+	const WORD *identify = (const WORD *)ReadIdeIdentify(TRUE, FALSE);
+	if (kind == 1)
+	{
+		sprintf(out, "Cyl: %d  Heads: %d  Sectors/Track: %d", identify[1], identify[3], identify[6]);
+	}
+	else if (kind == 2)
+	{
+		WORD udma = identify[88];
+		if ((udma >> 8) != 0)
+			sprintf(out, "Ultra DMA Mode %d", udma >> 8);
+		else
+			sprintf(out, "PIO Mode %d", identify[64] & 0xFF);
+	}
+}
+
+// --- Hard disk lock ----------------------------------------------------------
+
+#define ATA_SECURITY_SET_PASSWORD 0xF1
+#define ATA_SECURITY_DISABLE_PASSWORD 0xF6
+// The master password UnleashX (like Team Assembly's tools) sets.
+static const char s_szMasterPassword[] = "TEAMASSEMBLY";   // 0x0024C150
+#define HDD_PASSWORD_LENGTH 20
+
+// The length of an ATA string without its trailing spaces. Quirk: when
+// everything after the first character is spaces, the full length.
+static int TrimmedAtaLength(const char *s, int length)
+{
+	for (int i = length - 1; i > 0; i--)
+	{
+		if (s[i] != ' ')
+			return i + 1;
+	}
+	return length;
+}
+
+// 0x00090C19
+// The Xbox's user password for its disk: HMAC-SHA1 under the HDD key of
+// the model and serial number. Quirk: the key's length is its strlen, so a
+// key with a zero byte is cut short (the real one is 16 bytes).
+static void ComputeHddPassword(BYTE *password)
+{
+	char key[17];
+	memcpy(key, XboxHDKey, 16);
+	key[16] = 0;
+	char model[40] = {0};
+	char serial[20] = {0};
+	memcpy(model, HalDiskModelNumber.Buffer, sizeof(model));
+	memcpy(serial, HalDiskSerialNumber.Buffer, sizeof(serial));
+	int modelLength = TrimmedAtaLength(model, HalDiskModelNumber.Length < 40 ? HalDiskModelNumber.Length : 40);
+	int serialLength = TrimmedAtaLength(serial, HalDiskSerialNumber.Length < 20 ? HalDiskSerialNumber.Length : 20);
+	XKSHA1 sha1;
+	sha1.HMAC_SHA1(password, (const BYTE *)key, (int)strlen(key), (const BYTE *)model, modelLength,
+	               (const BYTE *)serial, serialLength);
+}
+
+static HANDLE OpenHddForWrite()
+{
+	ANSI_STRING name;
+	RtlInitAnsiString(&name, "\\Device\\Harddisk0\\Partition0");
+	OBJECT_ATTRIBUTES attributes = {NULL, &name, 0};
+	IO_STATUS_BLOCK status;
+	HANDLE disk;
+	if (NtOpenFile(&disk, GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE, &attributes, &status,
+	               FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_SYNCHRONOUS_IO_NONALERT) < 0)
+		return NULL;
+	return disk;
+}
+
+// A SECURITY command with its 512-byte password block: word 0 is 1 for the
+// master password, the password follows. TRUE if sent and the drive didn't
+// set the error bit.
+static BOOL SendSecurityCommand(HANDLE disk, BYTE command, BOOL master, const void *password, size_t length)
+{
+	BYTE block[0x200];
+	memset(block, 0, sizeof(block));
+	block[0] = master ? 1 : 0;
+	memcpy(block + 2, password, length);
+	ATA_PASS_THROUGH ata;
+	memset(&ata.IdeReg, 0, sizeof(ata.IdeReg));
+	ata.IdeReg.bDriveHeadReg = 0xA0;
+	ata.IdeReg.bCommandReg = command;
+	ata.IdeReg.bHostSendsData = 1;
+	ata.DataBufferSize = sizeof(block);
+	ata.DataBuffer = block;
+	DWORD returned;
+	if (!DeviceIoControl(disk, IOCTL_IDE_PASS_THROUGH, &ata, sizeof(ata), &ata, sizeof(ata), &returned, NULL))
+		return FALSE;
+	return (ata.IdeReg.bCommandReg & 1) == 0;
+}
+
+static BOOL IsHddLocked(WORD status)
+{
+	return (status & HDD_SECURITY_SUPPORTED) && (status & HDD_SECURITY_ENABLED);
+}
+
+// 0x00090D42
+// Sets the master password, then the user password; TRUE once the drive
+// reports security enabled (checked up to 3 times), or right away when the
+// drive has no security or is already locked. Quirk: a password whose
+// first byte is 0 counts as none.
+BOOL LockHdd()
+{
+	ReadIdeIdentify(TRUE, TRUE);
+	WORD status = GetHddSecurityStatus();
+	if (!(status & HDD_SECURITY_SUPPORTED) || (status & HDD_SECURITY_ENABLED))
+		return TRUE;
+	BYTE password[32] = {0};
+	ComputeHddPassword(password);
+	if (password[0] == 0)
+		return FALSE;
+	HANDLE disk = OpenHddForWrite();
+	if (disk == NULL)
+		return FALSE;
+
+	BOOL locked = FALSE;
+	if (SendSecurityCommand(disk, ATA_SECURITY_SET_PASSWORD, TRUE, s_szMasterPassword, sizeof(s_szMasterPassword)))
+	{
+		Sleep(50);
+		if (SendSecurityCommand(disk, ATA_SECURITY_SET_PASSWORD, FALSE, password, HDD_PASSWORD_LENGTH))
+		{
+			for (int tries = 0; tries < 3; tries++)
+			{
+				ReadIdeIdentify(TRUE, TRUE);
+				status = GetHddSecurityStatus();
+				if (IsHddLocked(status))
+					break;
+			}
+			locked = IsHddLocked(status);
+		}
+	}
+	NtClose(disk);
+	return locked;
+}
+
+// 0x00090EF8
+// Removes the user password, or failing that the master password; TRUE
+// once the drive reports security disabled.
+BOOL UnlockHdd()
+{
+	ReadIdeIdentify(TRUE, TRUE);
+	if (!IsHddLocked(GetHddSecurityStatus()))
+		return FALSE;
+	BYTE password[32] = {0};
+	ComputeHddPassword(password);
+	if (password[0] == 0)
+		return FALSE;
+	HANDLE disk = OpenHddForWrite();
+	if (disk == NULL)
+		return FALSE;
+
+	BOOL done = SendSecurityCommand(disk, ATA_SECURITY_DISABLE_PASSWORD, FALSE, password, HDD_PASSWORD_LENGTH);
+	if (!done)
+	{
+		Sleep(10);
+		done = SendSecurityCommand(disk, ATA_SECURITY_DISABLE_PASSWORD, TRUE, s_szMasterPassword,
+		                           sizeof(s_szMasterPassword));
+	}
+	NtClose(disk);
+	if (!done)
+		return FALSE;
+	Sleep(10);
+	ReadIdeIdentify(TRUE, TRUE);
+	WORD status = GetHddSecurityStatus();
+	return (status & HDD_SECURITY_SUPPORTED) && !(status & HDD_SECURITY_ENABLED);
 }
 
 // --- SMART ------------------------------------------------------------------

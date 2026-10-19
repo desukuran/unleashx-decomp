@@ -53,8 +53,14 @@ struct SXbeInfo
 BOOL ReadXbeInfo(const char *xbePath, SXbeInfo *info);             // 0x000A608D (Xbe.cpp)
 // Lets a copied game XBE run from the hard disk: sets the certificate's
 // allowed media to everything ("FF010040") and applies four byte patches.
-// TRUE if any patch applied. (path in edi)
-BOOL PatchXbe(const char *xbePath);                                 // 0x000A2245 TODO: decompile
+// TRUE if any patch applied. (path in edi; XbePatch.cpp)
+BOOL PatchXbe(const char *xbePath);                                 // 0x000A2245
+// The hex bytes written at offset: 0, or -1 bad hex, -2 can't open, -3
+// short write. (hex in eax)
+int WriteXbePatchBytes(const char *hex, const char *xbePath, long offset);   // 0x0009F58D
+// Where the hex bytes first appear from start on; -1 not found, -2 can't
+// open. (hex in eax)
+long CheckXbePatchBytes(const char *hex, const char *xbePath, long start);   // 0x0009F62A
 
 // An XBE's image header and certificate as read by ReadXbeHeader(). 0x35C
 // bytes; only the fields used are named.
@@ -79,7 +85,7 @@ struct SXbeHeaderInfo
 };
 BOOL ReadXbeHeader(const char *xbePath, SXbeHeaderInfo *info);     // 0x0009E08A (Xbe.cpp)
 // Writes a new title name (40 characters) into the XBE's certificate.
-// TRUE if it was written or already the same. TODO: decompile
+// TRUE if it was written or already the same. (path in eax; XbePatch.cpp)
 BOOL SetXbeTitleName(const char *xbePath, const wchar_t *title);    // 0x0009DB0C
 std::string GetXbeTitleName(const char *xbePath);                  // 0x000A5F49 (Xbe.cpp)
 // The kernel path of an XBE's folder (E:\Games\x.xbe ->

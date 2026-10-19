@@ -73,5 +73,7 @@ void StrWideToUtf8(const wchar_t *src, char *dst, unsigned int size);
 // Wide to narrow string.                                          (0x00020B69)
 std::string StrFromWide(const wchar_t *s);
 
-// "0A1B..." to bytes; 1 if the length is odd. The original takes hex in edi.
-int HexToBytes(const char *hex, BYTE *out);                       // 0x0009E6DB TODO: decompile
+// "0A1B..." to bytes; 1 if the length is odd (nothing written), else 0.
+// Pairs that aren't hex give 0 (or what strtoul makes of them). The
+// original takes hex in edi.
+int HexToBytes(const char *hex, BYTE *out);                       // 0x0009E6DB

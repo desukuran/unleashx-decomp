@@ -192,6 +192,28 @@ every 5 seconds. Quirk: the temperature SMART value is converted with 32.5
 instead of 32, and only when it looks like the other unit (above 90 or
 below 60).
 
+The geometry and transfer mode lines print IDENTIFY's mode *bit masks*,
+not mode numbers: a drive in Ultra DMA mode 5 shows "Ultra DMA Mode 32".
+
+**Locking** (`LockHdd`, `src/system/Hardware.cpp`) sends ATA SECURITY SET
+PASSWORD twice:
+1. The master password "TEAMASSEMBLY".
+2. The Xbox's user password: HMAC-SHA1, under the console's HDD key, of
+   the drive's model and serial number (as the kernel reports them, without
+   trailing spaces).
+
+It succeeds once the drive reports security enabled.
+
+**Unlocking** sends SECURITY DISABLE PASSWORD with the user password, and
+falls back to the master password.
+
+Quirks:
+* The HMAC key's length is the key's `strlen`. A console whose HDD key has
+  a zero byte gets a password made from a shortened key, which differs from
+  the one its kernel expects.
+* A password whose first byte is 0 is treated as no password, so nothing
+  happens.
+
 ## Sounds and Audio Settings
 
 | Line | Values | Saved as |

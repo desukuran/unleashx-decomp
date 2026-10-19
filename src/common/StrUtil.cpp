@@ -2,6 +2,7 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include <cstdlib>
 #include <cctype>
 #include <cstring>
 #include <cwchar>
@@ -381,4 +382,19 @@ void StrWideToUtf8(const wchar_t *src, char *dst, unsigned int size)
 	int written = WideCharToMultiByte(65001 /* CP_UTF8 */, 0x40, src, (int)length, dst, (int)size, NULL, NULL);
 	if (written > 0)
 		dst[written] = '\0';
+}
+
+// 0x0009E6DB
+int HexToBytes(const char *hex, BYTE *out)
+{
+	if (strlen(hex) & 1)
+		return 1;
+	int count = (int)(strlen(hex) / 2);
+	for (int i = 0; i < count; i++)
+	{
+		char pair[100];
+		sprintf(pair, "%c%c", hex[i * 2], hex[i * 2 + 1]);
+		out[i] = (BYTE)strtoul(pair, NULL, 16);
+	}
+	return 0;
 }

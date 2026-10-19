@@ -264,6 +264,7 @@ void __stdcall RtlLeaveCriticalSection(RTL_CRITICAL_SECTION *section);
 
 extern PANSI_STRING XeImageFileName;
 extern STRING HalDiskSerialNumber;
+extern STRING HalDiskModelNumber;
 typedef struct _XBOX_KRNL_VERSION
 {
 	USHORT Major;

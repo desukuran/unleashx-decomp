@@ -303,8 +303,17 @@ Entries that don't apply are greyed out.
     `new.zip`, and `.zip` is added when missing.
 * **XBE:**
   * **Patch XBE file:** patches a hard disk XBE and keeps the original as
-    `.bak`.
-  * **Rename XBE title:** changes the title stored in the XBE.
+    `.bak` (`PatchXbe`, `src/system/XbePatch.cpp`).
+    * **Allowed media:** the certificate's allowed media becomes
+      0x400001FF. The certificate is assumed to start at the image header's
+      size.
+    * **Code patches:** the first match of each of four byte patterns is
+      replaced. Two turn a `jge` after the media check into `jmp`, one
+      clears a `FATX....D:\` string, one turns `test al, 1 / jnz` into nops.
+    * **Result:** "patched" means at least one pattern was found.
+  * **Rename XBE title:** changes the title stored in the XBE. Quirk: 41
+    characters are written into the 40-character field, which clears the low
+    word of the first alternate title ID.
 * **Text:** **New text document** or **Open with text editor**.
 * **Format drive:** only in Root, for drives other than C: and D: that have
   no size information or are H: and up. It asks first.

@@ -2522,3 +2522,11 @@
 00031564 iso9660::GetDiscSize
 00031551 iso9660::GetVolumeName
 0027625c g_hIso9660Device
+# XKUtils (Team Assembly) pieces next to the HDD lock
+000900db XKSHA1::HMAC_SHA1
+00090a01 XKHDD::CleanATAData
+# (unused: the same password from IDENTIFY data)
+00090cdf XKHDD::GenerateHDDPwd
+0024c150 s_szMasterPassword
+0026d114 s_patchReplace
+0026d124 s_patchFind

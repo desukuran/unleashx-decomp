@@ -20,3 +20,12 @@ public:
 };
 
 extern XKEEPROM g_eeprom;   // 0x00277840
+
+class XKSHA1
+{
+public:
+	// HMAC-SHA1 of text1 followed by text2 under key (20 bytes into result).
+	// (key_length in edi)
+	void HMAC_SHA1(BYTE *result, const BYTE *key, int keyLength, const BYTE *text1, int length1, const BYTE *text2,
+	               int length2);   // 0x000900DB
+};
