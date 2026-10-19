@@ -237,3 +237,40 @@ files are reloaded at once.
 X sets the selected line back to its default. Quirks: typed scroll speeds
 and temperature thresholds aren't range-checked; the screen saver path is
 stored in the text setting until restart.
+
+## The file browser
+
+`CFileBrowser` (`src/ui/FileBrowser.cpp`) is the pop-up behind every "Browse..." item. The text editor's Open uses it too.
+
+### What it lists
+
+It starts with the mounted drives. Inside a drive it lists `..` first, then the folders as `<name>`, then the files. With "[New Folder]" enabled, that entry comes last.
+
+Two modes:
+
+* **Folder mode** (`SetSelectFiles(FALSE)`): only folders are listed, and A always enters.
+* **File mode** (`SetSelectFiles(TRUE)`): files are listed too, filtered by the extensions given (`"xbe"`, `"wmv|xmv"`). A on a file picks it.
+
+Filters match the end of the name, ignoring case. So `txt` also matches `footxt`.
+
+### Controls
+
+| Input | Effect |
+|---|---|
+| A | enter the folder, or pick the file |
+| A on `..` | go up |
+| B | go up |
+| START | pick the highlighted entry. A folder only counts when the caller allows folder results. |
+| BACK or BLACK | cancel |
+| "[New Folder]" | asks for a name (at most 64 characters) and creates the folder |
+
+The left stick only moves the selection when it's pushed all the way.
+
+### Position memory
+
+Each folder depth remembers its selection and scroll position. Going up returns to where you were. Going down into a folder also restores whatever position was last used at that depth.
+
+### Quirks kept
+
+* A drive picked from the drive list with START comes back as `\C`.
+* The `_strdup` copy of each filter is never freed.

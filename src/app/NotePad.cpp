@@ -586,8 +586,8 @@ void CNotePad::ShowOpenBrowser()
 		m_bFileBrowserOpen = FALSE;
 		return;
 	}
-	m_pFileBrowser->SetOption11C(1);
-	m_pFileBrowser->m_unknown120 = 0;
+	m_pFileBrowser->SetSelectFiles(1);
+	m_pFileBrowser->m_bNewFolderItem = 0;
 	m_pFileBrowser->Show(TRUE);
 	m_bFileBrowserOpen = TRUE;
 }

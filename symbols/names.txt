@@ -1002,7 +1002,7 @@
 000de58d CVirtualKeyboard::ProcessInput
 000caa5d CAutoLaunch::Save
 000113d9 CFileBrowser::SetTitle
-000112ba CFileBrowser::SetOption11C
+000112ba CFileBrowser::SetSelectFiles
 001281f6 CFileBrowser::AddFilter
 0001142f CFileBrowser::SetStartPath
 0001124e CFileBrowser::Show
@@ -1390,3 +1390,8 @@
 0010473e CNotePad::KeyboardCharEvent::OnKey
 0009a060 FormatIntW
 0027a404 s_fNotePadTextWidth
+001267b6 CFileBrowser::Reset
+0012abe3 CFileBrowser::Refresh
+00013c39 SFileItem::SFileItem
+001266fd SFileItem::operator_less
+002761d8 g_pFileSettings

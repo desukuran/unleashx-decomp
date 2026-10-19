@@ -358,7 +358,7 @@ void CSettingsBase::ShowClockEditor()
 }
 
 // 0x000D2057
-void CSettingsBase::ShowFileBrowser(const wchar_t *title, int unknown124, int option11C, int unknown120,
+void CSettingsBase::ShowFileBrowser(const wchar_t *title, int folderResult, int selectFiles, int newFolderItem,
                                     const char *startPath, const char *filters)
 {
 	if (m_pFileBrowser == NULL)
@@ -373,9 +373,9 @@ void CSettingsBase::ShowFileBrowser(const wchar_t *title, int unknown124, int op
 		return;
 	}
 
-	m_pFileBrowser->m_unknown124 = unknown124;
+	m_pFileBrowser->m_bFolderResult = folderResult;
 	m_pFileBrowser->SetTitle(title);
-	m_pFileBrowser->SetOption11C(option11C);
+	m_pFileBrowser->SetSelectFiles(selectFiles);
 	if (filters != NULL)
 	{
 		std::string list = filters;
@@ -399,7 +399,7 @@ void CSettingsBase::ShowFileBrowser(const wchar_t *title, int unknown124, int op
 			} while (bar != -1);
 		}
 	}
-	m_pFileBrowser->m_unknown120 = unknown120;
+	m_pFileBrowser->m_bNewFolderItem = newFolderItem;
 	if (startPath != NULL)
 		m_pFileBrowser->SetStartPath(startPath);
 	m_pFileBrowser->Show(FALSE);
