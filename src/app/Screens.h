@@ -118,22 +118,51 @@ public:
 	HRESULT Open(const char *path);                       // 0x00104181
 };
 
-// The "SetClock" screen: six CUpDown spinners (month, day, year, hour, ...),
-// started from the current time. Also the date/time pop-up of the settings
-// pages. 0x2A4 bytes.
+// The "SetClock" screen: six CUpDown spinners (the date in the language's
+// order, then hour, minute, AM/PM), started from the current time. Also the
+// date/time pop-up of the settings pages. 0x2A4 bytes.
 class CClockEditor
 {
 public:
 	CClockEditor();                                       // 0x000C66A7
-	~CClockEditor();                                      // 0x000C147B
+	~CClockEditor();                                      // 0x000C147B (this in eax)
+	// E_FAIL when already initialized.
 	HRESULT Init(CXBFontEx *font);                        // 0x000C1FAC
+	// Opens it showing the current time, and lays it out.
 	void Show();                                          // 0x000C0B13
-	void Render();                                        // 0x000BFC70
-	void ProcessInput(int *action, SGamepadState **pad);  // 0x000C1102
+	// Draws even when closed. (this in edi)
+	HRESULT Render();                                     // 0x000BFC70
+	// A sets the clock. (this in eax)
+	HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x000C1102
 
-	BYTE m_unknown00[0x0C];
+	enum
+	{
+		SPINNER_HOUR = 3,
+		SPINNER_MINUTE = 4,
+		SPINNER_AMPM = 5,
+	};
+
+	CXBFont *m_pFont;                                     // +0x00 MainFont, else Init's font
+	CXBFont *m_pButtonFont;                               // +0x04 XboxDings
+	BOOL m_bInitialized;                                  // +0x08
 	BOOL m_bOpen;                                         // +0x0C
-	BYTE m_unknown10[0x2A4 - 0x10];
+	CUpDown m_spinners[6];                                // +0x10
+	int m_nMonthSpinner;                                  // +0x208 which of 0-2 has the month,
+	int m_nDaySpinner;                                    // +0x20C the day
+	int m_nYearSpinner;                                   // +0x210 and the year
+	wchar_t m_szDateSeparator[2];                         // +0x214 "/" or "."
+	// The x of spinner 0, separator 0, spinner 1, ... separator 4, spinner 5.
+	float m_fPositions[11];                               // +0x218
+	int m_nFocus;                                         // +0x244
+	CSound *m_pSoundMove;                                 // +0x248 "Scroll"
+	CSound *m_pSoundAccept;                               // +0x24C "Select"
+	CSound *m_pSoundBack;                                 // +0x250 "Back"
+	wchar_t m_szTime[30];                                 // +0x254 "January 1, 2004  12:00 AM"
+	float m_fY;                                           // +0x290
+	float m_fX;                                           // +0x294
+	float m_fWidth;                                       // +0x298
+	float m_fHeight;                                      // +0x29C
+	DWORD m_unknown2A0;                                   // +0x2A0 unused
 };
 
 // The settings pages' IP address pop-up: four CUpDown spinners (0-255).

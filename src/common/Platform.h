@@ -127,6 +127,7 @@ uintptr_t _beginthreadex(void *security, unsigned stackSize, unsigned (__stdcall
 int stricmp(const char *a, const char *b);
 int _wcsicmp(const wchar_t *a, const wchar_t *b);
 char *_strdup(const char *s);
+int _wtoi(const wchar_t *s);
 long _wtol(const wchar_t *s);
 double _wtof(const wchar_t *s);
 int WideCharToMultiByte(UINT codePage, DWORD flags, const wchar_t *wide, int wideLength, char *multiByte,

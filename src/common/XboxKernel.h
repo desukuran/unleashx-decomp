@@ -36,6 +36,16 @@ struct MEMORYSTATUS
 
 void GlobalMemoryStatus(MEMORYSTATUS *status);
 HANDLE XFindFirstNicknameW(BOOL titleNicknamesOnly, wchar_t *nickname, unsigned size);
+// XGetLanguage values (XDK)
+#define XC_LANGUAGE_ENGLISH 1
+#define XC_LANGUAGE_JAPANESE 2
+#define XC_LANGUAGE_GERMAN 3
+#define XC_LANGUAGE_FRENCH 4
+#define XC_LANGUAGE_SPANISH 5
+#define XC_LANGUAGE_ITALIAN 6
+#define XC_LANGUAGE_KOREAN 7
+#define XC_LANGUAGE_TCHINESE 8
+#define XC_LANGUAGE_PORTUGUESE 9
 DWORD XGetLanguage();
 BOOL XSetNicknameW(const wchar_t *nickname, BOOL preserveCase);
 BOOL SystemTimeToFileTime(const SYSTEMTIME *systemTime, FILETIME *fileTime);
