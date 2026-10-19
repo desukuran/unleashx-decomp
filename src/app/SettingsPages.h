@@ -6,6 +6,7 @@
 // is closed, or the base class used the input), S_OK otherwise.
 #pragma once
 
+#include "../xml/XmlDocument.h"
 #include "SettingsBase.h"
 
 // Video Settings. 0xBC bytes, vtable 0x0025692C.
@@ -184,4 +185,50 @@ public:
 	virtual BOOL IsOpen();                                    // 0x0002DE49 the editor's flag
 
 	CScreenAdjuster m_adjuster;     // +0xB8
+};
+
+class CInternetSession;
+
+// Live Update: checks <server>Version.xml for a newer build, downloads it
+// (a RAR with its signature removed), unpacks it next to UnleashX and
+// launches UXUpdate.xbe to finish. 0x214 bytes, vtable 0x002568EC.
+class CLiveUpdate : public CSettingsBase
+{
+public:
+	enum
+	{
+		ITEM_AUTO_CHECK,
+		ITEM_CHECK,             // check for a release
+		ITEM_CHECK_WIP,         // check for a work-in-progress build
+		ITEM_SERVER,
+		ITEM_SAVE_HEADER,
+		ITEM_SAVE,
+		ITEM_RESET,
+		ITEM_EXIT,
+	};
+
+	CLiveUpdate();                                            // 0x000C1C87
+	virtual ~CLiveUpdate();                                   // 0x000C1C39
+	virtual HRESULT Init(CXBFont *font);                      // 0x000C422E
+	virtual HRESULT HandleInput(int *action, SGamepadState **pad);   // 0x000D4F97
+	// Also runs the check/download/install steps.
+	virtual HRESULT Render();                                 // 0x000D65CD
+	virtual void Reset();                                     // 0x000C1C20
+
+	BOOL Save();                                              // 0x000CA280
+	// Unpacks the download (thread, param is the page). Returns 0 when
+	// UXUpdate.xbe was unpacked.
+	static unsigned __stdcall InstallThread(void *param);      // 0x000D5EF9
+
+	CInternetSession *m_pSession;   // +0xB8
+	BOOL m_bDownloading;            // +0xBC the update itself (not Version.xml)
+	BOOL m_bAsked;                  // +0xC0 "download this version?" was shown
+	BOOL m_bBusy;                   // +0xC4 a check or download is running
+	BOOL m_bWIP;                    // +0xC8 the WIP line was chosen
+	BOOL m_bWIPAlternate;           // +0xCC never set: would read <WIP_A>
+	BOOL m_bUpdateAvailable;        // +0xD0
+	BOOL m_bUpdateReady;            // +0xD4 unpacked; OK launches UXUpdate.xbe
+	std::string m_strServer;        // +0xD8 ends in '/'
+	CXmlDocument m_versionDoc;      // +0xF4 Version.xml
+	CXmlElement *m_pMirror;         // +0x210 the <URL> being tried after a 404
 };

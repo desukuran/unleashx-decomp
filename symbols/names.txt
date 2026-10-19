@@ -1015,3 +1015,15 @@
 000112d9 CFileBrowser::GetSelectedPath
 000202ee WStringToString
 000ca63b CQuickLaunch::Save
+000ca280 CLiveUpdate::Save
+000d5ef9 CLiveUpdate::InstallThread
+0026c248 g_strUpdateMD5
+0026cdbc s_hInstallThread
+000d92ea CInternetSession::Cancel
+000d99f7 CInternetSession::DrawProgress
+0009e6db HexToBytes
+000a4c4c GetPathFileName
+000a648c LaunchXbeWithData
+00078582 urarlib_list
+00078811 urarlib_get
+0007850e urarlib_freelist

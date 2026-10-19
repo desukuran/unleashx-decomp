@@ -151,3 +151,5 @@ void AddRecentItem(const char *path, const char *name, int region);   // 0x000E1
 // Shows the loading screen and starts path (an XBE); returns only on
 // failure. region: the game's region (-1 = read it from the XBE).
 BOOL LaunchXbe(const char *path, const char *name, int region, const char *args);   // 0x000E4691
+// Maps D: to the XBE's folder and launches it with launchData. TODO: decompile
+DWORD LaunchXbeWithData(const char *path, LAUNCH_DATA *launchData);               // 0x000A648C

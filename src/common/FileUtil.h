@@ -33,3 +33,7 @@ BOOL IsFatxName(const char *name);                                    // 0x0009F
 BOOL MakeFatxPath(const char *path, std::string &out);                // 0x000A4630
 // Per-title persistent folder for name (flags as XapiMapLetterToDirectory). TODO: verify
 std::string GetPersistentDataPath(const wchar_t *name, unsigned int flags);   // 0x000A6D44 TODO: decompile
+
+// The file name part of path (after the last '\\'); "" if requireExtension
+// and the path has no '.'.
+std::string GetPathFileName(const char *path, BOOL requireExtension);   // 0x000A4C4C TODO: decompile

@@ -516,6 +516,11 @@ int _wcsicmp(const wchar_t *a, const wchar_t *b)
 	return wcscasecmp(a, b);
 }
 
+char *_strdup(const char *s)
+{
+	return strdup(s);
+}
+
 long _wtol(const wchar_t *s)
 {
 	return wcstol(s, NULL, 10);

@@ -63,3 +63,6 @@ BOOL IsFalseString(const char *s);
 void StrUtf8ToWide(const char *src, wchar_t *dst, unsigned int size);
 // Wide to narrow string.                                          (0x00020B69)
 std::string StrFromWide(const wchar_t *s);
+
+// "0A1B..." to bytes; 1 if the length is odd. The original takes hex in edi.
+int HexToBytes(const char *hex, BYTE *out);                       // 0x0009E6DB TODO: decompile
