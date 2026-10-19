@@ -27,6 +27,6 @@ struct SXbeInfo
 	BYTE unknown20[0x54];      // +0x20
 	DWORD gameRegion;          // +0x74 certificate game region flags
 };
-BOOL ReadXbeInfo(const char *xbePath, SXbeInfo *info);             // 0x000A608D TODO: decompile
-std::string GetXbeTitleName(const char *xbePath);                  // 0x000A5F49 TODO: decompile
+BOOL ReadXbeInfo(const char *xbePath, SXbeInfo *info);             // 0x000A608D (Xbe.cpp)
+std::string GetXbeTitleName(const char *xbePath);                  // 0x000A5F49 (Xbe.cpp)
 BOOL ExtractXbeTitleImage(const char *xbePath, const char *outFile);   // 0x000A4D10 TODO: decompile

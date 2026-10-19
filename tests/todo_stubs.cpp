@@ -19,7 +19,6 @@ void InitMemoryUnitTable() {}
 HRESULT GetUtilityDriveDevice(char *) { return E_FAIL; }
 void EnterFileLock() {}
 void LeaveFileLock() {}
-BOOL ReadXbeInfo(const char *, SXbeInfo *) { return FALSE; }
 BOOL ExtractXbeTitleImage(const char *, const char *) { return FALSE; }
 HRESULT FormatDrive(char) { return E_FAIL; }
 BOOL CreateDirectoryTree(const char *) { return FALSE; }
@@ -27,7 +26,6 @@ BOOL WriteTextFile(const char *path, const char *, BOOL) { printf("[stub] WriteT
 std::string GetPathDirectory(const char *) { return std::string(); }
 void MakeFatxPath(const char *path, std::string &out) { out = path; }
 std::string GetPersistentDataPath(const wchar_t *, unsigned int) { return std::string(); }
-std::string GetXbeTitleName(const char *) { return std::string(); }
 
 // SystemInfo.h (Hardware.cpp is Xbox only)
 std::string GetFlashChipName(BOOL) { return "Unknown"; }

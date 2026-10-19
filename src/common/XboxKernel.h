@@ -153,8 +153,10 @@ typedef struct _ATA_PASS_THROUGH
 #define GENERIC_READ 0x80000000
 #endif
 #define SYNCHRONIZE 0x00100000
+#ifndef FILE_SHARE_READ
 #define FILE_SHARE_READ 0x00000001
 #define FILE_SHARE_WRITE 0x00000002
+#endif
 #define FILE_OPEN 0x00000001
 #define FILE_SYNCHRONOUS_IO_NONALERT 0x00000020
 BOOL DeviceIoControl(HANDLE device, DWORD code, void *in, DWORD inSize, void *out, DWORD outSize, DWORD *returned,

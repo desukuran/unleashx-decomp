@@ -628,3 +628,12 @@
 0010986f CMenuItemEditor::Edit
 000366a8 RemoveDirectoryA
 0003627a ResumeThread
+000e2d80 AddXbeToFolder
+00276240 g_bItemCacheChanged
+0002a913 InsertChildElement
+0002a7a9 CObList::AddHead
+0002a7d3 CObList::InsertBefore
+000357a4 GetFileInformationByHandle
+0003785e FindFirstFileA
+0003796b FindNextFileA
+00035488 WriteFile

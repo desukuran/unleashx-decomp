@@ -127,12 +127,31 @@ BOOL MoveFileA(LPCSTR existingFileName, LPCSTR newFileName);
 #endif
 #define GENERIC_WRITE 0x40000000
 #define OPEN_EXISTING 3
+#ifndef FILE_SHARE_READ
+#define FILE_SHARE_READ 0x00000001
+#define FILE_SHARE_WRITE 0x00000002
+#endif
 #define FILE_BEGIN 0
 HANDLE CreateFileA(LPCSTR fileName, DWORD access, DWORD shareMode, void *security, DWORD creationDisposition,
                    DWORD flags, HANDLE templateFile);
 BOOL ReadFile(HANDLE file, void *buffer, DWORD size, DWORD *read, void *overlapped);
 DWORD SetFilePointer(HANDLE file, LONG distance, LONG *distanceHigh, DWORD moveMethod);
 BOOL RemoveDirectoryA(LPCSTR path);
+BOOL WriteFile(HANDLE file, const void *buffer, DWORD size, DWORD *written, void *overlapped);
+struct BY_HANDLE_FILE_INFORMATION
+{
+	DWORD dwFileAttributes;
+	FILETIME ftCreationTime;
+	FILETIME ftLastAccessTime;
+	FILETIME ftLastWriteTime;
+	DWORD dwVolumeSerialNumber;
+	DWORD nFileSizeHigh;
+	DWORD nFileSizeLow;
+	DWORD nNumberOfLinks;
+	DWORD nFileIndexHigh;
+	DWORD nFileIndexLow;
+};
+BOOL GetFileInformationByHandle(HANDLE file, BY_HANDLE_FILE_INFORMATION *info);
 #define CREATE_SUSPENDED 0x00000004
 DWORD ResumeThread(HANDLE thread);
 void _endthreadex(unsigned int code);

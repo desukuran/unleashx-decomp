@@ -6,22 +6,22 @@ CXXFLAGS ?= -std=c++11 -Wall -Wextra -O1 -g
 COMMON := src/common/StrUtil.cpp src/common/ObList.cpp src/common/PlatformHost.cpp src/common/FileUtil.cpp
 XML := src/xml/XmlDocument.cpp src/xml/XmlUtil.cpp
 SETTINGS := src/settings/AppSettings.cpp src/settings/ConfigLoader.cpp
-SYSTEM := src/system/Drives.cpp src/system/Dvd.cpp src/system/SystemInfo.cpp
+SYSTEM := src/system/Drives.cpp src/system/Dvd.cpp src/system/SystemInfo.cpp src/system/Xbe.cpp
 NET := src/net/Network.cpp src/net/XNetHost.cpp
 SKIN := src/skin/Skin.cpp src/skin/SkinText.cpp src/skin/SkinParser.cpp src/skin/SkinColors.cpp src/skin/SkinDefaults.cpp
-UI := src/ui/Language.cpp
+UI := src/ui/Language.cpp src/ui/MenuScan.cpp
 
 # Everything above, plus stand-ins for what isn't decompiled yet.
 LIBS := $(COMMON) $(XML) $(SETTINGS) $(SYSTEM) $(NET) $(SKIN) $(UI)
 STUBS := tests/stubs.cpp tests/todo_stubs.cpp tests/skin_stubs.cpp
 HEADERS := $(wildcard src/*/*.h) src/ui/StringTable.inc
 
-TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test
+TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test build/xbe_test build/menuscan_test
 
 # Syntax-checked but not linked: hardware access, or too much of what they
 # call isn't decompiled yet.
 XBOX_ONLY := src/system/Hardware.cpp src/system/SystemControl.cpp src/skin/SkinLoader.cpp \
-	src/app/Main.cpp src/app/MenuActions.cpp src/ui/MenuItem.cpp src/ui/Menu.cpp src/ui/MenuScan.cpp
+	src/app/Main.cpp src/app/MenuActions.cpp src/ui/MenuItem.cpp src/ui/Menu.cpp
 
 all: $(TESTS) check
 
@@ -41,6 +41,12 @@ test: $(TESTS)
 	build/skin_test build/skin
 	build/language_test UnleashX_0_39_0528A/French.xml
 	build/skintext_test
+	build/xbe_test
+	rm -rf build/testroot/E/Games && mkdir -p build/testroot/E/Games/A build/testroot/E/Games/B
+	cp UnleashX_0_39_0528A/Default.xbe build/testroot/E/Games/A/default.xbe
+	cp UnleashX_0_39_0528A/Default.xbe build/testroot/E/Games/B/default.xbe
+	touch build/testroot/E/Games/B/icon.png
+	UNLEASHX_ROOT=build/testroot build/menuscan_test > build/menuscan.log || (cat build/menuscan.log; false)
 	@echo ok
 
 .PHONY: all test check
