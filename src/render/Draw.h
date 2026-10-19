@@ -28,14 +28,14 @@ void DimScreen(float alpha);                                                 // 
 // Dialog frame: a box with cut corners.
 void DrawBevelBox(float x, float y, float width, float height, D3DCOLOR borderColor, D3DCOLOR fillColor,
                   float alpha, DWORD lineWidth);                             // 0x000A1BBF
-// A dialog window: the outer box, and an inner panel between the caption
-// (captionHeight) and the button row (footerHeight). TODO: decompile; what
-// inset does exactly. The original takes width in xmm7.
-void DrawWindowFrame(float x, float y, float width, float height, float inset, float captionHeight,
+// A dialog window: a tab-shaped outer box and an inner panel between the
+// caption (captionHeight) and the button row (footerHeight), margin in
+// from the sides. The original takes width in xmm7.
+void DrawWindowFrame(float x, float y, float width, float height, float margin, float captionHeight,
                      float footerHeight, D3DCOLOR borderColor, D3DCOLOR fillColor, D3DCOLOR innerBorderColor,
                      D3DCOLOR innerFillColor, DWORD borderWidth, DWORD innerBorderWidth);   // 0x000A10D2
-// A message box button's box. TODO: decompile. The original takes x in
-// xmm0.
+// A message box button: an outlined octagon with a filled one inside. The
+// original takes x in xmm0.
 void DrawButtonBox(float x, float y, float width, float height, D3DCOLOR borderColor, D3DCOLOR fillColor,
                    DWORD lineWidth);                                         // 0x000A1518
 // direction: 1 up, 2 down, 3 left, 4 right
@@ -44,9 +44,11 @@ HRESULT DrawTriangle(float x, float y, float width, float height, int direction,
 HRESULT DrawGradientRect(float x, float y, float width, float height, D3DCOLOR color1, D3DCOLOR color2,
                          BOOL vertical, D3DCOLOR frameColor);                // 0x000A1F08
 // A texture stretched over the rectangle (a zero size uses the texture's),
-// with alpha 0..1. The last three arguments rotate/scale it. TODO: decompile
+// with alpha 0..1, rotated by angle degrees and scaled by scale[2] (NULL =
+// 1, 1) around center (relative to x, y and scaled to the screen in place;
+// NULL = the middle).
 HRESULT DrawTexture(IDirect3DTexture8 *texture, float x, float y, float width, float height, float alpha,
-                    const float *origin, float unknown, const float *transform);   // 0x000A246F
+                    float *center, float angle, const float *scale);   // 0x000A246F
 // A bar filled to percent (0-100), fill1 to fill2. TODO: decompile
 HRESULT DrawProgressBar(float x, float y, float width, float height, float percent, D3DCOLOR borderColor,
                         D3DCOLOR backColor, D3DCOLOR fill1, D3DCOLOR fill2, BYTE gradient);   // 0x000A2897

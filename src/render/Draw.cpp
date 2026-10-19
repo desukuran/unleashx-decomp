@@ -168,6 +168,106 @@ void DrawBevelBox(float x, float y, float width, float height, D3DCOLOR borderCo
 	DrawPolygon(v, 8, fillColor, borderColor, alpha, lineWidth);
 }
 
+static void SetVertexRhw(SScreenVertex *v, float x, float y)
+{
+	v->x = x;
+	v->y = y;
+	v->z = 0.0f;
+	v->rhw = 1.0f;
+}
+
+// 0x000A10D2 (width arrives in xmm7)
+// A dialog window: the outer shape is a tab across the top 85% of the width
+// that slopes down (by margin + captionHeight) to the body, with cut
+// corners and a notch sticking out 5 pixels on the left; inside it, a bevel
+// box (3-pixel cuts) between the caption and the button row.
+void DrawWindowFrame(float x, float y, float width, float height, float margin, float captionHeight,
+                     float footerHeight, D3DCOLOR borderColor, D3DCOLOR fillColor, D3DCOLOR innerBorderColor,
+                     D3DCOLOR innerFillColor, DWORD borderWidth, DWORD innerBorderWidth)
+{
+	const float cut = 5.0f;
+	float right = x + width;
+	float bottom = y + height;
+	if (borderWidth < 1)
+		borderWidth = 1;
+
+	float left = x - 0.5f;
+	float top = y - 0.5f;
+	float tabRight = right - width * 0.15f - 0.5f;
+	float bodyTop = top + margin + captionHeight;
+	float edgeRight = right - 0.5f;
+	float edgeBottom = bottom - 0.5f;
+	float notch = height * 0.25f + y - 0.5f;
+	SScreenVertex v[12];
+	SetVertexRhw(&v[0], left, top);
+	SetVertexRhw(&v[1], tabRight, top);
+	SetVertexRhw(&v[2], tabRight + margin + captionHeight, bodyTop);
+	SetVertexRhw(&v[3], edgeRight - cut, bodyTop);
+	SetVertexRhw(&v[4], edgeRight, bodyTop + cut);
+	SetVertexRhw(&v[5], edgeRight, edgeBottom - cut);
+	SetVertexRhw(&v[6], edgeRight - cut, edgeBottom);
+	SetVertexRhw(&v[7], left + cut, edgeBottom);
+	SetVertexRhw(&v[8], left, edgeBottom - cut);
+	SetVertexRhw(&v[9], left, notch);
+	SetVertexRhw(&v[10], left - cut, notch - cut);
+	SetVertexRhw(&v[11], left - cut, top + cut);
+	DrawPolygon(v, 12, fillColor, borderColor, 1.0f, borderWidth);
+
+	if (innerBorderWidth < 1)
+		innerBorderWidth = 1;
+	const float innerCut = 3.0f;
+	float innerLeft = x + margin - 0.5f;
+	float innerRight = right - margin - 0.5f;
+	float innerTop = margin * 2.0f + y + captionHeight - 0.5f;
+	float innerBottom = bottom - (margin + footerHeight) - 0.5f;
+	SScreenVertex inner[8];
+	SetVertexRhw(&inner[0], innerLeft + innerCut, innerTop);
+	SetVertexRhw(&inner[1], innerRight - innerCut, innerTop);
+	SetVertexRhw(&inner[2], innerRight, innerTop + innerCut);
+	SetVertexRhw(&inner[3], innerRight, innerBottom - innerCut);
+	SetVertexRhw(&inner[4], innerRight - innerCut, innerBottom);
+	SetVertexRhw(&inner[5], innerLeft + innerCut, innerBottom);
+	SetVertexRhw(&inner[6], innerLeft, innerBottom - innerCut);
+	SetVertexRhw(&inner[7], innerLeft, innerTop + innerCut);
+	DrawPolygon(inner, 8, innerFillColor, innerBorderColor, 1.0f, innerBorderWidth);
+}
+
+// 0x000A1518 (x arrives in xmm0)
+// A message box button: an outlined octagon, and a filled one 4 pixels
+// inside it (cuts of 3 and 2 pixels).
+void DrawButtonBox(float x, float y, float width, float height, D3DCOLOR borderColor, D3DCOLOR fillColor,
+                   DWORD lineWidth)
+{
+	float left = x;
+	float top = y;
+	float right = x + width;
+	float bottom = y + height;
+	float cut = 3.0f;
+	for (int i = 0; i < 2; i++)
+	{
+		float inset = (float)(i * 4);
+		left += inset;
+		top += inset;
+		right -= inset;
+		bottom -= inset;
+		cut -= (float)i;
+		float l = left - 0.5f;
+		float t = top - 0.5f;
+		float r = right - 0.5f;
+		float b = bottom - 0.5f;
+		SScreenVertex v[8];
+		SetVertexRhw(&v[0], l + cut, t);
+		SetVertexRhw(&v[1], r - cut, t);
+		SetVertexRhw(&v[2], r, t + cut);
+		SetVertexRhw(&v[3], r, b - cut);
+		SetVertexRhw(&v[4], r - cut, b);
+		SetVertexRhw(&v[5], l + cut, b);
+		SetVertexRhw(&v[6], l, b - cut);
+		SetVertexRhw(&v[7], l, t + cut);
+		DrawPolygon(v, 8, i == 1 ? fillColor : 0, borderColor, 1.0f, lineWidth);
+	}
+}
+
 // 0x000A0D78
 // A triangle filling the box, pointing up (1), down (2), left (3) or right
 // (4). Quirk: any other direction draws whatever is on the stack.
@@ -294,5 +394,120 @@ HRESULT DrawBusyBox(CXBFont *font, const wchar_t *text)
 	             g_colorScheme.DIALOG_INNER_BORDERCOLOR, g_colorScheme.DIALOG_INNER_BACKCOLOR, 1.0f, 2);
 	font->DrawText(centerX - textWidth * 0.5f, centerY, g_colorScheme.CAPTION_TEXTCOLOR, line, XBFONT_CENTER_Y,
 	               0.0f);
+	return S_OK;
+}
+
+// A textured, colored screen vertex (D3DFVF_XYZRHW | D3DFVF_DIFFUSE |
+// D3DFVF_TEX1).
+struct STextureVertex
+{
+	float x, y, z, rhw;
+	D3DCOLOR color;
+	float u, v;
+};
+
+static void SetTextureVertex(STextureVertex *v, float x, float y, D3DCOLOR color, float u, float w)
+{
+	v->x = x;
+	v->y = y;
+	v->z = 1.0f;
+	v->rhw = 1.0f;
+	v->color = color;
+	v->u = u;
+	v->v = w;
+}
+
+// 0x000A22AC (center in ecx)
+// Scales the four vertices by scale and rotates them by angle radians
+// around center. The original builds the D3DX matrices (translate, scale,
+// rotate about Z, translate back: 0x000A17FC) and multiplies the vertices
+// as a 4x4 matrix. TODO: verify the multiplication order
+static void TransformQuad(STextureVertex *v, const float *center, const float *scale, float angle)
+{
+	float c = (float)cos(angle);
+	float s = (float)sin(angle);
+	for (int i = 0; i < 4; i++)
+	{
+		float x = (v[i].x - center[0]) * scale[0];
+		float y = (v[i].y - center[1]) * scale[1];
+		v[i].x = x * c - y * s + center[0];
+		v[i].y = x * s + y * c + center[1];
+	}
+}
+
+// 0x000A246F
+HRESULT DrawTexture(IDirect3DTexture8 *texture, float x, float y, float width, float height, float alpha,
+                    float *center, float angle, const float *scale)
+{
+	if (texture == NULL)
+		return E_FAIL;
+	if (width == 0.0f || height == 0.0f)
+	{
+		// Quirk: both take the texture's width.
+		D3DSURFACE_DESC desc;
+		texture->GetLevelDesc(0, &desc);
+		if (width == 0.0f)
+			width = (float)desc.Width;
+		if (height == 0.0f)
+			height = (float)desc.Width;
+	}
+
+	// Snapped to whole pixels.
+	float left = (float)floor(x);
+	float top = (float)floor(y);
+	width = (float)floor(x - left + width);
+	height = (float)floor(y - top + height);
+	float right = left + width;
+	float bottom = top + height;
+	D3DCOLOR color = ((DWORD)(int)(alpha * 255.0f) << 24) | 0x00FFFFFF;
+	STextureVertex v[4];
+	SetTextureVertex(&v[0], left - 0.5f, top - 0.5f, color, 0.0f, 0.0f);
+	SetTextureVertex(&v[1], left - 0.5f, bottom - 0.5f, color, 0.0f, 1.0f);
+	SetTextureVertex(&v[2], right - 0.5f, bottom - 0.5f, color, 1.0f, 1.0f);
+	SetTextureVertex(&v[3], right - 0.5f, top - 0.5f, color, 1.0f, 0.0f);
+
+	if (angle != 0.0f || center != NULL || scale != NULL)
+	{
+		float pivot[2];
+		if (center != NULL)
+		{
+			ScaleToScreen(&center[0], NULL, &center[1], NULL, FALSE);
+			pivot[0] = center[0] + left;
+			pivot[1] = center[1] + top;
+		}
+		else
+		{
+			pivot[0] = width * 0.5f + left;
+			pivot[1] = height * 0.5f + top;
+		}
+		float factors[2] = {1.0f, 1.0f};
+		if (scale != NULL)
+		{
+			factors[0] = scale[0];
+			factors[1] = scale[1];
+		}
+		TransformQuad(v, pivot, factors, angle * 0.017453292f);
+	}
+
+	g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+	g_pd3dDevice->SetTexture(0, texture);
+	// (The original writes these into D3D's texture stage state cache.)
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
+	g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
+	g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pd3dDevice->DrawVerticesUP(D3DPT_QUADLIST, 4, v, sizeof(STextureVertex));
+	g_pd3dDevice->SetTexture(0, NULL);
 	return S_OK;
 }

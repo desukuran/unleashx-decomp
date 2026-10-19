@@ -1123,3 +1123,5 @@
 0027215c g_nPointerX
 00272160 g_nPointerY
 0027a374 s_fSlide
+000a22ac TransformQuad
+000a17fc BuildQuadTransform
