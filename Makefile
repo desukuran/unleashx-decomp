@@ -18,8 +18,10 @@ HEADERS := $(wildcard src/*/*.h) src/ui/StringTable.inc
 
 TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test
 
-# Xbox-only sources (hardware access): syntax-checked, not linked.
-XBOX_ONLY := src/system/Hardware.cpp src/system/SystemControl.cpp src/skin/SkinLoader.cpp
+# Syntax-checked but not linked: hardware access, or too much of what they
+# call isn't decompiled yet.
+XBOX_ONLY := src/system/Hardware.cpp src/system/SystemControl.cpp src/skin/SkinLoader.cpp \
+	src/app/Main.cpp src/app/MenuActions.cpp
 
 all: $(TESTS) check
 

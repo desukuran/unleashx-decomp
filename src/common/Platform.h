@@ -119,6 +119,7 @@ BOOL CloseHandle(HANDLE handle);
 DWORD GetTickCount();
 BOOL DeleteFileA(LPCSTR fileName);
 BOOL CopyFileA(LPCSTR existingFileName, LPCSTR newFileName, BOOL failIfExists);
+BOOL MoveFileA(LPCSTR existingFileName, LPCSTR newFileName);
 void _endthreadex(unsigned int code);
 DWORD XGetLaunchInfo(DWORD *launchDataType, PLAUNCH_DATA launchData);
 DWORD XGetVideoFlags();

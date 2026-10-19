@@ -43,6 +43,23 @@ BOOL LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime);
 void GetSystemTime(SYSTEMTIME *systemTime);
 void GetLocalTime(SYSTEMTIME *systemTime);
 DWORD XLaunchNewImageA(LPCSTR imagePath, PLAUNCH_DATA launchData);
+
+struct EXCEPTION_RECORD
+{
+	DWORD ExceptionCode;
+	DWORD ExceptionFlags;
+	EXCEPTION_RECORD *ExceptionRecord;
+	void *ExceptionAddress;
+	DWORD NumberParameters;
+	ULONG ExceptionInformation[15];
+};
+struct EXCEPTION_POINTERS
+{
+	EXCEPTION_RECORD *ExceptionRecord;
+	void *ContextRecord;
+};
+typedef LONG(__stdcall *LPTOP_LEVEL_EXCEPTION_FILTER)(EXCEPTION_POINTERS *exception);
+LPTOP_LEVEL_EXCEPTION_FILTER SetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER filter);
 #endif
 
 extern "C" {
@@ -97,6 +114,16 @@ void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime);
 NTSTATUS __stdcall HalReadSMBusValue(UCHAR address, UCHAR command, BOOLEAN readWord, ULONG *value);
 NTSTATUS __stdcall HalWriteSMBusValue(UCHAR address, UCHAR command, BOOLEAN writeWord, ULONG value);
 NTSTATUS __stdcall NtSetSystemTime(LARGE_INTEGER *newTime, LARGE_INTEGER *previousTime);
+typedef enum _FIRMWARE_REENTRY
+{
+	ReturnFirmwareHalt,
+	ReturnFirmwareReboot,
+	ReturnFirmwareQuickReboot,
+	ReturnFirmwareHard,
+	ReturnFirmwareFatal,
+	ReturnFirmwareAll
+} FIRMWARE_REENTRY;
+void __stdcall HalReturnToFirmware(FIRMWARE_REENTRY routine);
 
 }
 

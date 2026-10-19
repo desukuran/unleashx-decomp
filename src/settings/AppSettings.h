@@ -11,6 +11,8 @@
 
 #include "../common/Platform.h"
 
+struct IDirect3DTexture8;
+
 // Screen position/size adjustment for one video mode. 0x18 bytes
 struct SScreenAdjust
 {
@@ -240,7 +242,7 @@ public:
 	wchar_t m_szNewsfeedSeparator[5];        // +0x0CAC
 	BYTE m_unknown0CB6[0x514];               // +0x0CB6
 	int m_unknown11CC;                       // +0x11CC
-	int m_unknown11D0;                       // +0x11D0
+	IDirect3DTexture8 *m_pLoadingIcon;       // +0x11D0 loading screen image of the launched item
 	std::string m_strUnknown11D4;            // +0x11D4
 	int m_unknown11F0;                       // +0x11F0 1
 	wchar_t m_szDiscTitle[0x80];             // +0x11F4 from D:\DiscTitle.txt

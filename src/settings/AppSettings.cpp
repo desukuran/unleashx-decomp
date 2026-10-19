@@ -82,7 +82,7 @@ CAppSettings::CAppSettings()
 	m_ftp.m_strPassword = "xbox";
 
 	m_unknown11CC = 0;
-	m_unknown11D0 = 0;
+	m_pLoadingIcon = NULL;
 	memset(m_unknown0CB6, 0, sizeof(m_unknown0CB6));
 	m_nDisplayWidth = 640;
 	m_nDisplayHeight = 480;

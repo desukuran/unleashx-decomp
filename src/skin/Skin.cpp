@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cwchar>
 
+#include "../common/StrUtil.h"
 #include "../media/WMVideoPlayer.h"
 #include "../render/Fonts.h"
 #include "../render/Texture.h"
@@ -230,4 +231,19 @@ HRESULT CSkin::PollLoad(BOOL *busy)
 	if (m_pBackgroundVideo != NULL)
 		m_pBackgroundVideo->Update(busy, 0);
 	return S_OK;
+}
+
+// 0x000F9B25
+IDirect3DTexture8 *CSkin::GetLoadingBackground()
+{
+	if (m_pLoadingBackground == NULL && m_strLoadingBackground.size() != 0)
+	{
+		if (StrCmpNoCase(m_strLoadingBackground, "GameIcon") == 0)
+			return NULL;
+		if (!LoadTextureFromFile(m_strLoadingBackground.c_str(), g_pd3dDevice, &m_pLoadingBackground, 1, 1, NULL))
+			m_pLoadingBackground = NULL;
+		// Loaded once: the name is cleared either way.
+		m_strLoadingBackground.clear();
+	}
+	return m_pLoadingBackground;
 }

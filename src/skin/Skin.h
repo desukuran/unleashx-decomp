@@ -224,6 +224,9 @@ public:
 	void Free();                                      // 0x000F9372
 	BOOL Parse(CXmlDocument *doc);                    // 0x000FD644
 	BOOL Load(const char *path);                      // 0x000FFE1A
+	// The <LoadingScreen> background, loaded on first use; NULL for
+	// "GameIcon" (the launched item's icon is shown instead).
+	IDirect3DTexture8 *GetLoadingBackground();        // 0x000F9B25
 	void BeginLoad(const char *path);                 // 0x00101743
 	void SetDefaultMainLayout();                      // 0x000FCEA6 TODO: decompile
 	void SetDefaultMusicPlayerLayout();               // 0x000FA219 TODO: decompile

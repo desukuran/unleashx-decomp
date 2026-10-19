@@ -19,12 +19,13 @@ HRESULT GetUtilityDriveDevice(char *devicePath);    // 0x0009DE6C TODO: decompil
 void EnterFileLock();                               // 0x00018FF7 TODO: decompile
 void LeaveFileLock();                               // 0x0001901A TODO: decompile
 
-// Fields read from an XBE's header/certificate.
+// Fields read from an XBE's header/certificate. 0x78 bytes.
 struct SXbeInfo
 {
-	DWORD titleId;
-	DWORD unknown04;
-	std::string titleName;     // TODO: verify layout (0x000A608D)
+	DWORD titleId;             // +0x00 TODO: verify
+	std::string titleName;     // +0x04
+	BYTE unknown20[0x54];      // +0x20
+	DWORD gameRegion;          // +0x74 certificate game region flags
 };
 BOOL ReadXbeInfo(const char *xbePath, SXbeInfo *info);             // 0x000A608D TODO: decompile
 std::string GetXbeTitleName(const char *xbePath);                  // 0x000A5F49 TODO: decompile
