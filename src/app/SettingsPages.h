@@ -148,3 +148,40 @@ public:
 
 	BOOL Save();                                              // 0x000CA63B
 };
+
+// The screen position editor inside CScreenAdjust: moves and sizes the
+// visible area (CAppSettings::m_viewport) with the d-pad. 0x58 bytes.
+// TODO: decompile (0x001018DC-0x00102514).
+class CScreenAdjuster
+{
+public:
+	CScreenAdjuster();                                        // 0x0010246E (this in ebx)
+	~CScreenAdjuster();                                       // 0x00101F35 (this in esi)
+	// Also finds the "XboxDings" icon font. Returns 0. (this in esi, font
+	// in eax)
+	HRESULT Init(CXBFont *font);                              // 0x00101F0E
+	// Takes the current screen area. (this in eax)
+	void Reset();                                             // 0x001018DC
+	void Render();                                            // 0x001018FC (this in ebx)
+	void HandleInput(int *action, SGamepadState **pad);       // 0x00102165 (this in edx)
+
+	BOOL m_bOpen;                   // +0x00 set by Reset, cleared when the editor closes
+	BYTE m_unknown04[0x58 - 0x04];
+};
+
+// Screen Adjust: a full-screen editor rather than a list. 0x110 bytes,
+// vtable 0x002568AC.
+class CScreenAdjust : public CSettingsBase
+{
+public:
+	CScreenAdjust() {}                                        // 0x000C3A09
+	virtual ~CScreenAdjust();                                 // 0x000C1BB8
+	// Quirk: returns E_FAIL (not S_OK) when already initialized.
+	virtual HRESULT Init(CXBFont *font);                      // 0x000C1B87
+	virtual HRESULT HandleInput(int *action, SGamepadState **pad);   // 0x000C39E6
+	virtual HRESULT Render();                                 // 0x000C05CF
+	virtual void Reset();                                     // 0x0002DE35
+	virtual BOOL IsOpen();                                    // 0x0002DE49 the editor's flag
+
+	CScreenAdjuster m_adjuster;     // +0xB8
+};
