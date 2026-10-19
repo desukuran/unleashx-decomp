@@ -29,6 +29,8 @@ public:
 	// The size of the first length characters (scaled); firstLineOnly
 	// stops at a newline. The original takes this in eax, width in edx
 	// and height in esi.
+	// The whole text's size; either output can be NULL. (height in esi)
+	HRESULT GetTextExtent(const wchar_t *text, float *width, float *height, BOOL firstLineOnly);   // 0x00098FC3 (XDK sample)
 	HRESULT GetTextExtentN(const wchar_t *text, int length, BOOL firstLineOnly, float *width,
 	                       float *height);                             // 0x00098E9E (XDK sample)
 

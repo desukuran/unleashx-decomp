@@ -209,15 +209,15 @@ HRESULT CLiveUpdate::HandleInput(int *action, SGamepadState **pad)
 		m_bKeyboardOpen = !g_virtualKeyboard.IsDone();
 		if (m_bKeyboardOpen)
 			return S_OK;
-		if (g_nKeyboardMode == 0)
+		if (g_virtualKeyboard.m_bCancelled == 0)
 		{
 			wchar_t text[300];
 			wcscpy(text, g_virtualKeyboard.GetText());
 			SetItemValue(&m_items[m_nSelected], text, TRUE);
 		}
-		if (g_nKeyboardOwner != 0)
+		if (g_virtualKeyboard.m_bNumeric != 0)
 			g_virtualKeyboard.Open();
-		g_nKeyboardOwner = 0;
+		g_virtualKeyboard.m_bNumeric = 0;
 		return S_OK;
 	}
 

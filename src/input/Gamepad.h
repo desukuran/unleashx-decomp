@@ -66,9 +66,9 @@ public:
 	int GetRemoteAction();                            // 0x00026340
 
 	XBGAMEPAD *m_pGamepad;            // +0x00 the one in use
-	XBGAMEPAD *m_pFixedGamepad;       // +0x04 if set, always this one (never set)
+	XBGAMEPAD *m_pFixedGamepad;       // +0x04 if set, always this one (Initialize: the merged pad)
 	SIRRemote *m_pRemote;             // +0x08
-	SIRRemote *m_pFixedRemote;        // +0x0C (never set)
+	SIRRemote *m_pFixedRemote;        // +0x0C (Initialize: CUnleashX::m_defaultIR)
 	DWORD m_unknown10;                // +0x10
 	DWORD m_unknown14;                // +0x14
 	CXBStopWatch m_padTimer;          // +0x18 how long a gamepad button has been held

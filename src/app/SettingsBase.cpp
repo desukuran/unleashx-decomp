@@ -409,15 +409,15 @@ void CSettingsBase::ShowFileBrowser(const wchar_t *title, int unknown124, int op
 // 0x000BFFE0
 void CSettingsBase::OpenKeyboard(const wchar_t *title, const wchar_t *text, BOOL password, int maxLength, int owner)
 {
-	g_nKeyboardMaxLength = 64;
+	g_virtualKeyboard.m_nMaxLength = 64;
 	if (maxLength != 0)
-		g_nKeyboardMaxLength = maxLength;
-	if (g_nKeyboardOwner != owner)
+		g_virtualKeyboard.m_nMaxLength = maxLength;
+	if (g_virtualKeyboard.m_bNumeric != owner)
 		g_virtualKeyboard.Open();
-	g_nKeyboardOwner = owner;
+	g_virtualKeyboard.m_bNumeric = owner;
 	g_virtualKeyboard.SetTitle(title);
 	g_virtualKeyboard.Open();
-	g_bKeyboardPassword = password;
+	g_virtualKeyboard.m_bPassword = password;
 	if (text != NULL)
 		g_virtualKeyboard.SetText(text);
 	m_bKeyboardOpen = TRUE;

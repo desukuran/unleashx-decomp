@@ -106,7 +106,7 @@ HRESULT CDateTimeSetting::HandleInput(int *action, SGamepadState **pad)
 		m_bKeyboardOpen = !g_virtualKeyboard.IsDone();
 		if (m_bKeyboardOpen)
 			return S_OK;
-		if (g_nKeyboardMode == 0)
+		if (g_virtualKeyboard.m_bCancelled == 0)
 		{
 			wchar_t text[100];
 			char message[100];
@@ -121,9 +121,9 @@ HRESULT CDateTimeSetting::HandleInput(int *action, SGamepadState **pad)
 				ShowMessage(message, L"Invalid Value", MSGBOX_BUTTONS_OK);
 			}
 		}
-		if (g_nKeyboardOwner != 0)
+		if (g_virtualKeyboard.m_bNumeric != 0)
 			g_virtualKeyboard.Open();
-		g_nKeyboardOwner = 0;
+		g_virtualKeyboard.m_bNumeric = 0;
 		return S_OK;
 	}
 	if (m_bIPEditorOpen)

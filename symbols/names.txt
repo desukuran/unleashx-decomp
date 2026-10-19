@@ -601,8 +601,6 @@
 00277958 g_unlockedItems
 002761f4 g_pItemCache
 00277128 g_bCancelOperation
-0027846c g_bKeyboardPassword
-00278470 g_nKeyboardMaxLength
 0001433e CVirtualKeyboard::SetTitle
 00014302 CVirtualKeyboard::SetText
 001381e0 CSoundEffects::Find
@@ -652,7 +650,6 @@
 00277138 g_szOperationFile
 000a6e7c CountFolder
 0027a5cc g_bKeyboardAccepted
-00278460 g_nKeyboardMode
 000d8404 CDropDown::CDropDown
 000d8169 CDropDown::AddItem
 000d80d2 CDropDown::Create
@@ -1213,9 +1210,7 @@
 000dff17 CUnleashX::BuildGlobePath
 000e0411 CUnleashX::CreateOrbBuffer
 00094645 CXBStopWatch::Resume void f(CXBStopWatch *this@esi)
-000dfd78 CVirtualKeyboard::Create
 0010302b CPassCode::CPassCode CPassCode * f(CPassCode *this@edi)
-00278434 g_pKeyboardIR
 000bdcbe CXipArchive::Open HRESULT f(CXipArchive *this@esi, char *path)
 000bdc0f CXipArchive::Close void f(CXipArchive *this@eax)
 000bdc67 CXipArchive::GetItem HRESULT f(CXipArchive *this@edx, uint index, SXipItem *item)
@@ -1331,3 +1326,37 @@
 0026cbf0 s_fSpinDirection
 0026cbf4 s_fLastSpin
 0026cbf8 s_fSpinStep
+000dfd78 CVirtualKeyboard::Create
+000de5b4 CVirtualKeyboard::CVirtualKeyboard CVirtualKeyboard * f(CVirtualKeyboard *this@edi)
+000dbad8 GetKeyboardString WORD * f(WORD **strings@ecx, uint index@eax)
+000dbe81 GetKeyboardStringIndex WORD * f(uint index@eax)
+000dbaeb KeyboardToLower WORD f(WORD ch@ax)
+000dbb12 KeyboardToUpper WORD f(WORD ch@ax)
+000dbb39 CVirtualKeyboard::ApplyCase WORD f(CVirtualKeyboard *this@eax, int ch)
+000dbb67 CVirtualKeyboard::DrawTextShadow
+000dbbd5 KeyboardHasInput BOOL f(XBGAMEPAD *pad@eax)
+000dbe8c CVirtualKeyboard::SetLanguage void f(CVirtualKeyboard *this@ecx, int language@eax)
+000dbeb2 CVirtualKeyboard::PlayClick void f(CVirtualKeyboard *this@eax)
+000dc05a GetKeyboardGamepad
+000dc0df CVirtualKeyboard::DrawFrame void f(CVirtualKeyboard *this@eax)
+000dc27d CVirtualKeyboard::DrawTextBox void f(CVirtualKeyboard *this@eax)
+000dc3cb CVirtualKeyboard::DrawKey
+000dcd8b CVirtualKeyboard::DrawText
+000dd35e CVirtualKeyboard::RenderKeys void f(CVirtualKeyboard *this@eax)
+000dd605 CVirtualKeyboard::PressKey void f(CVirtualKeyboard *this@ebx, int code)
+000dd83a CVirtualKeyboard::GetPadAction
+000dda78 MakeKeyboardKey
+000ddb0b CVirtualKeyboard::IsKeyDisabled BOOL f(CVirtualKeyboard *this@eax)
+000ddbdd CVirtualKeyboard::RememberColumn void f(CVirtualKeyboard *this@esi)
+000ddc52 CVirtualKeyboard::MoveRight void f(CVirtualKeyboard *this@eax)
+000ddcc9 CVirtualKeyboard::MoveDown void f(CVirtualKeyboard *this@esi)
+000dddf7 CVirtualKeyboard::MoveUp void f(CVirtualKeyboard *this@esi)
+000ddf85 CVirtualKeyboard::PressSelected void f(CVirtualKeyboard *this@esi)
+000ddfcd CVirtualKeyboard::HandleAction void f(CVirtualKeyboard *this@ecx, int *action@eax)
+000de1ea CVirtualKeyboard::HandleKeystroke int f(CVirtualKeyboard *this@eax)
+000de720 CVirtualKeyboard::BuildLayouts
+000985a4 GetKeystroke
+00098fc3 CXBFont::GetTextExtent
+0026c23c s_keyboardLanguages
+0026a69c s_pKeyboardStrings
+0026cc24 s_nKeyboardPort

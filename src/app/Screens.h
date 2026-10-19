@@ -8,6 +8,7 @@
 #include "../common/Platform.h"
 #include "XBApp.h"
 #include "../ui/UpDown.h"
+#include "../ui/VirtualKeyboard.h"
 
 class CXBFontEx;
 class CXBFont;
@@ -451,40 +452,6 @@ private:
 	void Reset(BOOL clear);                               // 0x000AFBFD
 	void AddButton(const wchar_t *text);                  // 0x000B0F05 (this in edi)
 };
-
-// The on-screen keyboard; $KBResult$ in an item's arguments is its last text.
-class CVirtualKeyboard
-{
-public:
-	// Sets it up: fonts, the key texture. TODO: name the other arguments
-	void Create(CXBFont *font, CXBFont *font2, IDirect3DTexture8 *keys, int unknown1, float x, float y,
-	            int unknown2);                            // vtable slot 0, 0x000DFD78
-	std::string GetResult();                              // 0x00014242
-	void SetTitle(const wchar_t *title);                  // 0x0001433E
-	void SetText(const wchar_t *text);                    // 0x00014302
-	// Starts a new input: clears the text and the done state. TODO: verify
-	void Open();                                          // vtable slot 3, 0x000DC9D7
-	void ProcessInput(int *action);                       // vtable slot 1, 0x000DE58D
-	void Render();                                        // vtable slot 2, 0x000DDA5A
-	// The typed text, or "" if cancelled.
-	const wchar_t *GetText();                             // 0x0001421F
-	BOOL IsDone() const;                                  // 0x00014325 OK or cancelled
-};
-extern CVirtualKeyboard g_virtualKeyboard;               // 0x00278328
-extern struct SIRRemote *g_pKeyboardIR;                 // 0x00278434 (g_virtualKeyboard+0x10C) the remote it reads
-extern BOOL g_bKeyboardPassword;                         // 0x0027846C masked input
-extern int g_nKeyboardMaxLength;                         // 0x00278470
-extern BOOL g_bKeyboardAccepted;                         // 0x0027A5CC TODO: verify (also read for the passcode pad)
-// TODO: verify. 0x00278460 is g_virtualKeyboard+0x138: BACK sets it to 1
-// (CUnleashX::FrameMove), GetText() returns "" when it's set, and the
-// settings pages only use the text when it's 0, so it looks like
-// "cancelled" rather than a mode.
-extern int g_nKeyboardMode;                              // 0x00278460
-extern int g_nKeyboardOwner;                             // 0x00278468 who opened it (settings line), 0 = none
-
-// An argument that is "KBResult" becomes the keyboard's text (trimmed);
-// "$KBResult$" inside it is replaced by that text.
-void ApplyKeyboardResult(std::string &arg);
 
 // DVD tray state from the SMC.
 class CTrayMonitor

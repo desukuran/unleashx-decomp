@@ -329,9 +329,9 @@ HRESULT CUnleashX::Initialize()
 
 	MountAllDrives();
 	XSetFileCacheSize(0x100000);
-	// (The input object points at the merged gamepad and remote.)
-	*(XBGAMEPAD **)((BYTE *)&g_gamepadInput + 4) = &m_defaultGamepad;
-	*(SIRRemote **)((BYTE *)&g_gamepadInput + 0xC) = &m_defaultIR;
+	// Input is read from the merged gamepad (all ports) and remote.
+	g_gamepadInput.m_pFixedGamepad = &m_defaultGamepad;
+	g_gamepadInput.m_pFixedRemote = &m_defaultIR;
 	g_pd3dDevice->GetViewport((D3DVIEWPORT8 *)&g_pSettings->m_viewport);
 	g_pSettings->m_nSkinWidth = g_pSettings->m_viewport.Width;
 	g_pSettings->m_nSkinHeight = g_pSettings->m_viewport.Height;
@@ -603,7 +603,7 @@ HRESULT CUnleashX::Initialize()
 		g_textures.Add("Keyboard", key, FALSE);
 	CXBFont *font = &m_fonts[4];
 	g_virtualKeyboard.Create(font, font, key, 0, 0.0f, 0.0f, 0);
-	g_pKeyboardIR = &m_defaultIR;
+	g_virtualKeyboard.m_pIR = &m_defaultIR;
 	m_bPasswordShown = FALSE;
 	if (!g_pSettings->m_bUnlocked)
 	{
@@ -620,7 +620,7 @@ HRESULT CUnleashX::Initialize()
 		{
 			g_virtualKeyboard.SetTitle(L"Enter System Password");
 			g_virtualKeyboard.Open();
-			g_bKeyboardPassword = TRUE;
+			g_virtualKeyboard.m_bPassword = TRUE;
 			m_bPasswordShown = TRUE;
 		}
 	}

@@ -730,8 +730,8 @@ BOOL CMenu::CheckPassword(CXmlElement *item, std::string &password)
 		// Masked keyboard input, up to 50 characters.
 		g_virtualKeyboard.SetTitle(L"Password");
 		g_virtualKeyboard.Open();
-		g_bKeyboardPassword = TRUE;
-		g_nKeyboardMaxLength = 50;
+		g_virtualKeyboard.m_bPassword = TRUE;
+		g_virtualKeyboard.m_nMaxLength = 50;
 		m_bWaitingForKeyboard = TRUE;
 	}
 	else
@@ -840,8 +840,8 @@ BOOL CMenu::RunItem(CXmlElement *item, BOOL isList)
 		text = GetDialogText(item, TRUE);
 		g_virtualKeyboard.SetTitle(title);
 		g_virtualKeyboard.Open();
-		g_bKeyboardPassword = FALSE;
-		g_nKeyboardMaxLength = 64;
+		g_virtualKeyboard.m_bPassword = FALSE;
+		g_virtualKeyboard.m_nMaxLength = 64;
 		if (text.size() != 0)
 		{
 			MultiByteToWideChar(CP_ACP, 0, text.c_str(), (int)text.size(), title, 50);
@@ -1788,7 +1788,7 @@ HRESULT CMenu::ProcessInput(int *action, SGamepadState **pad)
 			return S_OK;
 		if (!g_bKeyboardAccepted)
 		{
-			if (m_bBatchRunning && g_nKeyboardMode != 0)
+			if (m_bBatchRunning && g_virtualKeyboard.m_bCancelled != 0)
 				LeaveBatchSubList();
 			m_bDeletePending = FALSE;
 			m_bContextMenuShown = FALSE;
@@ -1799,7 +1799,7 @@ HRESULT CMenu::ProcessInput(int *action, SGamepadState **pad)
 		BOOL ok = FALSE;
 		if (m_bBatchRunning && g_pPendingBatchElement != NULL)
 			element = g_pPendingBatchElement;
-		if (g_nKeyboardMode == 0)
+		if (g_virtualKeyboard.m_bCancelled == 0)
 		{
 			if (s_strPassword.compare(g_virtualKeyboard.GetResult()) == 0)
 			{
@@ -1821,7 +1821,7 @@ HRESULT CMenu::ProcessInput(int *action, SGamepadState **pad)
 				s_bLastRunOk = FALSE;
 		}
 		g_virtualKeyboard.Open();
-		g_bKeyboardPassword = !ok;
+		g_virtualKeyboard.m_bPassword = !ok;
 		if (!m_bWaitingForKeyboard && ok)
 		{
 			if (m_bContextMenuShown)

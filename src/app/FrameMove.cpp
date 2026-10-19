@@ -355,7 +355,7 @@ HRESULT CUnleashX::FrameMove()
 			}
 		}
 		g_virtualKeyboard.Open();
-		g_bKeyboardPassword = !g_pSettings->m_bUnlocked;
+		g_virtualKeyboard.m_bPassword = !g_pSettings->m_bUnlocked;
 		goto done;
 	}
 
@@ -585,7 +585,7 @@ done:
 	// menu.
 	if (action == INPUT_BACK && !g_virtualKeyboard.IsDone())
 	{
-		g_nKeyboardMode = 1;
+		g_virtualKeyboard.m_bCancelled = 1;
 	}
 	else if (action == INPUT_BACK || action == INPUT_IR_MENU)
 	{

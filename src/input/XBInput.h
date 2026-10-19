@@ -61,3 +61,5 @@ struct SKeystroke
 	char ascii;                        // +0x01 > 0 for a character
 	BYTE flags;                        // +0x02 4 = Alt
 };
+// The last debug keyboard keystroke (XBInput). (0x002720E8)
+SKeystroke *GetKeystroke();                       // 0x000985A4
