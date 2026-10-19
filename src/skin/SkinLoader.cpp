@@ -176,7 +176,7 @@ BOOL CSkin::Load(const char *path)
 		m_strSkinName = "[Default]";
 		SetDefaultMainLayout();
 		m_bChanged = TRUE;
-		m_unknown654 = GetTickCount() + 1000;
+		m_dwLoadingFadeEnd = GetTickCount() + 1000;
 		return TRUE;
 	}
 
@@ -307,7 +307,7 @@ BOOL CSkin::Load(const char *path)
 		SetDefaultMainLayout();
 
 	m_bChanged = TRUE;
-	m_unknown654 = GetTickCount() + 1000;
+	m_dwLoadingFadeEnd = GetTickCount() + 1000;
 	return TRUE;
 }
 

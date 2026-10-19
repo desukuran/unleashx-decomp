@@ -80,6 +80,7 @@ public:
 	{
 	public:
 		virtual void OnSkinLoaded();                  // slot 2, 0x000E5824
+		virtual void DrawImage(int source, int left, int top, int width, int height, float opacity);   // slot 3, 0x000E1838
 
 		CUnleashX *m_pApp;                            // +0x04
 	};

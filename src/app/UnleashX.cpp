@@ -9,6 +9,8 @@
 #include "../common/FileUtil.h"
 #include "../common/StrUtil.h"
 #include "../audio/MusicManager.h"
+#include "../media/WMVideoPlayer.h"
+#include "../render/Draw.h"
 #include "../audio/Sound.h"
 #include "../net/FtpServer.h"
 #include "../net/Network.h"
@@ -269,6 +271,35 @@ HRESULT CUnleashX::Cleanup()
 void CUnleashX::CMenuEvent::OnPreview(const char *file)
 {
 	g_skin.PlayPreview(file);
+}
+
+// 0x000E1838
+void CUnleashX::CSkinEvent::DrawImage(int source, int left, int top, int width, int height, float opacity)
+{
+	IDirect3DTexture8 *texture;
+	if (source == 1)
+	{
+		texture = m_pApp->m_menu.m_pIconTexture;
+	}
+	else if (source == 2)
+	{
+		if (g_skin.m_pPreviewVideo != NULL)
+			g_skin.m_pPreviewVideo->Render();
+		return;
+	}
+	else if (source == 3)
+	{
+		texture = g_pMusicManager != NULL ? g_pMusicManager->GetAlbumArt() : NULL;
+	}
+	else
+	{
+		return;
+	}
+	if (texture == NULL)
+		return;
+	float x, y, w, h;
+	SkinRectToScreen(left, top, width, height, &x, &y, &w, &h);
+	DrawTexture(texture, x, y, w, h, opacity, NULL, 0.0f, NULL);
 }
 
 // 0x000E5824

@@ -597,6 +597,14 @@ void DrawTextureFullScreen(IDirect3DTexture8 *texture, float alpha)
 	            (float)(int)screen.height, alpha, NULL, 0.0f, NULL);
 }
 
+// 0x000A0371
+void DrawShadeFullScreen(IDirect3DTexture8 *texture, float alpha)
+{
+	SScreenRect screen = GetScreenRect();
+	DrawShade(texture, (float)(int)screen.x, (float)(int)screen.y, (float)(int)screen.width, (float)(int)screen.height,
+	          alpha);
+}
+
 // 0x0009F342 (matrix in esi): scale, then rotation, then translation.
 void BuildWorldMatrix(float *matrix, float x, float y, float z, float scaleX, float scaleY, float scaleZ,
                       float rotationX, float rotationY, float rotationZ)

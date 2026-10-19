@@ -198,6 +198,33 @@ The numeric IDs are in `enum SkinTextSource` (`src/skin/Skin.h`).
 - `Opacity` is a percentage. Values 0 and 1 both mean fully opaque.
 - A missing `Width`/`Height` is taken from the image file.
 
+### Drawing
+
+`src/skin/SkinRender.cpp`. Without any `zIndex` the `<Main>` images are
+drawn first, then the shapes, then the texts. With one, everything goes in
+`zIndex` order.
+
+Texts are drawn at the screen's scale: the smaller of its horizontal and
+vertical factors, cut to two decimals, never below 1. A scrolling text is
+clipped to its box. When it's wider than the box (or is a ticker), it
+moves one pixel every `<ScrollSpeed>` milliseconds and comes back in from
+the right once it's gone.
+
+Images without a picture of their own:
+
+| `Source` | Shows |
+|---|---|
+| 1 | the highlighted menu item's icon |
+| 2 | the preview video |
+| 3 | the album art of the song playing |
+
+Quirks:
+
+* While a preview video plays, an `<Image Source="2">` ends the drawing.
+  What comes after it isn't drawn.
+* In zIndex order, a text's box is scaled with the screen; otherwise it
+  isn't.
+
 ## `<ColorScheme>`
 
 ```xml

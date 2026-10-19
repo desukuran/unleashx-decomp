@@ -1895,3 +1895,11 @@
 0003e400 D3DXMatrixTranslation
 0003e3a4 D3DXMatrixScaling
 00278d9c s_displayMode
+00100fa6 CSkin::RenderUnsorted
+00100948 CSkin::RenderSorted
+000f910c LoadSkinImage
+0009e312 SkinRectToFloats
+000a0371 DrawShadeFullScreen
+000e1838 CUnleashX::CSkinEvent::DrawImage
+0027a444 s_dwSortedScrollTick
+0027a44c s_dwScrollTick

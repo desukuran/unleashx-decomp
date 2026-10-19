@@ -208,7 +208,9 @@ public:
 	virtual void Unknown0();                 // slot 0
 	virtual void Unknown1();                 // slot 1
 	virtual void OnSkinLoaded();             // slot 2 (+0x08)
-	virtual void Unknown3();                 // slot 3
+	// An <Image> without a picture of its own: source 1 the highlighted
+	// item's icon, 2 the preview video, 3 the album art.
+	virtual void DrawImage(int source, int left, int top, int width, int height, float opacity);   // slot 3
 	virtual void Unknown4();                 // slot 4
 	virtual void OnPreviewTimer();           // slot 5 (+0x14)
 };
@@ -251,7 +253,15 @@ public:
 
 	HRESULT PollLoad(BOOL *busy);                     // 0x000F8E2B
 	// Draws the skin's own elements (texts, images...). (this in eax)
-	HRESULT Render();                                 // 0x0010160B TODO: decompile
+	// The <Main> shapes, texts and images (in zIndex order when any has
+	// one), or the loading picture while a skin loads. (this in eax;
+	// SkinRender.cpp)
+	HRESULT Render();                                 // 0x0010160B
+	// Everything in the vectors' order: images, shapes, then texts. (this
+	// in ebx)
+	HRESULT RenderUnsorted();                         // 0x00100FA6
+	// Everything in m_mainOrder.
+	HRESULT RenderSorted();                           // 0x00100948
 
 	std::string ResolveFile(const char *path);        // 0x000F9DFC
 	HRESULT FindFont(const char *name, CXBFont **font);   // 0x000F9A08
@@ -356,7 +366,7 @@ public:
 	IDirect3DTexture8 *m_pLoadingTexture;          // +0x648
 	BOOL m_bLoading;                    // +0x64C
 	HANDLE m_hLoadThread;               // +0x650
-	int m_unknown654;                   // +0x654
+	DWORD m_dwLoadingFadeEnd;           // +0x654 the loading picture fades out until then (1 s)
 	std::string m_strLoadFile;          // +0x658
 	BOOL m_bChanged;                    // +0x674
 	BOOL m_bLoaded;                     // +0x678
@@ -367,6 +377,25 @@ public:
 };
 
 extern CSkin g_skin;   // 0x00277968
+
+// Helpers of the skin's drawing, shared with the music player
+// (SkinRender.cpp; inlined in each in the original).
+
+// Loads an image's file the first time. (image in eax)
+void LoadSkinImage(SSkinImage *image);                       // 0x000F910C
+// A skin rectangle on the screen.
+void SkinRectToScreen(int left, int top, int width, int height, float *x, float *y, float *w, float *h);   // 0x0009E312 + ScaleToScreen
+// The texts' scale: the screen's (the smaller of the two directions) cut
+// to two decimals, at least 1.
+float GetSkinTextScale();
+// A text's string: its own, its source's labelled line, or its format
+// filled with the source's value. Empty for none. (buffer 0x105)
+void GetSkinTextString(const SSkinText &text, wchar_t *buffer);
+// A scrolling text: clipped to its box; when step is set it moves a
+// pixel left (wider than the box, or a ticker) and starts again from the
+// right once gone. offsetApplied: draw it at the offset.
+void DrawScrollingSkinText(SSkinText &text, CXBFont *font, const wchar_t *shown, float x, float y, float width,
+                           float height, BOOL step, BOOL offsetApplied);
 
 
 
