@@ -44,6 +44,8 @@ std::string &StrTrimRightChars(std::string &s, const char *chars);
 std::string &StrTrimRightChar(std::string &s, char c);           // 0x0002FC7D
 // Uppercases with the C++ locale's ctype<char>::toupper.            (0x0001EFBD)
 void StrMakeUpper(std::string &s);
+// Lowercases with the C++ locale's ctype<char>::tolower.  (0x000226F6, 0x0002DAEB)
+void StrMakeLower(std::string &s);
 // Appends '\' unless the string already ends with one.            (0x000A41DF)
 void StrAddBackslash(std::string &s);
 // Lowercased copy (the original uses _strdup + _mbslwr and leaks the copy).

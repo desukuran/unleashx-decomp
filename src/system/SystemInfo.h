@@ -64,3 +64,5 @@ public:
 	bool m_bValid;          // +0x10
 	char m_szHex[33];       // +0x11
 };
+// The MD5 the web cache names files with (its m_szHex is read back).
+extern CMD5 g_md5;          // 0x00278478

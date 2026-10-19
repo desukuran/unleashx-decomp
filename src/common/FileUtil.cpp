@@ -340,3 +340,59 @@ BOOL WriteBinaryFile(const char *path, const void *data, DWORD size)
 	}
 	return ok;
 }
+
+// 0x000A3F51
+BOOL CreateDirectoryTree(const char *path)
+{
+	if (path == NULL || strlen(path) == 0)
+		return FALSE;
+	std::string all = path;
+	StrReplaceAll(all, "/", "\\");
+	if (DirectoryExists(path))
+		return TRUE;
+	// Each folder on the way, from the drive root.
+	std::string part = StrLeft(all, 3);
+	int pos = 3;
+	while (all.compare(part) != 0)
+	{
+		if (!DirectoryExists(part.c_str()) && !CreateDirectoryA(part.c_str(), NULL))
+			return FALSE;
+		pos = StrFind(all, "\\", pos + 1);
+		if (pos == -1)
+			break;
+		part = StrLeft(all, pos);
+	}
+	// (path as given, slashes and all)
+	if (DirectoryExists(path))
+		return TRUE;
+	return CreateDirectoryA(path, NULL) != 0;
+}
+
+// 0x000A4B0E
+std::string GetPathDirectory(const char *path)
+{
+	std::string dir;
+	std::string all = path;
+	int dot = StrReverseFind(all, ".", -1);
+	int slash = StrReverseFind(all, "\\", -1);
+	if (dot >= 0 && slash >= 0 && dot <= slash && slash != (int)all.size() - 1)
+		dir = all;                  // "C:\a.b\c": a folder
+	else if (slash < 0 || dot < 0)
+	{
+		if (dot != -1)
+			dir = "";               // "name.ext"
+		else if (slash == -1)
+			dir = all;              // "name"
+		else
+			dir = StrLeft(all, slash);   // "C:\Games\Halo": the last part counts as a file
+	}
+	else
+		dir = StrLeft(all, slash);
+	// No trailing backslash, except on a drive root.
+	slash = StrReverseFind(dir, "\\", -1);
+	if (slash > 0 && slash == (int)dir.size() - 1)
+		dir = StrLeft(dir, slash);
+	if (StrReverseFind(dir, ":", -1) == 1 && dir.size() == 2)
+		dir.append("\\");
+	return dir;
+}

@@ -1,4 +1,4 @@
-// MakeFatxPath / IsFatxName on a few names.
+// MakeFatxPath / IsFatxName / GetPathDirectory on a few names.
 #include <cstdio>
 #include <cstring>
 
@@ -17,8 +17,25 @@ static void Check(const char *path, BOOL changed, const char *expected)
 	}
 }
 
+static void CheckDir(const char *path, const char *expected)
+{
+	std::string dir = GetPathDirectory(path);
+	if (dir != expected)
+	{
+		printf("GetPathDirectory(\"%s\") = \"%s\", expected \"%s\"\n", path, dir.c_str(), expected);
+		s_failures++;
+	}
+}
+
 int main()
 {
+	CheckDir("E:\\Games\\Halo\\default.xbe", "E:\\Games\\Halo");
+	CheckDir("E:\\Games\\Halo", "E:\\Games");          // no dot: a file name
+	CheckDir("E:\\Games\\Halo\\", "E:\\Games\\Halo");
+	CheckDir("E:\\a.b\\c", "E:\\a.b\\c");              // a dot before the last part: a folder
+	CheckDir("E:\\file.txt", "E:\\");
+	CheckDir("file.txt", "");
+	CheckDir("name", "name");
 	Check("E:\\Games\\Halo\\default.xbe", FALSE, "(unchanged)");
 	Check("E:\\a\\b?c.txt", TRUE, "E:\\a\\bc.txt");
 	Check("E:\\x\\this is a very long file name for fatx limits.tar.gz", TRUE,

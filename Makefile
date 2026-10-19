@@ -7,7 +7,7 @@ COMMON := src/common/StrUtil.cpp src/common/ObList.cpp src/common/PlatformHost.c
 XML := src/xml/XmlDocument.cpp src/xml/XmlUtil.cpp
 SETTINGS := src/settings/AppSettings.cpp src/settings/ConfigLoader.cpp
 SYSTEM := src/system/Drives.cpp src/system/Dvd.cpp src/system/SystemInfo.cpp src/system/Xbe.cpp src/system/XipArchive.cpp
-NET := src/net/Network.cpp src/net/XNetHost.cpp src/net/FtpServer.cpp src/net/FtpConnection.cpp src/net/FtpTransfer.cpp
+NET := src/net/Network.cpp src/net/XNetHost.cpp src/net/FtpServer.cpp src/net/FtpConnection.cpp src/net/FtpTransfer.cpp src/net/Socket.cpp src/net/Http.cpp src/net/Sntp.cpp
 SKIN := src/skin/Skin.cpp src/skin/SkinText.cpp src/skin/SkinParser.cpp src/skin/SkinColors.cpp src/skin/SkinDefaults.cpp
 UI := src/ui/Language.cpp src/ui/MenuScan.cpp
 RENDER := src/render/Screen.cpp
@@ -18,13 +18,13 @@ LIBS := $(COMMON) $(XML) $(SETTINGS) $(SYSTEM) $(NET) $(SKIN) $(UI) $(RENDER) $(
 STUBS := tests/stubs.cpp tests/todo_stubs.cpp tests/skin_stubs.cpp tests/fileio_host.cpp
 HEADERS := $(wildcard src/*/*.h) src/ui/StringTable.inc
 
-TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test build/xbe_test build/menuscan_test build/ftp_test build/fileutil_test build/xip_test
+TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_test build/skintext_test build/xbe_test build/menuscan_test build/ftp_test build/fileutil_test build/xip_test build/http_test
 
 # Syntax-checked but not linked: hardware access, or too much of what they
 # call isn't decompiled yet.
 XBOX_ONLY := src/system/Hardware.cpp src/system/SystemControl.cpp src/skin/SkinLoader.cpp \
 	src/app/Main.cpp src/app/MenuActions.cpp src/app/UnleashX.cpp src/app/FtpEvents.cpp src/app/NetworkThread.cpp src/render/Draw.cpp src/ui/MenuItem.cpp src/ui/Menu.cpp \
-	src/app/SettingsBase.cpp src/app/SettingsVideo.cpp src/app/SettingsDateTime.cpp src/app/SettingsAutoLaunch.cpp src/app/SettingsQuickLaunch.cpp src/app/SettingsScreenAdjust.cpp src/app/SettingsLiveUpdate.cpp src/app/SettingsNetwork.cpp src/app/HddLockDialog.cpp src/app/SettingsHDD.cpp src/app/SettingsMusic.cpp src/app/SettingsSystem.cpp src/app/SettingsMenu.cpp src/app/IPAddressEditor.cpp src/ui/UpDown.cpp src/app/ClockEditor.cpp src/app/XboxInfo.cpp src/app/MessageBox.cpp src/app/FrameMove.cpp src/app/AppRender.cpp src/app/Initialize.cpp src/app/Resources.cpp src/app/Startup.cpp src/app/ScreenSaver.cpp src/app/Background.cpp src/ui/VirtualKeyboard.cpp src/ui/PassCode.cpp src/app/NotePad.cpp src/ui/FileBrowser.cpp src/app/SlideShow.cpp src/system/FileList.cpp src/audio/MusicManager.cpp src/common/Thread.cpp src/system/XSettings.cpp
+	src/app/SettingsBase.cpp src/app/SettingsVideo.cpp src/app/SettingsDateTime.cpp src/app/SettingsAutoLaunch.cpp src/app/SettingsQuickLaunch.cpp src/app/SettingsScreenAdjust.cpp src/app/SettingsLiveUpdate.cpp src/app/SettingsNetwork.cpp src/app/HddLockDialog.cpp src/app/SettingsHDD.cpp src/app/SettingsMusic.cpp src/app/SettingsSystem.cpp src/app/SettingsMenu.cpp src/app/IPAddressEditor.cpp src/ui/UpDown.cpp src/app/ClockEditor.cpp src/app/XboxInfo.cpp src/app/MessageBox.cpp src/app/FrameMove.cpp src/app/AppRender.cpp src/app/Initialize.cpp src/app/Resources.cpp src/app/Startup.cpp src/app/ScreenSaver.cpp src/app/Background.cpp src/ui/VirtualKeyboard.cpp src/ui/PassCode.cpp src/app/NotePad.cpp src/ui/FileBrowser.cpp src/app/SlideShow.cpp src/system/FileList.cpp src/net/HttpProgress.cpp src/audio/MusicManager.cpp src/common/Thread.cpp src/system/XSettings.cpp
 
 all: $(TESTS) check
 
@@ -47,6 +47,8 @@ test: $(TESTS)
 	build/xbe_test
 	build/fileutil_test
 	build/xip_test
+	rm -rf build/testroot/Y && mkdir -p build/testroot/Y
+	UNLEASHX_ROOT=build/testroot build/http_test
 	rm -rf build/testroot/E/Games && mkdir -p build/testroot/E/Games/A build/testroot/E/Games/B
 	cp UnleashX_0_39_0528A/Default.xbe build/testroot/E/Games/A/default.xbe
 	cp UnleashX_0_39_0528A/Default.xbe build/testroot/E/Games/B/default.xbe

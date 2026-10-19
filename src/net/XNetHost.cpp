@@ -8,6 +8,8 @@
 #include <cerrno>
 #include <cstdlib>
 #include <fcntl.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 extern "C" {
@@ -23,6 +25,8 @@ int __stdcall XNetSaveConfigParams(const XNetConfigParams *)
 }
 }
 
+BOOL g_bHostLinkUp = FALSE;
+
 int XNetStartup(const XNetStartupParams *)
 {
 	return -1;
@@ -35,7 +39,7 @@ int XNetCleanup()
 
 int WSAStartup(WORD, WSADATA *)
 {
-	return -1;
+	return g_bHostLinkUp ? 0 : -1;
 }
 
 int WSACleanup()
@@ -51,7 +55,7 @@ DWORD XNetGetTitleXnAddr(XNADDR *addr)
 
 DWORD XNetGetEthernetLinkStatus()
 {
-	return 0;
+	return g_bHostLinkUp ? XNET_ETHERNET_LINK_ACTIVE | XNET_ETHERNET_LINK_100MBPS : 0;
 }
 
 int XNetInAddrToString(IN_ADDR ina, char *text, int textSize)
@@ -113,6 +117,48 @@ int XNetRandom(BYTE *buffer, UINT size)
 int HostSelect(int, fd_set *readSet, fd_set *writeSet, fd_set *exceptSet, struct timeval *timeout)
 {
 	return select(FD_SETSIZE, readSet, writeSet, exceptSet, timeout);
+}
+
+int HostSetSockOpt(SOCKET s, int level, int name, const void *value, int size)
+{
+	if (level == SOL_SOCKET && (name == SO_RCVTIMEO || name == SO_SNDTIMEO) && size == (int)sizeof(int))
+	{
+		int ms = *(const int *)value;
+		struct timeval tv;
+		tv.tv_sec = ms / 1000;
+		tv.tv_usec = (ms % 1000) * 1000;
+		return setsockopt(s, level, name, &tv, sizeof(tv));
+	}
+	return setsockopt(s, level, name, value, (socklen_t)size);
+}
+
+// Looks the name up right away (the Xbox does it in the background).
+int XNetDnsLookup(const char *name, HANDLE, XNDNS **dns)
+{
+	XNDNS *result = new XNDNS;
+	memset(result, 0, sizeof(*result));
+	struct addrinfo hints;
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_INET;
+	struct addrinfo *list = NULL;
+	if (getaddrinfo(name, NULL, &hints, &list) != 0)
+	{
+		result->iStatus = 11001;   // WSAHOST_NOT_FOUND
+	}
+	else
+	{
+		for (struct addrinfo *it = list; it != NULL && result->cina < 8; it = it->ai_next)
+			result->aina[result->cina++] = ((struct sockaddr_in *)it->ai_addr)->sin_addr;
+		freeaddrinfo(list);
+	}
+	*dns = result;
+	return 0;
+}
+
+int XNetDnsRelease(XNDNS *dns)
+{
+	delete dns;
+	return 0;
 }
 
 DWORD GetLastError()

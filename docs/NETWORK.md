@@ -77,6 +77,56 @@ V0.40.0101 Build 600 is available for download." Quirk: "older" means
 version 0.x with a minor version below 40 and a revision below 585, so the
 check doesn't compare properly with other versions.
 
+## HTTP downloads
+
+`CInternetSession` (`src/net/Http.cpp`) is a small HTTP/1.0 client. It's used by the newsfeeds, Live Update, the skin browser and `HttpGetText`. Each download runs on its own thread, and callers poll `IsDone()`.
+
+### The request
+
+* It sends `GET` (or `POST` with form data).
+* The headers are `Accept`, `Accept-Language: en-us`, `Referer` (the last URL fetched into memory), `User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)`, `Host` and `Cookie`. The cookie is whatever the last `Set-Cookie` gave.
+* With `<HTTP UseProxy>`, it connects to the proxy and asks for the full URL.
+
+### The reply
+
+* **301/302:** `IsDone()` follows the redirect.
+* **`text/...`:** kept in memory (`GetData()`).
+* **Anything else:** written to `Y:\WebCache\`. The file is named from the host plus the file name, or from the URL's MD5 when that's longer than 43 characters (Live Update always uses the MD5).
+
+### The web cache
+
+* A download made with `useCache` takes the cached copy without asking the server.
+* The first session of a run formats Y: if it's unformatted, or small and nearly full. It then deletes cache files not created today.
+
+### The progress box
+
+It shows:
+
+* the file name with its percentage and animated dots
+* the source host
+* the estimated time and amounts
+* the transfer rate
+* the state (Opening, Connecting, Connected, Downloading, Finished)
+* a bar
+
+### Quirks kept
+
+* A reply without a `Content-Type` always goes to a file. The test meant to keep `.xml`/`.txt` URLs in memory can never be true.
+* Text is appended as C strings, so it stops at a NUL byte.
+* For a file, the first block's size assumes the headers came in that same packet.
+* The cache name loses the character before a `?`.
+* `UrlEncode` leaves `[ \ ] ^ _ \`` alone, because its uppercase range runs to `b`. Characters above 127 come out as `%ffffffxx`.
+* The time-left display gets the minutes wrong when it's an hour or more.
+
+## Time sync
+
+`SyncTimeWithSntp` (`src/net/Sntp.cpp`) sends one UDP packet to the server:
+
+* **NTP (port 123, or any other port):** a 48-byte client request.
+* **TIME (port 37, also the default):** one byte. The reply is 4 bytes of seconds since 1900; half the round trip is added.
+
+If that fails, it tries TIME at `time-a.nist.gov`. If that fails too, and `<SNTP HTTP>` is allowed (always, since it's never loaded), it reads the time from the US Naval Observatory's web clock. The clock is set as UTC.
+
 ## Discovery
 
 `ScanNetworkClients` broadcasts `ping` on UDP 4905 and lists the Xboxes that

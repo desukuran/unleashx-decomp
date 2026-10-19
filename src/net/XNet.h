@@ -55,6 +55,7 @@ typedef int SOCKET;
 #define WSAENOTCONN 10057
 #define WSAESHUTDOWN 10058
 #define WSAETIMEDOUT 10060
+#define WSAEINPROGRESS 10036
 #ifndef FIONBIO
 #define FIONBIO 0x8004667E
 #endif
@@ -115,6 +116,8 @@ int WSAStartup(WORD version, WSADATA *data);
 int WSACleanup();
 DWORD XNetGetTitleXnAddr(XNADDR *addr);
 DWORD XNetGetEthernetLinkStatus();
+// Host only: whether XNetGetEthernetLinkStatus() reports a link (tests set it).
+extern BOOL g_bHostLinkUp;
 int XNetInAddrToString(IN_ADDR ina, char *text, int textSize);
 int XNetSetSystemLinkPort(WORD port);   // TODO: verify, see Network.cpp
 int closesocket(SOCKET s);
@@ -122,9 +125,22 @@ int ioctlsocket(SOCKET s, long cmd, unsigned long *arg);
 int WSAGetLastError();
 int XNetRandom(BYTE *buffer, UINT size);
 int HostSelect(int count, fd_set *readSet, fd_set *writeSet, fd_set *exceptSet, struct timeval *timeout);
+// Winsock's SO_RCVTIMEO/SO_SNDTIMEO take milliseconds as a DWORD.
+int HostSetSockOpt(SOCKET s, int level, int name, const void *value, int size);
 #ifndef UNLEASHX_XNET_HOST_IMPL
 #define select HostSelect
+#define setsockopt HostSetSockOpt
 #endif
+
+// An XNetDnsLookup() result.
+struct XNDNS
+{
+	int iStatus;            // 0, or WSAEINPROGRESS while looking up
+	UINT cina;
+	IN_ADDR aina[8];
+};
+int XNetDnsLookup(const char *name, HANDLE event, XNDNS **dns);
+int XNetDnsRelease(XNDNS *dns);
 
 HANDLE CreateEventA(void *attributes, BOOL manualReset, BOOL initialState, LPCSTR name);
 BOOL SetEvent(HANDLE event);

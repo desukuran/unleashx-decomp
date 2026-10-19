@@ -45,9 +45,11 @@ public:
 	void *m_pDir;                                         // +0x184 the drive's directory object
 };
 
-// Directory part of a path to a file ("" if path has no file name).          TODO: verify
-std::string GetPathDirectory(const char *path);                       // 0x000A4B0E TODO: decompile
-BOOL CreateDirectoryTree(const char *path);                           // 0x000A3F51 TODO: decompile
+// The folder part of a path, without a trailing backslash (except "C:\").
+// A last part without a dot counts as a file name; see FileUtil.cpp.
+std::string GetPathDirectory(const char *path);                       // 0x000A4B0E
+// Creates the folder and any missing ones above it ('/' counts as '\').
+BOOL CreateDirectoryTree(const char *path);                           // 0x000A3F51
 // Writes data to path (replacing it), creating its folder. FALSE when
 // there's nothing to write.
 BOOL WriteBinaryFile(const char *path, const void *data, DWORD size);   // 0x000A439A

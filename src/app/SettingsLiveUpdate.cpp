@@ -124,11 +124,11 @@ static void StartCheck(CLiveUpdate *page)
 		// The default server, spelled out so it isn't a string in the XBE.
 		StrFormat(page->m_strServer, "http://%c%c.%c%c%c%c.%c%c%c%c%c%c%c%c%c.com/", 'u', 'x', 'h', 'o', 'm', 'e', 'i',
 		          'n', 's', 'i', 'g', 'h', 't', 'b', 'b');
-		page->m_pSession->m_unknown6B8 = TRUE;
+		page->m_pSession->m_bHashCacheName = TRUE;
 	}
 	else
 	{
-		page->m_pSession->m_unknown6B8 = TRUE;
+		page->m_pSession->m_bHashCacheName = TRUE;
 		if (StrCmpNoCase(StrLeft(page->m_strServer, 7), "http://") != 0)
 			StrFormat(page->m_strServer, "%s%s", "http://", page->m_strServer.c_str());
 		if (StrRight(page->m_strServer, 1).compare("/") != 0)

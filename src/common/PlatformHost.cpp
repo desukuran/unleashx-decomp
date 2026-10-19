@@ -453,6 +453,49 @@ void GetLocalTime(SYSTEMTIME *st)
 	st->wMilliseconds = 0;
 }
 
+void GetSystemTime(SYSTEMTIME *st)
+{
+	time_t now = time(NULL);
+	struct tm tm;
+	gmtime_r(&now, &tm);
+	st->wYear = (WORD)(tm.tm_year + 1900);
+	st->wMonth = (WORD)(tm.tm_mon + 1);
+	st->wDayOfWeek = (WORD)tm.tm_wday;
+	st->wDay = (WORD)tm.tm_mday;
+	st->wHour = (WORD)tm.tm_hour;
+	st->wMinute = (WORD)tm.tm_min;
+	st->wSecond = (WORD)tm.tm_sec;
+	st->wMilliseconds = 0;
+}
+
+BOOL SystemTimeToFileTime(const SYSTEMTIME *st, FILETIME *ft)
+{
+	struct tm tm;
+	memset(&tm, 0, sizeof(tm));
+	tm.tm_year = st->wYear - 1900;
+	tm.tm_mon = st->wMonth - 1;
+	tm.tm_mday = st->wDay;
+	tm.tm_hour = st->wHour;
+	tm.tm_min = st->wMinute;
+	tm.tm_sec = st->wSecond;
+	unsigned long long t = ((unsigned long long)timegm(&tm) + 11644473600ull) * 10000000ull + st->wMilliseconds * 10000ull;
+	ft->dwLowDateTime = (DWORD)t;
+	ft->dwHighDateTime = (DWORD)(t >> 32);
+	return TRUE;
+}
+
+// The host's clock counts as UTC.
+BOOL LocalFileTimeToFileTime(const FILETIME *local, FILETIME *utc)
+{
+	*utc = *local;
+	return TRUE;
+}
+
+NTSTATUS __stdcall NtSetSystemTime(LARGE_INTEGER *, LARGE_INTEGER *)
+{
+	return 0;
+}
+
 void *XPhysicalAlloc(size_t size, uintptr_t, uintptr_t, DWORD)
 {
 	return malloc(size);

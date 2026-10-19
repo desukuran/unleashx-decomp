@@ -234,6 +234,15 @@ void StrMakeUpper(std::string &s)
 		*it = ct.toupper(*it);
 }
 
+// 0x000226F6 (0x0002DAEB makes the locale)
+void StrMakeLower(std::string &s)
+{
+	std::locale loc;
+	const std::ctype<char> &ct = std::use_facet<std::ctype<char> >(loc);
+	for (std::string::iterator it = s.begin(); it != s.end(); ++it)
+		*it = ct.tolower(*it);
+}
+
 // 0x000A41DF
 void StrAddBackslash(std::string &s)
 {

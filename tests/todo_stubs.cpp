@@ -22,9 +22,7 @@ void EnterFileLock() {}
 void LeaveFileLock() {}
 BOOL ExtractXbeTitleImage(const char *, const char *) { return FALSE; }
 HRESULT FormatDrive(char) { return E_FAIL; }
-BOOL CreateDirectoryTree(const char *) { return FALSE; }
 BOOL WriteTextFile(const char *path, const char *, BOOL) { printf("[stub] WriteTextFile(%s)\n", path); return TRUE; }
-std::string GetPathDirectory(const char *) { return std::string(); }
 std::string GetPersistentDataPath(const wchar_t *, unsigned int) { return std::string(); }
 
 // SystemInfo.h (Hardware.cpp is Xbox only)
@@ -39,6 +37,7 @@ BYTE GetHddTemperature() { return 0; }
 void GetSmartAttribute(unsigned, DWORD *, DWORD *, DWORD *) {}
 CMD5::CMD5(const void *, int) { m_bValid = false; }
 BOOL CMD5::HashMemory(const void *, int) { return FALSE; }
+CMD5 g_md5(NULL, -1);
 
 // XKUtils.h
 XKEEPROM g_eeprom;
