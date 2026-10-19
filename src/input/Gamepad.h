@@ -1,5 +1,8 @@
-// Menu-level gamepad input.
+// Menu-level gamepad input (Gamepad.cpp).
 #pragma once
+
+#include "../app/XBApp.h"
+#include "../common/Platform.h"
 
 class CXBApplicationEx;
 
@@ -62,25 +65,29 @@ struct SGamepadState
 	float fY2;                         // +0x20
 };
 
-class CGamepadInput
+// The XDK sample framework's device tables (XBInput), by port; library
+// code that fills them in every frame. A gamepad starts with the state
+// above.
+struct XBGAMEPAD : public SGamepadState
 {
-public:
-	int GetAction();     // 0x0002B080 TODO: decompile
-};
-
-// The XDK sample framework's device tables (XBInput), by port. Only the
-// device handles are read outside the input code. TODO: decompile the input
-// layer.
-struct XBGAMEPAD
-{
-	BYTE unknown00[0xD4];
+	WORD wLastButtons;                 // +0x24
+	BOOL bLastAnalogButtons[8];        // +0x28
+	WORD wPressedButtons;              // +0x48
+	BOOL bPressedAnalogButtons[8];     // +0x4C
+	int nAction;                       // +0x6C an InputAction (1-14 below) to report. TODO: verify (who sets it)
+	BYTE unknown70[0xD4 - 0x70];
 	HANDLE hDevice;                    // +0xD4 NULL = no gamepad in the port
-	BYTE unknownD8[0x08];
+	BOOL bInserted;                    // +0xD8
+	BOOL bRemoved;                     // +0xDC
 };
-struct SIRRemoteState
+// An IR remote (the DVD playback kit). 0x84 bytes.
+struct SIRRemote
 {
-	HANDLE hDevice;                    // +0x00 TODO: verify
-	BYTE unknown04[0x80];
+	BYTE unknown00[0x0A];
+	WORD wKeyCode;                     // +0x0A the button held, 0 = none
+	BYTE unknown0C[0x28 - 0x0C];
+	HANDLE hDevice;                    // +0x28 NULL = no receiver in the port
+	BYTE unknown2C[0x84 - 0x2C];
 };
 struct SKeyboardState
 {
@@ -88,8 +95,48 @@ struct SKeyboardState
 	BYTE unknown04[0x10];
 };
 extern XBGAMEPAD g_Gamepads[4];                   // 0x00271B30
-extern SIRRemoteState g_irRemotes[4];             // 0x00271F00
+extern SIRRemote g_irRemotes[4];                  // 0x00271ED8
 extern SKeyboardState g_keyboards[4];             // 0x002720EC
+
+// Turns the gamepads and the IR remote into one InputAction per call: the
+// first port with something pressed wins (and is remembered), and held
+// buttons repeat after a delay. Code that takes "SGamepadState **pad" is
+// given this object: its first member is the gamepad in use. 0xA4 bytes.
+class CGamepadInput
+{
+public:
+	CGamepadInput();                                  // 0x00021F02 (this in edi)
+	int GetAction();                                  // 0x0002B080 (this in eax)
+	// The IR remote's action, or 0. (this in edi)
+	int GetRemoteAction();                            // 0x00026340
+
+	XBGAMEPAD *m_pGamepad;            // +0x00 the one in use
+	XBGAMEPAD *m_pFixedGamepad;       // +0x04 if set, always this one (never set)
+	SIRRemote *m_pRemote;             // +0x08
+	SIRRemote *m_pFixedRemote;        // +0x0C (never set)
+	DWORD m_unknown10;                // +0x10
+	DWORD m_unknown14;                // +0x14
+	CXBStopWatch m_padTimer;          // +0x18 how long a gamepad button has been held
+	float m_fPadDelay;                // +0x38 until the next repeat
+	float m_fPadRepeats;              // +0x3C
+	CXBStopWatch m_remoteTimer;       // +0x40
+	float m_fRemoteDelay;             // +0x60
+	DWORD m_unknown64;                // +0x64
+	CXBStopWatch m_unknownTimer;      // +0x68
+	DWORD m_unknown88;                // +0x88
+	float m_fDelays[6];               // +0x8C copies of the delays used (not read)
+
+private:
+	// The gamepad (remote) to read: the remembered port if it's still
+	// there, else the first one with input, else the first connected.
+	XBGAMEPAD *GetActiveGamepad();                    // 0x0002AF08
+	SIRRemote *GetActiveRemote();                     // 0x00026248
+	// Something is pressed on pad, or on the remote (whose arrows, SELECT
+	// and BACK are copied into the gamepad). (pad in eax, this in ecx)
+	BOOL HasInput(XBGAMEPAD *pad);                    // 0x0002AFAC
+	// (remote in eax, this in edx)
+	BOOL MapRemoteToGamepad(SIRRemote *remote);       // 0x000262E6
+};
 
 extern CGamepadInput g_gamepadInput;                 // 0x00278280
 

@@ -18,7 +18,10 @@ CSoundEffects g_soundEffects;
 void SetXboxSystemTime(SYSTEMTIME st, BOOL) { printf("[stub] SetXboxSystemTime(%d)\n", st.wYear); }
 void SetFanSpeed(int speed) { printf("[stub] SetFanSpeed(%d)\n", speed); }
 int GetFanSpeed() { return 0; }
-int CGamepadInput::GetAction() { return INPUT_NONE; }
+// The XBInput device tables (no devices on the host).
+XBGAMEPAD g_Gamepads[4];
+SIRRemote g_irRemotes[4];
+SKeyboardState g_keyboards[4];
 void UpdateGamepads(CXBApplicationEx *) {}
 HRESULT CNewsfeed::AddFeed(const char *url, const char *title) { printf("[stub] AddFeed(%s, '%s')\n", url, title); return S_OK; }
 void CSoundEffects::SetQuiet(BOOL quiet) { m_bQuiet = quiet; }
@@ -33,8 +36,10 @@ static double HostSeconds()
 	return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 CXBStopWatch::CXBStopWatch() { Reset(); }
-void CXBStopWatch::Start() { *(double *)m_state = HostSeconds(); }
-void CXBStopWatch::Stop() {}
-void CXBStopWatch::Reset() { m_fSecsPerTick = 0; *(double *)m_state = HostSeconds(); }
+// m_state: the start time, then a running flag.
+void CXBStopWatch::Start() { *(double *)m_state = HostSeconds(); m_state[8] = 1; }
+void CXBStopWatch::Stop() { m_state[8] = 0; }
+void CXBStopWatch::Reset() { m_fSecsPerTick = 0; *(double *)m_state = HostSeconds(); m_state[8] = 0; }
+BOOL CXBStopWatch::IsRunning() const { return m_state[8] != 0; }
 float CXBStopWatch::GetElapsedSeconds() { return (float)(HostSeconds() - *(double *)m_state); }
 float CXBStopWatch::GetElapsedMilliseconds() { return GetElapsedSeconds() * 1000.0f; }

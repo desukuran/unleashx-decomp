@@ -11,9 +11,10 @@ NET := src/net/Network.cpp src/net/XNetHost.cpp src/net/FtpServer.cpp src/net/Ft
 SKIN := src/skin/Skin.cpp src/skin/SkinText.cpp src/skin/SkinParser.cpp src/skin/SkinColors.cpp src/skin/SkinDefaults.cpp
 UI := src/ui/Language.cpp src/ui/MenuScan.cpp
 RENDER := src/render/Screen.cpp
+INPUT := src/input/Gamepad.cpp
 
 # Everything above, plus stand-ins for what isn't decompiled yet.
-LIBS := $(COMMON) $(XML) $(SETTINGS) $(SYSTEM) $(NET) $(SKIN) $(UI) $(RENDER)
+LIBS := $(COMMON) $(XML) $(SETTINGS) $(SYSTEM) $(NET) $(SKIN) $(UI) $(RENDER) $(INPUT)
 STUBS := tests/stubs.cpp tests/todo_stubs.cpp tests/skin_stubs.cpp tests/fileio_host.cpp
 HEADERS := $(wildcard src/*/*.h) src/ui/StringTable.inc
 
