@@ -2,6 +2,8 @@
 // inside zipped skins work too).
 #pragma once
 
+#include <vector>
+
 #include "../common/Platform.h"
 #include "D3D.h"
 
@@ -66,16 +68,39 @@ bool LoadXprTexture(const char *path, IDirect3DTexture8 **texture);   // 0x0009F
 // (path in eax)
 BOOL LoadXprFileTexture(const char *path, IDirect3DTexture8 **texture);   // 0x000A2371
 
+// A named texture, owned or not. 0x10C bytes.
+struct STextureEntry
+{
+	// A given texture is AddRef'd; texture NULL: loads the file name
+	// (owned when it worked). (owned in eax, this in esi)
+	STextureEntry(const char *name, IDirect3DTexture8 *texture, BOOL owned);   // 0x0002E307
+
+	char name[0x104];                      // +0x000
+	IDirect3DTexture8 *texture;            // +0x104
+	BOOL owned;                            // +0x108
+};
+
 // Name -> texture table: the textures the dialogs share ("Keyboard", set
-// from the skin's resource at startup).
+// from the skin's resource at startup). Names match in any case. See
+// TextureTable.cpp.
 class CTextureTable
 {
 public:
-	// Not in the table: loads the file name and adds it. (texture in edi)
-	HRESULT Find(const char *name, IDirect3DTexture8 **texture);           // 0x00137FA0 TODO: decompile
-	HRESULT Add(const char *name, IDirect3DTexture8 *texture, BOOL owned);  // 0x00137F1F TODO: decompile
+	CTextureTable() {}                                                 // (inlined: 0x00137DD2)
+	// Releases every texture.
+	~CTextureTable();                                                  // 0x00137BB9
+	// Not in the table: loads the file name and adds it (not owned).
+	// (texture in edi)
+	HRESULT Find(const char *name, IDirect3DTexture8 **texture);           // 0x00137FA0
+	// Replaces the texture of that name, or adds it. E_FAIL for no
+	// texture.
+	HRESULT Add(const char *name, IDirect3DTexture8 *texture, BOOL owned);  // 0x00137F1F
 
-	BYTE m_reserved[0x10];
+private:
+	IDirect3DTexture8 *FindTexture(const char *name);                  // 0x00137ACD
+	STextureEntry *FindEntry(const char *name);                        // 0x00137B37
+
+	std::vector<STextureEntry> m_entries;  // +0x00
 };
 
 extern CTextureTable g_textures;   // 0x002784E8

@@ -91,6 +91,10 @@ This picks the render resolution the skin is designed for:
 
 - `<ItemPos>` gives fixed slots for up to 19 items, each with its own `Align`. With a `Height` and a vertically centered alignment, the original adds the half-height offset twice.
 - `<Font>` is a font name from `<Fonts>`, a standard name, a `.xpr` file, or a `.ttf` file sized by `Height`/`Size` (default 20).
+- A `.ttf` menu font is drawn by the XDK's XFONT in white, antialiased (level 2), straight onto the back buffer (`src/render/FontEx.cpp`). It differs from a bitmap font:
+  - Text sizes are estimates from the average width of `A-Za-z0-9` plus the character spacing, so centered or right-aligned text can sit slightly off.
+  - Text marked as truncated isn't shortened with an ellipsis; when it's too wide it is clipped at the width instead.
+  - The font is never freed, even when another skin is loaded.
 - `<Position>` sets the menu area. A `Width` under 50 becomes 270.
 - `<Preview>` is the game-preview video area. Its `EnableAudio` defaults to on and `EnableMusic` to off.
 

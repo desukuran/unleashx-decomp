@@ -11,7 +11,6 @@
 #include "../src/skin/SkinColors.h"
 
 IDirect3DDevice8 *g_pd3dDevice;
-CFontTable g_fonts;
 
 BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *, IDirect3DTexture8 **texture, int, int, SImageInfo *)
 {
@@ -32,12 +31,19 @@ CXBFont::CXBFont() {}
 CXBFont::~CXBFont() {}
 HRESULT CXBFont::Create(const char *fileName, DWORD) { printf("[stub] CXBFont::Create(%s)\n", fileName); return S_OK; }
 void CXBFont::SetScaleFactors(float, float) {}
-CXBFontEx::CXBFontEx() {}
-HRESULT CXBFontEx::CreateFromTTF(const wchar_t *, int, int, int) { return E_FAIL; }
-CFontTable::CFontTable() {}
-CFontTable::~CFontTable() {}
-HRESULT CFontTable::Find(const char *, CXBFont **font) { *font = NULL; return E_FAIL; }
-HRESULT CFontTable::Add(const char *name, CXBFont *, BOOL) { printf("[stub] font %s\n", name); return S_OK; }
+HRESULT CXBFont::Destroy() { return S_OK; }
+HRESULT CXBFont::DrawToSurface(IDirect3DSurface8 *, const wchar_t *, int, DWORD, DWORD) { return S_OK; }
+HRESULT CXBFont::Unused1() { return S_OK; }
+HRESULT CXBFont::SetTextHeight(DWORD) { return S_OK; }
+HRESULT CXBFont::SetTextColor(D3DCOLOR color) { m_dwTextColor = color; return S_OK; }
+HRESULT CXBFont::GetTextExtentInt(const wchar_t *, int, int *width, int *height) { *width = *height = 0; return S_OK; }
+CXBPackedResource::CXBPackedResource() {}
+CXBPackedResource::~CXBPackedResource() {}
+// CXBFontEx (FontEx.cpp is Xbox-only: XFONT)
+CXBFontEx::CXBFontEx() : m_pTrueTypeFont(NULL) {}
+HRESULT CXBFontEx::CreateFromTTF(const wchar_t *, D3DCOLOR, DWORD, DWORD) { return E_FAIL; }
+HRESULT CXBFontEx::SetTextHeight(DWORD) { return S_OK; }
+HRESULT CXBFontEx::SetTextColor(D3DCOLOR) { return S_OK; }
 
 CWMVideoPlayer::CWMVideoPlayer() {}
 CWMVideoPlayer::~CWMVideoPlayer() {}
