@@ -1217,3 +1217,8 @@
 000dfd78 CVirtualKeyboard::Create
 0010302b CPassCode::CPassCode CPassCode * f(CPassCode *this@edi)
 00278434 g_pKeyboardIR
+000bdcbe CXipArchive::Open HRESULT f(CXipArchive *this@esi, char *path)
+000bdc0f CXipArchive::Close void f(CXipArchive *this@eax)
+000bdc67 CXipArchive::GetItem HRESULT f(CXipArchive *this@edx, uint index, SXipItem *item)
+000bdac0 CXipArchive::Extract HRESULT f(CXipArchive *this@ecx, uint index, char *path)
+000bdbdb GetXipName char * f(char *names@eax, int index)
