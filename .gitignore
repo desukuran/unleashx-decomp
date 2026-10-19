@@ -9,3 +9,6 @@ __pycache__/
 tools/ghidra_*_PUBLIC/
 tools/venv/
 tools/dl/
+
+# Microsoft XDK headers for local reference only (never commit)
+reference/
