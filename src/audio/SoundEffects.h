@@ -3,10 +3,15 @@
 
 #include "../common/Platform.h"
 
+class CSound;
+
 class CSoundEffects
 {
 public:
 	void SetQuiet(BOOL quiet);   // 0x001380EF TODO: decompile
+	// The named sound of the skin/sound set ("Select", "Back", "Menu Up",
+	// "Menu Down", ...), or NULL.
+	CSound *Find(const char *name);   // 0x001381E0 TODO: decompile
 
 	int m_unknown00;             // +0x00
 	BOOL m_bDisabled;            // +0x04 !<EnableSoundEffect>

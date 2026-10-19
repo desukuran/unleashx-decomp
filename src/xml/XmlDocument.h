@@ -56,6 +56,8 @@ public:
 	CXmlElement *FindFirstChild(const char *name);                // 0x0001CFFF
 	CXmlElement *FindNextChild();                                 // 0x0001D052
 	CXmlElement *GetNextChild();                                  // 0x000213F2
+	// Removes and deletes child. FALSE if it isn't a child of this element.
+	BOOL RemoveChild(CXmlElement *child);                         // 0x00021D93
 	std::string GetValue() const { return m_strValue; }           // 0x000213DE
 
 	// Comments written after the closing tag on save
@@ -101,6 +103,8 @@ public:
 	void Clear();                                                 // 0x0001E0AA
 
 	CXmlElement *FindElement(CXmlElement *parent, const char *name);  // 0x0001E041
+	// The next child of parent with the name of the last FindElement(parent, ...).
+	CXmlElement *FindNextElement(CXmlElement *parent);            // 0x00021DC2
 	CXmlElement *FindElementRecursive(const char *name, CXmlElement *parent);   // 0x000265F2
 	CXmlElement *GetFirstChild(CXmlElement *parent);              // 0x00023319
 	CXmlElement *GetNextChild(CXmlElement *parent);               // 0x00023347

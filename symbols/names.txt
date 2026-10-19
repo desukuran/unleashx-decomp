@@ -583,3 +583,48 @@
 00034f0f CreateFileA
 0003539b ReadFile
 000355e2 SetFilePointer
+00110f47 CMenu::LoadList void f(CMenu *this@ebx, CXmlElement *list)
+00110772 CMenu::AddItem void __cdecl f(CMenu *this, CXmlElement *item, int noSort)
+001100f6 CMenu::FindItemIcon void __cdecl f(CMenu *this, CXmlElement *item)
+00022647 CMenu::UpdateSoundVolume void f(CMenu *this@edi)
+00111f27 CMenu::Create
+001115b2 CMenu::OpenList
+0011159c LoadListThread
+00022635 CMenu::ReloadList
+0010ce86 CMenu::GetSelectedItem
+0011166b CMenu::RunItem
+0010ff6a CMenu::CheckPassword
+0010fdb8 CMenu::ShowMessage
+00110dcb CMenu::OpenRecentList
+0010fefc CMenu::OpenItemEditor
+00112364 CMenu::ScanFolders
+001120a7 CMenu::ScanFoldersNow
+0010ce1d CMenu::CaptureBootImage
+0010ceb2 CMenu::PlaySound
+00110a15 RemoveMissingXbes
+000e1f23 CollectMenuFolders
+000e4459 ScanFolder
+000e28d5 MergeFolderItems
+00021d93 CXmlElement::RemoveChild
+00021dc2 CXmlDocument::FindNextElement
+00277958 g_unlockedItems
+002761f4 g_pItemCache
+00277128 g_bCancelOperation
+0027846c g_bKeyboardPassword
+00278470 g_nKeyboardMaxLength
+0001433e CVirtualKeyboard::SetTitle
+00014302 CVirtualKeyboard::SetText
+001381e0 CSoundEffects::Find
+00094a84 CSound::Play
+00021ea0 GetFontHeight
+000aeade COptionMenu::COptionMenu
+000aea79 COptionMenu::AddOption
+000ade9e COptionMenu::Show
+0002209e CPassCode::SetTitle
+0010341c CPassCode::Init
+00103100 CPassCode::SetCode
+00102805 CPassCode::Show
+0010a05b CMenuItemEditor::Init
+0010986f CMenuItemEditor::Edit
+000366a8 RemoveDirectoryA
+0003627a ResumeThread

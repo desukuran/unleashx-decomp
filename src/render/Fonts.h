@@ -39,3 +39,7 @@ public:
 
 	BYTE m_reserved[0x10];
 };
+
+// Line height of a font: the TrueType face's height, or the bitmap font's
+// height times its vertical scale.
+float GetFontHeight(CXBFont *font);                                    // 0x00021EA0 TODO: decompile

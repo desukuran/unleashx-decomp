@@ -132,6 +132,9 @@ HANDLE CreateFileA(LPCSTR fileName, DWORD access, DWORD shareMode, void *securit
                    DWORD flags, HANDLE templateFile);
 BOOL ReadFile(HANDLE file, void *buffer, DWORD size, DWORD *read, void *overlapped);
 DWORD SetFilePointer(HANDLE file, LONG distance, LONG *distanceHigh, DWORD moveMethod);
+BOOL RemoveDirectoryA(LPCSTR path);
+#define CREATE_SUSPENDED 0x00000004
+DWORD ResumeThread(HANDLE thread);
 void _endthreadex(unsigned int code);
 DWORD XGetLaunchInfo(DWORD *launchDataType, PLAUNCH_DATA launchData);
 DWORD XGetVideoFlags();

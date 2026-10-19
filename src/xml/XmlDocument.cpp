@@ -538,6 +538,44 @@ CXmlElement *CXmlDocument::FindElement(CXmlElement *parent, const char *name)
 	return child;
 }
 
+// 0x00021DC2
+CXmlElement *CXmlDocument::FindNextElement(CXmlElement *parent)
+{
+	if (parent == NULL)
+		return NULL;
+	CXmlElement *child;
+	do
+	{
+		do
+		{
+			if (parent->m_findPos == NULL)
+				return NULL;
+			child = (CXmlElement *)parent->m_children.GetNext(parent->m_findPos);
+		} while (child == NULL);
+	} while (StrCmpNoCase(child->m_strName, parent->m_strFindName.c_str()) != 0);
+	m_pCurrent = child;
+	return child;
+}
+
+// 0x00021D93
+BOOL CXmlElement::RemoveChild(CXmlElement *child)
+{
+	if (child == NULL)
+		return FALSE;
+	POSITION pos = m_children.GetHeadPosition();
+	while (pos != NULL)
+	{
+		POSITION current = pos;
+		if (m_children.GetNext(pos) == child)
+		{
+			m_children.RemoveAt(current);
+			delete child;
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
 // 0x000265F2
 // Depth-first search below parent (the root if NULL): first the direct
 // children, then each child's subtree.

@@ -157,7 +157,12 @@ struct IDirect3DDevice8
 	HRESULT SetScissors(DWORD count, BOOL exclusive, const D3DRECT *rects);
 	HRESULT Clear(DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil);
 	HRESULT Present(const void *, const void *, void *, void *);
+	HRESULT CopyRects(IDirect3DSurface8 *source, const void *sourceRects, UINT count,
+	                  IDirect3DSurface8 *destination, const void *destPoints);
 };
+
+// The surface the previous program (or the boot animation) left on screen.
+IDirect3DSurface8 *AvGetSavedDataAddress();
 
 DWORD D3DResource_GetType(D3DResource *resource);
 void Get2DSurfaceDesc(D3DResource *resource, DWORD level, D3DSURFACE_DESC *desc);

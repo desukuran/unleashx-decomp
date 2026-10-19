@@ -100,7 +100,6 @@ void AddRecentItem(const char *path, const char *name, int region)
 // 0x000E2153
 void CUnleashX::ShowMessage(const char *text, const wchar_t *title, int flags)
 {
-	(void)flags;
 	if (m_pMessageBox == NULL)
 	{
 		m_pMessageBox = new CMessageBox;
@@ -122,7 +121,7 @@ void CUnleashX::ShowMessage(const char *text, const wchar_t *title, int flags)
 	}
 	if (m_pMessageBox != NULL)
 	{
-		m_pMessageBox->Show(text, title);
+		m_pMessageBox->Show(text, title, flags);
 		m_bMessageShown = TRUE;
 	}
 }
@@ -238,9 +237,8 @@ BOOL LaunchXbe(const char *path, const char *name, int region, const char *args)
 	return FALSE;
 }
 
-// "KBResult" is replaced by the keyboard's text (trimmed); "$KBResult$"
-// inside an argument too.
-static void ApplyKeyboardResult(std::string &arg)
+// The original repeats this at every use.
+void ApplyKeyboardResult(std::string &arg)
 {
 	if (StrCmpNoCase(arg.c_str(), "KBResult") == 0)
 	{

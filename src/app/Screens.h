@@ -93,7 +93,8 @@ public:
 	virtual ~CMessageBox();
 	HRESULT Create(int, int, int, int, int, int);         // 0x000B084D
 	void AddButton(const wchar_t *text);                  // 0x000AFB3D
-	void Show(const char *text, const wchar_t *title);    // 0x000B0F74
+	// buttons: 0 = OK, 4 = Yes/No. TODO: verify the values
+	void Show(const char *text, const wchar_t *title, int buttons = 0);   // 0x000B0F74
 };
 
 // The on-screen keyboard; $KBResult$ in an item's arguments is its last text.
@@ -101,8 +102,17 @@ class CVirtualKeyboard
 {
 public:
 	std::string GetResult();                              // 0x00014242
+	void SetTitle(const wchar_t *title);                  // 0x0001433E
+	void SetText(const wchar_t *text);                    // 0x00014302
+	void Show();                                          // vtable slot 3 TODO: verify
 };
 extern CVirtualKeyboard g_virtualKeyboard;               // 0x00278328
+extern BOOL g_bKeyboardPassword;                         // 0x0027846C masked input
+extern int g_nKeyboardMaxLength;                         // 0x00278470
+
+// An argument that is "KBResult" becomes the keyboard's text (trimmed);
+// "$KBResult$" inside it is replaced by that text.
+void ApplyKeyboardResult(std::string &arg);
 
 // DVD tray state from the SMC.
 class CTrayMonitor

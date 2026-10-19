@@ -4,6 +4,9 @@
 
 #include "../common/Platform.h"
 
+// Set to stop a running file operation (or a menu batch).
+extern BOOL g_bCancelOperation;      // 0x00277128
+
 void CopyDVD(const char *destination);                       // 0x000A9A30 NULL = ask
 void CopyFiles(const char *source, const char *destination);  // 0x000A9923
 void MoveFiles(const char *source, const char *destination);  // 0x000A9812
