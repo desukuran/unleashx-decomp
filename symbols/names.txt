@@ -1043,3 +1043,13 @@
 00090ef8 UnlockHdd
 0009048b GetHddInfoText
 000c7eb2 CHDDSetting::Save
+000ce1b9 CMusicSetting::Save
+000a2897 DrawProgressBar
+00106173 CMusicManager::IsPlaying
+001060bf CMusicManager::SetRandom
+001060b6 CMusicManager::SetGlobal
+0010607a CMusicManager::SetVolume
+001087df CMusicManager::SetSpeakerConfig
+000ac287 CAppSettings::GetMusicVolume
+00138511 CSoundEffects::Load
+00278d64 s_fMusicLabelWidth

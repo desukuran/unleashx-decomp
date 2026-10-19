@@ -37,6 +37,9 @@ HRESULT DrawGradientRect(float x, float y, float width, float height, D3DCOLOR c
 // with alpha 0..1. The last three arguments rotate/scale it. TODO: decompile
 HRESULT DrawTexture(IDirect3DTexture8 *texture, float x, float y, float width, float height, float alpha,
                     const float *origin, float unknown, const float *transform);   // 0x000A246F
+// A bar filled to percent (0-100), fill1 to fill2. TODO: decompile
+HRESULT DrawProgressBar(float x, float y, float width, float height, float percent, D3DCOLOR borderColor,
+                        D3DCOLOR backColor, D3DCOLOR fill1, D3DCOLOR fill2, BYTE gradient);   // 0x000A2897
 // "text..." in a centered box, with animated dots.
 HRESULT DrawBusyBox(CXBFont *font, const wchar_t *text);                     // 0x000A1D70
 

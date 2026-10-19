@@ -79,6 +79,8 @@ public:
 	void ClearChanged();                                      // 0x000BEEFA
 	void FreePopups();                                        // 0x000C1816
 	void DrawBackground();                                    // 0x000BF2B5
+	// Render's body (see SettingsBase.cpp).
+	void RenderPage(float &labelWidth, BOOL musicPage);
 	// B/BACK: asks "Save changes?" if anything changed, else closes.
 	void AskToSave();                                         // 0x000C5499
 	// Creates the message box on first use. The original passes this in edi.

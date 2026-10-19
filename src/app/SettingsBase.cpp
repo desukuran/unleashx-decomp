@@ -644,7 +644,16 @@ HRESULT CSettingsBase::Render()
 {
 	if (m_bClosed)
 		return S_OK;
+	RenderPage(m_fLabelWidth, FALSE);
+	return S_OK;
+}
 
+// The body of Render. CMusicSetting::Render (0x000C261F) is a copy of it
+// that keeps the label width in a static instead of the member, draws the
+// two volume lines as bars and doesn't mask passwords; musicPage selects
+// those differences.
+void CSettingsBase::RenderPage(float &labelWidth, BOOL musicPage)
+{
 	m_pFont->SetScaleFactors(g_pSettings->m_fUnknown131C, g_pSettings->m_fUnknown131C);
 	DimScreen(0.3f);
 	DrawBevelBox(m_fX, m_fY, m_fWidth, m_fHeight, g_colorScheme.DIALOG_BORDERCOLOR, g_colorScheme.DIALOG_BACKCOLOR,
@@ -663,22 +672,22 @@ HRESULT CSettingsBase::Render()
 
 	// The label column is as wide as the widest label (worked out once),
 	// at most half the list.
-	if (m_fLabelWidth == 0.0f)
+	if (labelWidth == 0.0f)
 	{
 		for (std::vector<CSettingItem>::iterator it = m_items.begin(); it != m_items.end(); ++it)
 		{
 			float width = m_pFont->GetTextWidth(it->m_strLabel.c_str());
-			if (width > m_fLabelWidth)
-				m_fLabelWidth = width;
+			if (width > labelWidth)
+				labelWidth = width;
 		}
-		m_fLabelWidth += 20.0f;
+		labelWidth += 20.0f;
 	}
 	float x = m_fX + 12.0f;
 	float y = LineHeight(m_pFont) * 0.5f + captionHeight + m_fY + 4.0f;
 	float rowWidth = m_fWidth - 24.0f;
-	if (m_fLabelWidth > rowWidth * 0.5f)
-		m_fLabelWidth = rowWidth * 0.5f - 2.0f;
-	float valueWidth = rowWidth - m_fLabelWidth;
+	if (labelWidth > rowWidth * 0.5f)
+		labelWidth = rowWidth * 0.5f - 2.0f;
+	float valueWidth = rowWidth - labelWidth;
 
 	m_pFont->Begin();
 	if (m_nFirstVisible > (int)m_items.size())
@@ -707,6 +716,18 @@ HRESULT CSettingsBase::Render()
 			m_pFont->Begin();
 		}
 
+		if (musicPage && (index == 8 || index == 5))
+		{
+			// The music and sound volume lines: a bar after the number.
+			// (Quirk: picked by position, not by type.)
+			m_pFont->End();
+			float numberWidth = m_pFont->GetTextWidth(L"100") + 10.0f;
+			DrawProgressBar(labelWidth + numberWidth + x, y - 6.0f, valueWidth - 10.0f - numberWidth, 12.0f,
+			                (float)item.m_nValue, g_colorScheme.DIALOG_BORDERCOLOR, g_colorScheme.DIALOG_BACKCOLOR,
+			                0xFF0000FF, 0xFF000040, 1);
+			m_pFont->Begin();
+		}
+
 		if (item.m_bHeader)
 		{
 			m_pFont->DrawText(m_fWidth * 0.5f + m_fX, y, g_colorScheme.CAPTION_TEXTCOLOR | 0xFF000000,
@@ -715,25 +736,31 @@ HRESULT CSettingsBase::Render()
 		else if (item.m_bEnabled)
 		{
 			DWORD color = index == m_nSelected ? g_colorScheme.OPTION_ACTIVETEXTCOLOR : g_colorScheme.OPTION_TEXTCOLOR;
-			m_pFont->DrawText(x, y, color, item.m_strLabel.c_str(), XBFONT_CENTER_Y | XBFONT_TRUNCATED, m_fLabelWidth);
-			if (item.m_bPassword)
+			m_pFont->DrawText(x, y, color, item.m_strLabel.c_str(), XBFONT_CENTER_Y | XBFONT_TRUNCATED, labelWidth);
+			if (musicPage)
+			{
+				m_pFont->DrawText(labelWidth + x, y, color, item.m_strValue.c_str(),
+				                  index == m_nSelected ? XBFONT_CENTER_Y : XBFONT_CENTER_Y | XBFONT_TRUNCATED,
+				                  valueWidth);
+			}
+			else if (item.m_bPassword)
 			{
 				size_t count = item.m_strValue.size() < 30 ? item.m_strValue.size() : 30;
 				for (size_t i = 0; i < count; i++)
 					masked[i] = L'*';
-				m_pFont->DrawText(m_fLabelWidth + x, y, color, masked, XBFONT_CENTER_Y, valueWidth);
+				m_pFont->DrawText(labelWidth + x, y, color, masked, XBFONT_CENTER_Y, valueWidth);
 			}
 			else
 			{
-				m_pFont->DrawText(m_fLabelWidth + x, y, color, item.m_strValue.c_str(),
+				m_pFont->DrawText(labelWidth + x, y, color, item.m_strValue.c_str(),
 				                  XBFONT_CENTER_Y | XBFONT_TRUNCATED, valueWidth);
 			}
 		}
 		else
 		{
 			DWORD color = g_colorScheme.DIALOG_DISABLEDTEXT | 0xFFC0C0C0;
-			m_pFont->DrawText(x, y, color, item.m_strLabel.c_str(), XBFONT_CENTER_Y | XBFONT_TRUNCATED, m_fLabelWidth);
-			m_pFont->DrawText(m_fLabelWidth + x, y, color, item.m_strValue.c_str(), XBFONT_CENTER_Y | XBFONT_TRUNCATED,
+			m_pFont->DrawText(x, y, color, item.m_strLabel.c_str(), XBFONT_CENTER_Y | XBFONT_TRUNCATED, labelWidth);
+			m_pFont->DrawText(labelWidth + x, y, color, item.m_strValue.c_str(), XBFONT_CENTER_Y | XBFONT_TRUNCATED,
 			                  valueWidth);
 		}
 
@@ -760,5 +787,4 @@ HRESULT CSettingsBase::Render()
 		m_pClockEditor->Render();
 	else if (m_bFileBrowserOpen)
 		m_pFileBrowser->Render();
-	return S_OK;
 }

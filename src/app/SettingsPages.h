@@ -379,3 +379,37 @@ public:
 	CHddLockDialog *m_pLockDialog;  // +0xB8
 	BOOL m_bLockDialogOpen;         // +0xBC
 };
+
+// Sounds and Audio Settings: music playback, volumes and the sound effect
+// files. 0xB8 bytes, vtable 0x0025680C.
+class CMusicSetting : public CSettingsBase
+{
+public:
+	enum
+	{
+		ITEM_PLAY_MUSIC,        // Off / Xbox / Custom / Both (m_nValue holds the mode)
+		ITEM_RANDOM,
+		ITEM_GLOBAL,
+		ITEM_MUSIC_PATH,        // folder pop-up; X clears it
+		ITEM_SURROUND,          // 5.1 (also the EEPROM AC3 flag)
+		ITEM_MUSIC_VOLUME,      // LEFT/RIGHT, 0-100 in m_nValue, drawn as a bar
+		ITEM_SOUND_HEADER,
+		ITEM_SOUND_ENABLE,
+		ITEM_SOUND_VOLUME,      // as the music volume
+		ITEM_EFFECTS_HEADER,
+		ITEM_EFFECT_FIRST,      // one line per SoundEffect: a .wav (X clears it)
+		ITEM_EFFECT_LAST = ITEM_EFFECT_FIRST + 9,
+		ITEM_SAVE_HEADER,
+		ITEM_SAVE,
+		ITEM_RESET,
+		ITEM_EXIT,
+	};
+
+	CMusicSetting() {}                                        // 0x000C1B0E
+	virtual ~CMusicSetting();                                 // 0x000C1AFA
+	virtual HRESULT Init(CXBFont *font);                      // 0x000C2CC1
+	virtual HRESULT HandleInput(int *action, SGamepadState **pad);   // 0x000D4A57
+	virtual HRESULT Render();                                 // 0x000C261F
+
+	BOOL Save();                                              // 0x000CE1B9
+};

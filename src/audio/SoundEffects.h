@@ -12,6 +12,8 @@ public:
 	// The named sound of the skin/sound set ("Select", "Back", "Menu Up",
 	// "Menu Down", ...), or NULL.
 	CSound *Find(const char *name);   // 0x001381E0 TODO: decompile
+	// (Re)loads the named sound from file. (this in eax) TODO: decompile
+	HRESULT Load(const char *name, const char *file, CSound **sound);   // 0x00138511
 
 	int m_unknown00;             // +0x00
 	BOOL m_bDisabled;            // +0x04 !<EnableSoundEffect>

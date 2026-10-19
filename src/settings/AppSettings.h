@@ -236,6 +236,8 @@ public:
 	void InitPaths(std::string xbePath);     // 0x000ACA86
 	// DirectSound volume (hundredths of dB) for effects. TODO: decompile
 	LONG GetSoundVolume();                   // 0x000AC21A
+	// DirectSound volume (hundredths of dB) for music. TODO: decompile
+	LONG GetMusicVolume();                   // 0x000AC287
 
 	static CAppSettings *s_pInstance;        // 0x0027626C
 
