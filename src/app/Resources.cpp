@@ -325,13 +325,14 @@ unsigned __stdcall LoadResources(void *param)
 				strcat(folder, "\\");
 				path = folder;
 			}
-			// The data path: the folder with the title ID after the drive.
+			// The data path: the same folder as a full E: path (U: is
+			// E:\UDATA\9e115330), e.g. E:\UDATA\9e115330\0064122817A8\.
 			mediaDir = folder;
 			std::string &dataPath = g_pSettings->m_strDataPath;
 			dataPath = StrLeft(mediaDir, 3);
 			dataPath.append("9e115330\\");
 			dataPath.append(StrMid(mediaDir, 3, (int)mediaDir.size() - 3));
-			StrReplaceAll(dataPath, "E:\\UDATA\\", "U:\\");
+			StrReplaceAll(dataPath, "U:\\", "E:\\UDATA\\");
 
 			// The save game's icon.
 			path = "U:\\SaveImage.xbx";

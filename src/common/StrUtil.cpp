@@ -354,3 +354,16 @@ std::string StrFromWide(const wchar_t *s)
 		out += (char)*s;
 	return out;
 }
+
+// 0x0009DF2C
+void StrWideToUtf8(const wchar_t *src, char *dst, unsigned int size)
+{
+	if (src == NULL || wcslen(src) == 0 || dst == NULL)
+		return;
+	unsigned int length = (unsigned int)wcslen(src);
+	if (length > size)
+		length = size;
+	int written = WideCharToMultiByte(65001 /* CP_UTF8 */, 0x40, src, (int)length, dst, (int)size, NULL, NULL);
+	if (written > 0)
+		dst[written] = '\0';
+}

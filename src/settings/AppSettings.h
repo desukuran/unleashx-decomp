@@ -250,7 +250,7 @@ public:
 	std::string m_strLaunchPath;             // +0x0C0C device path of this XBE
 	std::string m_strHomePath;               // +0x0C28 DOS dir of this XBE, lowercase, ends in '\'
 	std::string m_strXbeName;                // +0x0C44 file name of this XBE
-	std::string m_strDataPath;               // +0x0C60 the media folder with "9e115330\" after the drive (LoadResources)
+	std::string m_strDataPath;               // +0x0C60 the media folder as an E: path, E:\UDATA\9e115330\0064122817A8\ (LoadResources)
 	std::string m_strMSDashboard;            // +0x0C7C <MSDashBoard>
 	BOOL m_bRunFromDVD;                      // +0x0C98
 	BOOL m_bHomeNotOnD;                      // +0x0C9C our directory isn't what D: maps to. TODO: verify

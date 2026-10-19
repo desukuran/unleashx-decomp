@@ -61,6 +61,10 @@ BOOL IsFalseString(const char *s);
 // UTF-8 to wide into a buffer of size bytes, with the original's fallback
 // for text that doesn't convert cleanly.                          (0x0009DF6F)
 void StrUtf8ToWide(const char *src, wchar_t *dst, unsigned int size);
+// Wide to UTF-8 into a buffer: at most size characters, then a NUL (so the
+// buffer needs size + 1 bytes). Nothing for an empty or NULL string. (src in
+// edi, dst in esi)                                                (0x0009DF2C)
+void StrWideToUtf8(const wchar_t *src, char *dst, unsigned int size);
 // Wide to narrow string.                                          (0x00020B69)
 std::string StrFromWide(const wchar_t *s);
 

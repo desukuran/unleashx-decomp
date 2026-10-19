@@ -560,6 +560,17 @@ int MultiByteToWideChar(unsigned, DWORD, const char *src, int srcLen, wchar_t *d
 	return n;
 }
 
+int WideCharToMultiByte(UINT, DWORD, const wchar_t *wide, int wideLength, char *multiByte, int multiByteLength,
+                        const char *, BOOL *)
+{
+	if (wideLength < 0)
+		wideLength = (int)wcslen(wide) + 1;
+	int n = 0;
+	for (; n < wideLength && n < multiByteLength; n++)
+		multiByte[n] = wide[n] < 0x80 ? (char)wide[n] : '?';
+	return n;
+}
+
 DWORD XGetLaunchInfo(DWORD *type, PLAUNCH_DATA data)
 {
 	*type = 0;
