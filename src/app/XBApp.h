@@ -94,6 +94,10 @@ class CXBPackedResource
 {
 public:
 	CXBPackedResource();                      // 0x000972B3
+	~CXBPackedResource();                     // 0x000972AE
+	// Loads an .xpr file. (this on the stack, fileName in eax)
+	HRESULT Create(const char *fileName, DWORD numResourceTags = 0, void *resourceTags = NULL);   // 0x0009714B
+	void Destroy();                           // 0x00097104
 	// Texture of the named resource, or NULL.
 	IDirect3DTexture8 *GetTexture(const char *name);   // 0x0001C81B
 

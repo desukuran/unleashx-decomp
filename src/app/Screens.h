@@ -5,9 +5,11 @@
 #include <string>
 
 #include "../common/Platform.h"
+#include "XBApp.h"
 
 class CXBFontEx;
 class CXBFont;
+class CSound;
 struct IDirect3DTexture8;
 struct SGamepadState;
 
@@ -53,15 +55,43 @@ public:
 	void Show();                                          // 0x0011BAFA
 };
 
-// The settings menu. 0xA0 bytes.
+// The Control Panel: ten icons, each opening a settings page
+// (SettingsPages.h). 0xA0 bytes, no vtable. See SettingsMenu.cpp.
 class CSettingsMenu
 {
 public:
-	CSettingsMenu();                                      // 0x000BEBFD
-	virtual ~CSettingsMenu();
-	HRESULT Init(CXBFontEx *font);                        // 0x000C18A3
+	enum { PAGE_COUNT = 10, NO_PAGE = 10 };
+
+	CSettingsMenu();                                      // 0x000BEBFD (this in edx)
+	~CSettingsMenu();                                     // 0x000BEBCF (this in eax)
+	// Loads CtlPanel.xpr. (this in eax)
+	HRESULT Init(CXBFont *font);                          // 0x000C18A3
+	// Lays the panel out again and opens it. (this in ebx)
 	void Show();                                          // 0x0002B530
+	// Always returns 1. (this in ecx, action in edx, pad in eax)
+	int HandleInput(int *action, SGamepadState **pad);    // 0x000C62EE
+	// 1 when closed. (this in ebx)
+	HRESULT Render();                                     // 0x000C5E8A
+
+	CXBPackedResource m_resource;                         // +0x00 CtlPanel.xpr
+	IDirect3DTexture8 *m_pIcons[PAGE_COUNT];              // +0x18
+	class CSettingsBase *m_pPages[PAGE_COUNT];            // +0x40 created on first use
+	IDirect3DTexture8 *m_pSelectedIcon;                   // +0x68 drawn faintly behind the list
+	int m_nSelected;                                      // +0x6C
+	int m_nFirstVisible;                                  // +0x70
+	int m_nVisibleCount;                                  // +0x74
+	int m_nLastVisible;                                   // +0x78
+	float m_fX;                                           // +0x7C
+	float m_fY;                                           // +0x80
+	float m_fWidth;                                       // +0x84
+	float m_fHeight;                                      // +0x88
+	CXBFont *m_pFont;                                     // +0x8C
+	CSound *m_pSoundMove;                                 // +0x90 "Scroll"
+	CSound *m_pSoundSelect;                               // +0x94 "Select"
+	BOOL m_bClosed;                                       // +0x98
+	int m_nOpenPage;                                      // +0x9C NO_PAGE when none
 };
+
 
 // The skin chooser. 0xD0 bytes.
 class CSkinBrowser

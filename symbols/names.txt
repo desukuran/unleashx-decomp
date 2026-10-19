@@ -1004,7 +1004,6 @@
 000dc9d7 CVirtualKeyboard::Open
 000de58d CVirtualKeyboard::ProcessInput
 000caa5d CAutoLaunch::Save
-000d2057 CSettingsBase::ShowFileBrowser
 000113d9 CFileBrowser::SetTitle
 000112ba CFileBrowser::SetOption11C
 001281f6 CFileBrowser::AddFilter
@@ -1068,3 +1067,8 @@
 00038136 XSetNicknameW
 0005f1c5 _wtof
 0005f297 wcstod
+000bebcf CSettingsMenu::~CSettingsMenu
+000c62ee CSettingsMenu::HandleInput
+000c5e8a CSettingsMenu::Render
+0009714b CXBPackedResource::Create
+000972ae CXBPackedResource::~CXBPackedResource
