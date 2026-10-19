@@ -14,5 +14,10 @@ void ScanFolder(CXmlElement *folder, const char *path, const char *pattern, int 
                 BOOL delayLoad);                                         // 0x000E4459
 // Copies the cached folder items into the matching menu lists.
 void MergeFolderItems(CXmlElement *cache, CXmlElement *menu);            // 0x000E28D5
+// Set by MenuLoaderThread: FrameMove then creates the menu (mode 0).
+extern BOOL g_bMenuPending;                                              // 0x0027623C
+// Startup thread (from StartupThread): builds g_defaultMenu and fills its
+// game folders from the item cache; sets g_bMenuPending when done.
+unsigned __stdcall MenuLoaderThread(void *);                             // 0x000E9CCE
 // Removes (recursively) items whose XBE doesn't exist.
 void RemoveMissingXbes(CXmlElement *list);                               // 0x00110A15

@@ -1235,3 +1235,8 @@
 000390b8 XMountUtilityDrive
 0009906e CXBFont::CXBFont CXBFont * f(CXBFont *this@edx)
 00099051 CXBFont::~CXBFont void f(CXBFont *this@eax)
+000e9cce MenuLoaderThread
+000dfef4 IsFormatConfirmed BOOL f(XBGAMEPAD *pad@eax)
+000dfed7 IsFormatSkipped BOOL f(XBGAMEPAD *pad@eax)
+0009171d XKEEPROM::ReadFromXBOX void f(XKEEPROM *this@esi)
+000ac019 CheckDvdMedia

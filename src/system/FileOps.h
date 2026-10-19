@@ -13,7 +13,9 @@ extern BOOL g_bCancelOperation;      // 0x00277128
 // progress boxes.
 extern BOOL g_bFileOperationQueued;      // 0x00277650 TODO: verify
 extern BOOL g_bFileOperationActive;      // 0x00277120
-extern BOOL g_bFileOperationPaused;      // 0x00277124 TODO: verify
+// TODO: verify. PrepareHardDisk waits after CopyFiles until this (or
+// failed/cancelled) is set, and sets it at the end: it may mean "finished".
+extern BOOL g_bFileOperationPaused;      // 0x00277124
 // The running (or last) operation: 0 copy, 1 move, 2 delete, 3 zip, 4 unzip,
 // 5 unrar; 6 = none (FrameMove sets it back after reporting the end).
 extern int g_nFileOperationType;         // 0x0026BC60

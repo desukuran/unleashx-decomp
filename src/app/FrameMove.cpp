@@ -18,6 +18,7 @@
 #include "../system/SystemControl.h"
 #include "../ui/Language.h"
 #include "../ui/Menu.h"
+#include "../ui/MenuScan.h"
 #include "../ui/MenuDialogs.h"
 #include "../ui/StringIds.h"
 #include "FtpEvents.h"
@@ -99,7 +100,7 @@ HRESULT CUnleashX::FrameMove()
 
 	if (m_nMode == 0)
 	{
-		// (Nothing in the code sets g_bMenuPending.)
+		// The menu is ready once MenuLoaderThread has built it.
 		if (g_bMenuPending)
 		{
 			IDirect3DTexture8 *texture = m_pDashOrb != NULL ? m_pDashOrb : m_pOrb;
@@ -114,7 +115,7 @@ HRESULT CUnleashX::FrameMove()
 	else
 	{
 		// Start a disc when one goes in (unless a trigger is held).
-		if (!m_bAutoLaunchDisc || !g_bFrameDrawn)
+		if (!m_bDiscPresent || !g_bFrameDrawn)
 		{
 			s_bDiscHandled = FALSE;
 		}

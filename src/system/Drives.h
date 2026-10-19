@@ -111,6 +111,9 @@ enum DiscType
 extern int g_nDiscType;                    // 0x0026BBEC
 extern wchar_t g_szDiscTitle[0x80];        // 0x00276278
 int GetDiscType();                         // 0x000AA903
+// Updates drive D:'s state (media present, sizes) and returns an ID of the
+// disc in it, which changes when the disc does. TODO: decompile
+int CheckDvdMedia(BOOL extended);                       // 0x000AC019
 BOOL IsDiscPresent();                      // 0x000AA909
 const wchar_t *GetDiscTitleIfPresent();    // 0x000AA91E
 const wchar_t *GetDiscTypeName();          // 0x000AA7E8

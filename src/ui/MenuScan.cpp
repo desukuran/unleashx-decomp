@@ -18,11 +18,13 @@
 #include "../common/FileUtil.h"
 #include "../common/StrUtil.h"
 #include "../settings/AppSettings.h"
+#include "../settings/ConfigLoader.h"
 #include "../system/Storage.h"
 #include "../xml/XmlDocument.h"
 #include "../xml/XmlUtil.h"
 
 BOOL g_bItemCacheChanged;   // 0x00276240
+BOOL g_bMenuPending;        // 0x0027623C
 
 // 0x000E1F23
 // Each <Path> (with a drive letter) gets a cache <Folder>; DelayLoad="true"
@@ -378,4 +380,75 @@ void MergeFolderItems(CXmlElement *cache, CXmlElement *list)
 		}
 		child = list->GetNextChild();
 	}
+}
+
+// 0x000E9CCE
+// Builds the menu at startup: the built-in menu from Config.xml's <Menu>
+// (or the default one), then the game folders from the item cache, checked
+// against the disk (gone XBEs are dropped, folders rescanned). The cache is
+// saved when it changed (not when run from DVD).
+unsigned __stdcall MenuLoaderThread(void *)
+{
+	std::string folderPath;
+	std::string cachePath;
+	ResolvePath("d:\\items.xml", cachePath);
+	CXmlDocument cache;
+	if (!cache.Load(cachePath.c_str()))
+		cache.m_root.m_strName = "Cache";
+
+	// The menu: the lists, items, paths and sorts of Config.xml's <Menu>.
+	CXmlElement *root = &g_defaultMenu.m_root;
+	if (root->m_strName.size() == 0 || root->GetFirstChild() == NULL)
+	{
+		root->m_strName = "Menu";
+		CXmlElement *menu = g_config.FindElement(&g_config.m_root, "Menu");
+		if (menu != NULL)
+		{
+			for (CXmlElement *child = menu->GetFirstChild(); child != NULL; child = menu->GetNextChild())
+			{
+				const std::string &name = child->m_strName;
+				if (StrCmpNoCase(name, "List") == 0 || StrCmpNoCase(name, "Item") == 0 ||
+				    StrCmpNoCase(name, "Path") == 0 || StrCmpNoCase(name, "Sort") == 0)
+					AppendElement(root, CloneElement(child), &g_defaultMenu);
+			}
+		}
+	}
+	if (root->GetFirstChild() == NULL)
+		BuildDefaultMenu();
+
+	CollectMenuFolders(root, &cache.m_root);
+	bool removed = false;
+	for (CXmlElement *folder = cache.FindElement(&cache.m_root, "Folder"); folder != NULL;
+	     folder = cache.FindNextElement(&cache.m_root))
+	{
+		CXmlElement *item = folder->FindFirstChild("Item");
+		while (item != NULL)
+		{
+			if (!FileExists(item->GetAttribute("Action").c_str()))
+			{
+				folder->RemoveChild(item);
+				item = folder->FindFirstChild("Item");
+				removed = true;
+			}
+			else
+			{
+				item = folder->FindNextChild();
+			}
+		}
+		BOOL delayLoad = StrCmpNoCase(folder->GetAttribute("DelayLoad"), "False") != 0;
+		folderPath = folder->GetAttribute("Path");
+		if (DirectoryExists(folderPath.c_str()))
+			ScanFolder(folder, folderPath.c_str(), "default.xbe", 1, delayLoad);
+	}
+	MergeFolderItems(&cache.m_root, root);
+
+	if (!g_pSettings->m_bRunFromDVD && (g_bItemCacheChanged || removed || cache.m_bModified))
+	{
+		cache.SaveAs(cachePath.c_str());
+		g_bItemCacheChanged = FALSE;
+	}
+	cache.Clear();
+	g_bMenuPending = TRUE;
+	_endthreadex(0);
+	return 0;
 }

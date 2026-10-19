@@ -25,7 +25,7 @@ static std::map<int, std::wstring> s_textCache;                         // 0x002
 static CAppSettings *s_pSettings = CAppSettings::GetInstance();         // 0x0027783C
 
 DWORD g_dwSkinTextTick;                // 0x00278CEC tick of the last GetSkinTextValue call
-int g_nThreadCount;                    // 0x00276248 $Thread$; never written, so always 0
+int g_nThreadCount;                    // 0x00276248 $Thread$: running threads (ThreadNotifyRoutine)
 int g_nFtpClientCount;                 // 0x002785D8 $NumClient$ TODO: verify
 
 // Refresh deadlines (GetTickCount values).

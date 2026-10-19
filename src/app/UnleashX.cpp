@@ -24,7 +24,6 @@ CAudioGUI *g_pAudioGUI;                    // 0x00276228
 HANDLE g_hNetworkThread = INVALID_HANDLE_VALUE;   // 0x0026A630
 CXBPackedResource *g_pResource;            // 0x00276200 m_resource of the app
 IDirectSound *g_pDirectSound;               // 0x00276224
-BOOL g_bMenuPending;                       // 0x0027623C
 BOOL g_bFrameDrawn;                        // 0x00276218
 float g_fGlobeSpin;                        // 0x0027621C
 DWORD g_dwGlobeSpinTime;                   // 0x00276220
@@ -85,7 +84,7 @@ CUnleashX::CUnleashX()
 	m_pScreenSaver = NULL;
 	m_bScreenSaverActive = 0;
 	m_bKeepAwake = 0;
-	m_bAutoLaunchDisc = 0;
+	m_bDiscPresent = 0;
 	m_pSettingsMenu = NULL;
 	m_pClockEditor = NULL;
 	m_pPassCode = NULL;

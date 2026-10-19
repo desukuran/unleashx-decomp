@@ -138,7 +138,7 @@ public:
 	BOOL m_bPasswordShown;                    // +0x1960 the keyboard asks for the password at startup
 	int m_unknown1964;                        // +0x1964
 	BOOL m_bTakeScreenshot;                   // +0x1968 save the next frame as a .bmp
-	BOOL m_bAutoLaunchDisc;                   // +0x196C start a disc when one is inserted
+	BOOL m_bDiscPresent;                      // +0x196C a disc is in (MonitorThread); FrameMove autostarts it
 	BOOL m_bStartMusic;                       // +0x1970 create the music manager (soundtracks)
 	BOOL m_bKeepAwake;                        // +0x1974 no screen saver this frame. TODO: verify
 	CXBMesh m_outerSphereMesh;                // +0x1978 OuterSphere.xbg (textured with CellWall)
@@ -206,8 +206,6 @@ void __stdcall ThreadNotifyRoutine(BOOL create);    // 0x000DFF8C
 
 // Creates g_pMusicManager (on a thread; directly if that fails). TODO: decompile
 unsigned __stdcall MusicManagerThread(void *app);  // 0x000E85B3
-// Set (by nothing in the code) to create the menu from mode 0.
-extern BOOL g_bMenuPending;                  // 0x0027623C
 // Set by Render after each frame (FrameMove waits for the first one).
 extern BOOL g_bFrameDrawn;                   // 0x00276218
 // The globe spins this way after a menu move (+1 up, -1 down), and when.

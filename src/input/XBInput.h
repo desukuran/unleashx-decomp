@@ -5,6 +5,11 @@
 
 #include "../common/Platform.h"
 
+#ifndef XINPUT_GAMEPAD_START
+#define XINPUT_GAMEPAD_START 0x0010
+#define XINPUT_GAMEPAD_BACK 0x0020
+#endif
+
 // The start of XBGAMEPAD: what a gamepad looks like to most code.
 struct SGamepadState
 {

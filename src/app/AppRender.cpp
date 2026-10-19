@@ -137,7 +137,7 @@ HRESULT CUnleashX::Render()
 	g_pd3dDevice->SetViewport((const D3DVIEWPORT8 *)&g_pSettings->m_viewport);
 
 	// A video or slideshow screen saver takes the whole screen.
-	// TODO: verify the FTP field (+0x124) it checks.
+	// (CFTPServer +0x124, m_bPaused: also checked by MonitorThread.)
 	if (m_bScreenSaverActive && !m_pScreenSaver->IsTextOnly() &&
 	    (g_pSettings->m_prefs.m_nScreenSaverType != 0 || g_ftpServer.m_bPaused))
 	{
