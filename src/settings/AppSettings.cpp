@@ -170,7 +170,7 @@ void CAppSettings::SetDefaults()
 	m_prefs.m_bAudioCDAutoLaunch = TRUE;
 	m_prefs.m_bDataAutoLaunch = FALSE;
 	m_prefs.m_bSNTPSync = FALSE;
-	m_prefs.m_unknown98 = 1;
+	m_prefs.m_bSNTPAllowHTTP = TRUE;
 	m_prefs.m_nSNTPPort = 123;
 	m_prefs.m_strAudioCDPlayer.clear();
 	m_prefs.m_strDVDPlayer = m_strMSDashboard;

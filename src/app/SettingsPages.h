@@ -54,3 +54,40 @@ public:
 
 	DWORD m_unknownB8;              // +0xB8
 };
+
+// Date/Time Settings: the clock (opens the clock pop-up), 24-hour format,
+// setting the clock at startup and the SNTP time server. 0xB8 bytes, vtable
+// 0x0025682C.
+class CDateTimeSetting : public CSettingsBase
+{
+public:
+	enum
+	{
+		ITEM_CLOCK,             // the current date and time, refreshed every second
+		ITEM_24H_FORMAT,
+		ITEM_AUTO_SET_CLOCK,
+		ITEM_SNTP_HEADER,
+		ITEM_SNTP_ENABLE,
+		ITEM_SNTP_SERVER,       // IP address pop-up
+		ITEM_SNTP_PORT,         // keyboard
+		ITEM_SNTP_ALLOW_HTTP,
+		ITEM_SAVE_HEADER,
+		ITEM_SAVE,
+		ITEM_RESET,
+		ITEM_EXIT,
+	};
+
+	CDateTimeSetting() {}                                     // 0x000C1C14
+	virtual ~CDateTimeSetting();                              // 0x000C1C00
+	virtual HRESULT Init(CXBFont *font);                      // 0x000D1BBB
+	virtual HRESULT HandleInput(int *action, SGamepadState **pad);   // 0x000D16A4
+	// Quirk: ignores index; enables or disables the three SNTP lines.
+	virtual void SetItemEnabled(int index, BOOL enabled);     // 0x000BEECD
+
+	BOOL Save();                                              // 0x000C9B4B
+};
+
+// Checks a value typed for the line index (only the SNTP port is checked: it
+// must be 1..65535). On failure text is reset to "13" and message says why.
+// The original takes text in edi.
+BOOL ValidateSNTPValue(wchar_t *text, int index, char *message);   // 0x000BF191

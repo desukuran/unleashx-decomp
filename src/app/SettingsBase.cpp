@@ -2,6 +2,7 @@
 // "save changes?" question. The pages derive from it (Settings*.cpp).
 #include "SettingsBase.h"
 
+#include <cstdio>
 #include <cstring>
 #include <cwchar>
 
@@ -9,7 +10,9 @@
 #include "../audio/SoundEffects.h"
 #include "../render/Draw.h"
 #include "../render/Fonts.h"
+#include "../common/FileUtil.h"
 #include "../settings/AppSettings.h"
+#include "../settings/ConfigLoader.h"
 #include "../skin/SkinColors.h"
 #include "../ui/Language.h"
 #include "../ui/StringIds.h"
@@ -310,6 +313,109 @@ void CSettingsBase::ShowMessage(const char *text, const wchar_t *title, int butt
 		m_pMessageBox->Show(text, title, buttons);
 		m_bMessageBoxOpen = TRUE;
 	}
+}
+
+// 0x000CB39E
+void CSettingsBase::ShowIPEditor(const wchar_t *address, const wchar_t *title)
+{
+	if (m_pIPEditor == NULL)
+	{
+		m_pIPEditor = new CIPAddressEditor;
+		if (m_pIPEditor != NULL && FAILED(m_pIPEditor->Init(m_pFont)))
+		{
+			delete m_pIPEditor;
+			m_pIPEditor = NULL;
+		}
+	}
+	if (m_pIPEditor != NULL)
+	{
+		m_pIPEditor->m_strTitle = title;
+		m_pIPEditor->SetAddress(address);
+		m_pIPEditor->Show();
+		m_bIPEditorOpen = TRUE;
+	}
+}
+
+// 0x000CB434
+void CSettingsBase::ShowClockEditor()
+{
+	if (m_pClockEditor == NULL)
+	{
+		m_pClockEditor = new CClockEditor;
+		// (Init is declared with a CXBFontEx; the SetClock action passes one.)
+		if (m_pClockEditor != NULL && FAILED(m_pClockEditor->Init((CXBFontEx *)m_pFont)))
+		{
+			delete m_pClockEditor;
+			m_pClockEditor = NULL;
+		}
+	}
+	if (m_pClockEditor != NULL)
+	{
+		m_pClockEditor->Show();
+		m_bClockEditorOpen = TRUE;
+	}
+}
+
+// 0x000BFFE0
+void CSettingsBase::OpenKeyboard(const wchar_t *title, const wchar_t *text, BOOL password, int maxLength, int owner)
+{
+	g_nKeyboardMaxLength = 64;
+	if (maxLength != 0)
+		g_nKeyboardMaxLength = maxLength;
+	if (g_nKeyboardOwner != owner)
+		g_virtualKeyboard.Open();
+	g_nKeyboardOwner = owner;
+	g_virtualKeyboard.SetTitle(title);
+	g_virtualKeyboard.Open();
+	g_bKeyboardPassword = password;
+	if (text != NULL)
+		g_virtualKeyboard.SetText(text);
+	m_bKeyboardOpen = TRUE;
+}
+
+BOOL CSettingsBase::FinishSave(BOOL ok, const char *error, BOOL changed, BOOL needRestart)
+{
+	if (!ok)
+	{
+		ShowMessage(error, L"Save Error", MSGBOX_BUTTONS_OK);
+		return FALSE;
+	}
+	if (!changed)
+		return TRUE;
+
+	if (g_pSettings->m_bRunFromDVD)
+	{
+		ShowMessage("Some settings have been applied but you need to run this application from the hard drive to "
+		            "persist the changes.",
+		            L"Warning", MSGBOX_BUTTONS_OK);
+	}
+	else
+	{
+		std::string path;
+		if (g_config.m_strFileName.size() != 0)
+			ResolvePath(g_config.m_strFileName.c_str(), path);
+		else
+			ResolvePath("D:\\config.xml", path);
+		if (!g_config.SaveAs(path.c_str()))
+		{
+			char message[100];
+			DWORD lastError = GetLastError();
+			sprintf(message, GetStringA(STR_MSG_SETTING_SAVE_ERROR), lastError);
+			ShowMessage(message, L"Save Error", MSGBOX_BUTTONS_OK);
+			ok = FALSE;
+		}
+		else
+		{
+			if (needRestart)
+				ShowRestartMessage();
+			else
+				ShowSavedMessage();
+			ClearChanged();
+		}
+	}
+	if (ok)
+		m_bModified = FALSE;
+	return ok;
 }
 
 // 0x000C54E0

@@ -9,6 +9,7 @@
 class CXBFontEx;
 class CXBFont;
 struct IDirect3DTexture8;
+struct SGamepadState;
 
 // Screen modes (CUnleashX::m_nMode)
 enum AppMode
@@ -97,6 +98,11 @@ public:
 	HRESULT Init(CXBFontEx *font);                        // 0x000C1FAC
 	void Show();                                          // 0x000C0B13
 	void Render();                                        // 0x000BFC70
+	void ProcessInput(int *action, SGamepadState **pad);  // 0x000C1102
+
+	BYTE m_unknown00[0x0C];
+	BOOL m_bOpen;                                         // +0x0C
+	BYTE m_unknown10[0x2A4 - 0x10];
 };
 
 // The settings pages' IP address pop-up: four CUpDown spinners (0-255).
@@ -109,6 +115,21 @@ public:
 	HRESULT Init(CXBFont *font);                          // 0x000C1D45
 	void Show();                                          // 0x000C066E reads the address set before
 	void Render();                                        // 0x000BF86F
+	// The original takes address in eax.
+	void SetAddress(const wchar_t *address);              // 0x000C1A55
+	// "a.b.c.d" from the spinners. The original takes this in esi.
+	void GetAddress(wchar_t *address);                    // 0x000BFC30
+	// A accepts, B/BACK cancels (and resets the spinners). The original
+	// takes this in eax and action in edi.
+	void ProcessInput(int *action, SGamepadState **pad);  // 0x000C09EE
+
+	BYTE m_unknown00[0x0C];
+	BOOL m_bOpen;                                         // +0x0C
+	BYTE m_unknown10[0x170 - 0x10];
+	std::wstring m_strTitle;                              // +0x170
+	std::string m_strAddress;                             // +0x18C
+	BOOL m_bCancelled;                                    // +0x1AC
+	BYTE m_unknown1B0[0x1C4 - 0x1B0];
 };
 
 // The settings pages' file pop-up ("Browse XBE"). 0x180 bytes.
@@ -172,13 +193,20 @@ public:
 	void Open();                                          // vtable slot 3, 0x000DC9D7
 	void ProcessInput(int *action);                       // vtable slot 1, 0x000DE58D
 	void Render();                                        // vtable slot 2, 0x000DDA5A
+	// The typed text, or "" if cancelled.
+	const wchar_t *GetText();                             // 0x0001421F
 	BOOL IsDone() const;                                  // 0x00014325 OK or cancelled
 };
 extern CVirtualKeyboard g_virtualKeyboard;               // 0x00278328
 extern BOOL g_bKeyboardPassword;                         // 0x0027846C masked input
 extern int g_nKeyboardMaxLength;                         // 0x00278470
 extern BOOL g_bKeyboardAccepted;                         // 0x0027A5CC TODO: verify (also read for the passcode pad)
-extern int g_nKeyboardMode;                              // 0x00278460 0 = item password, else the master password prompt
+// TODO: verify. 0x00278460 is g_virtualKeyboard+0x138: BACK sets it to 1
+// (CUnleashX::FrameMove), GetText() returns "" when it's set, and the
+// settings pages only use the text when it's 0, so it looks like
+// "cancelled" rather than a mode.
+extern int g_nKeyboardMode;                              // 0x00278460
+extern int g_nKeyboardOwner;                             // 0x00278468 who opened it (settings line), 0 = none
 
 // An argument that is "KBResult" becomes the keyboard's text (trimmed);
 // "$KBResult$" inside it is replaced by that text.

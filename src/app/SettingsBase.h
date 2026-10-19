@@ -83,6 +83,17 @@ public:
 	void AskToSave();                                         // 0x000C5499
 	// Creates the message box on first use. The original passes this in edi.
 	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x000C5358
+	// Opens the IP address pop-up / the clock pop-up / the on-screen
+	// keyboard (owner tells the keyboard whether it's a new input; the
+	// original takes maxLength in eax, 0 = 64, and owner in edi).
+	void ShowIPEditor(const wchar_t *address, const wchar_t *title);   // 0x000CB39E
+	void ShowClockEditor();                                   // 0x000CB434
+	void OpenKeyboard(const wchar_t *title, const wchar_t *text, BOOL password, int maxLength,
+	                  int owner);                             // 0x000BFFE0
+	// The end of each page's Save (repeated in each in the original):
+	// reports error, or writes Config.xml (when changed) and says whether
+	// a restart is needed. Returns ok.
+	BOOL FinishSave(BOOL ok, const char *error, BOOL changed, BOOL needRestart);
 	void ShowSavedMessage();                                  // 0x000C54E0
 	void ShowRestartMessage();                                // 0x000C54FD
 

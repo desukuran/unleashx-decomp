@@ -180,7 +180,7 @@ struct SPreferences
 	BOOL m_bSNTPSync;                   // +0x74
 	std::string m_strSNTPServer;        // +0x78
 	int m_nSNTPPort;                    // +0x94
-	int m_unknown98;                    // +0x98 1
+	BOOL m_bSNTPAllowHTTP;              // +0x98 1; saved as <SNTP HTTP=...> but never loaded
 	std::string m_strUnknown9C;         // +0x9C
 	std::string m_strSkinPath;          // +0xB8 <Skin Path=...>
 	std::string m_strSkinName;          // +0xD4 <Skin>

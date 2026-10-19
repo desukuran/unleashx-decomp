@@ -994,3 +994,12 @@
 0008ef3c SetAudioDTS
 000c5e51 GetOrAddChildElement bool f(char *name, CXmlElement *parent, CXmlElement **element@esi)
 0002039a IsNoW
+000c9b4b CDateTimeSetting::Save
+000bf191 ValidateSNTPValue BOOL f(wchar_t *text@edi, int index, char *message)
+000c09ee CIPAddressEditor::ProcessInput
+000bfc30 CIPAddressEditor::GetAddress
+000c1a55 CIPAddressEditor::SetAddress
+000c1102 CClockEditor::ProcessInput
+0001421f CVirtualKeyboard::GetText
+000dc9d7 CVirtualKeyboard::Open
+000de58d CVirtualKeyboard::ProcessInput
