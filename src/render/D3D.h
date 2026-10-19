@@ -13,11 +13,15 @@ typedef DWORD D3DCOLOR;
 
 #define D3DFMT_X1R5G5B5 0x03
 #define D3DFMT_A8R8G8B8 0x06
+#define D3DFMT_A4R4G4B4 0x04
 #define D3DFMT_DXT1 0x0C
+#define D3DFMT_DXT3 0x0E
 #define D3DFMT_LIN_R5G6B5 0x11
 #define D3DFMT_LIN_A8R8G8B8 0x12
 #define D3DFMT_LIN_X1R5G5B5 0x1C
 #define D3DX_FILTER_NONE 1
+#define D3DX_FILTER_TRIANGLE 4
+#define D3DX_DEFAULT ((UINT)-1)
 
 #define D3DRTYPE_TEXTURE 3
 #define D3DLOCK_READONLY 0x80   // TODO: verify (LockRect flags 0x80 in the original)
@@ -269,6 +273,8 @@ struct IDirect3DDevice8
 	HRESULT DrawVerticesUP(DWORD primitiveType, UINT vertexCount, const void *vertices, UINT stride);
 	HRESULT GetDisplayMode(D3DDISPLAYMODE *mode);
 	HRESULT GetBackBuffer(int index, DWORD type, IDirect3DSurface8 **surface);
+	// A surface in system memory. (D3DDevice_CreateImageSurface, 0x00144840)
+	HRESULT CreateImageSurface(UINT width, UINT height, D3DFORMAT format, IDirect3DSurface8 **surface);
 	HRESULT SetScissors(DWORD count, BOOL exclusive, const D3DRECT *rects);
 	HRESULT Clear(DWORD count, const D3DRECT *rects, DWORD flags, D3DCOLOR color, float z, DWORD stencil);
 	HRESULT Present(const void *, const void *, void *, void *);
@@ -290,6 +296,19 @@ HRESULT D3DXLoadSurfaceFromSurface(IDirect3DSurface8 *destination, const void *d
                                    DWORD filter, D3DCOLOR colorKey);
 void Get2DSurfaceDesc(D3DResource *resource, DWORD level, D3DSURFACE_DESC *desc);
 
+HRESULT D3DXCreateTexture(IDirect3DDevice8 *device, UINT width, UINT height, UINT mipLevels, DWORD usage,
+                          D3DFORMAT format, DWORD pool, IDirect3DTexture8 **texture);
+// info: D3DXIMAGE_INFO (SImageInfo, Texture.h).
+HRESULT D3DXCreateTextureFromFileInMemoryEx(IDirect3DDevice8 *device, const void *data, UINT size, UINT width,
+                                            UINT height, UINT mipLevels, DWORD usage, D3DFORMAT format, DWORD pool,
+                                            DWORD filter, DWORD mipFilter, D3DCOLOR colorKey, void *info,
+                                            void *palette, IDirect3DTexture8 **texture);
+HRESULT D3DXLoadSurfaceFromFileInMemory(IDirect3DSurface8 *destination, const void *destPalette,
+                                        const void *destRect, const void *data, UINT size, const void *srcRect,
+                                        DWORD filter, D3DCOLOR colorKey, void *info);   // 0x00153B71
+// TRUE: DXT2/DXT4 data loads as DXT3/DXT5. 0x001536E0
+void D3DXSetDXT3DXT5(BOOL set);
+BOOL XGIsSwizzledFormat(D3DFORMAT format);
 HRESULT D3DXCreateTextureFromFileA(IDirect3DDevice8 *device, const char *file,
                                    IDirect3DTexture8 **texture);   // 0x001542A1
 // D3DX math (matrices are 4x4 floats).
@@ -299,6 +318,8 @@ float *D3DXMatrixRotationYawPitchRoll(float *out, float yaw, float pitch, float 
 float *D3DXMatrixMultiply(float *out, const float *a, const float *b);                      // 0x0003E25B
 // v (x, y, z, 1) times m, into a 4-vector.
 float *D3DXVec3Transform(float *out, const float *v, const float *m);                       // 0x0003E19C
+float *D3DXMatrixTranslation(float *out, float x, float y, float z);                         // 0x0003E400
+float *D3DXMatrixScaling(float *out, float x, float y, float z);                             // 0x0003E3A4
 float *D3DXMatrixIdentity(float *out);                                                      // 0x00020B0E (out in eax)
 float *D3DXMatrixTranspose(float *out, const float *m);                                     // 0x0003E359
 float D3DXVec4Length(const float *v);

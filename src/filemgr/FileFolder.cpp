@@ -293,6 +293,38 @@ SFolderItem *IFileFolder::GetItem(int index)
 	return m_items[index];
 }
 
+// The end of each LoadList(): the highlighted item, the line height, and
+// the scroll position back where this level was. (inlined)
+void IFileFolder::FitList()
+{
+	if (m_items.size() != 0)
+		m_pCurrent = m_items[0];
+	m_nLineHeight = (int)(m_pFont->m_fScaleFactorY * m_pFont->m_fFontHeight) + 2;
+	int count = (int)m_items.size();
+	m_nCount = count;
+	m_nVisible = (int)(m_fHeight / (float)m_nLineHeight);
+	if (count < m_nVisible)
+		m_nVisible = count;
+	int top = m_topStack[m_nLevel];
+	int selected = m_nSelected;
+	m_nTop = top;
+	if (selected < top)
+		m_nTop = selected;
+	if (count - 1 < m_nTop)
+		m_nTop = 0;
+	m_nBottom = m_nVisible - 1 + m_nTop;
+	if (count - 1 < selected)
+	{
+		m_nSelected = 0;
+		m_nTop = 0;
+	}
+	else if (m_nBottom < selected)
+	{
+		m_nTop = (selected - m_nBottom) - 1 + m_nVisible;
+		m_nBottom = m_nTop - 1 + m_nVisible;
+	}
+}
+
 // 0x0012AA4E
 void IFileFolder::AddEntry(const WIN32_FIND_DATAA *data, ULONGLONG displaySize, ULONGLONG dateNumber, BOOL inKB)
 {
@@ -984,33 +1016,7 @@ void CFileFolder::LoadList()
 		FormatNumberW(m_szTotalSize, m_ullTotalSize);
 	}
 
-	if (m_items.size() != 0)
-		m_pCurrent = m_items[0];
-	m_nLineHeight = (int)(m_pFont->m_fScaleFactorY * m_pFont->m_fFontHeight) + 2;
-	int count = (int)m_items.size();
-	m_nCount = count;
-	m_nVisible = (int)(m_fHeight / (float)m_nLineHeight);
-	if (count < m_nVisible)
-		m_nVisible = count;
-	// Back to where this level was.
-	int top = m_topStack[m_nLevel];
-	int selected = m_nSelected;
-	m_nTop = top;
-	if (selected < top)
-		m_nTop = selected;
-	if (count - 1 < m_nTop)
-		m_nTop = 0;
-	m_nBottom = m_nVisible - 1 + m_nTop;
-	if (count - 1 < selected)
-	{
-		m_nSelected = 0;
-		m_nTop = 0;
-	}
-	else if (m_nBottom < selected)
-	{
-		m_nTop = (selected - m_nBottom) - 1 + m_nVisible;
-		m_nBottom = m_nTop - 1 + m_nVisible;
-	}
+	FitList();
 	m_bListed = TRUE;
 }
 

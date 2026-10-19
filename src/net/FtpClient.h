@@ -105,7 +105,7 @@ public:
 	DWORD m_unknown4DC;                 // +0x4DC
 	ULONGLONG m_ullBytesUploaded;       // +0x4E0
 	ULONGLONG m_ullBytesDownloaded;     // +0x4E8
-	std::string m_strUnknown4F0;        // +0x4F0
+	std::string m_strHost;              // +0x4F0 (set by CFTPFileFolder; Connect takes its own)
 	int m_nControlPort;                 // +0x50C 21
 	std::string m_strUser;              // +0x510 "xbox"
 	std::string m_strPassword;          // +0x52C "xbox"

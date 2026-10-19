@@ -131,6 +131,10 @@ public:
 	BOOL m_bDrawBorder;                // +0x8E8 frames even over a background
 	IDirect3DTexture8 *m_pBackground;  // +0x8EC the skin's file manager background
 
+	// Starts the collect thread for pane (the FTP manager uses it too).
+	// (pane in edi)
+	static BOOL StartCollect(IFileFolder *pane);          // 0x00128855
+
 private:
 	// The frame for the screen (safe border or not). (this in eax)
 	void SetDefaultRect();                                // 0x00014189
@@ -145,8 +149,6 @@ private:
 	void ShowResult(std::string text, const wchar_t *title);   // 0x0012A2C4
 	// The text editor (g_pFileViewer), made once. (this on the stack)
 	BOOL CreateTextEditor();                              // 0x00129345
-	// Starts the collect thread for pane. (pane in edi)
-	static BOOL StartCollect(IFileFolder *pane);          // 0x00128855
 	static unsigned __stdcall CollectThread(void *param); // 0x0012824E
 	// The copy/move/delete/zip thread. (FileManagerOps.cpp)
 	static unsigned __stdcall OperationThread(void *param);   // 0x0012B374
@@ -166,6 +168,9 @@ private:
 
 // The error to report: GetLastError(), else g_dwOperationError. (0x0012631D)
 DWORD GetOperationError();
+// A total for the "You are about to ..." messages: "1.23" MB from 10 MB,
+// KB from 10 KB, else bytes. (inlined in each; FileManagerInput.cpp)
+void FormatTotal(ULONGLONG total, std::string &value, const char *&unit);
 
 // The panes' sounds (FileFolder.cpp).
 extern CSound *g_pFolderSelectSound;     // 0x002761C8

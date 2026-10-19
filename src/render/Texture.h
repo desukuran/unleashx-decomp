@@ -3,24 +3,31 @@
 #pragma once
 
 #include "../common/Platform.h"
+#include "D3D.h"
 
 struct IDirect3DDevice8;
 struct IDirect3DTexture8;
 struct IDirect3DSurface8;
 
+// D3DXIMAGE_INFO (Xbox): the file's own picture.
 struct SImageInfo
 {
 	int width;
 	int height;
-	DWORD unknown[3];
+	DWORD depth;
+	DWORD mipLevels;
+	D3DFORMAT format;
 };
 
 extern IDirect3DDevice8 *g_pd3dDevice;   // 0x00277664
 
-// width/height: requested size, or 1 to keep the file's size (TODO: verify).
-// Returns FALSE on failure (and *texture = NULL).
+// Reads the file (through the virtual file layer) and makes a texture of
+// its own size; if that fails, one that fits the display mode (width and
+// height below 2: the picture's size), and then a 16-bit one that fits
+// the TV. Big pictures are DXT3 with <TextureCompression>. info gets the
+// picture's own size. FALSE on failure (and *texture = NULL). (path in ecx)
 BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *device, IDirect3DTexture8 **texture,
-                         int width, int height, SImageInfo *info);   // 0x0009ECB3 TODO: decompile
+                         int width, int height, SImageInfo *info);   // 0x0009ECB3
 
 // D3DResource_Release (XDK) and clear the pointer.
 void ReleaseTexture(IDirect3DTexture8 *&texture);   // inlined everywhere in the original
@@ -28,16 +35,21 @@ void ReleaseTexture(IDirect3DTexture8 *&texture);   // inlined everywhere in the
 // The display mode's size (cached: read again when refresh is set or no
 // height was cached yet). Either pointer may be NULL. The original takes
 // width in esi and height in edi.
-void GetDisplaySize(float *width, float *height, BOOL refresh);    // 0x0009F14B TODO: decompile
+void GetDisplaySize(float *width, float *height, BOOL refresh);    // 0x0009F14B
+// A 640x480 copy of the front or back buffer into *texture (released
+// first). (texture in eax)
+HRESULT CaptureBackBuffer(IDirect3DTexture8 **texture, BOOL backBuffer);   // 0x0009F19C
 
 // The title image ($$XTIMAGE section) of an XBE: an XPR texture or a DDS.
 BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture);  // 0x0009FAAF TODO: decompile
 // Writes a surface as a .bmp file. TODO: decompile (library code?)
 HRESULT SaveSurfaceToBmp(IDirect3DSurface8 *surface, const char *path);   // 0x0016FD40
-// A texture from an .xpr file (the MS dashboard's .xbx files). TODO: decompile
+// A texture from an .xpr file holding one texture (the MS dashboard's .xbx
+// files), read straight into it.
 bool LoadXprTexture(const char *path, IDirect3DTexture8 **texture);   // 0x0009F909
 // The first texture of an .xpr file, copied with black as the color key.
-BOOL LoadXprFileTexture(const char *path, IDirect3DTexture8 **texture);   // 0x000A2371 TODO: decompile
+// (path in eax)
+BOOL LoadXprFileTexture(const char *path, IDirect3DTexture8 **texture);   // 0x000A2371
 
 // Name -> texture table: the textures the dialogs share ("Keyboard", set
 // from the skin's resource at startup).

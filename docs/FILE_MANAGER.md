@@ -160,6 +160,117 @@ Quirks:
 * The error box is drawn under the model.
 * The button that dismisses an error also closes the viewer.
 
+## FTP manager
+
+`src/filemgr/Ftp*.cpp`. The left pane is the file manager's own; the right
+one lists the FTP sites, and once connected the site's files (through the
+FTP client, `FTP.md`). Under the panes, while connected, is the transfer
+queue.
+
+### Sites
+
+The site list is `FtpSrv.xml` in the data folder:
+
+```xml
+<FTPSite>
+  <Site Host="192.168.0.2" Port="21" User="xbox" Pass="eGJveA==" PASV="Yes"
+        RemotePath="/E/Games" LocalPath="E:\Games">Living room</Site>
+</FTPSite>
+```
+
+* `Pass` is Base64.
+* A site needs a host and a port.
+* `RemotePath` is the folder to open after connecting.
+* `LocalPath` is opened in the left pane when connecting, if it exists.
+
+With `<FTPClient DetectPeer="Yes">` (the default) the list also shows the
+Xboxes that answer the network scan, named after their reply (or `[ip]`).
+Those can't be edited or deleted. `<FTPClient MinPort MaxPort>` set the
+active-mode port range.
+
+The site menu (START or WHITE) has these entries:
+
+* **Connect** (also A on a site).
+* **Quick Connect...:** the site editor without saving. The values are kept
+  for the next quick connect.
+* **New Site..., Edit Site..., Delete Site.** A name already in use gets
+  `(1)`, `(2)` and so on.
+* **Refresh:** scans the network again.
+* **View Log...**
+* **Switch to Local Browser:** back to the file manager.
+
+The site editor ("FTP Site Manager") has these lines:
+
+| Line | Notes |
+|---|---|
+| Site name | 30 characters; only for new sites. |
+| Address | 100 characters. |
+| Port | 1-65536. |
+| User Name | |
+| Password | Shown as stars. |
+| PASV | A toggles it. |
+| Remote Path | A `/` is put in front. |
+| Local Path | Chosen with the folder browser; not for a quick connect. |
+
+X clears the name, address, user and password. New sites start as port 21,
+user and password `xbox`, passive mode, and open the keyboard for the name.
+
+### Connected
+
+| Button | Effect |
+|---|---|
+| A | Opens a folder (files don't open). |
+| B | Up a folder (not while a transfer runs). |
+| X | Mark (the first line can't be marked). |
+| LT / RT | The left / right pane. |
+| Left / Right (and the remote's) | Cycle left pane, right pane, queue. |
+| Right stick click | The queue takes the input, or gives it back. |
+| Left stick click | The FTP log. |
+| START, WHITE | The menu. |
+| BACK | "Disconnect and exit?" |
+
+The menu has these entries:
+
+* **Transfer:** runs the queue. If the queue is empty, the marked items (or
+  the highlighted one) are queued first.
+* **Add to Queue:** the active pane's marked items (or the highlighted one)
+  go to the other side, as uploads or downloads.
+* **Delete..., Rename..., Create Folder...:** in the active pane. Deleting
+  locally lists the files and asks with the totals. Deleting on the FTP
+  side asks directly, then `DELE`s files and removes folder trees.
+* **Site Raw Command...:** sends a line of up to 80 characters and shows the
+  reply.
+* **Reboot, Shutdown, Power Cycle, Close Tray, Eject Tray, Drive Status:**
+  `SITE REBOOT`, `SITE SHUTDOWN`, `SITE POWERCYCLE`, `SITE TRAYCLOSE`,
+  `SITE EJECT` and `SITE DRIVESTAT`. These are UnleashX's own server
+  commands; the reply is shown.
+* **View Log..., Refresh, Disconnect.**
+
+The queue lists source and target with an arrow (up or down). Its menu has
+**Transfer**, **Remove** and **Clear Queue**. A transfer runs the items in
+order. A failed item stays in the queue and the rest go on. The result
+tells the files, bytes, time and KB/s for each direction.
+
+### FTP log
+
+The log keeps the last 1000 lines: commands, replies (green), errors (red)
+and the client's own messages. The d-pad scrolls. The menu has **Close**,
+**Clear** and **Save...** (a text file, by default the first free
+`C:\LogNNNN.txt`).
+
+### FTP quirks
+
+* A multi-line message is logged as several copies of its start, cut to
+  each line's length.
+* Scrolling the log stops 12 lines before the end.
+* A failed new folder is reported with the rename message.
+* The download time in the result divides by 6000, so its minutes are ten
+  times too high.
+* The transfer uses the file-copy LED, not the FTP ones.
+* The queue's highlight loses part of its alpha when the queue is active.
+* A target path on the FTP side that doesn't start with `/` is replaced by
+  `/`.
+
 ## Context menu
 
 Entries that don't apply are greyed out.
@@ -197,7 +308,7 @@ Entries that don't apply are greyed out.
 * **Text:** **New text document** or **Open with text editor**.
 * **Format drive:** only in Root, for drives other than C: and D: that have
   no size information or are H: and up. It asks first.
-* **Switch to FTP:** the FTP manager. Needs the network.
+* **Switch to FTP:** the FTP manager (below). Needs the network.
 
 While an operation runs, a box shows its progress. The current file and
 target are shown, with the file's and the overall percentages. When it

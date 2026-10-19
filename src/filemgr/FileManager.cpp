@@ -20,6 +20,7 @@
 #include "../ui/Language.h"
 #include "../ui/StringIds.h"
 #include "../ui/VirtualKeyboard.h"
+#include "FtpManager.h"
 #include "Viewers.h"
 
 BOOL g_bFileAudioPlayer = FALSE;

@@ -23,5 +23,6 @@ public:
 	IDirectSoundBuffer *m_pBuffer;            // +0x48
 };
 
-// Plays the sound from the start; NULL is ignored. The original takes it in esi.
-void PlaySound(CSound *sound);                // 0x0009F12E TODO: decompile
+// Plays the sound from the start; NULL (or no buffer) is ignored. The
+// original takes it in esi. (Sound.cpp)
+void PlaySound(CSound *sound);                // 0x0009F12E

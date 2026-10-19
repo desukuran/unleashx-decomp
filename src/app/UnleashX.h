@@ -160,6 +160,7 @@ public:
 };
 
 extern CUnleashX *g_pApp;                    // 0x00276204
+extern CXBPackedResource *g_pResource;       // 0x00276200 the app's m_resource (the media pack)
 extern CAudioGUI *g_pAudioGUI;               // 0x00276228 the music player screen (mode 9)
 extern HANDLE g_hNetworkThread;              // 0x0026A630
 // Starts the network thread (NetworkThread.cpp) unless it's running.
@@ -200,7 +201,9 @@ BOOL RunBootShortcut(int action);                   // 0x000E87BD
 // Draws the screen the previous program left (captured at startup).
 void DrawSavedScreen(IDirect3DTexture8 *texture, DWORD width, DWORD height, float alpha);   // 0x0009AEB8
 // Copies what the previous program left on screen into a new 640x480 texture.
-HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 *device);   // 0x0009F23D TODO: decompile
+// The picture the previous program (or the boot animation) left on the
+// screen, as a 640x480 texture. (device isn't used.) Texture.cpp
+HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 *device);   // 0x0009F23D
 // Text centered on x, y. TODO: decompile
 void DrawTextCentered(CXBFont *font, float x, float y, const wchar_t *text, D3DCOLOR color, DWORD flags);   // 0x0002AED1
 // Called by the kernel for each thread created/ended. TODO: decompile

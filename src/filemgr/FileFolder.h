@@ -146,6 +146,8 @@ public:
 	SFolderItem *GetItem(int index);
 	// Clears both lists (deleting the items).
 	void ClearItems();
+	// The end of LoadList(): the highlight, line height and scrolling.
+	void FitList();
 
 	DWORD m_unknown04;                 // +0x004
 	std::vector<SFolderItem *> m_files;     // +0x008

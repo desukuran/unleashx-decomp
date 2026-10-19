@@ -1,8 +1,8 @@
 // What the file manager opens files in, besides the text editor (CNotePad)
 // and the music player (CAudioGUI): pictures, archives browsed like
-// folders, XM/XBG meshes, and the FTP manager. All are CAppFrame screens
-// (vtable: destructor, Init(font), IsOpen, Render, ProcessInput, Show).
-// CImageViewer and CFTPManager are declared only. TODO: decompile
+// folders and XM/XBG meshes (the FTP manager is FtpManager.h). All are
+// CAppFrame screens (vtable: destructor, Init(font), IsOpen, Render,
+// ProcessInput, Show).
 #pragma once
 
 #include "../app/Screens.h"
@@ -359,26 +359,4 @@ public:
 private:
 	void ReleaseModel();                                  // 0x000BE316 (this in esi)
 	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x000BE6F8 (this in edi)
-};
-
-// The FTP manager: the site list and two panes, local and FTP
-// (CFTPFileFolder). vtable 0x0024B6E4, 0x750 bytes.
-class CFTPManager : public CAppFrame
-{
-public:
-	CFTPManager();                                        // 0x00123641 (this in ebx)
-	virtual ~CFTPManager();                               // 0x001213F8 (deleting 0x0001EF3D)
-	virtual BOOL Init(CXBFontEx *font);                   // 1 (0x0011F187)
-	virtual BOOL IsOpen();                                // 2 (0x0001E86B)
-	virtual BOOL Render();                                // 3 (0x00121C85)
-	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 4 (0x00124A37)
-	virtual void Show();                                  // 5 (0x0011F5A2)
-	// The file manager's font, background and left pane (its look and
-	// starting folder). (background in eax, local in ecx)
-	void Setup(CXBFontEx *font, IDirect3DTexture8 *background, IFileFolder *local);   // 0x001219B8
-
-	BYTE m_reserved004[0x734 - 4];
-	BOOL m_bDrawBorder;                                   // +0x734
-	BOOL m_bSafeBorder;                                   // +0x738
-	BYTE m_reserved73C[0x750 - 0x73C];
 };

@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstring>
 
+#include "../src/common/Base64.h"
 #include "../src/common/FileUtil.h"
 #include "../src/system/SystemInfo.h"
 
@@ -64,6 +65,25 @@ int main()
 			s_failures++;
 		}
 	}
+	// Base64 (the FTP site passwords).
+	static const char *const base64Cases[][2] = {
+		{ "xbox", "eGJveA==" }, { "pass1", "cGFzczE=" }, { "abc", "YWJj" }, { "", "" },
+	};
+	for (int i = 0; i < 4; i++)
+	{
+		std::string encoded, decoded;
+		Base64Encode(base64Cases[i][0], encoded);
+		Base64Decode(base64Cases[i][1], decoded);
+		if (encoded != base64Cases[i][1] || decoded != base64Cases[i][0])
+		{
+			printf("Base64(\"%s\") = %s / %s\n", base64Cases[i][0], encoded.c_str(), decoded.c_str());
+			s_failures++;
+		}
+	}
+	std::string spaced;
+	Base64Decode("eGJv\r\n eA==", spaced);
+	if (spaced != "xbox")
+		s_failures++;
 	printf(s_failures == 0 ? "fileutil_test passed\n" : "fileutil_test failed\n");
 	return s_failures != 0;
 }

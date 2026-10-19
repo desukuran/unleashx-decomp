@@ -23,6 +23,7 @@
 #include "../ui/Menu.h"
 #include "../ui/StringIds.h"
 #include "../ui/VirtualKeyboard.h"
+#include "FtpManager.h"
 #include "Viewers.h"
 
 // The drive letter of a pane path ("/C/..." or "C:\..."). (inlined)
@@ -34,9 +35,8 @@ static char PathDrive(const std::string &path)
 	return drive;
 }
 
-// A total for the "You are about to ..." messages: "1.23" MB from 10 MB,
-// KB from 10 KB, else bytes. (inlined in each)
-static void FormatTotal(ULONGLONG total, std::string &value, const char *&unit)
+// See FileManager.h. (inlined in each)
+void FormatTotal(ULONGLONG total, std::string &value, const char *&unit)
 {
 	double mb = (double)(LONGLONG)total * (1.0 / 1048576.0);
 	if (mb >= 10.0)

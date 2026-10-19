@@ -31,7 +31,7 @@ void ScaleToScreenInt(DWORD *x, DWORD *y, DWORD *width, DWORD *height);  // 0x00
 void ScaleRectToScreen(int *rect);                                       // 0x0009FDCC
 
 // A D3DMATRIX that scales, rotates (radians, about X, Y and Z) and
-// translates. TODO: decompile (D3DX). The original takes matrix in esi.
+// translates. The original takes matrix in esi.
 void BuildWorldMatrix(float *matrix, float x, float y, float z, float scaleX, float scaleY, float scaleZ,
                       float rotationX, float rotationY, float rotationZ);   // 0x0009F342
 
@@ -80,6 +80,13 @@ HRESULT DrawProgressBar(float x, float y, float width, float height, float perce
                         D3DCOLOR backColor, D3DCOLOR fill1, D3DCOLOR fill2, BYTE gradient);   // 0x000A2897
 // "text..." in a centered box, with animated dots.
 HRESULT DrawBusyBox(CXBFont *font, const wchar_t *text);                     // 0x000A1D70
+
+// The FTP manager's progress box: title, up to two lines, the bytes done
+// and a bar (percent; below 0 for none). height 0: fit the lines; width
+// 0: the screen's. It stays above the screen's bottom. TODO: decompile.
+// The original takes font in ebx.
+void DrawTransferBox(CXBFont *font, float x, float y, float width, float height, const wchar_t *title,
+                     const wchar_t *line1, const wchar_t *line2, float percent, BOOL showRate);   // 0x000A3267
 
 // The "please wait" box of file operations: title, current file, a second
 // line and a progress bar (percent); copies and moves also show the

@@ -597,6 +597,23 @@ void DrawTextureFullScreen(IDirect3DTexture8 *texture, float alpha)
 	            (float)(int)screen.height, alpha, NULL, 0.0f, NULL);
 }
 
+// 0x0009F342 (matrix in esi): scale, then rotation, then translation.
+void BuildWorldMatrix(float *matrix, float x, float y, float z, float scaleX, float scaleY, float scaleZ,
+                      float rotationX, float rotationY, float rotationZ)
+{
+	D3DXMatrixTranslation(matrix, x, y, z);
+	float rotation[16];
+	D3DXMatrixIdentity(rotation);
+	float scale[16];
+	D3DXMatrixScaling(scale, scaleX, scaleY, scaleZ);
+	D3DXMatrixMultiply(matrix, scale, matrix);
+	if (rotationX != 0.0f || rotationY != 0.0f || rotationZ != 0.0f)
+	{
+		D3DXMatrixRotationYawPitchRoll(rotation, rotationY, rotationX, rotationZ);
+		D3DXMatrixMultiply(matrix, rotation, matrix);
+	}
+}
+
 // 0x0009F2B2
 void SetScissorRect(BOOL enable, float x, float y, float width, float height)
 {

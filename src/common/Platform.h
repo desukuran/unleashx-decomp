@@ -34,6 +34,7 @@ typedef const char *LPCSTR;
 #define SUCCEEDED(hr) ((HRESULT)(hr) >= 0)
 #define FAILED(hr) ((HRESULT)(hr) < 0)
 #define E_FAIL ((HRESULT)0x80004005)
+#define E_OUTOFMEMORY ((HRESULT)0x8007000E)
 #define E_INVALIDARG ((HRESULT)0x80070057)
 
 #ifndef MAX_PATH
