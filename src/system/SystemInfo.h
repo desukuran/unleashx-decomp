@@ -42,7 +42,7 @@ BOOL LockHdd();                                            // 0x00090D42
 BOOL UnlockHdd();                                          // 0x00090EF8
 // Hard disk details for the HDD settings page: 1 = geometry, 2 = the
 // transfer mode ("Ultra DMA Mode 5", "PIO Mode 4"). TODO: decompile
-void GetHddInfoText(char *out, int kind);                  // 0x0009048B
+void GetHddInfoText(int kind, char *out);                  // 0x0009048B
 // SMART temperature attribute (0xC2) of the hard disk, 0 if unavailable.
 // Also refreshes the attributes GetSmartAttribute returns.
 BYTE GetHddTemperature();                                  // 0x00090AB1

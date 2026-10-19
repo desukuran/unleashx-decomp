@@ -323,3 +323,59 @@ public:
 	BOOL m_bUnlock;                 // +0x18 the disk is locked: offer to unlock
 	BOOL m_bMessageBoxOpen;         // +0x1C
 };
+
+// Harddisk Settings: drives F and G, hard disk and DVD drive details, SMART
+// values and the DVD media check. 0xC0 bytes, vtable 0x0025688C.
+class CHDDSetting : public CSettingsBase
+{
+public:
+	enum
+	{
+		ITEM_DRIVE_F,
+		ITEM_DRIVE_G,
+		ITEM_HDD_HEADER,
+		ITEM_MODEL,
+		ITEM_SERIAL,
+		ITEM_STATUS,            // A: lock or unlock the disk
+		ITEM_SPACE_C,           // total/free, refreshed every 5 seconds
+		ITEM_SPACE_E,
+		ITEM_SPACE_F,
+		ITEM_SPACE_G,
+		ITEM_SPACE_X,
+		ITEM_SPACE_Y,
+		ITEM_SPACE_Z,
+		ITEM_SMART_HEADER,
+		ITEM_INFO,
+		ITEM_TRANSFER_MODE,
+		ITEM_TEMPERATURE,
+		ITEM_SMART_RAW_READ_ERROR,   // the SMART lines follow in the disk's order
+		ITEM_SMART_SPIN_UP_TIME,
+		ITEM_SMART_START_STOP,
+		ITEM_SMART_REALLOCATED,
+		ITEM_SMART_SEEK_ERROR,
+		ITEM_SMART_POWER_ON,
+		ITEM_SMART_SPIN_RETRY,
+		ITEM_SMART_POWER_CYCLE,
+		ITEM_SMART_CRC_ERROR,
+		ITEM_SMART_WRITE_ERROR,
+		ITEM_DVD_HEADER,
+		ITEM_DVD_MODEL,
+		ITEM_DVD_SERIAL,
+		ITEM_MEDIA_CHECK,       // Normal / Extended
+		ITEM_SAVE_HEADER,
+		ITEM_SAVE,
+		ITEM_RESET,
+		ITEM_EXIT,
+	};
+
+	CHDDSetting();                                            // 0x000C1B6D
+	virtual ~CHDDSetting();                                   // 0x000C1B3A
+	virtual HRESULT Init(CXBFont *font);                      // 0x000D0AD7
+	virtual HRESULT HandleInput(int *action, SGamepadState **pad);   // 0x000D0159
+	virtual HRESULT Render();                                 // 0x000C8367
+
+	BOOL Save();                                              // 0x000C7EB2
+
+	CHddLockDialog *m_pLockDialog;  // +0xB8
+	BOOL m_bLockDialogOpen;         // +0xBC
+};
