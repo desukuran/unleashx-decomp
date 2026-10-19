@@ -231,7 +231,7 @@
 000e1b1e CUnleashX::Cleanup
 0009b270 CXBApplicationEx::Create HRESULT f(void *self@esi)
 0009a514 CXBApplicationEx::Run void f(void *self@esi)
-0008f9ef CXBApplicationEx::Destroy
+0008f9ef SmcPowerCycle
 00034e15 GetLocalTime void __stdcall f(SYSTEMTIME *st)
 0003490d GetSystemTime void __stdcall f(SYSTEMTIME *st)
 000349e4 SystemTimeToFileTime BOOL __stdcall f(SYSTEMTIME *st, FILETIME *ft)
@@ -488,3 +488,11 @@
 00034e94 FileTimeToLocalFileTime
 0003800b lstrcatW
 000359ba DeviceIoControl
+0008fa04 SmcPowerOff
+0008fa5c SmcReset
+0008fa1c SmcSetLedAuto
+0008fa31 SmcSetLed
+0008f947 SmcEnableResetOnEject
+0008f95c SmcDisableResetOnEject
+0008fa6a LaunchDefaultDashboard
+0009a240 RebootToDashboard

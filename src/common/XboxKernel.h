@@ -38,6 +38,11 @@ struct MEMORYSTATUS
 void GlobalMemoryStatus(MEMORYSTATUS *status);
 HANDLE XFindFirstNicknameW(BOOL titleNicknamesOnly, wchar_t *nickname, unsigned size);
 DWORD XGetLanguage();
+BOOL SystemTimeToFileTime(const SYSTEMTIME *systemTime, FILETIME *fileTime);
+BOOL LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime);
+void GetSystemTime(SYSTEMTIME *systemTime);
+void GetLocalTime(SYSTEMTIME *systemTime);
+DWORD XLaunchNewImageA(LPCSTR imagePath, PLAUNCH_DATA launchData);
 #endif
 
 extern "C" {
@@ -90,6 +95,8 @@ extern XBOX_KRNL_VERSION XboxKrnlVersion;
 extern BYTE XboxHDKey[16];
 void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime);
 NTSTATUS __stdcall HalReadSMBusValue(UCHAR address, UCHAR command, BOOLEAN readWord, ULONG *value);
+NTSTATUS __stdcall HalWriteSMBusValue(UCHAR address, UCHAR command, BOOLEAN writeWord, ULONG value);
+NTSTATUS __stdcall NtSetSystemTime(LARGE_INTEGER *newTime, LARGE_INTEGER *previousTime);
 
 }
 

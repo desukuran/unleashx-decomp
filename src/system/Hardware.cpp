@@ -7,7 +7,6 @@
 
 #include "../common/StrUtil.h"
 #include "../common/XboxKernel.h"
-#include "SystemControl.h"
 
 // SMBus addresses
 #define SMBUS_SMC 0x20
@@ -17,7 +16,6 @@
 #define SMC_VERSION 0x01
 #define SMC_CPU_TEMP 0x09
 #define SMC_MB_TEMP 0x0A
-#define SMC_FAN_SPEED 0x10
 
 // 0x0008F7CB
 // out must be zeroed by the caller; the "V1.x" strings are copied without
@@ -52,15 +50,6 @@ void GetXboxVersion(char *out)
 	else if (memcmp(version, "01D", 4) == 0 || memcmp(version, "D01", 4) == 0 ||
 	         memcmp(version, "1D0", 4) == 0 || memcmp(version, "0D1", 4) == 0)
 		strcpy(out, "Devkit");
-}
-
-// 0x0009E66D
-int GetFanSpeed()
-{
-	ULONG value = 0;
-	Sleep(10);
-	HalReadSMBusValue(SMBUS_SMC, SMC_FAN_SPEED, FALSE, &value);
-	return (signed char)value;
 }
 
 // 0x0009E69A
