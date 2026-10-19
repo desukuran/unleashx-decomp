@@ -15,6 +15,7 @@ class CAppSettings;
 class CMenuItem;
 class CMessageBox;
 class COptionMenu;
+class CDropDown;
 class CPassCode;
 class CMenuItemEditor;
 class CSound;
@@ -34,7 +35,8 @@ public:
 	virtual BOOL OnItemSelected(CXmlElement *item) { (void)item; return TRUE; }   // slot 1
 	virtual BOOL Unknown2() { return TRUE; }          // slot 2, 0x0002B65C
 	virtual void Unknown3() {}                        // slot 3, 0x0002B8DA
-	virtual void Unknown4() {}                        // slot 4, 0x0002B8DA
+	// Play the selected item's preview video (NULL stops it).
+	virtual void OnPreview(const char *file) { (void)file; }   // slot 4, 0x0002B8DA
 };
 
 // Recently launched XBEs, kept in <data path>\recent.dat as 10 of these.
@@ -92,24 +94,38 @@ public:
 	// Copies the image the previous program left on screen (for fades).
 	BOOL CaptureBootImage();                          // 0x0010CE1D
 
-	BOOL FrameMove();                                 // 0x001123B9 TODO: decompile
+	// Handles one input action (InputAction); may change *action.
+	HRESULT ProcessInput(int *action, const struct SGamepadState *pad);   // 0x001123B9
 	void Render();                                    // 0x0010D055 TODO: decompile
 
 	// Internal
+	HRESULT ProcessAction(int *action);
+	HRESULT OpenContextMenu();
+	HRESULT RunContextMenuChoice(int *action);
+	void ShowItemInfo(CMenuItem *item, CXmlElement *element, const std::string &action, BOOL isXbe);
+	HRESULT StepBatch();
+	void LeaveBatchSubList();
+	HRESULT SelectPrevious();
+	HRESULT SelectNext();
+	void StartScroll(int direction);
+	void FinishMove(CSound *sound);
+	int ItemUnderPointer();
+	BOOL PointerInItem(unsigned index);               // TODO: decompile (the item rectangle test inlined in 0x001123B9)
+	void DrawDeleteProgress();
 	void AddItem(CXmlElement *element, BOOL noSort);  // 0x00110772
 	void FindItemIcon(CXmlElement *item);             // 0x001100F6
 	void ScanFoldersNow();                            // 0x001120A7
 	static void PlaySound(CSound *sound);             // 0x0010CEB2
 
-	float m_fAreaX;                           // +0x008 the menu area (skin), default 50
-	float m_fAreaY;                           // +0x00C 50
+	float m_fAreaY;                           // +0x008 the menu area (skin), default 50. TODO: verify x/y order
+	float m_fAreaX;                           // +0x00C 50
 	float m_fAreaWidth;                       // +0x010 540
 	float m_fAreaHeight;                      // +0x014 380
 	BYTE m_unknown018[0x4];                   // +0x018
-	int m_unknown01C;                         // +0x01C
-	float m_fUnknown20;                       // +0x020
-	float m_fUnknown24;                       // +0x024
-	int m_unknown028;                         // +0x028
+	int m_nScrollDirection;                   // +0x01C smooth scrolling: -1 up, 1 down
+	float m_fScrollSpeed;                     // +0x020
+	float m_fScrollRemaining;                 // +0x024
+	DWORD m_dwScrollStart;                    // +0x028
 	CXBFont *m_pFont;                         // +0x02C
 	CXBFont *m_pSelectedFont;                 // +0x030
 	CXmlDocument *m_pMenuDoc;                 // +0x034
@@ -131,22 +147,22 @@ public:
 	int m_firstVisibleStack[MENU_MAX_DEPTH];  // +0x0CC m_nFirstVisible of each parent
 	BOOL m_bWaitingForKeyboard;               // +0x11C password/InputBox keyboard is up
 	BOOL m_bMessageShown;                     // +0x120
-	BOOL m_unknown124;                        // +0x124 1
+	BOOL m_bSmoothScroll;                     // +0x124 1
 	CMessageBox *m_pMessageBox;               // +0x128
 	CXmlElement *m_pBatchList;                // +0x12C
-	int m_nBatchIndex;                        // +0x130
+	CXmlElement *m_pBatchSubList;             // +0x130 nested <List> being run
 	BOOL m_bBatchRunning;                     // +0x134
-	int m_unknown138;                         // +0x138
+	BOOL m_bBatchStarted;                     // +0x138
 	BYTE m_unknown13C[0x4];                   // +0x13C
-	CXBStopWatch m_timer;                     // +0x140
-	int m_unknown160;                         // +0x160
+	CXBStopWatch m_previewTimer;              // +0x140 the preview starts 500 ms after the selection settles
+	BOOL m_bHorizontal;                       // +0x160 left/right move the selection
 	int m_unknown164;                         // +0x164
 	int m_nSkinVisibleItems;                  // +0x168 0 = fit the area
 	int m_unknown16C;                         // +0x16C
-	void *m_pUnknown170;                      // +0x170 deleted by the destructor
-	int m_unknown174;                         // +0x174
-	float m_fUnknown178;                      // +0x178
-	float m_fUnknown17C;                      // +0x17C
+	CDropDown *m_pContextMenu;                // +0x170 START (Select/Play, Launch in NTSC mode, ...)
+	BOOL m_bContextMenuShown;                 // +0x174
+	float m_fContextMenuX;                    // +0x178
+	float m_fContextMenuY;                    // +0x17C
 	BOOL m_bShowPreviews;                     // +0x180 look for preview videos next to XBEs
 	CPassCode *m_pPassCode;                   // +0x184
 	BOOL m_bWaitingForPassCode;               // +0x188
@@ -154,16 +170,16 @@ public:
 	BOOL m_bItemEditorShown;                  // +0x190
 	CXmlElement *m_pCommand;                  // +0x194 a <Command> element reused for generated actions
 	DWORD m_dwListOpenTime;                   // +0x198
-	int m_unknown19C;                         // +0x19C
-	int m_unknown1A0;                         // +0x1A0
-	std::string m_strUnknown1A4;              // +0x1A4
+	BOOL m_bDeletePending;                    // +0x19C waiting for the Yes/No of "Delete Game..."
+	BOOL m_bDeleting;                         // +0x1A0
+	std::string m_strDeletePath;              // +0x1A4 the game folder being deleted
 	COptionMenu *m_pRecentMenu;               // +0x1C0
 	BOOL m_bRecentMenuShown;                  // +0x1C4
 	SRecentItem m_recent[10];                 // +0x1C8 recent.dat
 	IDirect3DTexture8 *m_pIconTexture;        // +0xDF8 icon of the selected item
 	int m_unknownDFC;                         // +0xDFC
 	int m_unknownE00;                         // +0xE00
-	CMD5 m_md5;                               // +0xE04
+	CMD5 m_md5;                               // +0xE04 not used by the menu code seen so far
 	BOOL m_bDirty;                            // +0xE38
 	CAppSettings *m_pSettings;                // +0xE3C
 	CXmlElement *m_pCurrentList;              // +0xE40
@@ -185,8 +201,8 @@ public:
 	float m_fUnknownF24;                      // +0xF24 1.0
 	float m_fTextScale;                       // +0xF28 grows the text when lines are tall
 	int m_nMaxVisibleItems;                   // +0xF2C 0 = no limit
-	BYTE m_unknownF30;                        // +0xF30
-	BYTE m_unknownF31;                        // +0xF31
+	bool m_bWrap;                             // +0xF30 the selection wraps around
+	bool m_bPageScroll;                       // +0xF31 TODO: verify (scroll animation even without paging)
 	int m_unknownF34;                         // +0xF34
 	int m_unknownF38;                         // +0xF38
 	DWORD m_dwIconLoadTime;                   // +0xF3C
@@ -203,3 +219,17 @@ extern std::vector<SUnlockedItem> g_unlockedItems;   // 0x00277958
 
 // The game folder cache (d:\items.xml, resolved).
 extern CXmlDocument *g_pItemCache;                   // 0x002761F4
+
+extern CMenuItem *g_pPendingItem;                    // 0x00278D00
+extern CXmlElement *g_pPendingBatchElement;          // 0x00278CFC
+extern int g_nMessageResult;                         // 0x00278CF8
+extern float g_fFrameRate;                           // 0x0027764C TODO: verify
+
+// The pointer (USB mouse / IR) state. TODO: decompile
+extern BOOL g_bPointerActive;                        // 0x00272144
+extern BOOL g_bPointerClicked;                       // 0x00272148
+extern BOOL g_bPointerMoved;                         // 0x00272164
+extern int g_nPointerX;                              // TODO: find
+extern int g_nPointerY;
+// x, y, width, height
+BOOL PointInRect(const int *rect, int x, int y);     // 0x00011208

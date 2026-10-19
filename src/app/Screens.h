@@ -85,6 +85,21 @@ public:
 	void Show();                                          // 0x000C0B13
 };
 
+// Message box buttons, in the order they're added, and GetResult() values.
+enum MessageBoxResult
+{
+	MSGBOX_OK = 0,
+	MSGBOX_CANCEL = 1,
+	MSGBOX_ABORT = 2,
+	MSGBOX_RETRY = 3,
+	MSGBOX_IGNORE = 4,
+	MSGBOX_YES = 5,
+	MSGBOX_NO = 6,
+	MSGBOX_NONE = 7,
+};
+#define MSGBOX_BUTTONS_OK 0
+#define MSGBOX_BUTTONS_YESNO 4
+
 // The message box (OK / Cancel / Abort / Retry / Ignore / Yes / No). 0x158 bytes.
 class CMessageBox
 {
@@ -95,6 +110,10 @@ public:
 	void AddButton(const wchar_t *text);                  // 0x000AFB3D
 	// buttons: 0 = OK, 4 = Yes/No. TODO: verify the values
 	void Show(const char *text, const wchar_t *title, int buttons = 0);   // 0x000B0F74
+	void ProcessInput(int *action);                       // 0x000AF925
+	BOOL IsOpen() const;                                  // 0x000AF8E9
+	int GetResult();                                      // 0x000AFA59 MSGBOX_*
+	void SetSelection(int button);                        // 0x000AF8CF
 };
 
 // The on-screen keyboard; $KBResult$ in an item's arguments is its last text.
@@ -104,11 +123,16 @@ public:
 	std::string GetResult();                              // 0x00014242
 	void SetTitle(const wchar_t *title);                  // 0x0001433E
 	void SetText(const wchar_t *text);                    // 0x00014302
-	void Show();                                          // vtable slot 3 TODO: verify
+	// Starts a new input: clears the text and the done state. TODO: verify
+	void Open();                                          // vtable slot 3, 0x000DC9D7
+	void ProcessInput(int *action);                       // vtable slot 1, 0x000DE58D
+	BOOL IsDone() const;                                  // 0x00014325 OK or cancelled
 };
 extern CVirtualKeyboard g_virtualKeyboard;               // 0x00278328
 extern BOOL g_bKeyboardPassword;                         // 0x0027846C masked input
 extern int g_nKeyboardMaxLength;                         // 0x00278470
+extern BOOL g_bKeyboardAccepted;                         // 0x0027A5CC TODO: verify (also read for the passcode pad)
+extern int g_nKeyboardMode;                              // 0x00278460 0 = item password, else the master password prompt
 
 // An argument that is "KBResult" becomes the keyboard's text (trimmed);
 // "$KBResult$" inside it is replaced by that text.

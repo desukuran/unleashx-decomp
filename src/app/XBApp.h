@@ -76,7 +76,12 @@ class CXBStopWatch
 {
 public:
 	CXBStopWatch();                           // 0x00094658
+	void Start();                             // 0x0009462A
 	void Stop();                              // 0x00094606
+	void Reset();                             // 0x000945ED
+	BOOL IsRunning() const;                   // 0x000945E9
+	float GetElapsedSeconds();                // 0x000945BA
+	float GetElapsedMilliseconds();           // 0x0009468D
 
 	float m_fSecsPerTick;
 	BYTE m_state[0x1C];

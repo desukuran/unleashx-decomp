@@ -5,6 +5,10 @@
 #include <cstring>
 
 #include "../app/Screens.h"
+#include "../app/UnleashX.h"
+#include "../input/Gamepad.h"
+#include "../render/Draw.h"
+#include "../settings/ConfigLoader.h"
 #include "../audio/Sound.h"
 #include "../audio/SoundEffects.h"
 #include "../common/FileUtil.h"
@@ -61,8 +65,8 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_pTexture70 = NULL;
 	m_pTexture74 = NULL;
 	m_nMaxVisibleItems = 0;
-	m_unknownF30 = 0;
-	m_unknownF31 = 0;
+	m_bWrap = false;
+	m_bPageScroll = false;
 	m_unknownF34 = 0;
 	m_unknownF14 = 12;
 	m_bWaitingForKeyboard = FALSE;
@@ -72,33 +76,33 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_pSoundBack = NULL;
 	m_pSoundUp = NULL;
 	m_pSoundDown = NULL;
-	m_unknown01C = 0;
-	m_fUnknown20 = 0.0f;
-	m_fUnknown24 = 0.0f;
-	m_unknown028 = 0;
-	m_unknown124 = 1;
+	m_nScrollDirection = 0;
+	m_fScrollSpeed = 0.0f;
+	m_fScrollRemaining = 0.0f;
+	m_dwScrollStart = 0;
+	m_bSmoothScroll = TRUE;
 	m_bBatchRunning = FALSE;
 	m_pBatchList = NULL;
-	m_nBatchIndex = 0;
-	m_unknown138 = 0;
+	m_pBatchSubList = NULL;
+	m_bBatchStarted = FALSE;
 	m_nItemHeight = 0;
 	m_pCurrentList = NULL;
-	m_unknown160 = 0;
+	m_bHorizontal = FALSE;
 	m_nSkinVisibleItems = 0;
 	m_unknown16C = 0;
 	m_unknown164 = 0;
-	m_pUnknown170 = NULL;
-	m_unknown174 = 0;
-	m_fUnknown178 = 0.0f;
-	m_fUnknown17C = 0.0f;
+	m_pContextMenu = NULL;
+	m_bContextMenuShown = FALSE;
+	m_fContextMenuX = 0.0f;
+	m_fContextMenuY = 0.0f;
 	m_bShowPreviews = FALSE;
 	m_unknownF10 = 1;
 	m_bFontItemHeight = FALSE;
 	m_pPassCode = NULL;
 	m_bWaitingForPassCode = FALSE;
 	m_dwListOpenTime = 0;
-	m_unknown19C = 0;
-	m_unknown1A0 = 0;
+	m_bDeletePending = FALSE;
+	m_bDeleting = FALSE;
 	m_pRecentMenu = NULL;
 	m_bRecentMenuShown = FALSE;
 	memset(m_recent, 0, sizeof(m_recent));
@@ -113,7 +117,7 @@ CMenu::CMenu() : m_md5(NULL, -1)
 	m_pCommand = new CXmlElement;
 	if (m_pCommand != NULL)
 		m_pCommand->m_strName = "Command";
-	m_timer.Stop();
+	m_previewTimer.Stop();
 	m_bDirty = TRUE;
 	m_pSettings = CAppSettings::GetInstance();
 }
@@ -143,8 +147,8 @@ CMenu::~CMenu()
 	m_pSoundBack = NULL;
 	m_pSoundUp = NULL;
 	m_pSoundDown = NULL;
-	delete (CMessageBox *)m_pUnknown170;   // TODO: verify the type
-	m_pUnknown170 = NULL;
+	delete m_pContextMenu;
+	m_pContextMenu = NULL;
 	delete m_pItemEditor;
 	m_pItemEditor = NULL;
 	delete m_pPassCode;
@@ -725,7 +729,7 @@ BOOL CMenu::CheckPassword(CXmlElement *item, std::string &password)
 	{
 		// Masked keyboard input, up to 50 characters.
 		g_virtualKeyboard.SetTitle(L"Password");
-		g_virtualKeyboard.Show();
+		g_virtualKeyboard.Open();
 		g_bKeyboardPassword = TRUE;
 		g_nKeyboardMaxLength = 50;
 		m_bWaitingForKeyboard = TRUE;
@@ -787,11 +791,11 @@ BOOL CMenu::RunItem(CXmlElement *item, BOOL isList)
 		if (batch.size() != 0 && IsTrueString(batch.c_str()))
 		{
 			m_pBatchList = item;
-			m_nBatchIndex = 0;
+			m_pBatchSubList = NULL;
 			m_bBatchRunning = TRUE;
-			m_unknown138 = 0;
+			m_bBatchStarted = FALSE;
 			g_bCancelOperation = FALSE;
-			g_virtualKeyboard.Show();   // TODO: verify (vtable slot 3)
+			g_virtualKeyboard.Open();
 			return TRUE;
 		}
 
@@ -835,7 +839,7 @@ BOOL CMenu::RunItem(CXmlElement *item, BOOL isList)
 		MultiByteToWideChar(CP_ACP, 0, text.c_str(), (int)text.size(), title, 50);
 		text = GetDialogText(item, TRUE);
 		g_virtualKeyboard.SetTitle(title);
-		g_virtualKeyboard.Show();
+		g_virtualKeyboard.Open();
 		g_bKeyboardPassword = FALSE;
 		g_nKeyboardMaxLength = 64;
 		if (text.size() != 0)
@@ -1071,4 +1075,1021 @@ void RemoveMissingXbes(CXmlElement *list)
 		}
 		child = list->GetNextChild();
 	}
+}
+
+// --- Input --------------------------------------------------------------------
+
+// The password being asked for (CheckPassword fills it).
+static std::string s_strPassword;            // 0x0027A5B8
+CMenuItem *g_pPendingItem;                   // 0x00278D00 item waiting for its password
+CXmlElement *g_pPendingBatchElement;         // 0x00278CFC batch step waiting for its password
+static int s_nPreviewIndex = -1;             // 0x0026C700 item whose preview is (being) shown
+static BOOL s_bLastRunOk = TRUE;             // 0x0026C704 result of the last RunItem
+int g_nMessageResult;                        // 0x00278CF8
+
+// After a batch step was refused (No, Cancel, wrong password): leave the
+// current sub-list, or stop the batch at the top.
+void CMenu::LeaveBatchSubList()
+{
+	if (m_pBatchSubList == NULL)
+	{
+		m_bBatchRunning = FALSE;
+		return;
+	}
+	CXmlElement *parent = m_pBatchSubList->m_pParent;
+	if (parent == NULL || parent == m_pBatchList)
+		m_pBatchSubList = NULL;
+	else
+		m_pBatchSubList = parent;
+}
+
+// Remembers that the pending item was unlocked with s_strPassword.
+static void UnlockPendingItem(CXmlElement *element)
+{
+	SUnlockedItem unlocked;
+	unlocked.item = element;
+	unlocked.password = s_strPassword.c_str();
+	g_unlockedItems.push_back(unlocked);
+	s_strPassword.clear();
+}
+
+// Starts the smooth scroll animation (direction -1 up, 1 down). The speed
+// follows the frame rate.
+void CMenu::StartScroll(int direction)
+{
+	if (!m_bSmoothScroll)
+		return;
+	m_nScrollDirection = direction;
+	m_dwScrollStart = GetTickCount();
+	float fps = g_fFrameRate < 50.0f ? 50.0f : g_fFrameRate;
+	if (m_nSkinVisibleItems == 0 || m_unknown16C == 0)
+		m_fScrollSpeed = 1200.0f / fps;
+	else
+		m_fScrollSpeed = fps * 1.2f;
+	m_fScrollRemaining = m_fScrollSpeed;
+}
+
+// Up: the nearest selectable item above (wrapping to the last item).
+HRESULT CMenu::SelectPrevious()
+{
+	if (m_nItemCount == 0)
+		return E_FAIL;
+	if (m_nSelected == 0)
+	{
+		if (!m_bWrap)
+			return E_FAIL;
+		// The search here never matches, so this always lands on the last
+		// item, selectable or not.
+		m_nSelected = m_nItemCount - 1;
+		m_nLastVisible = m_nSelected;
+		m_nFirstVisible = m_nSelected - m_nVisibleItems + 1;
+	}
+	else
+	{
+		int i = (int)m_items.size() - 1;
+		for (; i >= 0; i--)
+		{
+			if (i < m_nSelected && m_items[i] != NULL && !m_items[i]->IsLabel())
+				break;
+		}
+		if (i < 0)
+			return S_OK;
+		m_nSelected = i;
+		m_bDirty = TRUE;
+		if ((unsigned)m_nSelected < (unsigned)m_nFirstVisible)
+		{
+			do
+				m_nFirstVisible--;
+			while ((unsigned)m_nSelected < (unsigned)m_nFirstVisible);
+			m_nLastVisible = m_nVisibleItems - 1 + m_nFirstVisible;
+			StartScroll(-1);
+		}
+		else if (m_bPageScroll)
+		{
+			StartScroll(-1);
+		}
+	}
+	FinishMove(m_pSoundUp);
+	return S_OK;
+}
+
+// Down: the nearest selectable item below (wrapping to the first one).
+HRESULT CMenu::SelectNext()
+{
+	if (m_nItemCount == 0)
+		return E_FAIL;
+	if ((unsigned)m_nSelected < (unsigned)m_nItemCount - 1)
+	{
+		int i = 0;
+		for (; i < (int)m_items.size(); i++)
+		{
+			if (m_nSelected < i && m_items[i] != NULL && !m_items[i]->IsLabel())
+				break;
+		}
+		if (i == (int)m_items.size())
+		{
+			if ((int)m_items.size() < i)
+				return S_OK;
+		}
+		else
+		{
+			m_nSelected = i;
+			m_bDirty = TRUE;
+		}
+		if ((unsigned)m_nLastVisible < (unsigned)m_nSelected)
+		{
+			do
+			{
+				m_nFirstVisible++;
+				m_nLastVisible++;
+			} while ((unsigned)m_nLastVisible < (unsigned)m_nSelected);
+			StartScroll(1);
+		}
+		else if (m_bPageScroll)
+		{
+			StartScroll(1);
+		}
+	}
+	else
+	{
+		if (!m_bWrap)
+			return E_FAIL;
+		m_nSelected = 0;
+		for (int i = 0; i < (int)m_items.size(); i++)
+		{
+			if (m_items[i] != NULL && !m_items[i]->IsLabel())
+			{
+				m_nSelected = i;
+				m_bDirty = TRUE;
+				break;
+			}
+		}
+		m_nFirstVisible = m_nSelected;
+		m_nLastVisible = m_nVisibleItems - 1 + m_nSelected;
+	}
+	FinishMove(m_pSoundDown);
+	return S_OK;
+}
+
+// After moving the selection: sound, and the old icon goes away.
+void CMenu::FinishMove(CSound *sound)
+{
+	MENU_SOUND(sound);
+	m_fUnknownF40 = 0.0f;
+	if (m_pIconTexture != NULL)
+	{
+		m_pIconTexture->Release();
+		m_pIconTexture = NULL;
+	}
+}
+
+// The visible item under the pointer, or -1.
+int CMenu::ItemUnderPointer()
+{
+	unsigned i = (unsigned)m_nFirstVisible;
+	for (; i < m_items.size(); i++)
+	{
+		if (!m_items[i]->IsLabel() && PointerInItem(i))
+			return (int)i;
+		if ((unsigned)m_nLastVisible < i)
+			return -1;
+	}
+	return -1;
+}
+
+// IR remote digits run <Settings><Shortcut><IR_n> from Config.xml: an XBE
+// path, or an action (without spaces).
+static void RunShortcut(CMenu *menu, int action)
+{
+	g_config.m_pCurrent = &g_config.m_root;
+	CXmlElement *settings = g_config.FindElement(&g_config.m_root, "Settings");
+	if (settings == NULL)
+		return;
+	CXmlElement *shortcuts = settings->FindFirstChild("Shortcut");
+	if (shortcuts == NULL)
+		return;
+	std::string key;
+	StrFormat(key, "IR_%u", (unsigned)(action - INPUT_IR_BACK) % 10);
+	CXmlElement *shortcut = shortcuts->FindFirstChild(key.c_str());
+	if (shortcut == NULL)
+		return;
+	std::string target = shortcut->m_strValue;
+	if (target.size() == 0)
+		return;
+	if (StrCmpNoCase(StrRight(target, 4), ".xbe") == 0)
+	{
+		LaunchXbe(target.c_str(), NULL, -1, NULL);
+	}
+	else if (StrFind(target, " ") == -1)
+	{
+		CXmlElement *item = new CXmlElement;
+		if (item != NULL)
+		{
+			item->SetAttribute("Action", target.c_str());
+			menu->RunItem(item, FALSE);
+			delete item;
+		}
+	}
+}
+
+// START on an item: the context menu.
+HRESULT CMenu::OpenContextMenu()
+{
+	if ((unsigned)m_nSelected >= (unsigned)m_nItemCount)
+		return E_FAIL;
+	if (m_pContextMenu == NULL)
+	{
+		m_pContextMenu = new CDropDown;
+		if (m_pContextMenu != NULL)
+		{
+			m_pContextMenu->AddItem(L"Select/Play");
+			m_pContextMenu->AddItem(L"Launch in NTSC mode");
+			m_pContextMenu->AddItem(L"Launch in PAL mode");
+			m_pContextMenu->AddItem(L"Information...");
+			m_pContextMenu->AddItem(L"Backup to Harddisk...");
+			m_pContextMenu->AddItem(L"Delete Game...");
+			m_pContextMenu->AddItem(L"Refresh List...");
+			m_pContextMenu->AddItem(L"Recent Titles...");
+			m_pContextMenu->AddItem(L"Edit Item...");
+			m_pContextMenu->AddItem(L"Open Containing Folder");
+			m_pContextMenu->AddItem(L"Open Saves Folder");
+			m_pContextMenu->Create(m_pSelectedFont, m_fAreaX + 5.0f, m_fAreaY + 5.0f);
+		}
+		if (m_pContextMenu == NULL)
+			return E_FAIL;
+	}
+	if (m_items.size() == 0)
+		return E_FAIL;
+	CMenuItem *item = GetSelectedItem();
+	if (item == NULL)
+		return E_FAIL;
+
+	BOOL isXbe = StrCmpNoCase(StrRight(item->m_pElement->GetAttribute("Action"), 4), ".xbe") == 0;
+	int region = 0;
+	if (isXbe)
+		region = atol(item->m_pElement->GetAttribute("Region").c_str());
+	SPreferences &prefs = m_pSettings->m_prefs;
+	BOOL fromDvd = m_pSettings->m_bRunFromDVD;
+	BOOL isGame = !item->m_bIsList && !item->IsLabel() && isXbe;
+
+	// NTSC for PAL (or any-region) games and vice versa.
+	m_pContextMenu->SetEnabled(1, isXbe && (region == 0 || region == 4 || region == 7));
+	m_pContextMenu->SetEnabled(2, isXbe && ((region > 0 && region < 4) || region == 7 || region == 0));
+	m_pContextMenu->SetEnabled(4, fromDvd && isGame);
+	m_pContextMenu->SetEnabled(5, prefs.m_bAllowUninstall && !fromDvd && isGame);
+	m_pContextMenu->SetEnabled(8, prefs.m_bAllowItemEdit && !fromDvd && !item->IsLabel());
+	m_pContextMenu->SetEnabled(7, !fromDvd && prefs.m_bAllowRecentList);
+	m_pContextMenu->SetEnabled(9, prefs.m_bLinkToGame && isXbe && m_pCommand != NULL);
+	m_pContextMenu->SetEnabled(10, prefs.m_bLinkToSave && isXbe && m_pCommand != NULL);
+	m_pContextMenu->Show(m_fContextMenuX + 10.0f, m_fContextMenuY + 5.0f);
+	m_bContextMenuShown = TRUE;
+
+	// Locked items ask for the password first; the choice runs afterwards.
+	if (CheckPassword(item->m_pElement, s_strPassword))
+	{
+		g_pPendingBatchElement = NULL;
+	}
+	else
+	{
+		g_pPendingBatchElement = item->m_pElement;
+		g_pPendingItem = GetSelectedItem();
+	}
+	return E_FAIL;
+}
+
+// "Information...": what the item is, and for games the XBE's details and
+// the folder size.
+void CMenu::ShowItemInfo(CMenuItem *item, CXmlElement *element, const std::string &action, BOOL isXbe)
+{
+	std::string info;
+	std::string line;
+	if (!isXbe)
+	{
+		if (!item->m_bIsList)
+			StrFormat(info, "Title: %s\nType: Action Command\nCommand: %s\n", element->m_strValue.c_str(),
+			          action.c_str());
+		else if (element->GetAttribute("Batch").size() == 0)
+			StrFormat(info, "Title: %s\nType: Submenu\n", element->GetAttribute("Text").c_str());
+		else
+			StrFormat(info, "Title: %s\nType: Batch Process\n", element->GetAttribute("Text").c_str());
+	}
+	else
+	{
+		StrFormat(info, "Location: %s\n", action.c_str());
+		EnterFileLock();
+		SXbeInfo xbe;
+		if (!ReadXbeInfo(action.c_str(), &xbe))
+		{
+			StrFormat(line, "Title: %s\n", element->m_strValue.c_str());
+			info += line;
+		}
+		else
+		{
+			StrFormat(line, "Title: %s\n", xbe.titleName.c_str());
+			info += line;
+			StrFormat(line, "ID: %08x (%u)\n", xbe.titleId, xbe.titleId);
+			info += line;
+			if (xbe.gameRegion == 0)
+				line = "Region: 0 (Homebrew)\n";
+			else if (xbe.gameRegion == 1)
+				line = "Region: 1 (North America -NTSC M)\n";
+			else if (xbe.gameRegion == 2)
+				line = "Region: 2 (Japan -NTSC J)\n";
+			else if (xbe.gameRegion == 4)
+				line = "Region: 4 (Europe -PAL)\n";
+			else if (xbe.gameRegion < 8)
+				line = "Region: Multi\n";
+			else
+				line = "Region: Multi (Debug)\n";
+			info += line;
+		}
+		if (!m_pSettings->m_bRunFromDVD)
+		{
+			// Size of the game's folder (16 KB blocks).
+			line = GetPathDirectory(action.c_str());
+			ResetFileOperationStats();
+			CountFolder(line.c_str());
+			StrFormat(line, "Total Size: %0.02f MB\t%u Blocks\n", (double)g_ullOperationBytes * (1.0 / 1048576),
+			          (unsigned)((double)g_ullOperationBytes * (1.0 / 16384)));
+			info += line;
+			StrFormat(line, "Contains: %u Files, %u Folders\n", g_nOperationFiles, g_nOperationFolders);
+			info += line;
+		}
+		LeaveFileLock();
+	}
+	StrFormat(line, "Icon: %s\n", element->GetAttribute("Icon").c_str());
+	info += line;
+	StrFormat(line, "Alt. Icon: %s\n", element->GetAttribute("AltIcon").c_str());
+	info += line;
+	StrFormat(line, "Preview: %s\n", element->GetAttribute("Preview").c_str());
+	info += line;
+	BOOL locked = element->GetAttribute("Password").size() != 0 || element->GetAttribute("Passcode").size() != 0;
+	info += locked ? "Protected: Yes\n" : "Protected: No\n";
+	ShowMessage(info.c_str(), L"Information");
+}
+
+// Runs the context menu choice.
+HRESULT CMenu::RunContextMenuChoice(int *action)
+{
+	CMenuItem *item;
+	CXmlElement *element;
+	std::string text;
+	switch (m_pContextMenu->m_nSelection)
+	{
+	case 0:   // Select/Play
+		*action = INPUT_A;
+		return ProcessAction(action);
+
+	case 4:   // Backup to Harddisk (from DVD only)
+		if (!m_pSettings->m_bRunFromDVD)
+			return S_OK;
+		// fall through
+	case 1:   // Launch in NTSC mode
+	case 2:   // Launch in PAL mode
+	case 3:   // Information
+	{
+		item = GetSelectedItem();
+		if (item == NULL || (element = item->m_pElement) == NULL)
+			return S_OK;
+		std::string actionName = element->GetAttribute("Action");
+		BOOL isXbe = StrCmpNoCase(StrRight(actionName, 4), ".xbe") == 0;
+		int choice = m_pContextMenu->m_nSelection;
+		if (m_pContextMenu->m_bCancelled)
+			break;
+		if (choice == 1 || choice == 2)
+		{
+			// Run with the region forced (and AutoVideoMode on for this
+			// launch). Quirk: the Region attribute stays changed.
+			BOOL autoVideo = m_pSettings->m_prefs.m_bAutoVideoMode;
+			m_pSettings->m_prefs.m_bAutoVideoMode = TRUE;
+			element->SetAttribute("Region", choice == 1 ? "1" : "4");
+			RunItem(element, item->m_bIsList);
+			m_pSettings->m_prefs.m_bAutoVideoMode = autoVideo;
+		}
+		else if (choice == 3)
+		{
+			ShowItemInfo(item, element, actionName, isXbe);
+		}
+		else if (isXbe && choice == 4 && !item->m_bIsList)
+		{
+			CopyDVD(actionName.c_str());
+		}
+		break;
+	}
+
+	case 5:   // Delete Game
+	{
+		if (!m_pSettings->m_prefs.m_bAllowUninstall)
+			return S_OK;
+		std::string title;
+		item = GetSelectedItem();
+		if (item != NULL)
+		{
+			element = item->m_pElement;
+			if (element == NULL)
+				return S_OK;
+			title = element->m_strValue;
+			text = element->GetAttribute("Action");
+			int slash;
+			if (StrCmpNoCase(StrRight(text, 4), ".xbe") == 0 && (slash = StrReverseFind(text, "\\")) > 3)
+			{
+				text = StrLeft(text, slash);
+				if (DirectoryExists(text.c_str()))
+				{
+					m_strDeletePath = text;
+					m_bDeletePending = TRUE;
+				}
+			}
+		}
+		if (m_bDeletePending)
+		{
+			StrFormat(text,
+			          "The following title will be deleted from your hard disk?\nXbox Title:\t%s\nAre you sure you want to continue?",
+			          title.c_str());
+			ShowMessage(text.c_str(), L"Confirm", MSGBOX_BUTTONS_YESNO);
+			if (m_pMessageBox != NULL)
+				m_pMessageBox->SetSelection(1);   // TODO: verify (No as the default)
+		}
+		return S_OK;
+	}
+
+	case 6:   // Refresh List
+		ScanFolders();
+		return S_OK;
+
+	case 7:   // Recent Titles
+		if (!m_pSettings->m_prefs.m_bAllowRecentList)
+			return S_OK;
+		OpenRecentList();
+		return S_OK;
+
+	case 8:   // Edit Item
+		if (m_pSink != NULL)
+			m_pSink->OnPreview(NULL);
+		OpenItemEditor();
+		return S_OK;
+
+	case 9:   // Open Containing Folder
+	case 10:  // Open Saves Folder (E:\UDATA\<title id>)
+	{
+		item = GetSelectedItem();
+		BOOL allowed = m_pContextMenu->m_nSelection == 9 ? m_pSettings->m_prefs.m_bLinkToGame
+		                                                  : m_pSettings->m_prefs.m_bLinkToSave;
+		if (!allowed || m_pCommand == NULL || item == NULL || item->m_pElement == NULL)
+			return S_OK;
+		text = item->m_pElement->GetAttribute("Action");
+		if (StrCmpNoCase(StrRight(text, 4), ".xbe") != 0)
+			break;
+		if (m_pContextMenu->m_nSelection == 9)
+		{
+			text = GetPathDirectory(text.c_str());
+			if (DirectoryExists(text.c_str()))
+			{
+				m_pCommand->SetAttribute("Action", "filemanager");
+				m_pCommand->SetAttribute("Arg1", text.c_str());
+				RunItem(m_pCommand, FALSE);
+			}
+		}
+		else
+		{
+			EnterFileLock();
+			SXbeInfo xbe;
+			if (ReadXbeInfo(text.c_str(), &xbe))
+			{
+				StrFormat(text, "E:\\UDATA\\%08x", xbe.titleId);
+				if (DirectoryExists(text.c_str()))
+				{
+					m_pCommand->SetAttribute("Action", "filemanager");
+					m_pCommand->SetAttribute("Arg1", text.c_str());
+					RunItem(m_pCommand, FALSE);
+				}
+			}
+			LeaveFileLock();
+		}
+		break;
+	}
+
+	default:
+		return S_OK;
+	}
+	return S_OK;
+}
+
+// The plain menu actions (no dialog open).
+HRESULT CMenu::ProcessAction(int *action)
+{
+	for (;;)
+	{
+		int a = *action;
+		if (a >= INPUT_IR_1 && a <= INPUT_IR_0)
+		{
+			RunShortcut(this, a);
+			return E_FAIL;
+		}
+
+		switch (a)
+		{
+		case INPUT_NONE:
+			// Start the selected item's preview after 500 ms.
+			if (m_bShowPreviews)
+			{
+				if (s_nPreviewIndex != m_nSelected)
+				{
+					s_nPreviewIndex = m_nSelected;
+					m_previewTimer.Start();
+					if (m_pSink != NULL)
+						m_pSink->OnPreview(NULL);
+				}
+				else if (m_pSink != NULL && m_previewTimer.IsRunning() &&
+				         m_previewTimer.GetElapsedMilliseconds() > 500.0f)
+				{
+					if ((size_t)m_nSelected < m_items.size())
+					{
+						CMenuItem *item = m_items[m_nSelected];
+						if (item != NULL && item->m_pElement != NULL)
+						{
+							std::string preview;
+							ResolvePath(item->m_pElement->GetAttribute("Preview").c_str(), preview);
+							if (m_pSink != NULL)
+								m_pSink->OnPreview(preview.c_str());
+						}
+					}
+					m_previewTimer.Reset();
+					m_previewTimer.Stop();
+				}
+			}
+			// The pointer selects what it hovers over.
+			if (g_bPointerActive && g_bPointerMoved)
+			{
+				// Quirk: a RECT goes where PointInRect wants x, y, width,
+				// height, so the hot area is too big.
+				int rect[4];
+				rect[0] = (int)m_fAreaX;
+				rect[1] = (int)m_fAreaY;
+				rect[2] = (int)m_fAreaWidth + rect[0];
+				rect[3] = (int)m_fAreaHeight + rect[1];
+				if (PointInRect(rect, g_nPointerX, g_nPointerY))
+				{
+					int i = ItemUnderPointer();
+					if (i >= 0)
+						m_nSelected = i;
+				}
+			}
+			return E_FAIL;
+
+		case INPUT_A:
+		{
+			if ((unsigned)m_nSelected >= (unsigned)m_nItemCount)
+				return S_OK;
+			CMenuItem *item = (size_t)m_nSelected < m_items.size() ? m_items[m_nSelected] : NULL;
+			g_pPendingItem = item;
+			if (item != NULL && item->m_pElement != NULL)
+			{
+				CXmlElement *element = item->m_pElement;
+				s_nPreviewIndex = -1;
+				if (m_bShowPreviews && m_pSink != NULL)
+					m_pSink->OnPreview(NULL);
+				if (CheckPassword(element, s_strPassword))
+					s_bLastRunOk = RunItem(element, item->m_bIsList);
+			}
+			*action = INPUT_NONE;
+			return S_OK;
+		}
+
+		case INPUT_START:
+			return OpenContextMenu();
+
+		case INPUT_B:
+		case INPUT_BACK:
+		case INPUT_IR_LEFT:
+		{
+			CXmlElement *root = &m_pMenuDoc->m_root;
+			m_pMenuDoc->m_pCurrent = root;
+			if (m_pCurrentList == root || m_pCurrentList->m_pParent == NULL)
+				return S_OK;
+			s_nPreviewIndex = -1;
+			m_nDepth--;
+			m_nSelected = m_selectedStack[m_nDepth];
+			m_nFirstVisible = m_firstVisibleStack[m_nDepth];
+			if (m_bShowPreviews && m_pSink != NULL)
+				m_pSink->OnPreview(NULL);
+			OpenList(m_pCurrentList->m_pParent);
+			MENU_SOUND(m_pSoundBack);
+			return S_OK;
+		}
+
+		case INPUT_X:
+			*action = INPUT_NONE;
+			if (m_pSettings->m_prefs.m_bAllowRecentList)
+				OpenRecentList();
+			return E_FAIL;
+
+		case INPUT_LTRIGGER:
+		case INPUT_UP:
+			return SelectPrevious();
+
+		case INPUT_RTRIGGER:
+		case INPUT_DOWN:
+			return SelectNext();
+
+		case INPUT_LEFT:
+			if (!m_bHorizontal)
+				return E_FAIL;
+			*action = INPUT_UP;
+			continue;
+
+		case INPUT_RIGHT:
+			if (!m_bHorizontal)
+				return E_FAIL;
+			*action = INPUT_DOWN;
+			continue;
+
+		case INPUT_POINTER_CLICK:
+		{
+			if (!g_bPointerClicked)
+				return E_FAIL;
+			int i = ItemUnderPointer();
+			if (i < 0)
+				return E_FAIL;
+			m_nSelected = i;
+			*action = INPUT_A;
+			continue;
+		}
+
+		default:
+			return E_FAIL;
+		}
+	}
+}
+
+// 0x001123B9
+// One frame of input. Open dialogs (message box, keyboard, passcode, item
+// editor, recent list, context menu) get the input first; a running batch
+// advances one step per frame.
+HRESULT CMenu::ProcessInput(int *action, const SGamepadState *pad)
+{
+	BOOL fileOperation = g_bFileOperationQueued;
+	if (!m_bReady)
+	{
+		s_nPreviewIndex = -1;
+		return S_OK;
+	}
+
+	// While a file operation runs only BACK (cancel) counts.
+	if ((g_bFileOperationQueued || g_bFileOperationActive) && !g_bFileOperationPaused)
+	{
+		if (*action != INPUT_BACK)
+			return S_OK;
+		*action = INPUT_NONE;
+		g_bCancelOperation = TRUE;
+		return S_OK;
+	}
+
+	// The left stick pushed fully up/down is like the D-pad.
+	if (*action == INPUT_LTHUMB && pad != NULL)
+	{
+		if (pad->fY1 == 1.0f)
+			*action = INPUT_UP;
+		else if (pad->fY1 == -1.0f)
+			*action = INPUT_DOWN;
+	}
+
+	if (m_bMessageShown)
+	{
+		m_pMessageBox->ProcessInput(action);
+		if (m_pMessageBox->IsOpen())
+			return S_OK;
+		m_bMessageShown = FALSE;
+		int result = m_pMessageBox->GetResult();
+		g_nMessageResult = result;
+		// A batch's AskUser answered with anything but OK/Yes.
+		if (m_bBatchRunning && result != MSGBOX_OK && result != MSGBOX_YES)
+			LeaveBatchSubList();
+		if (m_bDeletePending && result == MSGBOX_YES)
+		{
+			if (m_pSink != NULL)
+				m_pSink->OnPreview(NULL);
+			DeleteFolder(m_strDeletePath.c_str());
+			m_bDeleting = TRUE;
+			return S_OK;
+		}
+		m_bDeleting = FALSE;
+		m_bDeletePending = FALSE;
+		return S_OK;
+	}
+
+	if (m_bWaitingForKeyboard && g_pPendingItem != NULL)
+	{
+		g_virtualKeyboard.ProcessInput(action);
+		BOOL done = g_virtualKeyboard.IsDone();
+		m_bWaitingForKeyboard = !done;
+		if (!done)
+			return S_OK;
+		if (!g_bKeyboardAccepted)
+		{
+			if (m_bBatchRunning && g_nKeyboardMode != 0)
+				LeaveBatchSubList();
+			m_bDeletePending = FALSE;
+			m_bContextMenuShown = FALSE;
+			return S_OK;
+		}
+
+		CXmlElement *element = g_pPendingItem->m_pElement;
+		BOOL ok = FALSE;
+		if (m_bBatchRunning && g_pPendingBatchElement != NULL)
+			element = g_pPendingBatchElement;
+		if (g_nKeyboardMode == 0)
+		{
+			if (s_strPassword.compare(g_virtualKeyboard.GetResult()) == 0)
+			{
+				ok = TRUE;
+				UnlockPendingItem(element);
+			}
+			else
+			{
+				m_bWaitingForKeyboard = TRUE;
+				ShowMessage("The password you entered is incorrect!", L"Invalid Password");
+			}
+		}
+		else
+		{
+			// The master password.
+			if (g_virtualKeyboard.GetResult().compare("MicrosoftXBOX") == 0)
+				ok = TRUE;
+			else
+				s_bLastRunOk = FALSE;
+		}
+		g_virtualKeyboard.Open();
+		g_bKeyboardPassword = !ok;
+		if (!m_bWaitingForKeyboard && ok)
+		{
+			if (m_bContextMenuShown)
+				return S_OK;
+			s_bLastRunOk = RunItem(element, StrCmpNoCase(element->m_strName, "List") == 0);
+			return S_OK;
+		}
+		m_bContextMenuShown = FALSE;
+		return S_OK;
+	}
+
+	if (m_bWaitingForPassCode && g_pPendingItem != NULL)
+	{
+		m_pPassCode->ProcessInput();
+		BOOL closed = m_pPassCode->IsClosed();
+		m_bWaitingForPassCode = !closed;
+		if (!closed)
+			return S_OK;
+		if (!g_bKeyboardAccepted)
+		{
+			m_bContextMenuShown = FALSE;
+			m_bDeletePending = FALSE;
+			if (m_bBatchRunning)
+				LeaveBatchSubList();
+			return S_OK;
+		}
+
+		CXmlElement *element = g_pPendingItem->m_pElement;
+		BOOL ok = FALSE;
+		if (m_bBatchRunning && g_pPendingBatchElement != NULL)
+			element = g_pPendingBatchElement;
+		if (!m_pPassCode->m_bCancelled)
+		{
+			if (m_pPassCode->IsCorrect())
+			{
+				ok = TRUE;
+				s_strPassword = m_pPassCode->m_strCode;
+				UnlockPendingItem(element);
+			}
+			else
+			{
+				m_bWaitingForPassCode = TRUE;
+				ShowMessage("The passcode you entered is incorrect!", L"Invalid Passcode");
+			}
+		}
+		else
+		{
+			s_bLastRunOk = FALSE;
+			m_bContextMenuShown = FALSE;
+		}
+		m_pPassCode->Show();
+		if (!m_bWaitingForPassCode && ok)
+		{
+			if (m_bContextMenuShown)
+				return S_OK;
+			s_bLastRunOk = RunItem(element, StrCmpNoCase(element->m_strName, "List") == 0);
+			return S_OK;
+		}
+		m_bContextMenuShown = FALSE;
+		return S_OK;
+	}
+
+	if (m_bItemEditorShown)
+	{
+		m_pItemEditor->ProcessInput();
+		m_bItemEditorShown = m_pItemEditor->IsOpen();
+		if (m_bItemEditorShown)
+			return S_OK;
+		// Reload the edited item's icon.
+		s_nPreviewIndex = -1;
+		CMenuItem *item = GetSelectedItem();
+		if (item != NULL && item->m_pTexture != NULL)
+		{
+			item->m_pTexture->Release();
+			item->m_pTexture = NULL;
+		}
+		return S_OK;
+	}
+
+	if (m_bBatchRunning && m_pBatchList != NULL)
+		return StepBatch();
+
+	if (m_bRecentMenuShown)
+	{
+		m_pRecentMenu->ProcessInput(action, pad);
+		m_bRecentMenuShown = m_pRecentMenu->IsOpen();
+		if (m_bRecentMenuShown || !m_pRecentMenu->m_bChosen)
+			return S_OK;
+		SRecentItem *recent = &m_recent[m_pRecentMenu->GetSelection()];
+		AddRecentItem(recent->path, recent->name, recent->region);
+		LaunchXbe(recent->path, recent->name, recent->region, NULL);
+		return S_OK;
+	}
+
+	if (!m_bContextMenuShown)
+	{
+		if (!m_bDeletePending && !m_bDeleting)
+			return ProcessAction(action);
+
+		// Progress while the delete runs.
+		if (!g_bOperationFailed && fileOperation)
+		{
+			if (m_bDeleting)
+				DrawDeleteProgress();
+			return ProcessAction(action);
+		}
+
+		BOOL failed = g_bOperationFailed;
+		m_bDeletePending = FALSE;
+		m_bDeleting = FALSE;
+		if (failed && !g_bCancelOperation)
+		{
+			// Quirk: the file name is wide but printed with %s.
+			std::string message;
+			DWORD error = g_dwOperationError != 0 ? g_dwOperationError : GetLastError();
+			StrFormat(message, "An error occured while deleting '%s'.\nError Code: %d",
+			          (const char *)g_szOperationFile, (int)error);
+			ShowMessage(message.c_str(), L"ERROR");
+			return S_OK;
+		}
+		if (fileOperation)
+			return S_OK;
+
+		// Remove the deleted game from the menu and select a neighbour.
+		CMenuItem *item = GetSelectedItem();
+		if (item != NULL)
+		{
+			if (m_pCurrentList == NULL)
+				m_pMenuDoc->m_pCurrent = &m_pMenuDoc->m_root;
+			CXmlElement *list = m_pCurrentList != NULL ? m_pCurrentList : &m_pMenuDoc->m_root;   // TODO: verify
+			list->RemoveChild(item->m_pElement);
+		}
+		if (m_items.size() == 0)
+		{
+			m_nSelected = 0;
+		}
+		else if ((unsigned)m_nSelected > m_items.size() - 1)
+		{
+			m_nSelected = (int)m_items.size() - 1;
+		}
+		else if ((unsigned)m_nSelected < m_items.size() - 1)
+		{
+			m_nSelected++;
+		}
+		else if (m_nSelected != 0)
+		{
+			m_nSelected--;
+		}
+		if (m_pMenuDoc != NULL)
+			OpenList(m_pCurrentList);
+		return S_OK;
+	}
+
+	// The context menu is open.
+	m_pContextMenu->ProcessInput(action);
+	m_bContextMenuShown = m_pContextMenu->IsOpen();
+	if (m_bContextMenuShown || m_pContextMenu->m_bCancelled || m_pContextMenu->m_nSelection == -1)
+		return S_OK;
+	return RunContextMenuChoice(action);
+}
+
+// One step of a running <List Batch="true">.
+HRESULT CMenu::StepBatch()
+{
+	CXmlElement *element;
+	if (!m_bBatchStarted)
+	{
+		element = m_pBatchList->GetFirstChild();
+		m_bBatchStarted = TRUE;
+		s_bLastRunOk = TRUE;
+	}
+	else if (!s_bLastRunOk)
+	{
+		m_bBatchRunning = FALSE;
+		m_pBatchList = NULL;
+		m_pBatchSubList = NULL;
+		return S_OK;
+	}
+	else
+	{
+		// Wait for the previous step's file operation.
+		if (g_bFileOperationActive)
+			return S_OK;
+		if (g_bCancelOperation)
+		{
+			m_bBatchRunning = FALSE;
+			m_pBatchList = NULL;
+			m_pBatchSubList = NULL;
+			return S_OK;
+		}
+
+		CXmlElement *list = m_pBatchSubList;
+		if (list == NULL || list == m_pBatchList)
+		{
+			m_pBatchSubList = NULL;
+			element = m_pBatchList->GetNextChild();
+		}
+		else
+		{
+			element = list->GetNextChild();
+			if (element == NULL)
+			{
+				// End of a sub-list: continue in its parent.
+				CXmlElement *parent = list->m_pParent;
+				if (parent == NULL || (m_pBatchSubList = parent) == m_pBatchList)
+				{
+					m_pBatchSubList = NULL;
+					element = m_pBatchList->GetNextChild();
+				}
+				else
+				{
+					element = parent->GetNextChild();
+					if (element == NULL)
+						return S_OK;
+				}
+			}
+		}
+	}
+
+	if (element == NULL)
+	{
+		m_bBatchRunning = FALSE;
+		m_pBatchList = NULL;
+		m_pBatchSubList = NULL;
+		return S_OK;
+	}
+
+	BOOL isList = FALSE;
+	if (StrCmpNoCase(element->m_strName, "List") == 0)
+	{
+		// Run a nested list's items in order.
+		m_pBatchSubList = element;
+		element = element->GetFirstChild();
+		if (element == NULL)
+			return S_OK;
+		isList = StrCmpNoCase(element->m_strName, "List") == 0;
+	}
+	if (!CheckPassword(element, s_strPassword))
+	{
+		g_pPendingBatchElement = element;
+		return S_OK;
+	}
+	g_pPendingBatchElement = NULL;
+	s_bLastRunOk = RunItem(element, isList);
+	if (s_bLastRunOk)
+		return S_OK;
+
+	m_bBatchRunning = FALSE;
+	std::string message;
+	StrFormat(message, "Batch process failed.\nThe last item was: %s.\nAction: %s", element->m_strValue.c_str(),
+	          element->GetAttribute("Action").c_str());
+	ShowMessage(message.c_str(), L"Failure");
+	m_pBatchList = NULL;
+	m_pBatchSubList = NULL;
+	return S_OK;
+}
+
+// The "Deleting. Please Wait" box with the progress.
+void CMenu::DrawDeleteProgress()
+{
+	float x = 120.0f, y = 210.0f, width = 400.0f, height = 60.0f;   // TODO: verify (0x0025CC28, 0x0025CB88, ...)
+	ScaleToScreen(&x, &width, &y, &height, TRUE);
+	unsigned percent = 0;
+	unsigned total = g_nOperationFiles + g_nOperationFolders;
+	if (total > 1)
+	{
+		percent = (unsigned)(g_nOperationProgress * 100) / total;
+		if (percent > 100)
+			percent = 100;
+	}
+	DrawProgressBox(x, y, width, height, L"Deleting. Please Wait", g_szOperationFile, NULL, (float)percent, 1.0f, 0);
 }

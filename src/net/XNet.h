@@ -114,7 +114,7 @@ int XNetInAddrToString(IN_ADDR ina, char *text, int textSize);
 int XNetSetSystemLinkPort(WORD port);   // TODO: verify, see Network.cpp
 int closesocket(SOCKET s);
 int ioctlsocket(SOCKET s, long cmd, unsigned long *arg);
-DWORD GetLastError();
+
 HANDLE CreateEventA(void *attributes, BOOL manualReset, BOOL initialState, LPCSTR name);
 BOOL SetEvent(HANDLE event);
 #define WAIT_OBJECT_0 0

@@ -39,7 +39,7 @@ public:
 	public:
 		virtual BOOL OnItemSelected(CXmlElement *item);   // 0x000EE514
 		virtual BOOL Unknown2() { return TRUE; }      // 0x000DFF11
-		virtual void Unknown4();                      // 0x000E4173 TODO: decompile
+		virtual void OnPreview(const char *file);     // 0x000E4173 TODO: decompile
 
 		CUnleashX *m_pApp;                            // +0x04
 	};

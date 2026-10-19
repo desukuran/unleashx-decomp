@@ -137,6 +137,7 @@ HANDLE CreateFileA(LPCSTR fileName, DWORD access, DWORD shareMode, void *securit
 BOOL ReadFile(HANDLE file, void *buffer, DWORD size, DWORD *read, void *overlapped);
 DWORD SetFilePointer(HANDLE file, LONG distance, LONG *distanceHigh, DWORD moveMethod);
 BOOL RemoveDirectoryA(LPCSTR path);
+DWORD GetLastError();
 BOOL WriteFile(HANDLE file, const void *buffer, DWORD size, DWORD *written, void *overlapped);
 struct BY_HANDLE_FILE_INFORMATION
 {
