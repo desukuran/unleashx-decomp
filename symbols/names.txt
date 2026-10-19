@@ -1066,6 +1066,16 @@
 0013877d CmdExtract::ExtractCurrentFile
 0007bfd5 CommandData::GetArcName
 00079a0a FindFile::FastFind
+0007a8d0 File::WOpen
+0007b2b3 ErrorHandler::SetErrorCode
+0007e759 Archive::IsArchive
+00079477 VolNameToFirstName
+00079e86 FileExist
+0007d82a Archive::ReadHeader
+00138625 CmdExtract::ExtractArchiveInit
+0007944c CmpExt
+00073b05 stricomp
+00073a46 strupper
 0007850e urarlib_freelist
 000b1240 MD5Transform
 000c66fd CNetworkSetting::Save

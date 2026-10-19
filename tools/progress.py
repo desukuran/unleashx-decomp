@@ -10,19 +10,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Code ranges in .text that are UnleashX (and its bundled third-party code)
 # rather than XAPI/CRT. Approximate; refine as library boundaries are found.
 # Functions inside them that tools/libmatch.py found in the XDK libraries
-# (STL instantiations, CRT helpers) don't count as app code.
+# (STL instantiations, CRT helpers), and the bundled third-party code
+# (symbols/thirdparty.txt), don't count as app code.
 APP_RANGES = [(0x00011000, 0x00034000), (0x0006A400, 0x0013FD38)]
 
 
 def library_functions():
-    path = os.path.join(ROOT, 'symbols/xdklib.txt')
-    if not os.path.exists(path):
-        return set()
     found = set()
-    for line in open(path):
-        fields = line.split()
-        if len(fields) == 2 and not line.startswith('#'):
-            found.add(int(fields[0], 16))
+    for name in ('xdklib.txt', 'thirdparty.txt'):
+        path = os.path.join(ROOT, 'symbols', name)
+        if not os.path.exists(path):
+            continue
+        for line in open(path):
+            fields = line.split()
+            if len(fields) == 2 and not line.startswith('#'):
+                found.add(int(fields[0], 16))
     return found
 
 
