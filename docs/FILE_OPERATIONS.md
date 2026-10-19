@@ -13,6 +13,14 @@ Each operation runs on a thread of its own, one at a time:
 
 While it runs, the progress box shows the current file and target, the file and overall percentages, the elapsed and remaining time, and the rate. Remaining time is `(left / (done / elapsed + 1)) + 1` seconds; the rate is in KB/s. The operation can be cancelled.
 
+The box itself is `DrawProgressBox` (`src/render/ProgressBox.cpp`).
+* **Contents:** a beveled box with the title (its dots count up every half second: "Copying...", "Copying.", "Copying.."), up to two lines, then a blue bar per percentage with the number to its right, then "Elapse: mm:ss  Remaining: mm:ss Rate: n KB/s".
+* **Size:** a zero height fits the parts, and a zero width is the screen's less 70.
+* **The FTP manager's version** (`DrawTransferBox`) has one bar, with "Current Transfer *n* Bytes *n* Bytes" above it.
+* **Quirks:**
+  * The byte counts print only their low 32 bits.
+  * A box that would run off the bottom is moved up only until it ends 5 pixels below the screen's edge.
+
 ## Settings
 
 | `<Preference>` setting | Effect |
