@@ -418,7 +418,7 @@ HRESULT CUnleashX::FrameMove()
 		}
 		if (m_menu.ProcessInput(&action, (SGamepadState **)&g_gamepadInput) >= 0)
 		{
-			// The globe spins the way the menu moved.
+			// The orb spins the way the menu moved (see Background.cpp).
 			if (action == INPUT_UP || action == INPUT_LTRIGGER)
 			{
 				g_fGlobeSpin = 1.0f;

@@ -63,6 +63,9 @@ enum D3DTEXTURESTAGESTATETYPE
 	D3DTSS_ALPHAARG0 = 17,
 	D3DTSS_ALPHAARG1 = 18,
 	D3DTSS_ALPHAARG2 = 19,
+	D3DTSS_RESULTARG = 20,
+	D3DTSS_TEXTURETRANSFORMFLAGS = 21,
+	D3DTSS_TEXCOORDINDEX = 26,   // TODO: verify the value (the original calls D3DDevice_SetTextureState_TexCoordIndex)
 };
 
 // D3DTEXTUREOP (Xbox)
@@ -99,6 +102,16 @@ enum D3DRENDERSTATETYPE
 	D3DRS_MULTISAMPLEMASK,
 	D3DRS_COLORWRITEENABLE,
 	D3DRS_AMBIENT,
+	D3DRS_ZWRITEENABLE,
+	D3DRS_SPECULARENABLE,
+	D3DRS_LIGHTING,
+	D3DRS_EDGEANTIALIAS,
+	D3DRS_FOGENABLE,
+	D3DRS_FOGCOLOR,
+	D3DRS_FOGTABLEMODE,
+	D3DRS_FOGSTART,
+	D3DRS_FOGEND,
+	D3DRS_FOGDENSITY,
 };
 
 // D3DBLEND (Xbox uses the GL values)
@@ -185,6 +198,19 @@ struct SPresentParameters;   // D3DPRESENT_PARAMETERS, see app/XBApp.h
 #define D3DTS_PROJECTION 1
 #define D3DTS_WORLD 6
 #define D3DCULL_NONE 0
+#define D3DCULL_CW 0x900
+#define D3DCULL_CCW 0x901
+#define D3DTS_TEXTURE0 2
+#define D3DFOG_LINEAR 3
+#define D3DTTFF_DISABLE 0
+#define D3DTTFF_COUNT2 2
+#define D3DTSS_TCI_PASSTHRU 0
+#define D3DTSS_TCI_CAMERASPACENORMAL 0x10000
+#define D3DTADDRESS_CLAMPTOEDGE 5
+#define D3DBLEND_ONE 1
+#define D3DFVF_XYZ 0x002
+#define D3DFVF_NORMAL 0x010
+#define D3DFVF_TEX2 0x200
 #define D3DSHADE_GOURAUD 0x1D01
 #define D3DCOLORWRITEENABLE_ALL 0x01010101
 
@@ -215,6 +241,9 @@ struct IDirect3DDevice8
 	HRESULT CreateTexture(UINT width, UINT height, UINT levels, DWORD usage, D3DFORMAT format, DWORD pool,
 	                      IDirect3DTexture8 **texture);
 	HRESULT SetTexture(DWORD stage, IDirect3DTexture8 *texture);
+	HRESULT SetStreamSource(UINT stream, IDirect3DVertexBuffer8 *buffer, UINT stride);
+	HRESULT DrawVertices(DWORD primitiveType, UINT startVertex, UINT vertexCount);
+	HRESULT SetVertexShaderConstant(int reg, const void *data, DWORD count);
 	HRESULT CreateVertexBuffer(UINT length, DWORD usage, DWORD fvf, DWORD pool, IDirect3DVertexBuffer8 **buffer);
 	HRESULT SetTextureStageState(DWORD stage, D3DTEXTURESTAGESTATETYPE type, DWORD value);
 	HRESULT SetRenderState(D3DRENDERSTATETYPE state, DWORD value);
@@ -253,6 +282,8 @@ float *D3DXMatrixRotationYawPitchRoll(float *out, float yaw, float pitch, float 
 float *D3DXMatrixMultiply(float *out, const float *a, const float *b);                      // 0x0003E25B
 // v (x, y, z, 1) times m, into a 4-vector.
 float *D3DXVec3Transform(float *out, const float *v, const float *m);                       // 0x0003E19C
+float *D3DXMatrixIdentity(float *out);                                                      // 0x00020B0E (out in eax)
+float *D3DXMatrixTranspose(float *out, const float *m);                                     // 0x0003E359
 float D3DXVec4Length(const float *v);                                                       // 0x0002A76A
 // XDK sample framework: where the XBUtil loaders look for media ("D:\\Media\\").
 extern char g_strMediaPath[];                                                              // 0x0026BC78

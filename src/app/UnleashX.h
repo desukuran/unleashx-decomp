@@ -55,8 +55,9 @@ public:
 	// The screen saver and the "any input" bookkeeping: starts the saver
 	// after the wait, stops it on input. (this in ebx)
 	void UpdateScreenSaver(int *action);              // 0x000EA56C
-	// The background: the globe/orb and the skin's 3D scene. TODO: decompile
-	void RenderBackground();                          // 0x000E0E0F
+	// The background: the globe, the skin's image or video, the orb and
+	// the game icon. See Background.cpp.
+	HRESULT RenderBackground();                       // 0x000E0E0F (this on the stack)
 	// The file operation progress/error over the menu (inlined in Render).
 	void RenderFileOperation();
 	// Started by the updater with launch data naming the old dashboard XBE:
@@ -211,7 +212,8 @@ void __stdcall ThreadNotifyRoutine(BOOL create);    // 0x000DFF8C
 unsigned __stdcall MusicManagerThread(void *app);  // 0x000E85B3
 // Set by Render after each frame (FrameMove waits for the first one).
 extern BOOL g_bFrameDrawn;                   // 0x00276218
-// The globe spins this way after a menu move (+1 up, -1 down), and when.
+// The orb spins this way after a menu move (+1 up, -1 down), and when.
+// (Named for the globe; it's the orb that turns. See Background.cpp.)
 extern float g_fGlobeSpin;                   // 0x0027621C
 extern DWORD g_dwGlobeSpinTime;              // 0x00276220
 

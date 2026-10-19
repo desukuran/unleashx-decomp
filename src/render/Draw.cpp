@@ -588,3 +588,11 @@ HRESULT DrawProgressBar(float x, float y, float width, float height, float perce
 	}
 	return S_OK;
 }
+
+// 0x000A282E
+void DrawTextureFullScreen(IDirect3DTexture8 *texture, float alpha)
+{
+	SScreenRect screen = GetScreenRect();
+	DrawTexture(texture, (float)(int)screen.x, (float)(int)screen.y, (float)(int)screen.width,
+	            (float)(int)screen.height, alpha, NULL, 0.0f, NULL);
+}

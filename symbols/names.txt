@@ -1318,3 +1318,16 @@
 00279510 s_fOrbYaw
 00279514 s_fOrbPitch
 00279518 s_fOrbRoll
+000a282e DrawTextureFullScreen
+00097521 CXBMesh::Render HRESULT f(CXBMesh *this@ecx, DWORD flags)
+00020b0e D3DXMatrixIdentity float * f(float *out@eax)
+0003e359 D3DXMatrixTranspose
+0027a36c s_fAspect
+00278d30 s_fOrbX
+00278d2c s_fOrbY
+00278d28 s_fOrbAngle
+00278d24 s_fSpinFrames
+00278d20 s_nSpinItem
+0026cbf0 s_fSpinDirection
+0026cbf4 s_fLastSpin
+0026cbf8 s_fSpinStep

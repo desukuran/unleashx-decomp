@@ -126,6 +126,9 @@ public:
 	// Loads an .xbg file; its textures come from resource (if given).
 	// (this on the stack, fileName in eax) TODO: decompile
 	HRESULT Create(const char *fileName, CXBPackedResource *resource);   // 0x00097F4B
+	// Draws the frames; flags XBMESH_* (0x30: no materials or textures, the
+	// caller sets them). (this in ecx)
+	HRESULT Render(DWORD flags);                                        // 0x00097521
 	virtual ~CXBMesh() {}
 
 	BYTE m_data[0x14];

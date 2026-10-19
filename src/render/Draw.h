@@ -17,6 +17,8 @@ struct SScreenRect
 	DWORD x, y, width, height;
 };
 SScreenRect GetScreenRect();                                 // 0x0009E2A8
+// A texture over the whole screen area.
+void DrawTextureFullScreen(IDirect3DTexture8 *texture, float alpha);   // 0x000A282E
 
 // Skin coordinates (laid out for m_nSkinWidth x m_nSkinHeight) to screen
 // coordinates. Any pointer can be NULL. With base640x480 the sizes are
