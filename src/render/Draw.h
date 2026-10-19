@@ -33,6 +33,10 @@ HRESULT DrawTriangle(float x, float y, float width, float height, int direction,
                      D3DCOLOR fillColor, float alpha);                       // 0x000A0D78
 HRESULT DrawGradientRect(float x, float y, float width, float height, D3DCOLOR color1, D3DCOLOR color2,
                          BOOL vertical, D3DCOLOR frameColor);                // 0x000A1F08
+// A texture stretched over the rectangle (a zero size uses the texture's),
+// with alpha 0..1. The last three arguments rotate/scale it. TODO: decompile
+HRESULT DrawTexture(IDirect3DTexture8 *texture, float x, float y, float width, float height, float alpha,
+                    const float *origin, float unknown, const float *transform);   // 0x000A246F
 // "text..." in a centered box, with animated dots.
 HRESULT DrawBusyBox(CXBFont *font, const wchar_t *text);                     // 0x000A1D70
 

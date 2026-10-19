@@ -671,7 +671,7 @@ void CMenu::ShowMessage(const char *text, const wchar_t *title, int buttons)
 	if (m_pMessageBox == NULL)
 	{
 		m_pMessageBox = new CMessageBox;
-		if (m_pMessageBox != NULL && FAILED(m_pMessageBox->Create(0, 0, 0, 0, 0, 10)))
+		if (m_pMessageBox != NULL && FAILED(m_pMessageBox->Create(m_pSelectedFont, NULL, 0.0f, 0.0f, 0.0f, 0.0f, 10)))
 		{
 			delete m_pMessageBox;
 			m_pMessageBox = NULL;

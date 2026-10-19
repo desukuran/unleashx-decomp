@@ -102,7 +102,7 @@ void CUnleashX::ShowMessage(const char *text, const wchar_t *title, int flags)
 	if (m_pMessageBox == NULL)
 	{
 		m_pMessageBox = new CMessageBox;
-		if (m_pMessageBox != NULL && FAILED(m_pMessageBox->Create(0, 0, 0, 0, 0, 10)))
+		if (m_pMessageBox != NULL && FAILED(m_pMessageBox->Create(&m_fonts[4], NULL, 0.0f, 0.0f, 0.0f, 0.0f, 10)))
 		{
 			delete m_pMessageBox;
 			m_pMessageBox = NULL;
@@ -657,19 +657,19 @@ BOOL CUnleashX::CMenuEvent::OnItemSelected(CXmlElement *item)
 	}
 	if (StrCmpNoCase(cmd, "SetClock") == 0)
 	{
-		if (app->m_pDateTimeSetting == NULL)
+		if (app->m_pClockEditor == NULL)
 		{
-			app->m_pDateTimeSetting = new CDateTimeSetting;
-			if (app->m_pDateTimeSetting != NULL && FAILED(app->m_pDateTimeSetting->Init(&app->m_fonts[1])))
+			app->m_pClockEditor = new CClockEditor;
+			if (app->m_pClockEditor != NULL && FAILED(app->m_pClockEditor->Init(&app->m_fonts[1])))
 			{
-				delete app->m_pDateTimeSetting;
-				app->m_pDateTimeSetting = NULL;
+				delete app->m_pClockEditor;
+				app->m_pClockEditor = NULL;
 			}
 		}
 		// The clock screen is the one shown after a cold boot.
-		g_bColdBoot = app->m_pDateTimeSetting != NULL;
+		g_bColdBoot = app->m_pClockEditor != NULL;
 		if (g_bColdBoot)
-			app->m_pDateTimeSetting->Show();
+			app->m_pClockEditor->Show();
 		return TRUE;
 	}
 	if (StrCmpNoCase(cmd, "TextEditor") == 0)

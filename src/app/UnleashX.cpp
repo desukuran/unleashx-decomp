@@ -109,7 +109,7 @@ CUnleashX::CUnleashX()
 	m_unknown1974 = 0;
 	m_unknown196C = 0;
 	m_pSettingsMenu = NULL;
-	m_pDateTimeSetting = NULL;
+	m_pClockEditor = NULL;
 	m_pFrame800 = NULL;
 	m_hThread2248 = NULL;
 	m_unknown225C = 0;
@@ -227,8 +227,8 @@ HRESULT CUnleashX::Cleanup()
 		delete m_pBackgroundSound;
 		m_pBackgroundSound = NULL;
 	}
-	delete m_pDateTimeSetting;
-	m_pDateTimeSetting = NULL;
+	delete m_pClockEditor;
+	m_pClockEditor = NULL;
 	ReleaseTexture(m_pTexture9D8);
 	ReleaseTexture(m_pTexture9E4);
 	delete m_pFileManager;

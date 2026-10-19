@@ -7,6 +7,7 @@
 #include "../common/Platform.h"
 
 class CXBFontEx;
+class CXBFont;
 struct IDirect3DTexture8;
 
 // Screen modes (CUnleashX::m_nMode)
@@ -85,13 +86,39 @@ public:
 	HRESULT Open(const char *path);                       // 0x00104181
 };
 
-class CDateTimeSetting
+// The "SetClock" screen: six CUpDown spinners (month, day, year, hour, ...),
+// started from the current time. Also the date/time pop-up of the settings
+// pages. 0x2A4 bytes.
+class CClockEditor
 {
 public:
-	CDateTimeSetting();                                   // 0x000C66A7
-	virtual ~CDateTimeSetting();
+	CClockEditor();                                       // 0x000C66A7
+	~CClockEditor();                                      // 0x000C147B
 	HRESULT Init(CXBFontEx *font);                        // 0x000C1FAC
 	void Show();                                          // 0x000C0B13
+	void Render();                                        // 0x000BFC70
+};
+
+// The settings pages' IP address pop-up: four CUpDown spinners (0-255).
+// 0x1C4 bytes.
+class CIPAddressEditor
+{
+public:
+	CIPAddressEditor();                                   // 0x000C662B
+	~CIPAddressEditor();                                  // 0x000C0AB6
+	HRESULT Init(CXBFont *font);                          // 0x000C1D45
+	void Show();                                          // 0x000C066E reads the address set before
+	void Render();                                        // 0x000BF86F
+};
+
+// The settings pages' file pop-up ("Browse XBE"). 0x180 bytes.
+class CFileBrowser
+{
+public:
+	CFileBrowser();                                       // 0x00127A32
+	~CFileBrowser();                                      // 0x00127013
+	void Create(CXBFont *font, const wchar_t *title);     // 0x0012C378
+	void Render();                                        // 0x00129B10
 };
 
 // Message box buttons, in the order they're added, and GetResult() values.
@@ -106,8 +133,14 @@ enum MessageBoxResult
 	MSGBOX_NO = 6,
 	MSGBOX_NONE = 7,
 };
+// Show()'s button sets: the Windows MB_ values.
 #define MSGBOX_BUTTONS_OK 0
+#define MSGBOX_BUTTONS_OKCANCEL 1
+#define MSGBOX_BUTTONS_ABORTRETRYIGNORE 2
+#define MSGBOX_BUTTONS_YESNOCANCEL 3
 #define MSGBOX_BUTTONS_YESNO 4
+#define MSGBOX_BUTTONS_RETRYCANCEL 5
+#define MSGBOX_BUTTONS_CANCEL 6
 
 // The message box (OK / Cancel / Abort / Retry / Ignore / Yes / No). 0x158 bytes.
 class CMessageBox
@@ -115,14 +148,17 @@ class CMessageBox
 public:
 	CMessageBox();                                        // 0x000B10D4
 	virtual ~CMessageBox();
-	HRESULT Create(int, int, int, int, int, int);         // 0x000B084D
+	// The font is passed in eax. The callers pass 0 for the rest and 10.
+	HRESULT Create(CXBFont *font, const wchar_t *title, float x, float y, float width, float height,
+	               int maxVisible);                       // 0x000B084D
 	void AddButton(const wchar_t *text);                  // 0x000AFB3D
-	// buttons: 0 = OK, 4 = Yes/No. TODO: verify the values
+	// buttons: MSGBOX_BUTTONS_*
 	void Show(const char *text, const wchar_t *title, int buttons = 0);   // 0x000B0F74
 	void ProcessInput(int *action);                       // 0x000AF925
 	BOOL IsOpen() const;                                  // 0x000AF8E9
 	int GetResult();                                      // 0x000AFA59 MSGBOX_*
 	void SetSelection(int button);                        // 0x000AF8CF
+	void Render();                                        // 0x000AFC64
 };
 
 // The on-screen keyboard; $KBResult$ in an item's arguments is its last text.
@@ -135,6 +171,7 @@ public:
 	// Starts a new input: clears the text and the done state. TODO: verify
 	void Open();                                          // vtable slot 3, 0x000DC9D7
 	void ProcessInput(int *action);                       // vtable slot 1, 0x000DE58D
+	void Render();                                        // vtable slot 2, 0x000DDA5A
 	BOOL IsDone() const;                                  // 0x00014325 OK or cancelled
 };
 extern CVirtualKeyboard g_virtualKeyboard;               // 0x00278328

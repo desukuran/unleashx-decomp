@@ -68,6 +68,7 @@ public class ApplySymbols extends GhidraScript {
 	}
 
 	private static final Pattern CONV = Pattern.compile("\\b(__stdcall|__cdecl|__thiscall|__fastcall)\\b");
+	private static final Pattern RETREG = Pattern.compile("@(xmm0|st0|eax)\\s+f\\(");
 	private static final Pattern REG = Pattern.compile("@(e[abcd]x|e[sd]i|ebp|[abcd][lh]|xmm[0-7])\\s*$");
 
 	/** Strips "@reg" markers from the parameter list, recording one entry (or null) per parameter. */
@@ -92,7 +93,7 @@ public class ApplySymbols extends GhidraScript {
 		return out.append(sig.substring(close)).toString();
 	}
 
-	private void applyRegisterStorage(Function fn, List<String> regs) throws Exception {
+	private void applyRegisterStorage(Function fn, List<String> regs, String retRegName) throws Exception {
 		Parameter[] old = fn.getParameters();
 		List<Parameter> params = new ArrayList<>();
 		int stack = 4; // past the return address
@@ -113,7 +114,8 @@ public class ApplySymbols extends GhidraScript {
 			params.add(new ParameterImpl(old[i].getName(), dt, vs, currentProgram));
 		}
 		DataType rt = fn.getReturnType();
-		String retReg = rt instanceof ghidra.program.model.data.AbstractFloatDataType ? "ST0" : "EAX";
+		String retReg = retRegName != null ? (retRegName.startsWith("xmm") ? retRegName.toUpperCase() + "_Da" : retRegName.toUpperCase())
+				: rt instanceof ghidra.program.model.data.AbstractFloatDataType ? "ST0" : "EAX";
 		ReturnParameterImpl ret = rt.getLength() <= 0
 				? new ReturnParameterImpl(rt, VariableStorage.VOID_STORAGE, currentProgram)
 				: new ReturnParameterImpl(rt, new VariableStorage(currentProgram, currentProgram.getRegister(retReg)), currentProgram);
@@ -155,6 +157,13 @@ public class ApplySymbols extends GhidraScript {
 		fn.setParentNamespace(ns);
 		if (sig != null) {
 			List<String> regs = new ArrayList<>();
+			// "float@xmm0 f(...)": the return value's register
+			String retReg = null;
+			Matcher rm = RETREG.matcher(sig);
+			if (rm.find()) {
+				retReg = rm.group(1);
+				sig = sig.substring(0, rm.start()) + " " + sig.substring(rm.end() - 2);
+			}
 			sig = extractRegisters(sig, regs);
 			String cc = null;
 			Matcher ccm = CONV.matcher(sig);
@@ -168,7 +177,7 @@ public class ApplySymbols extends GhidraScript {
 			if (cc != null) {
 				def.setCallingConvention(cc);
 			}
-			else if (regs.stream().anyMatch(r -> r != null)) {
+			else if (retReg != null || regs.stream().anyMatch(r -> r != null)) {
 				// Custom storage; avoid __thiscall's hidden 'this' parameter.
 				def.setCallingConvention("__stdcall");
 			}
@@ -180,8 +189,8 @@ public class ApplySymbols extends GhidraScript {
 			}
 			fn.setName(name, SourceType.USER_DEFINED);
 			fn.setParentNamespace(ns);
-			if (regs.stream().anyMatch(r -> r != null)) {
-				applyRegisterStorage(fn, regs);
+			if (retReg != null || regs.stream().anyMatch(r -> r != null)) {
+				applyRegisterStorage(fn, regs, retReg);
 			}
 		}
 		else if (ns instanceof GhidraClass) {

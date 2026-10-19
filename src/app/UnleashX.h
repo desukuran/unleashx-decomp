@@ -77,7 +77,7 @@ public:
 	IDirect3DTexture8 *m_pTexture7F0;         // +0x7F0
 	int m_unknown7F4;                         // +0x7F4
 	CSound *m_pBackgroundSound;               // +0x7F8 looped in the menu
-	CDateTimeSetting *m_pDateTimeSetting;     // +0x7FC
+	CClockEditor *m_pClockEditor;     // +0x7FC
 	CAppFrame *m_pFrame800;                   // +0x800 TODO: verify the class
 	int m_unknown804;                         // +0x804
 	void *m_pDefaultGamepad;                  // +0x808 &m_defaultGamepad

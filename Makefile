@@ -21,7 +21,8 @@ TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_te
 # Syntax-checked but not linked: hardware access, or too much of what they
 # call isn't decompiled yet.
 XBOX_ONLY := src/system/Hardware.cpp src/system/SystemControl.cpp src/skin/SkinLoader.cpp \
-	src/app/Main.cpp src/app/MenuActions.cpp src/app/UnleashX.cpp src/app/FtpEvents.cpp src/app/NetworkThread.cpp src/render/Draw.cpp src/ui/MenuItem.cpp src/ui/Menu.cpp
+	src/app/Main.cpp src/app/MenuActions.cpp src/app/UnleashX.cpp src/app/FtpEvents.cpp src/app/NetworkThread.cpp src/render/Draw.cpp src/ui/MenuItem.cpp src/ui/Menu.cpp \
+	src/app/SettingsBase.cpp
 
 all: $(TESTS) check
 

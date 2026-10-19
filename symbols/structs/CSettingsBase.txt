@@ -1,0 +1,31 @@
+# CSettingsBase: a page of the settings screen (src/app/SettingsBase.h).
+struct CSettingsBase 0xb8
+0x00 void* vftable
+0x04 float m_fX
+0x08 float m_fY
+0x0c float m_fWidth
+0x10 float m_fHeight
+0x14 void* m_pFont
+0x18 void* m_pSoundMove
+0x1c void* m_pSoundSelect
+0x20 BOOL m_bClosed
+0x24 int m_nSelected
+0x28 int m_nFirstVisible
+0x2c int m_nVisibleCount
+0x30 int m_nLastVisible
+0x34 wchar_t m_szTitle[30]
+0x70 BOOL m_bKeyboardOpen
+0x74 BOOL m_bAskSave
+0x78 BOOL m_bModified
+0x7c BOOL m_bMessageBoxOpen
+0x80 void* m_pMessageBox
+0x84 BOOL m_bIPEditorOpen
+0x88 void* m_pIPEditor
+0x8c BOOL m_bClockEditorOpen
+0x90 void* m_pClockEditor
+0x94 BOOL m_bFileBrowserOpen
+0x98 void* m_pFileBrowser
+0x9c BOOL m_bSelectionMoved
+0xa0 void* m_pBackground
+0xa4 std_vector m_items                  # CSettingItem, 0x74 bytes each
+0xb4 float m_fLabelWidth

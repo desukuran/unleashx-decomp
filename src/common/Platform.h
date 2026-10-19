@@ -30,6 +30,7 @@ typedef const char *LPCSTR;
 #endif
 
 #define S_OK ((HRESULT)0)
+#define S_FALSE ((HRESULT)1)
 #define SUCCEEDED(hr) ((HRESULT)(hr) >= 0)
 #define FAILED(hr) ((HRESULT)(hr) < 0)
 #define E_FAIL ((HRESULT)0x80004005)

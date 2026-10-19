@@ -544,9 +544,9 @@
 000f6597 CSkinBrowser::CSkinBrowser
 000f5dec CSkinBrowser::Init
 000f6791 CSkinBrowser::Show
-000c66a7 CDateTimeSetting::CDateTimeSetting
-000c1fac CDateTimeSetting::Init
-000c0b13 CDateTimeSetting::Show
+000c66a7 CClockEditor::CClockEditor
+000c1fac CClockEditor::Init
+000c0b13 CClockEditor::Show
 00104399 CNotePad::Init
 00103d4d CNotePad::NewFile
 00104181 CNotePad::Open
@@ -879,3 +879,65 @@
 00095b7d SyncTimeWithSntp
 0009db0c SetXbeTitleName
 0009f0ca IsFatxName
+# settings pages (src/app/Settings*.cpp)
+000124ad std::wstring::ctor_copy std_wstring * f(std_wstring *self@esi, std_wstring *other)
+000203d8 CSettingItem::CSettingItem CSettingItem * f(CSettingItem *this@edi, std_wstring label, std_wstring value, int type, BOOL header, BOOL enabled, BOOL visible, int value2, BOOL password)
+0002057e std::wstring::ctor_wcstr std_wstring * f(std_wstring *self@esi, wchar_t *s)
+000205d3 SettingItems::push_back void f(std_vector *self@eax, CSettingItem *item)
+0002053c CSettingItem::~CSettingItem void f(CSettingItem *this@esi)
+000204e7 CSettingItem::CSettingItem_copy void f(CSettingItem *this@edi, CSettingItem *other@ebx)
+000205bd SettingItems::size int f(std_vector *self@eax)
+000206c9 SettingItems::clear void f(std_vector *self@esi)
+00020499 CSettingsBase::SetTitle void f(CSettingsBase *this@edx, wchar_t *title)
+0002ddfc CSettingsBase::IsSelectedSelectable BOOL f(CSettingsBase *this@eax)
+000204bf CSettingsBase::IsOpen
+000204c8 CSettingsBase::SetItemEnabled
+000bebb2 CSettingsBase::Init
+000c5bb0 CSettingsBase::HandleInput
+000c551a CSettingsBase::Render
+000c16c8 CSettingsBase::Reset
+000c17f0 CSettingsBase::LoadSounds void f(CSettingsBase *this@esi)
+000c1816 CSettingsBase::FreePopups void f(CSettingsBase *this@eax)
+000bf231 CSettingsBase::RevertChanges void f(CSettingsBase *this@ebx)
+000bf2b5 CSettingsBase::DrawBackground void f(CSettingsBase *this@eax)
+000beefa CSettingsBase::ClearChanged void f(CSettingsBase *this@ecx)
+000c5499 CSettingsBase::AskToSave void f(CSettingsBase *this@eax)
+0009f12e PlaySound void f(void *sound@esi)
+0009978b CXBFont::Begin
+0009968d CXBFont::End
+00098e3a CXBFont::DrawText HRESULT __stdcall f(void *font, float x, float y, DWORD color, wchar_t *text, DWORD flags, float maxWidth)
+00099571 CXBFont::GetTextWidth float@xmm0 f(void *font, wchar_t *text)
+00098fc3 CXBFont::GetTextExtent
+00098e9e CXBFont::GetTextExtentN
+00099aad CXBFont::DrawTextN
+000a1d37 DrawFrame
+000a1a39 DimScreen
+000a0a87 DrawPolygon
+000a1bbf DrawBevelBox void f(float x@xmm0, float y@xmm5, float width, float height, DWORD borderColor, DWORD fillColor, float alpha, DWORD lineWidth)
+000a0d78 DrawTriangle
+000a1f08 DrawGradientRect
+000a1d70 DrawBusyBox
+000a10d2 DrawWindowFrame
+000a2163 DrawCaptionBar
+000beccd IsLeapYear
+000becf5 DaysInMonth
+000bef1a ValidateSettingValue
+000c5358 CSettingsBase::ShowMessage void f(CSettingsBase *this@edi, char *text, wchar_t *title, int buttons)
+000c54e0 CSettingsBase::ShowSavedMessage void f(CSettingsBase *this@edi)
+000c54fd CSettingsBase::ShowRestartMessage void f(CSettingsBase *this@edi)
+000c147b CClockEditor::~CClockEditor
+000bfc70 CClockEditor::Render
+000c662b CIPAddressEditor::CIPAddressEditor
+000c0ab6 CIPAddressEditor::~CIPAddressEditor
+000c1d45 CIPAddressEditor::Init
+000c066e CIPAddressEditor::Show
+000bf86f CIPAddressEditor::Render
+00127a32 CFileBrowser::CFileBrowser
+00127013 CFileBrowser::~CFileBrowser
+0012c378 CFileBrowser::Create
+00129b10 CFileBrowser::Render
+000afc64 CMessageBox::Render
+000dda5a CVirtualKeyboard::Render
+000cb39e CSettingsBase::ShowIPEditor
+000cb434 CSettingsBase::ShowClockEditor
+000d2057 CSettingsBase::ShowFileBrowser

@@ -1,0 +1,13 @@
+# CSettingItem: one line of a settings page (src/app/SettingsBase.h).
+struct CSettingItem 0x74
+0x00 std_wstring m_strLabel
+0x1c std_wstring m_strValue
+0x38 BOOL m_bHeader                      # a section caption, not selectable
+0x3c BOOL m_bEnabled
+0x40 int m_nType
+0x44 BOOL m_bVisible
+0x48 BOOL m_bChanged
+0x4c int m_nValue
+0x50 std_wstring m_strSavedValue
+0x6c int m_nSavedValue
+0x70 BOOL m_bPassword
