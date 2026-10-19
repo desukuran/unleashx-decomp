@@ -120,6 +120,17 @@ DWORD GetTickCount()
 	return (DWORD)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
 }
 
+// No threads on the host: the start routine isn't run.
+uintptr_t _beginthreadex(void *, unsigned, unsigned(__stdcall *)(void *), void *, unsigned, unsigned *)
+{
+	return 0;
+}
+
+BOOL SetThreadPriority(HANDLE, int)
+{
+	return TRUE;
+}
+
 void _endthreadex(unsigned int)
 {
 }

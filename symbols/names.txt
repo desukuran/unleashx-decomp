@@ -344,3 +344,73 @@
 00038c16 GetVolumeInformationA
 00038b22 GetDiskFreeSpaceExA
 0005f698 tolower
+# network (src/net/Network.cpp)
+00276260 g_bNetworkStarted
+00276264 g_bNetworkStopping
+00276268 g_hNetworkEvent
+002713a4 g_dwIPAddress
+002713a8 g_netConfig
+00271a94 g_xnAddr
+0026bbd8 g_dwXnAddrStatus
+00278670 g_netClients
+00278d78 s_bLinkMonitorStarted
+00278d7c s_dwNextClientScan
+000aeb5b StopNetwork
+000aebf9 HasNoNetworkAddress
+000aec23 IsDhcpAddress
+000aec2c IsStaticAddress
+000aec35 GetIPAddress
+000aec3b IsNetworkReady
+000aec52 IsEthernetLinkUp
+000aec63 LinkMonitorThread
+000aecd0 StartLinkMonitor
+000aed23 ApplyNetworkConfig int __cdecl f(int useDhcp, char *ip, char *subnet, char *gateway, char *dns1, char *dns2)
+000af004 GetIPAddressString
+000af055 ScanNetworkClients
+000af5a8 NetworkStatusThread
+000af6dc StartNetworkStatusThread
+000af716 InitNetworkStack
+000af785 WaitForLinkThread
+000af7dc StartWaitForLinkThread
+000af81c StartNetwork void __cdecl f(int waitSeconds)
+# XNet API wrappers (load the stack's context into ecx, jump to the implementation)
+001e2c43 XNetInAddrToString
+001e2c70 XNetGetTitleXnAddr
+001e2c7b XNetSetSystemLinkPort
+001e2c86 socket
+001e2c91 closesocket
+001e2c9c shutdown
+001e2ca7 ioctlsocket
+001e2cb2 setsockopt
+001e2d2c recvfrom
+001e2d46 sendto
+001e1664 htons
+001e306d WSACleanup
+001e3060 XNetCleanup
+001e3263 XNetSaveConfigParams
+001e32f9 XNetLoadConfigParams
+# number/locale formatting
+0003952f XGetLanguage
+00099f10 GetThousandsSeparator
+00099f3a GetDecimalSeparator
+00099f58 FormatDoubleW
+0005fafb _ui64tow
+000a3a5a FormatDouble
+000a385e FormatIPAddress
+000a38c8 GetKernelVersionString
+00021ced FormatBytes16
+# skin text values (src/skin/SkinText.cpp)
+00277830 s_textCache
+0027783c s_pTextSettings
+002761f0 s_pszNewsText
+000214d7 TextCache_At
+00021573 TextCache_Find
+0002154f TextCache_Clear
+00022bd1 TextCache_Init
+00021490 std::wstring::clear
+000190bb std::wstring::assign_cstr
+000a1a7f FormatNumberW
+00114655 GetNewsText
+001146a3 InvalidateSkinText
+001146ed GetSkinTextValue
+00117fb9 GetInfoText
