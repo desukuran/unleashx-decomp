@@ -41,8 +41,8 @@ HRESULT CFontTable::Add(const char *name, CXBFont *, BOOL) { printf("[stub] font
 CWMVideoPlayer::CWMVideoPlayer() {}
 CWMVideoPlayer::~CWMVideoPlayer() {}
 void CWMVideoPlayer::SetFont(CXBFont *) {}
-void CWMVideoPlayer::Unknown2() {}
-void CWMVideoPlayer::Unknown3() {}
+BOOL CWMVideoPlayer::IsPlaying() { return FALSE; }
+void CWMVideoPlayer::Render() {}
 HRESULT CWMVideoPlayer::Update(BOOL *, int) { return S_OK; }
 void CWMVideoPlayer::SetFullScreen(BOOL) {}
 void CWMVideoPlayer::SetAudio(BOOL) {}

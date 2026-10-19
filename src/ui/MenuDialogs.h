@@ -31,13 +31,15 @@ public:
 class CPassCode
 {
 public:
-	CPassCode();                                          // 0x00102F62? TODO: verify
+	CPassCode();                                          // 0x0010302B (this in edi)
 	// vtable: ProcessInput, Render, then the (deleting) destructor.
 	virtual void ProcessInput(int *action, struct SGamepadState **pad);   // vtable slot 0
 	virtual void Render();                                // vtable slot 1
 	virtual ~CPassCode();                                 // vtable slot 2
 	void SetTitle(const wchar_t *title);                  // 0x0002209E
-	void Init();                                          // 0x0010341C
+	// symbols: the button-glyph font, NULL for XboxDings. Fails without a
+	// font or when already set up. (this in esi, font in eax, symbols in ecx)
+	HRESULT Init(CXBFont *font, CXBFont *symbols);       // 0x0010341C
 	void SetCode(const char *code);                       // 0x00103100
 	void Show();                                          // 0x00102805
 	BOOL IsClosed() const { return m_bCancelled || m_unknown50; }   // 0x0002208B

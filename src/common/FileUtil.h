@@ -20,6 +20,21 @@ void ResolvePath(const char *path, std::string &out);               // 0x000AC73
 // FALSE for empty text.
 BOOL WriteTextFile(const char *path, const char *text, BOOL append);   // 0x000A5BC6 TODO: decompile
 
+// Walks the matches of a pattern in a folder. TODO: decompile
+class CFileFinder
+{
+public:
+	CFileFinder();                                        // 0x0001331C (this in eax)
+	~CFileFinder();                                       // 0x00013564 (this in esi)
+	// The first match, or NULL.
+	WIN32_FIND_DATAA *FindFirst(const char *dir, const char *pattern);   // 0x00013338
+
+	HANDLE m_hFind;                                       // +0x00
+	std::string m_strDir;                                 // +0x04
+	std::string m_strPattern;                             // +0x20
+	WIN32_FIND_DATAA m_data;                              // +0x3C
+};
+
 // Directory part of a path to a file ("" if path has no file name).          TODO: verify
 std::string GetPathDirectory(const char *path);                       // 0x000A4B0E TODO: decompile
 BOOL CreateDirectoryTree(const char *path);                           // 0x000A3F51 TODO: decompile

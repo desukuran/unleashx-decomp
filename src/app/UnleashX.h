@@ -5,6 +5,7 @@
 #include <string>
 
 #include "../common/Platform.h"
+#include "../render/D3D.h"
 #include "../render/Fonts.h"
 #include "../skin/Skin.h"
 #include "../ui/Menu.h"
@@ -36,6 +37,13 @@ public:
 	// soundtrack music or a preview with sound).
 	void PlayBackgroundSound(BOOL play);              // 0x000E045B
 	void InitOrb();                                   // 0x000E0662 TODO: decompile
+	// The globe's vertex buffer. (this in esi)
+	HRESULT CreateGlobeBuffer();                      // 0x000E0411 TODO: decompile
+	// Fills m_globePath (a slow sway). (this in ecx)
+	void BuildGlobePath();                            // 0x000DFF17 TODO: decompile
+	// The startup splash (or the previous program's screen) at alpha, full
+	// screen. Inlined in the original.
+	void DrawSplash(float alpha, const D3DDISPLAYMODE &mode);
 	// Message box with OK; text is ANSI.
 	void ShowMessage(const char *text, const wchar_t *title, int flags = 0);   // 0x000E2153
 	BOOL CreateTextEditor();                          // 0x000E2853
@@ -102,10 +110,13 @@ public:
 	float m_unknown878;                       // +0x878 0.2
 	DWORD m_unknown87C;                       // +0x87C
 	float m_globeMatrix[16];                  // +0x880 the globe's world transform (D3DMATRIX)
-	BYTE m_unknown8C0[0x100];                 // +0x8C0 view/projection matrices (+0x8C0, +0x900, +0x940)
+	float m_worldMatrix[16];                  // +0x8C0 identity
+	float m_viewMatrix[16];                   // +0x900
+	float m_projMatrix[16];                   // +0x940
+	BYTE m_unknown980[0x40];                  // +0x980
 	int m_unknown9C0;                         // +0x9C0
 	float m_fSplashAlpha;                     // +0x9C4
-	BOOL m_bSplashIsVideo;                    // +0x9C8 TODO: verify
+	BOOL m_bSplashIsScreen;                   // +0x9C8 the splash is the previous program's screen
 	int m_unknown9CC;                         // +0x9CC
 	IDirect3DTexture8 *m_pSplash;             // +0x9D0
 	int m_unknown9D4;                         // +0x9D4
@@ -149,6 +160,7 @@ extern CAudioGUI *g_pAudioGUI;               // 0x00276228 the music player scre
 extern HANDLE g_hNetworkThread;              // 0x0026A630
 // Starts the network thread (NetworkThread.cpp) unless it's running.
 void StartNetworkThread();                   // 0x000EC903
+unsigned __stdcall NetworkThread(void *);    // 0x000EAAB5
 extern BOOL g_bUpdateAvailable;              // 0x0027620C a newer UnleashX was found
 extern std::string g_strUpdateMessage;       // 0x0026C200
 extern BOOL g_bAutoLaunchPending;            // 0x00276210
@@ -170,6 +182,28 @@ void DrawPointer(int x, int y, float alpha);         // 0x000E0950
 std::string GetScreenshotPath();                     // 0x000A3C39
 extern DWORD g_dwPointerMoveTime;            // 0x0027216C
 
+// Startup work Initialize runs on threads. TODO: decompile
+// Fonts, the resource .xpr and the media; non-zero when something required
+// is missing (the recovery screen follows).
+unsigned __stdcall LoadResources(void *app);        // 0x000E8938
+// Starts the item cache thread (0x000E9CCE) and loads the "Ambient" sound.
+unsigned __stdcall StartupThread(void *app);        // 0x000EA4AA
+// SMC/EEPROM/temperature monitoring for the whole run.
+unsigned __stdcall MonitorThread(void *app);        // 0x000E4188
+// A button held at boot runs its <Settings><Shortcut> entry; TRUE when it
+// launched something. (action in eax)
+BOOL RunBootShortcut(int action);                   // 0x000E87BD
+// Draws the screen the previous program left (captured at startup).
+void DrawSavedScreen(IDirect3DTexture8 *texture, DWORD width, DWORD height, float alpha);   // 0x0009AEB8
+// Copies what the previous program left on screen into a new 640x480 texture.
+HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 *device);   // 0x0009F23D TODO: decompile
+// Text centered on x, y. TODO: decompile
+void DrawTextCentered(CXBFont *font, float x, float y, const wchar_t *text, D3DCOLOR color, DWORD flags);   // 0x0002AED1
+// Mounts a utility partition folder? TODO: identify (XDK)
+BOOL XSetupDriveFolder(const char *drive, const wchar_t *name);   // 0x000373FB
+// Called by the kernel for each thread created/ended. TODO: decompile
+void __stdcall ThreadNotifyRoutine(BOOL create);    // 0x000DFF8C
+
 // Creates g_pMusicManager (on a thread; directly if that fails). TODO: decompile
 unsigned __stdcall MusicManagerThread(void *app);  // 0x000E85B3
 // Set (by nothing in the code) to create the menu from mode 0.
@@ -184,5 +218,6 @@ void AddRecentItem(const char *path, const char *name, int region);   // 0x000E1
 // Shows the loading screen and starts path (an XBE); returns only on
 // failure. region: the game's region (-1 = read it from the XBE).
 BOOL LaunchXbe(const char *path, const char *name, int region, const char *args);   // 0x000E4691
+DWORD LaunchXbeImage(const char *path, const char *args);    // 0x000A67D5 TODO: decompile
 // Maps D: to the XBE's folder and launches it with launchData. TODO: decompile
 DWORD LaunchXbeWithData(const char *path, LAUNCH_DATA *launchData);               // 0x000A648C

@@ -14,7 +14,7 @@ extern CUnleashX *g_pApp;              // 0x00276204
 
 // Thread that mounts drives, loads Config.xml (or creates a default one) and
 // applies it.
-DWORD ConfigLoaderThread(void *param);   // 0x000EA0A6
+unsigned __stdcall ConfigLoaderThread(void *param);   // 0x000EA0A6
 
 // Copies every known setting from g_config into g_pSettings.
 void LoadConfigSettings();               // 0x000E5A4F

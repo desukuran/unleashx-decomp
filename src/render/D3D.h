@@ -16,6 +16,7 @@ typedef DWORD D3DCOLOR;
 #define D3DFMT_DXT1 0x0C
 #define D3DFMT_LIN_R5G6B5 0x11
 #define D3DFMT_LIN_A8R8G8B8 0x12
+#define D3DFMT_LIN_X1R5G5B5 0x1C
 #define D3DX_FILTER_NONE 1
 
 #define D3DRTYPE_TEXTURE 3
@@ -93,6 +94,11 @@ enum D3DRENDERSTATETYPE
 	D3DRS_MULTISAMPLEANTIALIAS,
 	D3DRS_FILLMODE,
 	D3DRS_DITHERENABLE,
+	D3DRS_SHADEMODE,
+	D3DRS_ZBIAS,
+	D3DRS_MULTISAMPLEMASK,
+	D3DRS_COLORWRITEENABLE,
+	D3DRS_AMBIENT,
 };
 
 // D3DBLEND (Xbox uses the GL values)
@@ -168,10 +174,35 @@ struct D3DVIEWPORT8
 
 struct SPresentParameters;   // D3DPRESENT_PARAMETERS, see app/XBApp.h
 
+// D3DTRANSFORMSTATETYPE (Xbox)
+#define D3DTS_VIEW 0
+#define D3DTS_PROJECTION 1
+#define D3DTS_WORLD 6
+#define D3DCULL_NONE 0
+#define D3DSHADE_GOURAUD 0x1D01
+#define D3DCOLORWRITEENABLE_ALL 0x01010101
+
+struct D3DCOLORVALUE
+{
+	float r, g, b, a;
+};
+struct D3DMATERIAL8
+{
+	D3DCOLORVALUE Diffuse;
+	D3DCOLORVALUE Ambient;
+	D3DCOLORVALUE Specular;
+	D3DCOLORVALUE Emissive;
+	float Power;
+};
+
 struct IDirect3DDevice8
 {
 	HRESULT Reset(SPresentParameters *params);
 	HRESULT SetViewport(const D3DVIEWPORT8 *viewport);
+	HRESULT GetViewport(D3DVIEWPORT8 *viewport);
+	HRESULT SetTransform(DWORD state, const float *matrix);
+	HRESULT SetMaterial(const D3DMATERIAL8 *material);
+	HRESULT BlockUntilVerticalBlank();
 	HRESULT Swap(DWORD flags);
 	HRESULT SetSoftDisplayFilter(BOOL enable);
 	HRESULT SetFlickerFilter(DWORD level);
@@ -206,6 +237,14 @@ HRESULT D3DXLoadSurfaceFromSurface(IDirect3DSurface8 *destination, const void *d
                                    DWORD filter, D3DCOLOR colorKey);
 void Get2DSurfaceDesc(D3DResource *resource, DWORD level, D3DSURFACE_DESC *desc);
 
+HRESULT D3DXCreateTextureFromFileA(IDirect3DDevice8 *device, const char *file,
+                                   IDirect3DTexture8 **texture);   // 0x001542A1
+// D3DX math (matrices are 4x4 floats).
+float *D3DXMatrixLookAtLH(float *out, const float *eye, const float *at, const float *up);   // 0x0003E5F3
+float *D3DXMatrixPerspectiveFovLH(float *out, float fovY, float aspect, float zNear, float zFar);   // 0x0003E6DE
+float *D3DXMatrixRotationYawPitchRoll(float *out, float yaw, float pitch, float roll);         // 0x0003E5BA
+// XDK sample framework: diffuse and ambient set to the color. (material in edx)
+void XBUtil_InitMaterial(D3DMATERIAL8 *material, float r, float g, float b, float a);       // 0x00092EEF
 HRESULT D3DXCreateTextureFromFileExA(IDirect3DDevice8 *device, const char *file, UINT width, UINT height,
                                      UINT mipLevels, DWORD usage, D3DFORMAT format, DWORD pool, DWORD filter,
                                      DWORD mipFilter, D3DCOLOR colorKey, void *srcInfo, void *palette,

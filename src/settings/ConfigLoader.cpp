@@ -44,7 +44,7 @@ static void AssignIfIP(std::string &dst, const std::string &value)
 }
 
 // 0x000EA0A6
-DWORD ConfigLoaderThread(void *param)
+unsigned __stdcall ConfigLoaderThread(void *param)
 {
 	(void)param;
 	CAppSettings *settings = g_pSettings;

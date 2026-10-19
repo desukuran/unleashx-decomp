@@ -398,6 +398,9 @@ private:
 class CVirtualKeyboard
 {
 public:
+	// Sets it up: fonts, the key texture. TODO: name the other arguments
+	void Create(CXBFont *font, CXBFont *font2, IDirect3DTexture8 *keys, int unknown1, float x, float y,
+	            int unknown2);                            // vtable slot 0, 0x000DFD78
 	std::string GetResult();                              // 0x00014242
 	void SetTitle(const wchar_t *title);                  // 0x0001433E
 	void SetText(const wchar_t *text);                    // 0x00014302
@@ -410,6 +413,7 @@ public:
 	BOOL IsDone() const;                                  // 0x00014325 OK or cancelled
 };
 extern CVirtualKeyboard g_virtualKeyboard;               // 0x00278328
+extern struct SIRRemote *g_pKeyboardIR;                 // 0x00278434 (g_virtualKeyboard+0x10C) the remote it reads
 extern BOOL g_bKeyboardPassword;                         // 0x0027846C masked input
 extern int g_nKeyboardMaxLength;                         // 0x00278470
 extern BOOL g_bKeyboardAccepted;                         // 0x0027A5CC TODO: verify (also read for the passcode pad)

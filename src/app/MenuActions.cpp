@@ -35,7 +35,6 @@ void SetVideoRegion(int standard, int mode);         // 0x000BCF48 TODO: decompi
 // Shows the skin's loading screen for the XBE.
 void ShowLaunchScreen(const char *path, const char *name);   // 0x000E3B65 TODO: decompile
 // Maps D: to the XBE's folder and starts it; returns only on failure.
-DWORD LaunchXbeImage(const char *path, const char *args);    // 0x000A67D5 TODO: decompile
 // Starts the network from the settings on a thread (unless one is running).
 
 #ifndef _XBOX

@@ -612,7 +612,7 @@
 000aea79 COptionMenu::AddOption
 000ade9e COptionMenu::Show
 0002209e CPassCode::SetTitle
-0010341c CPassCode::Init
+0010341c CPassCode::Init HRESULT f(CPassCode *this@esi, CXBFont *font@eax, CXBFont *symbols@ecx)
 00103100 CPassCode::SetCode
 00102805 CPassCode::Show
 0010a05b CMenuItemEditor::Init
@@ -1190,3 +1190,30 @@
 00277610 g_dTotalPercent
 00277130 g_ullOperationTotal
 00277620 g_ullOperationDone
+000e8938 LoadResources
+000ea4aa StartupThread
+000e4188 MonitorThread
+000e87bd RunBootShortcut BOOL f(int action@eax)
+0009aeb8 DrawSavedScreen
+0002aed1 DrawTextCentered
+000373fb XSetupDriveFolder
+000dff8c ThreadNotifyRoutine
+00270fa4 s_threadNotify
+0007fbb1 CAudioDevice::GetInstance
+00011472 CAudioDevice::GetDirectSound
+0007fc2e CAudioDevice::Shutdown
+0007fc65 CAudioDevice::Create
+0001331c CFileFinder::CFileFinder
+00013564 CFileFinder::~CFileFinder
+00013338 CFileFinder::FindFirst
+001542a1 D3DXCreateTextureFromFileA
+0003e5f3 D3DXMatrixLookAtLH
+0003e6de D3DXMatrixPerspectiveFovLH
+0003e5ba D3DXMatrixRotationYawPitchRoll
+00092eef XBUtil_InitMaterial
+000dff17 CUnleashX::BuildGlobePath
+000e0411 CUnleashX::CreateGlobeBuffer
+00094645 CXBStopWatch::Resume void f(CXBStopWatch *this@esi)
+000dfd78 CVirtualKeyboard::Create
+0010302b CPassCode::CPassCode CPassCode * f(CPassCode *this@edi)
+00278434 g_pKeyboardIR

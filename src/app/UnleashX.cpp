@@ -5,6 +5,7 @@
 
 #include <cstring>
 
+#include "../audio/AudioDevice.h"
 #include "../audio/MusicManager.h"
 #include "../audio/Sound.h"
 #include "../net/FtpServer.h"
@@ -22,7 +23,7 @@ CUnleashX *g_pApp;                         // 0x00276204
 CAudioGUI *g_pAudioGUI;                    // 0x00276228
 HANDLE g_hNetworkThread = INVALID_HANDLE_VALUE;   // 0x0026A630
 CXBPackedResource *g_pResource;            // 0x00276200 m_resource of the app
-int g_unknown276224;                       // 0x00276224 TODO
+IDirectSound *g_pDirectSound;               // 0x00276224
 BOOL g_bMenuPending;                       // 0x0027623C
 BOOL g_bFrameDrawn;                        // 0x00276218
 float g_fGlobeSpin;                        // 0x0027621C
@@ -30,8 +31,6 @@ DWORD g_dwGlobeSpinTime;                   // 0x00276220
 static BOOL s_bBackgroundSoundPlaying;     // 0x00278D48
 
 // The XDK framework's resource/font teardown and DirectSound shutdown.
-void ShutdownAudio();                      // 0x0007FBB1 TODO: verify
-void ShutdownAudio2();                     // 0x0007FC2E TODO: verify
 void CXBFontDestroy(CXBFontEx *font);      // 0x00098FFE CXBFont::Destroy
 void CXBPackedResourceDestroy(CXBPackedResource *resource);   // 0x00097104
 extern IDirect3DTexture8 *g_pTexture270FB0;   // 0x00270FB0
@@ -50,7 +49,7 @@ CUnleashX::CUnleashX()
 	g_pResource = &m_resource;
 	m_bStartMusic = 0;
 	m_bNoHardDisk = FALSE;
-	g_unknown276224 = 0;
+	g_pDirectSound = NULL;
 	g_pMusicManager = NULL;
 	m_unknown9CC = 0;
 	m_pSplash = NULL;
@@ -252,8 +251,7 @@ HRESULT CUnleashX::Cleanup()
 		delete g_pMusicManager;
 		g_pMusicManager = NULL;
 	}
-	ShutdownAudio();
-	ShutdownAudio2();
+	CAudioDevice::GetInstance()->Shutdown();
 	if (g_hNetworkThread != NULL && g_hNetworkThread != INVALID_HANDLE_VALUE)
 		WaitForSingleObject(g_hNetworkThread, 200);
 	return S_OK;

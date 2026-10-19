@@ -82,6 +82,8 @@ class CXBStopWatch
 public:
 	CXBStopWatch();                           // 0x00094658
 	void Start();                             // 0x0009462A
+	// Start without clearing the time counted so far (the tail of Start).
+	void Resume();                            // 0x00094645 (this in esi)
 	void Stop();                              // 0x00094606
 	void Reset();                             // 0x000945ED
 	BOOL IsRunning() const;                   // 0x000945E9

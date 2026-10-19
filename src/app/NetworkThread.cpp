@@ -23,7 +23,6 @@ BOOL g_bUpdateAvailable;               // 0x0027620C
 std::string g_strUpdateMessage;        // 0x0026C200 "UnleashX V... is available for download."
 BOOL g_bAutoLaunchPending;             // 0x00276210 set by Initialize; skips newsfeed and update
 
-static unsigned __stdcall NetworkThread(void *);
 
 // 0x000EC903
 void StartNetworkThread()
@@ -238,7 +237,7 @@ static BOOL CheckForUpdate(CAppSettings *settings)
 }
 
 // 0x000EAAB5
-static unsigned __stdcall NetworkThread(void *)
+unsigned __stdcall NetworkThread(void *)
 {
 	CAppSettings *settings = g_pSettings;
 	if (!settings->m_network.m_bEnable)

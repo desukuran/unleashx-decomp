@@ -742,7 +742,7 @@ BOOL CMenu::CheckPassword(CXmlElement *item, std::string &password)
 			if (m_pPassCode != NULL)
 			{
 				m_pPassCode->SetTitle(L"Passcode");
-				m_pPassCode->Init();
+				m_pPassCode->Init(m_pSelectedFont, NULL);
 			}
 		}
 		if (m_pPassCode != NULL)
