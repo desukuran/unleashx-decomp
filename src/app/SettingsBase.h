@@ -88,6 +88,9 @@ public:
 	// original takes maxLength in eax, 0 = 64, and owner in edi).
 	void ShowIPEditor(const wchar_t *address, const wchar_t *title);   // 0x000CB39E
 	void ShowClockEditor();                                   // 0x000CB434
+	// filters is "ext" or "ext1|ext2|...". The original takes this in edi.
+	void ShowFileBrowser(const wchar_t *title, int unknown124, int option11C, int unknown120,
+	                     const char *startPath, const char *filters);   // 0x000D2057
 	void OpenKeyboard(const wchar_t *title, const wchar_t *text, BOOL password, int maxLength,
 	                  int owner);                             // 0x000BFFE0
 	// The end of each page's Save (repeated in each in the original):

@@ -91,3 +91,32 @@ public:
 // must be 1..65535). On failure text is reset to "13" and message says why.
 // The original takes text in edi.
 BOOL ValidateSNTPValue(wchar_t *text, int index, char *message);   // 0x000BF191
+
+// AutoLaunch Settings: what to start when a game, DVD movie, audio CD or
+// data disc is inserted. 0xB8 bytes, vtable 0x0025686C.
+class CAutoLaunch : public CSettingsBase
+{
+public:
+	enum
+	{
+		ITEM_GAMES,             // <Games AutoLaunch>
+		ITEM_DVD,               // <DVD AutoLaunch>
+		ITEM_DVD_PLAYER,        // <DVD>xbe</DVD>, file pop-up; X clears it
+		ITEM_AUDIO_CD,
+		ITEM_AUDIO_CD_PLAYER,
+		ITEM_DATA,
+		ITEM_DATA_LAUNCHER,     // the "File Manager"
+		ITEM_SAVE_HEADER,
+		ITEM_SAVE,
+		ITEM_RESET,
+		ITEM_EXIT,
+	};
+
+	CAutoLaunch();                                            // 0x000C1D32
+	virtual ~CAutoLaunch();                                   // 0x000C1D1E
+	virtual HRESULT Init(CXBFont *font);                      // 0x000C4EC9
+	virtual HRESULT HandleInput(int *action, SGamepadState **pad);   // 0x000D5AFF
+	// (Render, 0x000CB399, just calls CSettingsBase::Render.)
+
+	BOOL Save();                                              // 0x000CAA5D
+};

@@ -22,7 +22,7 @@ TESTS := build/xml_roundtrip build/config_test build/skin_test build/language_te
 # call isn't decompiled yet.
 XBOX_ONLY := src/system/Hardware.cpp src/system/SystemControl.cpp src/skin/SkinLoader.cpp \
 	src/app/Main.cpp src/app/MenuActions.cpp src/app/UnleashX.cpp src/app/FtpEvents.cpp src/app/NetworkThread.cpp src/render/Draw.cpp src/ui/MenuItem.cpp src/ui/Menu.cpp \
-	src/app/SettingsBase.cpp src/app/SettingsVideo.cpp src/app/SettingsDateTime.cpp src/system/XSettings.cpp
+	src/app/SettingsBase.cpp src/app/SettingsVideo.cpp src/app/SettingsDateTime.cpp src/app/SettingsAutoLaunch.cpp src/system/XSettings.cpp
 
 all: $(TESTS) check
 

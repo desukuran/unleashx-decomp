@@ -132,7 +132,8 @@ public:
 	BYTE m_unknown1B0[0x1C4 - 0x1B0];
 };
 
-// The settings pages' file pop-up ("Browse XBE"). 0x180 bytes.
+// The settings pages' file pop-up ("Browse XBE"). 0x180 bytes. Most
+// methods take this in a register (noted).
 class CFileBrowser
 {
 public:
@@ -140,6 +141,25 @@ public:
 	~CFileBrowser();                                      // 0x00127013
 	void Create(CXBFont *font, const wchar_t *title);     // 0x0012C378
 	void Render();                                        // 0x00129B10
+	void SetTitle(const wchar_t *title);                  // 0x000113D9 (this in eax, title in esi)
+	void SetOption11C(int value);                         // 0x000112BA (this in esi) TODO: what it is
+	// Only files with these extensions; NULL clears the list. (this in eax)
+	void AddFilter(const char *extension);                // 0x001281F6
+	void SetStartPath(const char *path);                  // 0x0001142F (this in ebx, path in esi)
+	void Show(BOOL unknown);                              // 0x0001124E (this in ebx)
+	void ProcessInput(int *action, SGamepadState **pad);  // 0x0012AF3F (this in ebx)
+	BOOL IsOpen();                                        // 0x0001123B (this in eax)
+	// The chosen file, "" if cancelled. (this in eax)
+	std::string GetSelectedPath();                        // 0x000112D9
+
+	BYTE m_unknown00[0x48];
+	BOOL m_bOpen;                                         // +0x48
+	BOOL m_bCancelled;                                    // +0x4C
+	BYTE m_unknown50[0x120 - 0x50];
+	int m_unknown120;                                     // +0x120
+	int m_unknown124;                                     // +0x124
+	wchar_t m_szTitle[40];                                // +0x128
+	BYTE m_unknown178[0x180 - 0x178];
 };
 
 // Message box buttons, in the order they're added, and GetResult() values.

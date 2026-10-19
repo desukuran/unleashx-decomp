@@ -1003,3 +1003,14 @@
 0001421f CVirtualKeyboard::GetText
 000dc9d7 CVirtualKeyboard::Open
 000de58d CVirtualKeyboard::ProcessInput
+000caa5d CAutoLaunch::Save
+000d2057 CSettingsBase::ShowFileBrowser
+000113d9 CFileBrowser::SetTitle
+000112ba CFileBrowser::SetOption11C
+001281f6 CFileBrowser::AddFilter
+0001142f CFileBrowser::SetStartPath
+0001124e CFileBrowser::Show
+0012af3f CFileBrowser::ProcessInput
+0001123b CFileBrowser::IsOpen
+000112d9 CFileBrowser::GetSelectedPath
+000202ee WStringToString

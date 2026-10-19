@@ -11,6 +11,7 @@
 #include "../render/Draw.h"
 #include "../render/Fonts.h"
 #include "../common/FileUtil.h"
+#include "../common/StrUtil.h"
 #include "../settings/AppSettings.h"
 #include "../settings/ConfigLoader.h"
 #include "../skin/SkinColors.h"
@@ -354,6 +355,55 @@ void CSettingsBase::ShowClockEditor()
 		m_pClockEditor->Show();
 		m_bClockEditorOpen = TRUE;
 	}
+}
+
+// 0x000D2057
+void CSettingsBase::ShowFileBrowser(const wchar_t *title, int unknown124, int option11C, int unknown120,
+                                    const char *startPath, const char *filters)
+{
+	if (m_pFileBrowser == NULL)
+	{
+		m_pFileBrowser = new CFileBrowser;
+		if (m_pFileBrowser != NULL)
+			m_pFileBrowser->Create(m_pFont, L"Browse XBE");
+	}
+	if (m_pFileBrowser == NULL)
+	{
+		m_bFileBrowserOpen = FALSE;
+		return;
+	}
+
+	m_pFileBrowser->m_unknown124 = unknown124;
+	m_pFileBrowser->SetTitle(title);
+	m_pFileBrowser->SetOption11C(option11C);
+	if (filters != NULL)
+	{
+		std::string list = filters;
+		int bar = StrFind(list, "|", 0);
+		if (bar == -1)
+		{
+			m_pFileBrowser->AddFilter(filters);
+		}
+		else
+		{
+			m_pFileBrowser->AddFilter(NULL);
+			if (StrRight(list, 1).compare("|") != 0)
+				list.append("|");
+			int start = 0;
+			do
+			{
+				std::string extension = StrMid(list, start, bar - start);
+				m_pFileBrowser->AddFilter(extension.c_str());
+				start = bar + 1;
+				bar = StrFind(list, "|", start);
+			} while (bar != -1);
+		}
+	}
+	m_pFileBrowser->m_unknown120 = unknown120;
+	if (startPath != NULL)
+		m_pFileBrowser->SetStartPath(startPath);
+	m_pFileBrowser->Show(FALSE);
+	m_bFileBrowserOpen = TRUE;
 }
 
 // 0x000BFFE0
