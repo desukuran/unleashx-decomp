@@ -3,6 +3,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "../common/Platform.h"
 
@@ -31,6 +32,10 @@ extern double g_dFilePercent;            // 0x00277608 of the current file
 extern double g_dTotalPercent;           // 0x00277610 0 = work it out from the counts below
 extern ULONGLONG g_ullOperationTotal;    // 0x00277130 bytes to copy
 extern ULONGLONG g_ullOperationDone;     // 0x00277620 bytes copied
+// The clock of the running operation (DrawProgressBox), in seconds.
+extern DWORD g_dwOperationRemaining;     // 0x00277638
+extern DWORD g_dwOperationElapsed;       // 0x0027763C
+extern DWORD g_dwOperationUnknown640;    // 0x00277640
 // Where failed operations are logged ("" = no log).
 extern std::string g_strOperationLog;    // 0x0026C280
 void ResetFileOperationStats();          // inlined
@@ -44,3 +49,21 @@ void DeleteFolder(const char *path);                          // 0x000A9738
 void ZipFiles(const char *source, const char *zipFile, int unknown);   // 0x000A963D
 void UnzipFile(const char *zipFile, const char *destination); // 0x000A633E
 void UnRarFile(const char *rarFile, const char *destination); // 0x000AA245
+
+// A file or folder an operation works through. 0x24 bytes.
+struct SFileListItem
+{
+	SFileListItem(const std::string &path, BOOL isFolder, DWORD size);   // 0x000132B3 (this in esi)
+
+	std::string path;               // +0x00
+	BOOL isFolder;                  // +0x1C
+	DWORD size;                     // +0x20 (the low 32 bits)
+};
+// The running operation's list.
+extern std::vector<SFileListItem> g_fileList;   // 0x002788E8
+
+// Adds everything under path to list (NULL = g_fileList): each folder's
+// files, then each subfolder (itself, then what's in it), counting them in
+// the operation stats. Stops on g_bCancelOperation. (FileList.cpp; LTCG
+// copies at 0x00084186, 0x000A6436, 0x000F5B4B, 0x0010A5C6, 0x001292EF.)
+void CollectFiles(const char *path, std::vector<SFileListItem> *list);   // 0x000F5B4B

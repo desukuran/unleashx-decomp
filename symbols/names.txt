@@ -1248,7 +1248,7 @@
 0002b806 CScreenSaver::IsTextOnly BOOL f(CScreenSaver *this@eax)
 000f4e50 CSlideShow::Stop void f(CSlideShow *this@esi)
 000f4dd5 CSlideShow::SetDelay void f(DWORD seconds@eax, CSlideShow *this)
-000f4dd1 CSlideShow::SetUnknown70 void f(CSlideShow *this@eax, BOOL value@ecx)
+000f4dd1 CSlideShow::SetTransitions void f(CSlideShow *this@eax, BOOL value@ecx)
 0009c224 CWMVideoPlayer::Close void f(CWMVideoPlayer *this@edi)
 0002653e CWMVideoPlayer::IsValid BOOL f(CWMVideoPlayer *this@eax)
 0009d050 CWMVideoPlayer::Reopen
@@ -1395,3 +1395,18 @@
 00013c39 SFileItem::SFileItem
 001266fd SFileItem::operator_less
 002761d8 g_pFileSettings
+00029095 CSlideShow::IsOpen
+000f4f6c CSlideShow::Render
+000f56b7 CSlideShow::ProcessInput
+000f4df1 CSlideShow::Show
+000f4eb4 CSlideShow::Reset
+000f563b CSlideShow::LoadNext
+000f5ba1 CSlideShow::ListThread
+000f527e CSlideShow::LoaderThread
+000f57e4 CollectFolder
+000f5b4b CollectFiles
+000132b3 SFileListItem::SFileListItem
+002788e8 g_fileList
+00277638 g_dwOperationRemaining
+0027763c g_dwOperationElapsed
+00277640 g_dwOperationUnknown640

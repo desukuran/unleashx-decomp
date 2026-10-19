@@ -196,6 +196,38 @@ keyboard up) and the remote's MENU go back to the menu.
 * **Globe:** with `<Main Globe>`, the globe sways back and forth along the
   path of 512 heights from the skin, at a speed tied to the frame rate.
 
+## The slideshow
+
+`CSlideShow` (`src/app/SlideShow.cpp`) shows a folder's pictures. The screen saver uses it.
+
+### Loading
+
+* A thread collects everything under the folder, including subfolders, and shuffles it. Only `.jpg`, `.png` and `.bmp` files are shown.
+* Each picture loads on its own thread after the delay (5 seconds, at least 3).
+* A picture is scaled to the screen's width, unless that makes it too tall. Small pictures are scaled up too. It's then centered.
+* Quirk: the first picture in the shuffled list only comes up when the list wraps around.
+
+### Transitions
+
+A new picture fades in over 2 seconds while the old one fades out. Each picture also gets one of 12 effects at random:
+
+* a wipe from the left, the top or the right
+* growing from the corner or the middle
+* sliding in from the left or from below
+* a spin-zoom
+* a horizontal or vertical stretch
+* two plain cross-fades
+
+### Controls
+
+| Input | Effect |
+|---|---|
+| A or START | pause |
+| B or BACK | close |
+| Y | turn the transitions on or off |
+| Up / down | change the delay |
+| Left / right | previous / next picture |
+
 ## Drawing
 
 Each frame clears to the skin's sky color (black without a globe), then:

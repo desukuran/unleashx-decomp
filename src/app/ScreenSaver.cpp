@@ -136,7 +136,7 @@ void CScreenSaver::SetSource(const wchar_t *source)
 			if (m_pSlideShow != NULL)
 			{
 				m_bSlideShow = TRUE;
-				m_pSlideShow->SetUnknown70(TRUE);
+				m_pSlideShow->SetTransitions(TRUE);
 				m_pSlideShow->SetDelay(5);
 			}
 			return;
@@ -149,7 +149,7 @@ void CScreenSaver::SetSource(const wchar_t *source)
 		if (m_pSlideShow != NULL)
 		{
 			m_bSlideShow = TRUE;
-			m_pSlideShow->SetUnknown70(TRUE);
+			m_pSlideShow->SetTransitions(TRUE);
 			m_pSlideShow->SetDelay(5);
 		}
 		return;

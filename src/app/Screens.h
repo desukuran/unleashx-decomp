@@ -8,6 +8,7 @@
 #include "../common/Platform.h"
 #include "XBApp.h"
 #include "../ui/UpDown.h"
+#include "../system/FileOps.h"
 #include "../ui/FileBrowser.h"
 #include "../ui/MenuDialogs.h"
 #include "../ui/VirtualKeyboard.h"
@@ -59,27 +60,68 @@ public:
 	virtual void Show();                                  // 0x00133A5D
 };
 
-// A slideshow of a picture folder (or a single picture). 0xD0 bytes.
-// TODO: decompile
+// A slideshow of a picture folder (and its subfolders), in random order:
+// the screen saver's and the file manager's. A thread lists the pictures;
+// another loads each next one, which then fades in with one of a dozen
+// transitions. 0xD0 bytes.
 class CSlideShow : public CAppFrame
 {
 public:
 	explicit CSlideShow(const char *path);               // 0x000F5C9D (this in ebx)
 	virtual ~CSlideShow();                                // 0x000F5602
-	virtual BOOL IsOpen();                                // 0x00029095 (+0xC4)
+	virtual BOOL IsOpen() { return m_bOpen; }             // 0x00029095
 	virtual BOOL Render();                                // 0x000F4F6C
+	// A/START pause, B/BACK close, Y switches the transitions, up/down
+	// change the delay, left/right go back/forward. (Sleeps 10-50 ms.)
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x000F56B7
-	// Starts over (restarts the picture timers).
+	// Starts over (restarts the picture timer).
 	virtual void Show();                                  // 0x000F4DF1
-	// Ends the loader thread. (this in esi)
+	// Ends the loader thread and frees the pictures. (this in esi)
 	void Stop();                                          // 0x000F4E50
 	// Seconds per picture (milliseconds over 1000 are converted; 2 or
 	// less is ignored). (seconds in eax)
 	void SetDelay(DWORD seconds);                         // 0x000F4DD5
-	// TODO: what +0x70 means. (this in eax, value in ecx)
-	void SetUnknown70(BOOL value);                        // 0x000F4DD1
-};
+	// FALSE: pictures just replace each other. (this in eax, value in ecx)
+	void SetTransitions(BOOL transitions) { m_bTransitions = transitions; }   // 0x000F4DD1
 
+	int m_nTransition;                     // +0x04 the effect of the picture fading in (0-11)
+	std::string m_strPath;                 // +0x08 the folder
+	IDirect3DTexture8 *m_pLoading;         // +0x24 the picture being loaded
+	IDirect3DTexture8 *m_pTextures[2];     // +0x28 the current and the previous picture
+	int m_nCurrent;                        // +0x30 which of the two is current
+	UINT m_nIndex;                         // +0x34 in m_files
+	BOOL m_bFading;                        // +0x38 the current one is fading in
+	std::vector<SFileListItem> m_files;    // +0x3C shuffled
+	float m_fX[2];                         // +0x4C per texture
+	float m_fWidth[2];                     // +0x54
+	float m_fY[2];                         // +0x5C
+	float m_fHeight[2];                    // +0x64
+	UINT m_nDelay;                         // +0x6C seconds, 5
+	BOOL m_bTransitions;                   // +0x70
+	int m_unknown74;                       // +0x74
+	CXBStopWatch m_timer;                  // +0x78 the fade, then the delay
+	HANDLE m_hLoader;                      // +0x98 -1 = none
+	BOOL m_bReady;                         // +0x9C the list is done
+	BOOL m_bStretch;                       // +0xA0 fill the screen (never set)
+	float m_fFixedX;                       // +0xA4 a fixed place, if the size is set (never set)
+	float m_fFixedY;                       // +0xA8
+	float m_fFixedWidth;                   // +0xAC
+	float m_fFixedHeight;                  // +0xB0
+	int m_unknownB4[2];                    // +0xB4
+	float m_fScale[2];                     // +0xBC the zoom transitions' x and y scale
+	BOOL m_bOpen;                          // +0xC4
+	BOOL m_bSkip;                          // +0xC8 load the next one now
+	BOOL m_bPaused;                        // +0xCC
+
+private:
+	void Reset();                                         // 0x000F4EB4 (this in esi)
+	// Starts loading the next picture. (this in edi)
+	void LoadNext();                                      // 0x000F563B
+	// Lists and shuffles the pictures, then Show(). (thread)
+	static unsigned __stdcall ListThread(void *param);          // 0x000F5BA1
+	// Loads the next picture that loads. (thread)
+	static unsigned __stdcall LoaderThread(void *param);        // 0x000F527E
+};
 class CWMVideoPlayer;
 
 // The screen saver: bouncing text, a video, or a slideshow (by what the
