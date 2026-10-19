@@ -103,6 +103,23 @@ void Sleep(DWORD)
 {
 }
 
+DWORD WaitForSingleObject(HANDLE, DWORD)
+{
+	return 0;
+}
+
+BOOL CloseHandle(HANDLE)
+{
+	return TRUE;
+}
+
+DWORD GetTickCount()
+{
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	return (DWORD)(ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+}
+
 void _endthreadex(unsigned int)
 {
 }

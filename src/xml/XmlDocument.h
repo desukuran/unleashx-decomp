@@ -101,6 +101,7 @@ public:
 	void Clear();                                                 // 0x0001E0AA
 
 	CXmlElement *FindElement(CXmlElement *parent, const char *name);  // 0x0001E041
+	CXmlElement *FindElementRecursive(const char *name, CXmlElement *parent);   // 0x000265F2
 	CXmlElement *GetFirstChild(CXmlElement *parent);              // 0x00023319
 	CXmlElement *GetNextChild(CXmlElement *parent);               // 0x00023347
 	BOOL RemoveElement(CXmlElement *element);                     // 0x0001DD1A

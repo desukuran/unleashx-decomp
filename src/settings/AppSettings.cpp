@@ -128,8 +128,8 @@ CAppSettings::CAppSettings()
 	else      { adj[SCREEN_640x480].x = 5;    adj[SCREEN_640x480].y = 5; }
 	InitScreenAdjust(adj[SCREEN_1920x1080], 1920, 1080, 2.0f);
 
-	m_nUnknownWidth = 640;
-	m_nUnknownHeight = 480;
+	m_nSkinWidth = 640;
+	m_nSkinHeight = 480;
 }
 
 // 0x000311B1

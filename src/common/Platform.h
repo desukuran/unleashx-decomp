@@ -26,6 +26,8 @@ typedef const char *LPCSTR;
 #endif
 
 #define S_OK ((HRESULT)0)
+#define SUCCEEDED(hr) ((HRESULT)(hr) >= 0)
+#define FAILED(hr) ((HRESULT)(hr) < 0)
 #define E_FAIL ((HRESULT)0x80004005)
 
 #define FILE_ATTRIBUTE_DIRECTORY 0x00000010
@@ -81,6 +83,10 @@ BOOL FileTimeToSystemTime(const FILETIME *fileTime, SYSTEMTIME *systemTime);
 void OutputDebugStringA(LPCSTR text);
 void Sleep(DWORD ms);
 int MultiByteToWideChar(unsigned codePage, DWORD flags, const char *src, int srcLen, wchar_t *dst, int dstLen);
+#define INFINITE 0xFFFFFFFF
+DWORD WaitForSingleObject(HANDLE handle, DWORD ms);
+BOOL CloseHandle(HANDLE handle);
+DWORD GetTickCount();
 BOOL DeleteFileA(LPCSTR fileName);
 BOOL CopyFileA(LPCSTR existingFileName, LPCSTR newFileName, BOOL failIfExists);
 void _endthreadex(unsigned int code);

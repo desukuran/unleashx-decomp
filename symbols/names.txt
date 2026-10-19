@@ -237,3 +237,49 @@
 000349e4 SystemTimeToFileTime BOOL __stdcall f(SYSTEMTIME *st, FILETIME *ft)
 00034ebf LocalFileTimeToFileTime BOOL __stdcall f(FILETIME *local, FILETIME *utc)
 00145e80 Direct3DCreate8
+
+# ---- src/skin ----
+00277968 g_skin
+000f9852 CSkin::~CSkin void f(void *self@edi)
+000f9166 CSkin::SetDefaults void f(void *self@eax)
+000f9372 CSkin::Free void __stdcall f(void *self)
+000fd644 CSkin::Parse BOOL __stdcall f(void *self, CXmlDocument *doc)
+000ffe1a CSkin::Load
+000fcea6 CSkin::SetDefaultMainLayout void f(void *self@esi)
+000fa219 CSkin::SetDefaultMusicPlayerLayout
+000f9dfc CSkin::ResolveFile std_string * __cdecl f(void *self, std_string *out, char *path)
+000f9a08 CSkin::FindFont HRESULT f(void **font@eax, void *self, char *name)
+000f8e2b CSkin::PollLoad HRESULT f(void *self@eax, BOOL *busy)
+000fae12 CSkin::ParseTexts void __cdecl f(void *self, CXmlElement *parent, char *tag, std_vector *texts, std_vector *order)
+000fc526 CSkin::ParseShapes void __cdecl f(void *self, CXmlElement *parent, char *tag, std_vector *shapes, std_vector *order)
+000fcb03 CSkin::ParseImages void __cdecl f(void *self, CXmlElement *parent, char *tag, std_vector *images, std_vector *order)
+000f9b86 ParseSkinAlign DWORD __cdecl f(char *align)
+000f9ca6 ParseSkinRect void __cdecl f(int *rect, CXmlElement *element)
+000266b8 MakeSkinText
+0002667f MakeSkinShape
+0002692d MakeSkinImage
+00101708 SkinLoaderThread
+00101743 CSkin::BeginLoad void f(void *self@esi, char *path)
+000f90b0 FindInternalSkin int __cdecl f(void *unused, char *name)
+000265f2 CXmlDocument::FindElementRecursive CXmlElement * __thiscall f(char *name, CXmlElement *parent)
+000ad398 LoadSkinColorScheme
+002784c0 g_fonts
+002786fc g_dwSkinBorderColor
+00278700 g_dwSkinBackColor
+00277e70 g_bSkinGameIcon
+00277664 g_pd3dDevice
+0009ecb3 LoadTextureFromFile BOOL f(char *path@ecx, void *device, void **texture, int width, int height, void *info)
+0009f14b GetScreenWidth
+00099ec9 CXBFont::Create HRESULT f(char *fileName@eax, void *self, DWORD offset)
+00098feb CXBFont::SetScaleFactors
+00137841 CXBFontEx::CreateFromTTF
+00137887 CXBFontEx::CXBFontEx
+00137df6 CFontTable::CFontTable
+00138089 CFontTable::Find
+00137ff6 CFontTable::Add
+0009bdf1 CWMVideoPlayer::SetFullScreen
+0009bf89 CWMVideoPlayer::SetAudio
+0009bb70 CWMVideoPlayer::SetRect
+0009ce46 CWMVideoPlayer::Open
+0005f0f1 _strtoul ulong __cdecl f(char *s, char **end, int base)
+000226f6 StrMakeLower

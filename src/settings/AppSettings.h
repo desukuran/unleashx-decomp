@@ -247,8 +247,8 @@ public:
 	int m_nDisplayWidth;                     // +0x12F4 640. TODO: verify
 	int m_nDisplayHeight;                    // +0x12F8 480
 	BYTE m_unknown12FC[0x18];                // +0x12FC
-	int m_nUnknownWidth;                     // +0x1314 640
-	int m_nUnknownHeight;                    // +0x1318 480
+	int m_nSkinWidth;                        // +0x1314 render size the skin asks for (<ScreenSize>)
+	int m_nSkinHeight;                       // +0x1318
 	float m_fUnknown131C;                    // +0x131C 1.0
 	int m_nScrollSpeed;                      // +0x1320 10..60
 	SAudioSettings m_audio;                  // +0x1324

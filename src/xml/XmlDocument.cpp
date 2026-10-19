@@ -538,6 +538,33 @@ CXmlElement *CXmlDocument::FindElement(CXmlElement *parent, const char *name)
 	return child;
 }
 
+// 0x000265F2
+// Depth-first search below parent (the root if NULL): first the direct
+// children, then each child's subtree.
+CXmlElement *CXmlDocument::FindElementRecursive(const char *name, CXmlElement *parent)
+{
+	if (parent == NULL)
+	{
+		parent = &m_root;
+		m_pCurrent = parent;
+	}
+
+	CXmlElement *child;
+	for (child = parent->GetFirstChild(); child != NULL; child = parent->GetNextChild())
+	{
+		if (StrCmpNoCase(child->m_strName, name) == 0)
+			return child;
+	}
+
+	for (child = parent->GetFirstChild(); child != NULL; child = parent->GetNextChild())
+	{
+		CXmlElement *found = FindElementRecursive(name, child);
+		if (found != NULL)
+			return found;
+	}
+	return NULL;
+}
+
 // 0x00023319
 // Like CXmlElement::GetFirstChild, but also makes the child current.
 CXmlElement *CXmlDocument::GetFirstChild(CXmlElement *parent)
