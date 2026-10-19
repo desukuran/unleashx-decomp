@@ -6,6 +6,7 @@
 
 #include "../common/Platform.h"
 #include "XBApp.h"
+#include "../ui/UpDown.h"
 
 class CXBFontEx;
 class CXBFont;
@@ -141,25 +142,37 @@ class CIPAddressEditor
 {
 public:
 	CIPAddressEditor();                                   // 0x000C662B
-	~CIPAddressEditor();                                  // 0x000C0AB6
+	~CIPAddressEditor();                                  // 0x000C0AB6 (this in eax)
+	// E_FAIL when already initialized. (this in eax)
 	HRESULT Init(CXBFont *font);                          // 0x000C1D45
-	void Show();                                          // 0x000C066E reads the address set before
-	void Render();                                        // 0x000BF86F
-	// The original takes address in eax.
+	// Opens it showing m_strAddress, and lays it out. (this in ebx)
+	void Show();                                          // 0x000C066E
+	HRESULT Render();                                     // 0x000BF86F (this in edi)
+	// The original takes this in ecx and address in eax.
 	void SetAddress(const wchar_t *address);              // 0x000C1A55
 	// "a.b.c.d" from the spinners. The original takes this in esi.
 	void GetAddress(wchar_t *address);                    // 0x000BFC30
 	// A accepts, B/BACK cancels (and resets the spinners). The original
 	// takes this in eax and action in edi.
-	void ProcessInput(int *action, SGamepadState **pad);  // 0x000C09EE
+	HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x000C09EE
 
-	BYTE m_unknown00[0x0C];
+	CXBFont *m_pFont;                                     // +0x00 MainFont, else Init's font
+	CXBFont *m_pButtonFont;                               // +0x04 XboxDings (the A/B glyphs)
+	BOOL m_bInitialized;                                  // +0x08
 	BOOL m_bOpen;                                         // +0x0C
-	BYTE m_unknown10[0x170 - 0x10];
+	CUpDown m_spinners[4];                                // +0x10
+	int m_nFocus;                                         // +0x160
+	CSound *m_pSoundMove;                                 // +0x164 "Scroll"
+	CSound *m_pSoundAccept;                               // +0x168 "Select"
+	CSound *m_pSoundBack;                                 // +0x16C "Back"
 	std::wstring m_strTitle;                              // +0x170
 	std::string m_strAddress;                             // +0x18C
 	BOOL m_bCancelled;                                    // +0x1AC
-	BYTE m_unknown1B0[0x1C4 - 0x1B0];
+	float m_fY;                                           // +0x1B0
+	float m_fX;                                           // +0x1B4
+	float m_fWidth;                                       // +0x1B8
+	float m_fHeight;                                      // +0x1BC
+	DWORD m_unknown1C0;                                   // +0x1C0 unused
 };
 
 // The settings pages' file pop-up ("Browse XBE"). 0x180 bytes. Most

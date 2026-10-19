@@ -34,3 +34,17 @@ BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture);  // 0x0009FA
 HRESULT SaveSurfaceToBmp(IDirect3DSurface8 *surface, const char *path);   // 0x0016FD40
 // The first texture of an .xpr file, copied with black as the color key.
 BOOL LoadXprFileTexture(const char *path, IDirect3DTexture8 **texture);   // 0x000A2371 TODO: decompile
+
+// Name -> texture table: the textures the dialogs share ("Keyboard", set
+// from the skin's resource at startup).
+class CTextureTable
+{
+public:
+	// Not in the table: loads the file name and adds it. (texture in edi)
+	HRESULT Find(const char *name, IDirect3DTexture8 **texture);           // 0x00137FA0 TODO: decompile
+	HRESULT Add(const char *name, IDirect3DTexture8 *texture, BOOL owned);  // 0x00137F1F TODO: decompile
+
+	BYTE m_reserved[0x10];
+};
+
+extern CTextureTable g_textures;   // 0x002784E8
