@@ -22,6 +22,8 @@ typedef DWORD D3DCOLOR;
 #define D3DRTYPE_TEXTURE 3
 #define D3DLOCK_READONLY 0x80   // TODO: verify (LockRect flags 0x80 in the original)
 
+#define D3DERR_INVALIDCALL ((HRESULT)0x8876086C)
+
 #define D3DCLEAR_TARGET 0x000000F0
 #define D3DCLEAR_ZBUFFER 0x00000001
 #define D3DCLEAR_STENCIL 0x00000002
@@ -181,6 +183,14 @@ struct IDirect3DVertexBuffer8
 	HRESULT Lock(UINT offset, UINT size, BYTE **data, DWORD flags);
 };
 
+struct IDirect3DIndexBuffer8
+{
+	ULONG Release();
+	HRESULT Lock(UINT offset, UINT size, BYTE **data, DWORD flags);
+};
+
+#define D3DFMT_INDEX16 0x65   // TODO: verify
+
 struct D3DVIEWPORT8
 {
 	DWORD X;
@@ -243,6 +253,13 @@ struct IDirect3DDevice8
 	HRESULT SetTexture(DWORD stage, IDirect3DTexture8 *texture);
 	HRESULT SetStreamSource(UINT stream, IDirect3DVertexBuffer8 *buffer, UINT stride);
 	HRESULT DrawVertices(DWORD primitiveType, UINT startVertex, UINT vertexCount);
+	HRESULT SetIndices(IDirect3DIndexBuffer8 *buffer, UINT baseVertexIndex);
+	HRESULT CreateIndexBuffer(UINT length, DWORD usage, D3DFORMAT format, DWORD pool, IDirect3DIndexBuffer8 **buffer);
+	// (Inline on the Xbox: they turn the primitive count into a vertex
+	// count and call DrawIndexedVertices / DrawVertices.)
+	HRESULT DrawIndexedPrimitive(DWORD primitiveType, UINT minIndex, UINT numVertices, UINT startIndex,
+	                             UINT primitiveCount);
+	HRESULT DrawPrimitive(DWORD primitiveType, UINT startVertex, UINT primitiveCount);
 	HRESULT SetVertexShaderConstant(int reg, const void *data, DWORD count);
 	HRESULT CreateVertexBuffer(UINT length, DWORD usage, DWORD fvf, DWORD pool, IDirect3DVertexBuffer8 **buffer);
 	HRESULT SetTextureStageState(DWORD stage, D3DTEXTURESTAGESTATETYPE type, DWORD value);
@@ -284,7 +301,10 @@ float *D3DXMatrixMultiply(float *out, const float *a, const float *b);          
 float *D3DXVec3Transform(float *out, const float *v, const float *m);                       // 0x0003E19C
 float *D3DXMatrixIdentity(float *out);                                                      // 0x00020B0E (out in eax)
 float *D3DXMatrixTranspose(float *out, const float *m);                                     // 0x0003E359
-float D3DXVec4Length(const float *v);                                                       // 0x0002A76A
+float D3DXVec4Length(const float *v);
+UINT D3DXGetFVFVertexSize(DWORD fvf);                                                       // 0x00154515
+HRESULT D3DXComputeBoundingSphere(const void *vertices, DWORD numVertices, DWORD fvf, float *center,
+                                  float *radius);                                           // 0x001543F5                                                       // 0x0002A76A
 // XDK sample framework: where the XBUtil loaders look for media ("D:\\Media\\").
 extern char g_strMediaPath[];                                                              // 0x0026BC78
 void XBUtil_SetMediaPath(const char *path);   // 0x000930A7 (path in eax)

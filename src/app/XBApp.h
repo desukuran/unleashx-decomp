@@ -5,6 +5,7 @@
 
 #include "../common/Platform.h"
 #include "../input/XBInput.h"
+#include "../render/D3D.h"
 
 struct IDirect3DDevice8;
 struct IDirect3DTexture8;
@@ -98,6 +99,13 @@ public:
 	BYTE m_state[0x1C];
 };
 
+// A named resource in an .xpr (XDK XBRESOURCE).
+struct XBRESOURCE
+{
+	char *strName;
+	DWORD dwOffset;
+};
+
 // A packed resource (.xpr) loaded from the XBE. 0x18 bytes.
 class CXBPackedResource
 {
@@ -109,6 +117,12 @@ public:
 	void Destroy();                           // 0x00097104
 	// Texture of the named resource, or NULL.
 	IDirect3DTexture8 *GetTexture(const char *name);   // 0x0001C81B
+	// The resource at offset in the system-memory data, registered and
+	// AddRef'd (each call adds a reference). (this in ecx, the resource
+	// pointer in esi)
+	D3DResource *GetResource(DWORD offset);   // 0x0001C7E4
+	// (count in eax, tags in edx, this in ecx)
+	HRESULT GetResourceTags(DWORD *count, XBRESOURCE **tags);   // 0x00097134
 
 	BYTE *m_pSysMemData;
 	DWORD m_dwSysMemDataSize;
@@ -116,6 +130,37 @@ public:
 	DWORD m_dwVidMemDataSize;
 	void *m_pResourceTags;
 	DWORD m_dwNumResourceTags;
+};
+
+// XDK sample framework mesh data (XBMesh.h). A subset of a frame's mesh.
+struct XBMESH_SUBSET
+{
+	D3DMATERIAL8 mtrl;                // +0x00
+	IDirect3DTexture8 *pTexture;      // +0x44
+	char strTexture[64];              // +0x48
+	DWORD dwVertexStart;              // +0x88
+	DWORD dwVertexCount;              // +0x8C
+	DWORD dwIndexStart;               // +0x90
+	DWORD dwIndexCount;               // +0x94
+};
+
+// A frame of an .xbg mesh. 0xC0 bytes in the array.
+struct XBMESH_FRAME
+{
+	float matTransform[16];           // +0x00
+	D3DResource VB;                   // +0x40 the D3DVertexBuffer header itself
+	DWORD dwNumVertices;              // +0x4C
+	D3DResource IB;                   // +0x50
+	DWORD dwNumIndices;               // +0x5C
+	DWORD dwFVF;                      // +0x60
+	DWORD dwVertexSize;               // +0x64
+	DWORD dwPrimType;                 // +0x68
+	DWORD dwNumSubsets;               // +0x6C
+	XBMESH_SUBSET *pSubsets;          // +0x70
+	char strName[64];                 // +0x74
+	XBMESH_FRAME *pChild;             // +0xB4
+	XBMESH_FRAME *pNext;              // +0xB8
+	DWORD m_padding;                  // +0xBC
 };
 
 // 0x18 bytes; CXBMeshEx only replaces the vtable.
@@ -129,7 +174,17 @@ public:
 	// Draws the frames; flags XBMESH_* (0x30: no materials or textures, the
 	// caller sets them). (this in ecx)
 	HRESULT Render(DWORD flags);                                        // 0x00097521
+	// (Inlined as written: it can't reach 0, so it only counts down.)
+	void Release()
+	{
+		if (m_dwRefCount > 1 && --m_dwRefCount == 0)
+			delete this;
+	}
 	virtual ~CXBMesh() {}
 
-	BYTE m_data[0x14];
+	void *m_pAllocatedSysMem;                 // +0x04
+	void *m_pAllocatedVidMem;                 // +0x08
+	XBMESH_FRAME *m_pMeshFrames;              // +0x0C
+	DWORD m_dwNumFrames;                      // +0x10
+	DWORD m_dwRefCount;                       // +0x14
 };

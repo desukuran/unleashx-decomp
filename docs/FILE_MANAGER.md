@@ -52,9 +52,9 @@ You can also use the pointer:
 | `wav` `wma` `mp3` | The music player. |
 | `wmv` `xmv` | The video player, full screen; the music pauses. |
 | `txt` `xml` `ini` `nfo` `cfg` `lst` | The text editor. |
-| `bmp` `jpg` `png` `xbx` `xpr` | The picture viewer. |
+| `bmp` `jpg` `png` `xbx` `xpr` | The picture viewer (below). |
 | `zip` `rar` `xip` | Browsed like a folder. |
-| `xm` `xbg` | The module player. |
+| `xm` `xbg` | The mesh viewer (below). |
 
 ## Archives
 
@@ -108,6 +108,57 @@ the base, which is dropped. An "extract all" of a RAR is one unrarlib call.
   a `_strdup` copy.
 * Unless a message is showing, an archive with no entries closes as soon as
   it's listed.
+
+## Picture viewer
+
+`src/filemgr/ImageViewer.cpp`. It opens a picture (`bmp`, `jpg`, `png`), an
+`.xbx` (an `.xpr` holding one texture), or an `.xpr`, which shows each of
+its named textures. Other extensions are tried as `.xpr`.
+
+| Button | Effect |
+|---|---|
+| Left / Right | The previous / next texture of an `.xpr` (wraps around). |
+| Thumbstick click | Zoom: in the window (the start), its own size (shrunk to fit the screen), stretched over the screen. |
+| START | A slideshow of the picture's folder (`bmp`/`jpg`/`png` only; 5 seconds a picture, with transitions). An XboxDings sign before the caption shows it's available. |
+| B, BACK | Close. |
+
+In the window, the picture is scaled to the window's width, then shrunk to
+fit its height. The caption shows its name and size, and for an `.xpr` the
+texture's number (`3 of 7`). Resources that aren't textures say so.
+
+Quirks:
+
+* An `.xbx` that isn't a packed resource is loaded as a picture, but then
+  isn't counted, so the window says "(No Image)".
+* An `.xpr` has room for 20 textures, but the count isn't checked.
+* A slideshow still running when the viewer closes is never freed.
+* The image count and the last index shown are globals.
+
+## Mesh viewer
+
+`xbg` and `xm` files open in the mesh viewer (`src/filemgr/XMViewer.cpp`),
+over the dimmed screen.
+
+* **`.xbg`:** an XDK sample-framework mesh. Each frame is scaled to a unit
+  sphere and centred on the origin.
+* **`.xm`:** a raw dump: a 0x18-byte header (primitive type, primitive
+  count, FVF, vertex size, vertex count, index count), the vertices, then
+  16-bit indices. Only points and lines (primitive types 1 to 4) are
+  accepted.
+
+The model is untextured, drawn in the skin's `AMBIENT_CELLCOLOR`, 45 units
+in front of the camera. The right stick turns it up to 90 degrees either
+way. A, B or BACK closes the viewer.
+
+Quirks:
+
+* An `.xm` draws its vertices twice: once indexed, and once more as a list
+  that takes the vertex count as the primitive count.
+* No vertex shader is set for an `.xm`.
+* A short index read leaves both buffers in place, so the model is drawn
+  anyway.
+* The error box is drawn under the model.
+* The button that dismisses an error also closes the viewer.
 
 ## Context menu
 

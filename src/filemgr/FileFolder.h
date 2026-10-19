@@ -31,7 +31,7 @@ enum FolderItemType
 	ITEM_IMAGE = 4,      // bmp jpg png xbx xpr: the picture viewer
 	ITEM_FOLDER = 5,
 	ITEM_ARCHIVE = 6,    // zip xip rar: browsed like a folder
-	ITEM_MODULE = 7,     // xbg xm: the module player (CXMViewer)
+	ITEM_MESH = 7,       // xbg xm: the mesh viewer (CXMViewer)
 	ITEM_OTHER = 8,
 };
 

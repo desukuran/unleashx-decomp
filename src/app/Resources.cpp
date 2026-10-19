@@ -189,12 +189,10 @@ static void LoadMenuFont(CXBFont &menuFont, const char *fontFile, BOOL *ok)
 	}
 }
 
-// The globe's sky sphere wears CellWall. TODO: name the mesh fields
-// (frame +0x70 is the subsets, +0x44 a subset's texture?).
+// The globe's sky sphere wears CellWall: the first frame's first subset.
 static void SetSphereTexture(CXBMesh &mesh, IDirect3DTexture8 *texture)
 {
-	BYTE *frames = *(BYTE **)(mesh.m_data + 8);
-	*(IDirect3DTexture8 **)(*(BYTE **)(frames + 0x70) + 0x44) = texture;
+	mesh.m_pMeshFrames->pSubsets->pTexture = texture;
 }
 
 // 0x000E8938

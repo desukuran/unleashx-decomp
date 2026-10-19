@@ -1,13 +1,15 @@
 // What the file manager opens files in, besides the text editor (CNotePad)
 // and the music player (CAudioGUI): pictures, archives browsed like
-// folders, XM/XBG modules, and the FTP manager. All are CAppFrame screens
+// folders, XM/XBG meshes, and the FTP manager. All are CAppFrame screens
 // (vtable: destructor, Init(font), IsOpen, Render, ProcessInput, Show).
-// Only the interface the file manager uses is declared. TODO: decompile
+// CImageViewer and CFTPManager are declared only. TODO: decompile
 #pragma once
 
 #include "../app/Screens.h"
+#include "../app/XBApp.h"
 #include "../system/XipArchive.h"
 #include "../thirdparty/Unrar.h"
+#include "../render/Texture.h"
 #include "FileFolder.h"
 
 #include <string>
@@ -16,21 +18,69 @@
 class CFileBrowser;
 class CSound;
 
-// A picture (bmp jpg png xbx xpr) full screen, with a slideshow of its
-// folder. vtable 0x0024E618, 0x29D4 bytes.
+#define IMAGEVIEWER_MAX_IMAGES 20
+
+// The picture viewer: a bmp, jpg or png, an .xbx (one texture), or every
+// texture of an .xpr (left/right step through them). START runs a
+// slideshow of a picture's folder. vtable 0x0024E618, 0x29D4 bytes. See
+// ImageViewer.cpp.
 class CImageViewer : public CAppFrame
 {
 public:
-	CImageViewer();                                       // 0x00118E34
-	virtual ~CImageViewer();                              // 0x00118DC1 (deleting 0x00021395)
+	CImageViewer();                                       // 0x00118E34 (this in esi)
+	virtual ~CImageViewer();                              // 0x00118DC1 (this in edi; deleting 0x00021395)
 	virtual BOOL Init(CXBFontEx *font);                   // 1 (0x001185D2)
-	virtual BOOL IsOpen();                                // 2 (0x00021387)
+	virtual BOOL IsOpen() { return m_bOpen; }             // 2 (0x00021387)
 	virtual BOOL Render();                                // 3 (0x001186F3)
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 4 (0x001194AE)
-	virtual void Show();                                  // 5 (0x0002138E)
-	// (path in eax)
+	virtual void Show() { m_bOpen = TRUE; }               // 5 (0x0002138E)
+	// (path in eax, this on the stack)
 	BOOL Open(const char *path);                          // 0x0011935E
+
+	enum
+	{
+		ZOOM_FULLSCREEN = 0,     // stretched over the screen
+		ZOOM_WINDOW = 1,         // fitted in the window, with a caption
+		ZOOM_ACTUAL = 2,         // its own size, shrunk to fit the screen
+	};
+
+	IDirect3DTexture8 *m_pUnknown004;                     // +0x0004 released, never set
+	IDirect3DTexture8 *m_pTextures[IMAGEVIEWER_MAX_IMAGES];   // +0x0008
+	DWORD m_dwTypes[IMAGEVIEWER_MAX_IMAGES];              // +0x0058 D3DResource_GetType; 3 is a texture
+	wchar_t m_szNames[IMAGEVIEWER_MAX_IMAGES][0x104];     // +0x00A8
+	int m_nCurrent;                                       // +0x2948
+	BOOL m_bLoading;                                      // +0x294C never set
+	CXBPackedResource m_xpr;                              // +0x2950 (.xpr, .xbx)
+	XBRESOURCE *m_pResourceTags;                          // +0x2968 the .xpr's names, or NULL
+	int m_nZoom;                                          // +0x296C ZOOM_*
+	std::string m_strPath;                                // +0x2970
+	BOOL m_bOpen;                                         // +0x298C
+	BOOL m_bMessageShown;                                 // +0x2990
+	CMessageBox *m_pMessageBox;                           // +0x2994
+	CXBFontEx *m_pFont;                                   // +0x2998
+	CXBFont *m_pDingsFont;                                // +0x299C XboxDings, for the slideshow sign
+	BOOL m_bInitialized;                                  // +0x29A0
+	float m_fY;                                           // +0x29A4
+	float m_fX;                                           // +0x29A8
+	float m_fWidth;                                       // +0x29AC
+	float m_fHeight;                                      // +0x29B0
+	DWORD m_unknown29B4;                                  // +0x29B4
+	SImageInfo m_imageInfo;                               // +0x29B8 from LoadTextureFromFile
+	CSlideShow *m_pSlideShow;                             // +0x29CC
+	BOOL m_bSlideShowAllowed;                             // +0x29D0 a jpg, png or bmp
+
+private:
+	// (this in eax)
+	HRESULT LoadImage(const char *path);                  // 0x00118EE8
+	// (this in eax)
+	HRESULT LoadXbx(const char *path);                    // 0x0011863F
+	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x00119217 (this in edi)
 };
+
+// The number of images the viewer holds. 0x002761E4
+extern int g_nImageCount;
+// The last image index the viewer showed (written, never read). 0x0026C68C
+extern int g_nLastImageIndex;
 
 // One line of the zip browser. 0x40 bytes.
 struct SZipEntry
@@ -259,19 +309,56 @@ private:
 	static unsigned __stdcall ExtractThread(void *param); // 0x00017397
 };
 
-// Plays an XM module (and .xbg). vtable 0x00258900, 0xD0 bytes.
+// The 0x18-byte header of an .xm file: a raw mesh dump. The vertices
+// (vertexSize * vertexCount bytes) and the 16-bit indices follow.
+struct SXmHeader
+{
+	DWORD primitiveType;      // +0x00 D3DPT_*; only 1-4 (points and lines) are accepted
+	DWORD primitiveCount;     // +0x04 for the indexed draw
+	DWORD fvf;                // +0x08 not used TODO: verify
+	DWORD vertexSize;         // +0x0C
+	DWORD vertexCount;        // +0x10
+	DWORD indexCount;         // +0x14
+};
+
+// The mesh viewer: an .xm (raw dump) or .xbg (XDK packed mesh, CXBMesh)
+// in the middle of the screen, turned with the right stick. vtable
+// 0x00258900, 0xD0 bytes. See XMViewer.cpp.
 class CXMViewer : public CAppFrame
 {
 public:
-	CXMViewer();                                          // 0x000BE4E7
-	virtual ~CXMViewer();                                 // 0x000BE6BB (deleting 0x0002E101)
+	CXMViewer();                                          // 0x000BE4E7 (this in esi)
+	virtual ~CXMViewer();                                 // 0x000BE6BB (this in eax; deleting 0x0002E101)
 	virtual BOOL Init(CXBFontEx *font);                   // 1 (0x000BDF7D)
-	virtual BOOL IsOpen();                                // 2 (0x0002E0F5)
+	virtual BOOL IsOpen() { return m_bOpen; }             // 2 (0x0002E0F5)
 	virtual BOOL Render();                                // 3 (0x000BE52C)
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 4 (0x000BE21B)
-	virtual void Show();                                  // 5 (0x0002E0F9)
+	virtual void Show() { m_bOpen = TRUE; }               // 5 (0x0002E0F9)
 	// (this in ebx)
 	BOOL Open(const char *path);                          // 0x000BE815
+
+	IDirect3DVertexBuffer8 *m_pVB;     // +0x04 (.xm)
+	IDirect3DIndexBuffer8 *m_pIB;      // +0x08
+	SXmHeader m_header;                // +0x0C
+	std::string m_strPath;             // +0x24
+	BOOL m_bOpen;                      // +0x40
+	BOOL m_bMessageShown;              // +0x44
+	BOOL m_bStayOpen;                  // +0x48 never set: A/B/BACK always close
+	CMessageBox *m_pMessageBox;        // +0x4C
+	CXBFontEx *m_pFont;                // +0x50
+	CXBMesh m_mesh;                    // +0x54 (.xbg)
+	BOOL m_bInitialized;               // +0x6C
+	float m_fUnknown70;                // +0x70 40.0 (unused)
+	float m_fUnknown74;                // +0x74 30.0 (unused)
+	float m_fScreenWidth;              // +0x78 (unused)
+	float m_fScreenHeight;             // +0x7C (unused)
+	BOOL m_bXbg;                       // +0x80 m_mesh holds the model
+	DWORD m_unknown084[3];             // +0x84
+	float m_matWorld[16];              // +0x90
+
+private:
+	void ReleaseModel();                                  // 0x000BE316 (this in esi)
+	void ShowMessage(const char *text, const wchar_t *title, int buttons);   // 0x000BE6F8 (this in edi)
 };
 
 // The FTP manager: the site list and two panes, local and FTP

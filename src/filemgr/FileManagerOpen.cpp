@@ -146,7 +146,7 @@ void CFileFolderEventsink::OnOpen(std::string path, int type, CXBFontEx *font)
 		g_bFileViewerOpen = TRUE;
 		return;
 
-	case ITEM_MODULE:
+	case ITEM_MESH:
 	{
 		CXMViewer *viewer = new CXMViewer;
 		g_pFileViewer = viewer;

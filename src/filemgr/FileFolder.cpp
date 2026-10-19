@@ -146,7 +146,7 @@ BOOL SFolderItem::Init(const char *name, DWORD size, FILETIME date, ULONGLONG di
 			{"png", ITEM_IMAGE},   {"xbx", ITEM_IMAGE},   {"xpr", ITEM_IMAGE},   {"txt", ITEM_TEXT},
 			{"xml", ITEM_TEXT},    {"ini", ITEM_TEXT},    {"nfo", ITEM_TEXT},    {"cfg", ITEM_TEXT},
 			{"lst", ITEM_TEXT},    {"zip", ITEM_ARCHIVE}, {"xip", ITEM_ARCHIVE}, {"rar", ITEM_ARCHIVE},
-			{"xbg", ITEM_MODULE},  {"xm", ITEM_MODULE},
+			{"xbg", ITEM_MESH},  {"xm", ITEM_MESH},
 		};
 		for (size_t i = 0; i < sizeof(s_types) / sizeof(s_types[0]); i++)
 		{

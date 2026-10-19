@@ -1,7 +1,7 @@
 // The file manager (mode MODE_FILEMANAGER): two panes (CFileFolder) side by
 // side or one at a time, a context menu with the file operations, and the
 // viewers it opens files in (text editor, pictures, music, video, archives,
-// modules). The operations run on threads that report through the
+// meshes). The operations run on threads that report through the
 // FileOps.h progress state; the manager steps through collecting, asking,
 // running and reporting. docs/FILE_MANAGER.md describes it.
 #pragma once
