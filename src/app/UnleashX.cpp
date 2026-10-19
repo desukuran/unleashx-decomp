@@ -66,8 +66,8 @@ CUnleashX::CUnleashX()
 	g_pSettings = CAppSettings::GetInstance();
 	m_pDefaultGamepad = m_defaultGamepad;
 	m_pDefaultIR = m_defaultIR;
-	m_unknown2190 = 0;
-	m_unknown2194 = 1;
+	m_nGlobePos = 0;
+	m_nGlobeStep = 1;
 	g_pResource = &m_resource;
 	m_unknown1970 = 0;
 	m_bNoHardDisk = FALSE;

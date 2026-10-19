@@ -103,12 +103,12 @@ public:
 	DWORD m_dwNumResourceTags;
 };
 
-// 0x20 bytes; CXBMeshEx only replaces the vtable.
+// 0x18 bytes; CXBMeshEx only replaces the vtable.
 class CXBMesh
 {
 public:
 	CXBMesh();                                // 0x00097536
 	virtual ~CXBMesh() {}
 
-	BYTE m_data[0x1C];
+	BYTE m_data[0x14];
 };

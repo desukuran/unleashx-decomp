@@ -62,7 +62,10 @@ public:
 
 	CXBPackedResource m_resource;             // +0x220 UnleashX's own .xpr (icons)
 	CXBFontEx m_fonts[6];                     // +0x238 0xE4 each
-	CXBMesh m_meshes[2];                      // +0x790 CXBMeshEx
+	CXBMesh m_mesh790;                        // +0x790 CXBMeshEx
+	BYTE m_unknown7A8[0x8];                   // +0x7A8
+	CXBMesh m_mesh7B0;                        // +0x7B0 CXBMeshEx
+	BYTE m_unknown7C8[0x8];                   // +0x7C8
 	IDirect3DTexture8 *m_pTexture7D0;         // +0x7D0
 	IDirect3DTexture8 *m_pTexture7D4;         // +0x7D4
 	IDirect3DTexture8 *m_pTexture7D8;         // +0x7D8
@@ -113,9 +116,9 @@ public:
 	int m_unknown1970;                        // +0x1970
 	int m_unknown1974;                        // +0x1974
 	CXBMesh m_mesh1978;                       // +0x1978
-	BYTE m_unknown1998[0x2190 - 0x1998];      // +0x1998
-	int m_unknown2190;                        // +0x2190
-	int m_unknown2194;                        // +0x2194 1
+	float m_globePath[0x200];                 // +0x1990 <Main Globe>: camera heights the globe sways through
+	int m_nGlobePos;                          // +0x2190 index in m_globePath
+	int m_nGlobeStep;                         // +0x2194 +1 or -1
 	BOOL m_bNoHardDisk;                       // +0x2198 C:\ and E:\ both missing at startup
 	BYTE m_unknown219C[0x2248 - 0x219C];      // +0x219C
 	HANDLE m_hThread2248;                     // +0x2248
