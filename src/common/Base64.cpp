@@ -5,7 +5,8 @@
 
 static const char s_alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";   // 0x00269E98
 
-// 0x0001ECC5: three bytes (count of them real) into four characters.
+// 0x0001ECC5: three bytes (count of them real) into four characters
+// (0x0001ED46, splitting them into 6-bit values, folded in).
 static void EncodeGroup(const unsigned char *in, int count, char *out)
 {
 	unsigned char b0 = in[0], b1 = count > 1 ? in[1] : 0, b2 = count > 2 ? in[2] : 0;
@@ -19,7 +20,11 @@ static void EncodeGroup(const unsigned char *in, int count, char *out)
 		out[3] = '=';
 }
 
-// 0x0001E977 (with the class's encoder, 0x0001EAE4, folded in)
+// 0x0001E977 (with the class's encoder, 0x0001EAE4, folded in). The original
+// is a small class with an input and an output buffer: 0x0001EC66 copies the
+// input in, 0x0001EBE3 and 0x0001EB9D grow the input and output buffers in
+// 4 KB steps, and 0x0001E955 frees both (its destructor); a std::string does
+// all of that here.
 BOOL Base64Encode(const char *text, std::string &out)
 {
 	out.clear();

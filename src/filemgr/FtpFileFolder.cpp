@@ -496,7 +496,7 @@ void CFTPFileFolder::CollectFiles(const char *path)
 				g_fileList.push_back(SFileListItem(folder, TRUE, 0));
 				std::string rest = m_ftp.m_strListLeft;
 				CollectFiles(folder.c_str());
-				m_ftp.m_strListLeft = rest;   // (via a _strdup copy that leaks)
+				m_ftp.SetListLeft(rest.c_str());
 			}
 		} while (m_ftp.FindNext(find, &data) == TRUE);
 	}

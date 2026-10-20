@@ -229,7 +229,7 @@ BOOL CMusicManager::IsPlaying()
 	return m_pPlayer->IsReady();
 }
 
-// 0x00106189
+// 0x00106189 (the copy is 0x00023756, folded in)
 void CMusicManager::GetSoundtrackName(wchar_t *name)
 {
 	if (m_pSoundtrack != NULL)

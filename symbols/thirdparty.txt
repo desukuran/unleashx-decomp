@@ -20,6 +20,7 @@
 00032b72 Array<wchar>::Array_size_virtual
 00032ba7 Array<wchar>::~Array_virtual
 00032bca Unpack::scalar_deleting_destructor
+00032beb File::`scalar_deleting_destructor'
 00032c07 Array<byte>::Add
 00032c47 BitInput::fgetbits
 00032c71 Array::Array
@@ -300,6 +301,7 @@
 0007a4e2 File::AddFileToList
 0007a50b File::Create
 0007a610 File::Open
+0007a713 File::File
 0007a750 File::SetOpenFileTime
 0007a803 File::Tell
 0007a850 File::Close
@@ -312,6 +314,7 @@
 0007a9a7 File::Read
 0007aa59 File::Write
 0007ab11 File::Delete
+0007ab3b File::~File
 0007ab64 File::Copy
 0007ac25 File::RemoveCreated
 0007ad17 File::PutByte
@@ -381,6 +384,7 @@
 0007e37d Archive::ReadSubData
 0007e52f Archive::IsSignature
 0007e57e Archive::SeekToNext
+0007e592 Archive::Archive
 0007e6f5 Archive::GetRecoverySize
 0007e759 Archive::IsArchive
 0007ea5f Archive::WCheckOpen
@@ -533,6 +537,7 @@
 #
 # xkutils: Team Assembly's XKUtils; xbmc4xbox: xbmc/platform/xbox/XK*
 0008f971 XKUtils::ReadEEPROMFromXBOX
+0008fb15 XKUtils::~XKUtils
 0008fbc0 XKSHA1::SHA1ProcessMessageBlock
 0008fda9 XKSHA1::SHA1Input
 0008fe1a XKSHA1::SHA1Reset
@@ -545,7 +550,9 @@
 00090182 XKRC4::swap_byte
 0009018d XKRC4::InitRC4Key
 0009022a XKRC4::RC4EnDecrypt
+0009028e XKRC4::~XKRC4
 00090a01 XKHDD::CleanATAData
+00090a48 XKHDD::~XKHDD
 00090cdf XKHDD::GenerateHDDPwd
 000910b3 XKGeneral::StripEnclosedChars
 0009114a XKGeneral::StripQuotes
@@ -573,6 +580,7 @@
 00092605 XKEEPROM::ReadFromCFGFile
 0009297f XKEEPROM::Decrypt_key
 00092a6b XKCRC::QuickCRC
+00092af3 XKCRC::~XKCRC
 #
 # iso9660: XBMC's iso9660 reader and CIoSupport; xbmc4xbox: xbmc/filesystem/iso9660.*, xbmc/platform/xbox/storage/IoSupport.cpp
 000b1194 MD5_memset
@@ -588,6 +596,8 @@
 000b2683 iso9660::ReadRecursiveDirFromSector
 000b3070 CIoSupport::IsMappedPartition
 000b3160 CIoSupport::ReadSectorMode2
+000b33e1 CIoSupport::~CIoSupport
+000b343c CIoSupport::CIoSupport
 #
 # fat32: the FAT32 USB driver (src/thirdparty/Fat32.h): an early version of Rob Riglar's FAT File IO Library, adapted to several volumes; github.com/ultraembedded/fat_io_lib (v2.6.11, later)
 00033c3c Fat32Io::scalar_deleting_destructor
@@ -683,6 +693,14 @@
 0006de03 fatfs_write_sector
 0006dede Fat32Volume::~Fat32Volume
 #
+# ftpparse: D. J. Bernstein's ftpparse (cr.yp.to/ftpparse.html), named in names.txt
+000bb407 ftpparse_check
+000bb451 ftpparse_totai
+000bb4f4 ftpparse_getmonth
+000bb523 ftpparse_initbase
+000bb578 ftpparse_initnow
+000bb63a ftpparse_guesstai
+#
 # xdksample: the XDK samples framework (XBApp, XBFont, XBMesh, XBMemUnit, XBStorageDevice, XBSound, XBUtil, XBInput, xmvhelper); the XDK's Samples/Common/Src, a later version than the one linked in (in reference/Samples)
 0003201e XBUtil_VectorToRGBA
 0008efe1 XMVHelper_ReleasePreviousMemoryPacket
@@ -713,6 +731,8 @@
 00094375 CXBStorageDevice::FindNextSaveGame
 00094384 CXBStorageDevice::FindFirstSaveGame
 000943db CXBStorageDevice::IsValid
+00094401 CXBStorageDevice::~CXBStorageDevice
+00094429 CXBStorageDevice::CXBStorageDevice
 000944cd CXBStorageDevice::GetSavedGameCount
 0009451c CXBStorageDevice::GetSize
 000945a4 CXBStopWatch::GetTicks
@@ -737,6 +757,9 @@
 000972c7 XBResource_SizeOf
 0009748a XBInput_InitDebugMouse
 00097560 UnionBox
+000975e9 CXBMesh::vfunc1
+00097759 CXBMesh::vfunc0
+00097801 CXBMesh::CXBMesh
 00097890 CXBMesh::ComputeMeshBoundingBox
 00097914 CXBMesh::ComputeFrameBoundingBox
 00097a22 CXBMesh::ComputeBoundingBox

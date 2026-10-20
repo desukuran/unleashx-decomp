@@ -92,6 +92,9 @@ public:
 	std::string m_strCurrentDir;        // +0x45C ends in '/'
 	std::string m_strListing;           // +0x478 the current directory's LIST
 	std::string m_strListLeft;          // +0x494 the lines FindNext hasn't read
+	// Puts back a saved listing (CFTPFileFolder::CollectFiles). Quirk: it
+	// goes through a _strdup copy that's never freed.
+	void SetListLeft(const char *rest) { m_strListLeft = _strdup(rest); }   // 0x0001E53E
 	BOOL m_bReplyPending;               // +0x4B0 a command was sent and its reply not read
 	DWORD m_unknown4B4[2];              // +0x4B4 (zeroed)
 	DWORD m_dwStartTick;                // +0x4BC of the last transfer

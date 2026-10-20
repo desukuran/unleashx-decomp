@@ -353,7 +353,7 @@ void CSongListControl::Fill(UINT next)
 
 	if (m_bMusicManager)
 	{
-		// The music manager's current soundtrack.
+		// The music manager's current soundtrack (copied by 0x0002998B).
 		SSoundtrack soundtrack = g_pMusicManager->m_soundtracks[g_pMusicManager->m_nSoundtrack];
 		if (soundtrack.isFolder)
 		{

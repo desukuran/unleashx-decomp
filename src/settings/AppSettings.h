@@ -126,6 +126,9 @@ struct SAudioSettings
 	// Turns 5.1 on or off and sets the mix bins to match. (this on the
 	// stack, enable in edx)
 	void SetEnable51(BOOL enable);               // 0x0002B3E4
+	// The mix bins music players get: the speaker assignment with 5.1 on,
+	// else NULL. (this in eax)
+	SSpeakerMixBins *GetMixBins() { return m_bEnable51 ? &m_speakerMixBins : NULL; }   // 0x000129CA
 };
 
 // Video options. At CAppSettings+0x14BC; zeroed as a block by the constructor.

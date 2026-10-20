@@ -33,7 +33,7 @@ REF = os.path.join(ROOT, 'reference/thirdparty')
 # functions already named elsewhere)
 # Libraries whose ranges hold nothing but their own code: every hand-named
 # function there (that src/ doesn't implement) is theirs, whatever its name.
-OWNS_RANGES = ('unrar', 'xdksample', 'fat32', 'xzip', 'xunzip', 'xkutils', 'iso9660')
+OWNS_RANGES = ('unrar', 'xdksample', 'fat32', 'xzip', 'xunzip', 'xkutils', 'iso9660', 'ftpparse')
 
 LIBRARIES = [
     ('unrar', 'XBMC\'s UnrarXLib (unrar 3.x with the urarlib_* entry points); xbmc4xbox: lib/UnrarXLib '
@@ -65,6 +65,8 @@ LIBRARIES = [
      [(0x6AF11, 'fatfs_lfn_generate_tail'), (0x6C3D1, 'fl_fopen'), (0x6BAAE, 'fl_fread'), (0x6BE2C, 'fl_fwrite'),
       (0x6BF08, 'fl_fclose'), (0x6B789, 'fl_fseek'), (0x6BFE9, 'fl_remove'), (0x6C0E8, 'fl_createdirectory')],
      ('Fat32', 'fatfs_', 'fl_')),
+    ('ftpparse', 'D. J. Bernstein\'s ftpparse (cr.yp.to/ftpparse.html), named in names.txt',
+     [], [(0xBB3F0, 0xBBE70)], [], ('ftpparse',)),
     ('xdksample', 'the XDK samples framework (XBApp, XBFont, XBMesh, XBMemUnit, XBStorageDevice, XBSound, '
                   'XBUtil, XBInput, xmvhelper); the XDK\'s Samples/Common/Src, a later version than the one linked in '
                   '(in reference/Samples)',
@@ -131,6 +133,8 @@ def main():
     args = ap.parse_args()
 
     curated = symbol_file('names.txt')
+    # RTTI names (constructors, destructors, vfuncs) of library classes count as hand names too.
+    rtti = symbol_file('rtti.txt')
     # This generator's own earlier output (already applied) counts as unnamed.
     previous = set(symbol_file('thirdparty.txt')) if os.path.exists(args.out) else set()
     lib_names = {}            # address -> (library, name)
@@ -222,13 +226,14 @@ def main():
             named = sorted(a for a, (l, n) in lib_names.items() if l == lib)
             # Hand-named functions of the library (names.txt wins anyway); listed so
             # tools/progress.py counts them as library code, unless src/ has them.
-            hand = sorted(a for a in curated if a not in lib_names and a not in done and
+            hand = sorted(a for a in set(curated) | set(rtti) if a not in lib_names and a not in done and
                           (library_of(a) == lib or (lib in OWNS_RANGES and any(lo <= a < hi for lo, hi in ranges))))
             subs = sorted(a for a, l in labels.items() if l == lib)
             f.write('#\n# %s: %s\n' % (lib, desc))
             for a in sorted(named + subs + hand):
                 f.write('%08x %s\n' % (a, lib_names[a][1] if a in lib_names else
-                                       curated[a] if a in curated else '%s_sub_%08x' % (lib, a)))
+                                       curated[a] if a in curated else rtti[a] if a in rtti else
+                                       '%s_sub_%08x' % (lib, a)))
     for r in reports:
         print(r, file=sys.stderr)
     by_lib = {}
