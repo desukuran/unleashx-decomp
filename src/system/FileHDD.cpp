@@ -476,7 +476,7 @@ unsigned __stdcall CFileHDD::WriterThread(void *param)
 // 0x00081DEE
 BOOL CDirHDD::CopyFile(const char *source, const char *destination, BOOL failIfExists)
 {
-	if (CopyFileA(source, destination, failIfExists))
+	if (::CopyFileA(source, destination, failIfExists))
 		return TRUE;
 	return CopyFileEx(source, destination, NULL, NULL, NULL, failIfExists != 0);
 }
@@ -485,7 +485,7 @@ BOOL CDirHDD::CopyFile(const char *source, const char *destination, BOOL failIfE
 BOOL CDirHDD::CopyFileEx(const char *source, const char *destination, CopyProgressRoutine progress, void *data,
                          BOOL *cancel, DWORD flags)
 {
-	if (CopyFileExA(source, destination, XDK_CAST(CopyProgressRoutine, (void *)progress), data, cancel, flags))
+	if (::CopyFileExA(source, destination, XDK_CAST(CopyProgressRoutine, (void *)progress), data, cancel, flags))
 		return TRUE;
 
 	// Win32 refused (another drive type): copy it by hand, 256 KB at a time.
@@ -569,7 +569,7 @@ BOOL CDirHDD::CopyFileEx(const char *source, const char *destination, CopyProgre
 // 0x00081DC1
 BOOL CDirHDD::MoveFile(const char *source, const char *destination)
 {
-	if (MoveFileA(source, destination))
+	if (::MoveFileA(source, destination))
 		return TRUE;
 	return MoveFileWithProgress(source, destination, NULL, NULL, MOVEFILE_COPY_ALLOWED);
 }
@@ -577,7 +577,7 @@ BOOL CDirHDD::MoveFile(const char *source, const char *destination)
 // 0x00081D90
 BOOL CDirHDD::MoveFileEx(const char *source, const char *destination, DWORD flags)
 {
-	if (MoveFileExA(source, destination, flags))
+	if (::MoveFileExA(source, destination, flags))
 		return TRUE;
 	return MoveFileWithProgress(source, destination, NULL, NULL, flags);
 }
@@ -586,7 +586,7 @@ BOOL CDirHDD::MoveFileEx(const char *source, const char *destination, DWORD flag
 BOOL CDirHDD::MoveFileWithProgress(const char *source, const char *destination, CopyProgressRoutine progress,
                                    void *data, DWORD flags)
 {
-	BOOL ok = MoveFileWithProgressA(source, destination, XDK_CAST(CopyProgressRoutine, (void *)progress), data, flags);
+	BOOL ok = ::MoveFileWithProgressA(source, destination, XDK_CAST(CopyProgressRoutine, (void *)progress), data, flags);
 	if (!ok && CopyFileEx(source, destination, progress, data, NULL, flags))
 		ok = DeleteFile(source);
 	return ok;

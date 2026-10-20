@@ -221,16 +221,16 @@ public:
 class CDirHDD : public CDirectory
 {
 public:
-	virtual BOOL FindClose(HANDLE find) { return CloseHandle(find); }                              // 0x000321B8
-	virtual HANDLE FindFirst(const char *pattern, WIN32_FIND_DATAA *data) { return FindFirstFileA(pattern, data); }   // 0x000321BD
-	virtual BOOL FindNext(HANDLE find, WIN32_FIND_DATAA *data) { return FindNextFileA(find, data); }   // 0x000321C2
+	virtual BOOL FindClose(HANDLE find) { return ::CloseHandle(find); }                              // 0x000321B8
+	virtual HANDLE FindFirst(const char *pattern, WIN32_FIND_DATAA *data) { return ::FindFirstFileA(pattern, data); }   // 0x000321BD
+	virtual BOOL FindNext(HANDLE find, WIN32_FIND_DATAA *data) { return ::FindNextFileA(find, data); }   // 0x000321C2
 	virtual DWORD GetFileSize(HANDLE file, DWORD *high) { return ::GetFileSize(file, high); }     // 0x000321C7
-	virtual BOOL RemoveDirectory(const char *path) { return RemoveDirectoryA(path); }             // 0x000321CC
+	virtual BOOL RemoveDirectory(const char *path) { return ::RemoveDirectoryA(path); }             // 0x000321CC
 	virtual BOOL CopyFile(const char *source, const char *destination, BOOL failIfExists);        // 0x00081DEE
 	virtual BOOL CopyFileEx(const char *source, const char *destination, CopyProgressRoutine progress,
 	                        void *data, BOOL *cancel, DWORD flags);                               // 0x00081E9A
-	virtual BOOL CreateDirectory(const char *path, void *security) { return CreateDirectoryA(path, security); }   // 0x000321D1
-	virtual BOOL DeleteFile(const char *path) { return DeleteFileA(path); }                       // 0x000321D6
+	virtual BOOL CreateDirectory(const char *path, void *security) { return ::CreateDirectoryA(path, security); }   // 0x000321D1
+	virtual BOOL DeleteFile(const char *path) { return ::DeleteFileA(path); }                       // 0x000321D6
 	virtual BOOL MoveFile(const char *source, const char *destination);                           // 0x00081DC1
 	virtual BOOL MoveFileEx(const char *source, const char *destination, DWORD flags);            // 0x00081D90
 	virtual BOOL MoveFileWithProgress(const char *source, const char *destination, CopyProgressRoutine progress,
