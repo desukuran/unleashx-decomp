@@ -38,28 +38,42 @@ struct XBGAMEPAD : public SGamepadState
 	// X Y BLACK WHITE, 9-12 the d-pad, 13-14 the triggers. Reported as
 	// actions by CGamepadInput::GetAction.
 	int nAction;                       // +0x6C
-	BYTE unknown70[0xD4 - 0x70];       // +0x70 Rumble, Feedback, caps
+	BYTE feedback[0xBA - 0x70];        // +0x70 Rumble and Feedback (unused)
+	BYTE caps[0xD4 - 0xBA];            // +0xBA XINPUT_CAPABILITIES
 	HANDLE hDevice;                    // +0xD4 NULL = no gamepad in the port
 	BOOL bInserted;                    // +0xD8
 	BOOL bRemoved;                     // +0xDC
 };
-// An IR remote (the DVD playback kit). 0x84 bytes.
+// An IR remote (the DVD playback kit). 0x84 bytes. Every 0.14 s the first
+// receiver found is read; a key repeat comes faster (0.1 s) than a new key.
 struct SIRRemote
 {
-	BYTE unknown00;                    // +0x00 (copied into the merged state)
-	BYTE unknown01[7];
-	WORD unknown08;                    // +0x08 (copied into the merged state)
+	BYTE unknown00;                    // +0x00 the reported key (copied into the merged state)
+	BYTE unknown01;
+	BYTE bKeyFlags;                    // +0x02 TODO: verify
+	BYTE unknown03;
+	WORD wPreviousKey;                 // +0x04 the key reported before last
+	WORD wLastKey;                     // +0x06 the last key reported
+	WORD unknown08;                    // +0x08 the key held (copied into the merged state)
 	WORD wKeyCode;                     // +0x0A the button held, 0 = none
 	BYTE unknown0C[0x28 - 0x0C];
 	HANDLE hDevice;                    // +0x28 NULL = no receiver in the port
-	BYTE unknown2C[0x80 - 0x2C];
+	BYTE unknown2C[0x78 - 0x2C];
+	BOOL bInserted;                    // +0x78
+	BOOL bRemoved;                     // +0x7C
 	DWORD dwPort;                      // +0x80 the merged state: which port it came from
 };
+
+// A debug keyboard port. 0x14 bytes.
 struct SKeyboardState
 {
-	HANDLE hDevice;                    // +0x00 TODO: verify
-	BYTE unknown04[0x10];
+	HANDLE hDevice;                    // +0x00
+	BOOL bInserted;                    // +0x04
+	BOOL bRemoved;                     // +0x08
+	DWORD dwPort;                      // +0x0C
+	DWORD unknown10;
 };
+
 extern XBGAMEPAD g_Gamepads[4];                   // 0x00271B30
 extern SIRRemote g_irRemotes[4];                  // 0x00271ED8
 extern SKeyboardState g_keyboards[4];             // 0x002720EC
@@ -96,7 +110,7 @@ struct SMouseState
 	HANDLE hDevice;                    // +0x18
 	BOOL bInserted;                    // +0x1C
 	BOOL bRemoved;                     // +0x20
-	BYTE unknown24[4];
+	DWORD dwPort;                      // +0x24
 	BYTE bClickButtons;                // +0x28 the buttons again within 180 ms (a double click), else 0
 	BYTE unknown29[3];
 	DWORD dwLastTime;                  // +0x2C
@@ -105,6 +119,8 @@ extern SMouseState g_mice[4];                     // 0x00272170
 // Reads the mice; the ports with new data as bits. The XDK's DebugMouse
 // sample (Input/DebugMouse/mouse.cpp) extended with the connected flag,
 // insert/remove tracking and the 180 ms double click. (Library code.)
+// Opens the mice plugged in at startup. (The debug mouse sample.)
+HRESULT XBInput_InitDebugMouse(SMouseState **mice);   // 0x0009748A
 DWORD XBInput_GetMouseInput();                    // 0x000972F6
 // Whether a mouse is plugged in (as of the last read).
 BOOL XBInput_IsMouseConnected();                  // 0x000972F0

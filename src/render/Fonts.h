@@ -64,15 +64,25 @@ public:
 	// The size in whole pixels; length -1 for all of it.
 	virtual HRESULT GetTextExtentInt(const wchar_t *text, int length, int *width, int *height);   // 4, 0x00099345
 
-	float m_fCellHeight;                                               // +0x04 TODO: verify (the file manager's line spacing)
-	BYTE m_reserved08[0x08];
-	float m_fFontHeight;                                               // +0x10
+	float m_fCellHeight;                                               // +0x04 the glyph cell height (the file manager's line spacing)
+	DWORD m_dwTexWidth;                                                // +0x08 (version 5 font files)
+	DWORD m_dwTexHeight;                                               // +0x0C
+	float m_fFontHeight;                                               // +0x10 the line spacing
 	float m_fScaleFactorX;                                             // +0x14
 	float m_fScaleFactorY;                                             // +0x18
-	BYTE m_reserved1C[0x04];
+	float m_fSlantFactor;                                              // +0x1C 0
 	float m_fCursorX;                                                  // +0x20
 	float m_fCursorY;                                                  // +0x24
-	BYTE m_reserved28[0x74];
+	WORD m_cMaxGlyph;                                                  // +0x28
+	short *m_pTranslatorTable;                                         // +0x2C character -> glyph
+	BOOL m_bTranslatorTableAllocated;                                  // +0x30
+	DWORD m_dwNumGlyphs;                                               // +0x34
+	struct SGlyph *m_pGlyphs;                                          // +0x38 0x18 bytes each
+	BOOL m_bSaveState;                                                 // +0x3C not a pure device: Begin/End save the render states
+	DWORD m_dwSavedState[13];                                          // +0x40
+	DWORD m_reserved74[3];
+	CXBPackedResource m_xprResource;                                   // +0x80
+	IDirect3DTexture8 *m_pFontTexture;                                 // +0x98
 	DWORD m_dwNestedBeginCount;                                        // +0x9C
 	D3DCOLOR m_dwTextColor;                                            // +0xA0 (bitmap fonts' SetTextColor)
 };

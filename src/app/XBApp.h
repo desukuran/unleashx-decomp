@@ -30,12 +30,14 @@ struct SPresentParameters
 	void *DepthStencilSurface;          // +0x40
 };
 
+#ifndef _XBOX
 #define D3DPRESENTFLAG_WIDESCREEN 0x10
 #define D3DPRESENTFLAG_INTERLACED 0x20
 #define D3DPRESENTFLAG_PROGRESSIVE 0x40
 #define D3DPRESENT_INTERVAL_IMMEDIATE 0x80000000
 #define D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE 0x80000001
 #define D3DMULTISAMPLE_4_SAMPLES_SUPERSAMPLE_GAUSSIAN 0x3223
+#endif
 
 // 0x220 bytes. Vtable: scalar deleting destructor, then the four overrides.
 class CXBApplicationEx
@@ -63,7 +65,9 @@ public:
 	BOOL m_bPaused;                           // +0x068
 	float m_fFPS;                             // +0x06C
 	wchar_t m_strFrameRate[20];               // +0x070
-	BYTE m_unknown098[0x0C];                  // +0x098
+	DWORD m_unknown098;                       // +0x098
+	DWORD m_dwNumInputDeviceTypes;            // +0x09C 0: XInitDevices preallocates nothing
+	void *m_pInputDeviceTypes;                // +0x0A0
 	XBGAMEPAD *m_pGamepads;                   // +0x0A4 the four ports (g_Gamepads)
 	XBGAMEPAD m_defaultGamepad;               // +0x0A8 all four gamepads merged (UpdateGamepads)
 	SIRRemote *m_pIRRemotes;                  // +0x188 the four ports (g_irRemotes)
@@ -96,8 +100,12 @@ public:
 	void StopTicks();                         // 0x0002B5DE
 	float GetElapsedTicks();                  // 0x0002B604
 
-	float m_fSecsPerTick;
-	BYTE m_state[0x1C];
+	float m_fSecsPerTick;                     // +0x00
+	DWORD m_reserved04;
+	LONGLONG m_nStartTick;                    // +0x08 when running
+	LONGLONG m_nElapsedTicks;                 // +0x10 counted while stopped
+	BOOL m_bRunning;                          // +0x18
+	DWORD m_reserved1C;
 };
 
 // A named resource in an .xpr (XDK XBRESOURCE).
@@ -149,6 +157,20 @@ struct XBMESH_SUBSET
 	DWORD dwIndexCount;               // +0x94
 };
 
+// A frame's mesh: the part of XBMESH_FRAME from VB to pSubsets.
+struct XBMESH_DATA
+{
+	D3DResource VB;                   // +0x00
+	DWORD dwNumVertices;              // +0x0C
+	D3DResource IB;                   // +0x10
+	DWORD dwNumIndices;               // +0x1C
+	DWORD dwFVF;                      // +0x20
+	DWORD dwVertexSize;               // +0x24
+	DWORD dwPrimType;                 // +0x28
+	DWORD dwNumSubsets;               // +0x2C
+	XBMESH_SUBSET *pSubsets;          // +0x30
+};
+
 // A frame of an .xbg mesh. 0xC0 bytes in the array.
 struct XBMESH_FRAME
 {
@@ -168,13 +190,13 @@ struct XBMESH_FRAME
 	DWORD m_padding;                  // +0xBC
 };
 
-// 0x18 bytes; CXBMeshEx only replaces the vtable.
+// 0x18 bytes; CXBMeshEx only replaces the vtable (vtable 0x0025B300).
 class CXBMesh
 {
 public:
-	CXBMesh();                                // 0x00097536
+	CXBMesh();                                // 0x00097536 (this in eax)
 	// Loads an .xbg file; its textures come from resource (if given).
-	// (this on the stack, fileName in eax; library code)
+	// (this on the stack, fileName in eax)
 	HRESULT Create(const char *fileName, CXBPackedResource *resource);   // 0x00097F4B
 	// Draws the frames; flags XBMESH_* (0x30: no materials or textures, the
 	// caller sets them). (this in ecx)
@@ -185,7 +207,15 @@ public:
 		if (m_dwRefCount > 1 && --m_dwRefCount == 0)
 			delete this;
 	}
-	virtual ~CXBMesh() {}
+
+	// A frame with the world transform multiplied in, its mesh, then its
+	// children; then its siblings.
+	virtual HRESULT RenderFrame(XBMESH_FRAME *frame, DWORD flags);      // 0, 0x00097759
+	// The subsets of a frame's mesh (opaque or alpha ones by flags).
+	virtual HRESULT RenderMesh(XBMESH_DATA *mesh, DWORD flags);  // 1, 0x000975E9
+	virtual ~CXBMesh();                                                 // 2, 0x00097801 (deleting 0x00031EA7)
+	virtual void RenderFrameCallback(DWORD /*frame*/, XBMESH_FRAME * /*data*/, DWORD /*flags*/) {}   // 3, 0x0002A7A0
+	virtual BOOL RenderMeshCallback(DWORD /*subset*/, XBMESH_SUBSET * /*data*/, DWORD /*flags*/) { return TRUE; }   // 4, 0x0002A7A3
 
 	void *m_pAllocatedSysMem;                 // +0x04
 	void *m_pAllocatedVidMem;                 // +0x08

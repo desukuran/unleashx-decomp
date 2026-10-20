@@ -14,6 +14,8 @@ public:
 	CXBMemUnit(DWORD port = (DWORD)-1, DWORD slot = (DWORD)-1);   // 0x000981A8
 	CXBMemUnit(const CXBMemUnit &other);                         // 0x00098191 (this in eax)
 	virtual ~CXBMemUnit();                                       // 0x00098255
+	// Copies the port and slot, not the mount. (this in eax)
+	CXBMemUnit &operator=(const CXBMemUnit &other);              // 0x00098180
 
 	// Units 0..7 are port * 2 + slot. (index in eax)
 	static DWORD GetPort(DWORD index) { return index >> 1; }     // 0x0009811C
