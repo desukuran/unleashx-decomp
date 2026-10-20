@@ -302,6 +302,7 @@
 0007a50b File::Create
 0007a610 File::Open
 0007a713 File::File
+0007a713 File::File
 0007a750 File::SetOpenFileTime
 0007a803 File::Tell
 0007a850 File::Close
@@ -314,6 +315,7 @@
 0007a9a7 File::Read
 0007aa59 File::Write
 0007ab11 File::Delete
+0007ab3b File::~File
 0007ab3b File::~File
 0007ab64 File::Copy
 0007ac25 File::RemoveCreated
@@ -385,6 +387,7 @@
 0007e52f Archive::IsSignature
 0007e57e Archive::SeekToNext
 0007e592 Archive::Archive
+0007e592 Archive::Archive
 0007e6f5 Archive::GetRecoverySize
 0007e759 Archive::IsArchive
 0007ea5f Archive::WCheckOpen
@@ -414,6 +417,7 @@
 001374fa strnicompcw
 001374ff CmpNameW
 00137641 FileCreate
+00137dde CFontTable::Init_unused
 00138625 CmdExtract::ExtractArchiveInit
 0013869d CmdExtract::~CmdExtract
 001386bf CmdExtract::CmdExtract
@@ -537,6 +541,10 @@
 #
 # xkutils: Team Assembly's XKUtils; xbmc4xbox: xbmc/platform/xbox/XK*
 0008f971 XKUtils::ReadEEPROMFromXBOX
+0008f9b6 XKUtils::WriteEEPROMBytes_unused
+0008fa74 XKUtils::MountDevice_unused
+0008faaf XKUtils::UnMountDevice_unused
+0008fb15 XKUtils::~XKUtils
 0008fb15 XKUtils::~XKUtils
 0008fbc0 XKSHA1::SHA1ProcessMessageBlock
 0008fda9 XKSHA1::SHA1Input
@@ -551,6 +559,8 @@
 0009018d XKRC4::InitRC4Key
 0009022a XKRC4::RC4EnDecrypt
 0009028e XKRC4::~XKRC4
+000905dd XKHDD::ReadIDEData_unused
+00090852 XKHDD::SendATACommand_unused
 00090a01 XKHDD::CleanATAData
 00090a48 XKHDD::~XKHDD
 00090cdf XKHDD::GenerateHDDPwd
@@ -583,6 +593,7 @@
 00092af3 XKCRC::~XKCRC
 #
 # iso9660: XBMC's iso9660 reader and CIoSupport; xbmc4xbox: xbmc/filesystem/iso9660.*, xbmc/platform/xbox/storage/IoSupport.cpp
+000b10ac ShowMessageBoxOverScreen_unused
 000b1194 MD5_memset
 000b11b9 MD5_memcpy
 000b11d2 MD5_Decode
@@ -597,7 +608,10 @@
 000b3070 CIoSupport::IsMappedPartition
 000b3160 CIoSupport::ReadSectorMode2
 000b33e1 CIoSupport::~CIoSupport
+000b33e1 CIoSupport::~CIoSupport
 000b343c CIoSupport::CIoSupport
+000b343c CIoSupport::CIoSupport
+000b3469 CIoSupport::ReadPartitionTable
 #
 # fat32: the FAT32 USB driver (src/thirdparty/Fat32.h): an early version of Rob Riglar's FAT File IO Library, adapted to several volumes; github.com/ultraembedded/fat_io_lib (v2.6.11, later)
 00033c3c Fat32Io::scalar_deleting_destructor
@@ -732,6 +746,8 @@
 00094384 CXBStorageDevice::FindFirstSaveGame
 000943db CXBStorageDevice::IsValid
 00094401 CXBStorageDevice::~CXBStorageDevice
+00094401 CXBStorageDevice::~CXBStorageDevice
+00094429 CXBStorageDevice::CXBStorageDevice
 00094429 CXBStorageDevice::CXBStorageDevice
 000944cd CXBStorageDevice::GetSavedGameCount
 0009451c CXBStorageDevice::GetSize
@@ -752,6 +768,20 @@
 000950ad CWaveFile::ReadSample
 000950e0 XBSound_DrawLevelMeters_dsound
 000954ca WSACleanup_thunk
+00096695 CXBSocket::RecvFrom
+0009670b CXBSocket::GetSockName
+0009674e CXBSocket::Accept
+00096805 SockAddrGetPort
+00096892 SockAddrToString_unused
+000968f8 CXBSavedGame::GetDrive
+000968ff CXBSavedGame::IsEmpty
+000969b2 CXBSavedGame::Init
+000969f3 CXBSavedGame::SaveImage
+00096ace CXBSavedGame::GetLastWriteTime
+00096b95 CXBSavedGame::DeleteGame
+00096bc8 CXBSavedGame::CreateGame
+00096d60 CXBSavedGame::GetImage
+00096f31 CXBSavedGame::GetLastWriteQword
 00097048 CXBPackedResource::CreateFromMemory_unused
 0009726f CXBPackedResource::GetData
 000972c7 XBResource_SizeOf
