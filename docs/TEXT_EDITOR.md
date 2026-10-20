@@ -4,6 +4,13 @@
 The `TextEditor` action opens it, and so do the file manager's text files.
 It also shows the file operation log (`Load`).
 
+It reads the file with `std::ifstream`, that is through the kernel's file
+systems, not UnleashX's own virtual file layer. So a text file on a plain
+ISO 9660 data disc (CD-R/DVD-R that isn't an Xbox disc), which the file
+manager lists through the bundled ISO 9660 reader, opens empty: the kernel
+can't read that disc. Files on the hard disk and Xbox-format discs open
+normally. (Quirk of the original, kept.)
+
 ## Window
 
 The window is 630x470 at (5, 5), scaled to the screen. From top to bottom it has:

@@ -80,6 +80,26 @@ signed, so the BIOS has to be one that runs unsigned code (a modded BIOS;
 the 4627 retail BIOS in xemu has worked in our tests). A blank hard disk
 image is at <https://github.com/xemu-project/xemu-hdd-image>.
 
+FTP into xemu: turn networking on (NAT) and forward the guest's port 21 to
+a host port. Either add this to `xemu.toml` (`~/.local/share/xemu/xemu/` on
+Linux) before starting xemu:
+
+```toml
+[net]
+enable = true
+backend = 'nat'
+
+[net.nat]
+forward_ports = [ { host = 2121, guest = 21, protocol = 'tcp' } ]
+```
+
+or, on a running xemu started with a monitor (`-qmp unix:qmp.sock,server,nowait`),
+send the HMP command `hostfwd_add xemu-netdev tcp:127.0.0.1:2121-:21`. Then
+`python3 tools/xemu_ftp.py ls /E` (login `xbox`/`xbox`). The script uses
+active mode with the address the guest sees the host at (10.0.2.2), so the
+data ports need no forwarding; a normal client in passive mode would need the
+whole `MinPASVPort`..`MaxPASVPort` range forwarded.
+
 **A modded console**: run `default.xbe` from the hard disk (FTP it to, say,
 `E:\Apps\UnleashX\` with the XML files and `Skins` from `assets/disc/`), or
 burn the disc image. As a dashboard, it replaces your current one the usual

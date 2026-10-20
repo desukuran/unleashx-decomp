@@ -505,7 +505,9 @@ BOOL CNotePad::Open(const char *path)
 	ResetWindow();
 
 	// Quirk: a file that can't be opened just comes up empty (with no
-	// lines at all).
+	// lines at all). That includes every file on an ISO 9660 data disc:
+	// this reads through the kernel, which has no ISO 9660 file system,
+	// not through the file layer's iso9660 reader the listing used.
 	std::ifstream file;
 	file.open(path);
 	file.seekg(0, std::ios::end);

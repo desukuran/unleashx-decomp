@@ -65,6 +65,12 @@ and the size: packed, then `/` and unpacked when the archive records it.
 Entries are sorted by name, ignoring case. RAR folders aren't listed; zip
 and xip folders are.
 
+A zip's folders show up only when the zip has entries of their own (names
+ending in `/`). UnleashX's own zipping writes files only, with their
+relative paths, so its zips look flat here even though extracting them
+recreates the folders. (Checked against the original: the listing thread
+cuts each name at its last `/`, 0x000157A8.)
+
 | Button | Effect |
 |---|---|
 | Up/Down, LT/RT, left stick | Move. |
