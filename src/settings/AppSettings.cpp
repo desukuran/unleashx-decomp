@@ -1,10 +1,12 @@
 #include "AppSettings.h"
 
+#include <cmath>
 #include <cstring>
 #include <cwchar>
 
 #include "../common/FileUtil.h"
 #include "../common/StrUtil.h"
+#include "../render/Texture.h"
 
 CAppSettings *CAppSettings::s_pInstance;  // 0x0027626C
 CAppSettings *g_pSettings;                // 0x00276230
@@ -363,4 +365,93 @@ convert:
 		m_strXbeName = StrMid(path, slash, (int)path.size() - slash);
 	}
 	StrAddBackslash(m_strHomePath);
+}
+
+// The DirectSound volume for a 0..100 setting: -5000..0 in hundredths of a
+// dB, 0 from 99 on, silent (-6400) for 3 or less.
+#define VOLUME_RANGE 5000
+#define VOLUME_SILENT -6400
+
+static LONG VolumeToHundredthsDb(unsigned volume)
+{
+	if (volume > 98)
+		return 0;
+	LONG level = (LONG)((double)volume * VOLUME_RANGE * 0.01f - VOLUME_RANGE);
+	return level < -VOLUME_RANGE ? -VOLUME_RANGE : level;
+}
+
+// 0x000AC21A
+LONG CAppSettings::GetSoundVolume()
+{
+	unsigned volume = (unsigned)m_audio.m_nSoundVolume;
+	if (volume > 98)
+		return 0;
+	if (volume <= 3 || !m_audio.m_bSoundEffects)
+		return VOLUME_SILENT;
+	return VolumeToHundredthsDb(volume);
+}
+
+// 0x000AC287
+LONG CAppSettings::GetMusicVolume()
+{
+	unsigned volume = (unsigned)m_audio.m_nMusicVolume;
+	if (volume > 98)
+		return 0;
+	if (volume <= 3)
+		return VOLUME_SILENT;
+	return VolumeToHundredthsDb(volume);
+}
+
+// 0x000AC2EF
+SScreenAdjust *CAppSettings::GetScreenAdjust()
+{
+	float width = 0.0f, height = 0.0f;
+	GetDisplaySize(&width, &height, FALSE);
+	width = (float)floor(width);
+	height = (float)floor(height);
+	int mode = SCREEN_640x480;
+	switch ((int)width)
+	{
+	case 640:
+		if (height == 576.0f)
+			mode = SCREEN_640x576;
+		break;
+	case 720:
+		mode = height == 576.0f ? SCREEN_720x576 : SCREEN_720x480;
+		break;
+	case 1280:
+		mode = SCREEN_1280x720;
+		break;
+	case 1920:
+		mode = SCREEN_1920x1080;
+		break;
+	}
+	return &m_video.m_screenAdjust[mode];
+}
+
+// 0x0002B3E4 (this on the stack, enable in edx)
+// The speakers: with 5.1 the six channels go to the crosstalk-cancelled
+// fronts and rears, the center and the I3DL2 bin; otherwise front left and
+// right. Quirk: the pairs pointer is set only after a change, so a copied
+// setting points at the original's pairs.
+void SAudioSettings::SetEnable51(BOOL enable)
+{
+	if (m_bEnable51 == enable)
+		return;
+	m_bEnable51 = enable;
+	m_speakerMixBins.dwMixBinCount = 0;
+	m_speakerMixBins.lpMixBinVolumePairs = NULL;
+	// DSMIXBIN_* numbers. (The surround table has a 7th entry, 3 (the low
+	// frequency bin), that the count leaves out.)
+	static const DWORD surround[7] = {6, 8, 7, 9, 2, 10, 3};
+	static const DWORD stereo[2] = {0, 1};
+	const DWORD *bins = enable ? surround : stereo;
+	DWORD count = enable ? 6 : 2;
+	m_speakerMixBins.dwMixBinCount = count;
+	for (DWORD i = 0; i < m_speakerMixBins.dwMixBinCount; i++)
+	{
+		m_speakerMixBins.pairs[i].dwMixBin = bins[i];
+		m_speakerMixBins.pairs[i].lVolume = 0;
+	}
+	m_speakerMixBins.lpMixBinVolumePairs = m_speakerMixBins.pairs;
 }

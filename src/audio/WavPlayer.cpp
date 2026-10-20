@@ -190,7 +190,7 @@ HRESULT CWAVPlayer::Open(const char *file)
 	m_format.channels = m_wfx.nChannels;
 	m_format.duration = m_dwLength;
 	m_format.sampleRate = m_wfx.nSamplesPerSec;
-	SetSpeakerConfig(m_pSettings->m_audio.m_bEnable51 ? (const DSMIXBINS *)m_pSettings->m_speakerMixBins : NULL);
+	SetSpeakerConfig(m_pSettings->m_audio.m_bEnable51 ? (const DSMIXBINS *)&m_pSettings->m_audio.m_speakerMixBins : NULL);
 	m_pBuffer->SetVolume((LONG)GetVolume());
 	m_bActive = TRUE;
 	return S_OK;

@@ -72,7 +72,7 @@ HRESULT CDDAPlayer::Open(const char *file)
 	m_format.channels = m_wfx.nChannels;
 	m_format.duration = m_dwLength;
 	m_format.sampleRate = m_wfx.nSamplesPerSec;
-	SetSpeakerConfig(m_pSettings->m_audio.m_bEnable51 ? (const DSMIXBINS *)m_pSettings->m_speakerMixBins : NULL);
+	SetSpeakerConfig(m_pSettings->m_audio.m_bEnable51 ? (const DSMIXBINS *)&m_pSettings->m_audio.m_speakerMixBins : NULL);
 	m_pPump->SetVolume((LONG)GetVolume());
 	m_bReady = TRUE;
 	m_bActive = TRUE;

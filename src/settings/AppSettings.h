@@ -95,7 +95,20 @@ enum MultiRegion
 	REGION_PAL = 3,
 };
 
-// <Audio>. At CAppSettings+0x1324; continues past the named fields.
+// A DSMIXBINS (DSound.h) with room for its pairs. 0x48 bytes on the Xbox.
+struct SSpeakerMixBins
+{
+	DWORD dwMixBinCount;                         // +0x00
+	void *lpMixBinVolumePairs;                   // +0x04 points at pairs (set by SetEnable51)
+	struct
+	{
+		DWORD dwMixBin;
+		LONG lVolume;
+	} pairs[8];                                  // +0x08
+};
+
+// <Audio>. At CAppSettings+0x1324. (The implicit constructor is
+// 0x00031418.)
 struct SAudioSettings
 {
 	int m_nSoundVolume;                          // +0x00 0..100
@@ -107,8 +120,12 @@ struct SAudioSettings
 	int m_nSoundTrackMode;                       // +0x30 SoundTrackMode
 	BOOL m_bSoundEffects;                        // +0x34
 	std::string m_strSound[SOUND_EFFECT_COUNT];  // +0x38
+	// What music players are given with 5.1 on: the speaker assignment.
+	SSpeakerMixBins m_speakerMixBins;            // +0x150 (+0x1474)
 
-	void SetEnable51(BOOL enable);               // 0x0002B3E4 TODO: decompile
+	// Turns 5.1 on or off and sets the mix bins to match. (this on the
+	// stack, enable in edx)
+	void SetEnable51(BOOL enable);               // 0x0002B3E4
 };
 
 // Video options. At CAppSettings+0x14BC; zeroed as a block by the constructor.
@@ -129,7 +146,8 @@ struct SVideoSettings
 	BOOL m_bTextureCompression;                      // +0xBC
 };
 
-// <Network> and <HTTP>. At CAppSettings+0x15A8.
+// <Network> and <HTTP>. At CAppSettings+0x15A8. (The implicit constructor
+// is 0x00031488.)
 struct SNetworkSettings
 {
 	BOOL m_bEnable;             // +0x00
@@ -145,7 +163,7 @@ struct SNetworkSettings
 	int m_nProxyPort;           // +0xB8 <HTTP Port>
 };
 
-// <FTP>. At CAppSettings+0x1664.
+// <FTP>. At CAppSettings+0x1664. (The implicit constructor is 0x000314B3.)
 struct SFTPSettings
 {
 	BOOL m_bEnable;             // +0x00
@@ -164,7 +182,8 @@ struct SFTPSettings
 	BOOL m_bClientDetectPeers;  // +0x94 1, <FTPClient DetectPeer>
 };
 
-// <Preference>. At CAppSettings+0x16FC.
+// <Preference>. At CAppSettings+0x16FC. (The implicit constructor is
+// 0x000314D6.)
 struct SPreferences
 {
 	int m_nDateFormat;                  // +0x00 1. TODO: verify
@@ -235,11 +254,13 @@ public:
 
 	void SetDefaults();                      // 0x000AC39B
 	void InitPaths(std::string xbePath);     // 0x000ACA86
-	// DirectSound volume (hundredths of dB) for effects. TODO: decompile
+	// DirectSound volume (hundredths of dB) for effects: -5000..0 for
+	// 4..98, 0 above, -6400 (silent) for 3 or less or with effects off.
 	LONG GetSoundVolume();                   // 0x000AC21A
-	// The screen adjustment of the current video mode. TODO: decompile
+	// The screen adjustment of the current display size (640x480 when the
+	// size is none of the six). (this on the stack)
 	SScreenAdjust *GetScreenAdjust();        // 0x000AC2EF
-	// DirectSound volume (hundredths of dB) for music. TODO: decompile
+	// The same for music (no effects switch). (this on the stack)
 	LONG GetMusicVolume();                   // 0x000AC287
 
 	static CAppSettings *s_pInstance;        // 0x0027626C
@@ -272,7 +293,6 @@ public:
 	float m_fFontScale;                      // +0x131C 1.0; the screen mode's font scale (videoset.dat)
 	int m_nScrollSpeed;                      // +0x1320 10..60
 	SAudioSettings m_audio;                  // +0x1324
-	BYTE m_speakerMixBins[0x14BC - 0x1474]; // +0x1474 the 5.1 DSMIXBINS and its pairs (SetEnable51)
 	SVideoSettings m_video;                  // +0x14BC
 	std::string m_strPassword;               // +0x157C
 	int m_nPasswordFailures;                 // +0x1598 wrong passwords/passcodes so far

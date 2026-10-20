@@ -472,7 +472,7 @@ unsigned __stdcall MusicManagerThread(void *param)
 		{
 			audio.SetEnable51(TRUE);
 			if (audio.m_bEnable51)
-				g_pMusicManager->SetSpeakerConfig(audio.m_bEnable51 ? g_pSettings->m_speakerMixBins : NULL);
+				g_pMusicManager->SetSpeakerConfig(audio.m_bEnable51 ? &g_pSettings->m_audio.m_speakerMixBins : NULL);
 		}
 	}
 	catch (...)

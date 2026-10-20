@@ -37,5 +37,34 @@ int main()
 
 	CXmlElement *menu = g_config.m_root.FindFirstChild("Menu");
 	printf("menu items: %d\n", menu != NULL ? menu->m_children.GetCount() : -1);
-	return 0;
+
+	// Volumes, the screen adjustment and the 5.1 mix bins.
+	int failures = 0;
+	SAudioSettings saved = s->m_audio;
+	const struct { int volume; BOOL effects; LONG sound, music; } volumes[] = {
+		{100, TRUE, 0, 0}, {99, TRUE, 0, 0}, {50, TRUE, -2500, -2500}, {4, TRUE, -4800, -4800},
+		{3, TRUE, -6400, -6400}, {50, FALSE, -6400, -2500},
+	};
+	for (size_t i = 0; i < sizeof(volumes) / sizeof(volumes[0]); i++)
+	{
+		s->m_audio.m_nSoundVolume = s->m_audio.m_nMusicVolume = volumes[i].volume;
+		s->m_audio.m_bSoundEffects = volumes[i].effects;
+		if (s->GetSoundVolume() != volumes[i].sound || s->GetMusicVolume() != volumes[i].music)
+		{
+			printf("FAIL volume %d: %ld %ld\n", volumes[i].volume, (long)s->GetSoundVolume(), (long)s->GetMusicVolume());
+			failures++;
+		}
+	}
+	if (s->GetScreenAdjust() != &s->m_video.m_screenAdjust[SCREEN_640x480])
+		printf("FAIL GetScreenAdjust\n"), failures++;
+	s->m_audio.m_bEnable51 = FALSE;
+	s->m_audio.SetEnable51(TRUE);
+	if (s->m_audio.m_speakerMixBins.dwMixBinCount != 6 || s->m_audio.m_speakerMixBins.pairs[4].dwMixBin != 2 ||
+	    s->m_audio.m_speakerMixBins.lpMixBinVolumePairs != s->m_audio.m_speakerMixBins.pairs)
+		printf("FAIL SetEnable51(TRUE)\n"), failures++;
+	s->m_audio.SetEnable51(FALSE);
+	if (s->m_audio.m_speakerMixBins.dwMixBinCount != 2 || s->m_audio.m_speakerMixBins.pairs[1].dwMixBin != 1)
+		printf("FAIL SetEnable51(FALSE)\n"), failures++;
+	s->m_audio = saved;
+	return failures != 0;
 }

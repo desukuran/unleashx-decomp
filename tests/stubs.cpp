@@ -24,7 +24,6 @@ void XBInput_GetInput(XBGAMEPAD *) {}
 CSoundEffects::CSoundEffects() : m_pSettings(NULL), m_bDisabled(FALSE), m_bQuiet(FALSE) {}
 CSoundEffects::~CSoundEffects() {}
 void CSoundEffects::SetQuiet(BOOL quiet) { m_bQuiet = quiet; }
-void SAudioSettings::SetEnable51(BOOL enable) { m_bEnable51 = enable; }
 
 BOOL SetLedPattern(int, BOOL) { return FALSE; }
 
