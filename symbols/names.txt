@@ -2637,3 +2637,8 @@
 00092e21 XBUtil_UnswizzleTexture3D
 00092e8c XBUtil_UnswizzleTexture2D
 00092f34 XBUtil_Timer
+# XBUtil_VectorToRGBA is an inline in the samples' xbutil.h; LTCG made a copy for the cube map (vector in esi)
+0003201e XBUtil_VectorToRGBA
+# Dead code: an XPR0-only copy of CreateFromMemory with the data pointer constant-folded to NULL
+# (reads the header at address 0; nothing calls or references it)
+00097048 CXBPackedResource::CreateFromMemory_unused

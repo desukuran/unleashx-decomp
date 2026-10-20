@@ -658,7 +658,7 @@
 0006dede fat32_sub_0006dede
 #
 # xdksample: the XDK samples framework (XBApp, XBFont, XBMesh, XBMemUnit, XBStorageDevice, XBSound, XBUtil, XBInput, xmvhelper); the XDK's Samples/Common/Src, a later version than the one linked in (in reference/Samples)
-0003201e xdksample_sub_0003201e
+0003201e XBUtil_VectorToRGBA
 0008efe1 XMVHelper_ReleasePreviousMemoryPacket
 0008f000 XMVHelper_GetNextMemoryPacket
 0008f060 XMVHelper_ReleasePreviousPacket
@@ -704,7 +704,7 @@
 00094fe2 CWaveFile::GetLoopRegionBytes
 000950ad CWaveFile::ReadSample
 000950e0 XBSound_DrawLevelMeters_dsound
-00097048 xdksample_sub_00097048
+00097048 CXBPackedResource::CreateFromMemory_unused
 0009726f CXBPackedResource::GetData
 000972c7 XBResource_SizeOf
 0009748a XBInput_InitDebugMouse

@@ -60,7 +60,7 @@ LIBRARIES = [
                   'XBUtil, XBInput, xmvhelper); the XDK\'s Samples/Common/Src, a later version than the one linked in '
                   '(in reference/Samples)',
      ['../Samples/Common/Src/xb*.cpp', '../Samples/Common/Include/xb*.h'],
-     [(0x8EFE1, 0x8F7CB), (0x92B01, 0x9A000)], [],
+     [(0x3201E, 0x32078), (0x8EFE1, 0x8F7CB), (0x92B01, 0x9A000)], [],
      ('CXBApplicationEx::', 'CXBMesh::', 'CXBMemUnit::', 'CXBStorageDevice::', 'CXBFont::', 'CSound::',
       'XBUtil_', 'XBInput_', 'CXBPackedResource::', 'CXBStopWatch::', 'CWaveFile::', 'CRiffChunk::',
       'XBSound_', 'XBResource_', 'CXMVPlayer::', 'XMVHelper_')),
