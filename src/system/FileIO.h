@@ -313,5 +313,5 @@ CDirectory *CreateDirObject(const char *path);     // 0x0013D5CF
 
 // Whether path exists as a directory (directory = TRUE) or a file. A drive
 // root ("C:\") counts if the drive is mounted. Falls back to asking the
-// drive's CDirectory. TODO: decompile
-BOOL PathExists(const char *path, BOOL directory);   // 0x0002FB84 TODO: decompile
+// drive's CDirectory. (path in edi; FileIO.cpp)
+BOOL PathExists(const char *path, BOOL directory);   // 0x0002FB84

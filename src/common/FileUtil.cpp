@@ -7,6 +7,7 @@
 
 #include "../settings/AppSettings.h"
 #include "../system/Drives.h"
+#include "../system/FileIO.h"
 #include "StrUtil.h"
 
 #include "XboxKernel.h"
@@ -545,4 +546,99 @@ std::string GetPersistentDataPath(const wchar_t *name, unsigned int creation)
 		path = folder;
 	}
 	return path;
+}
+
+// --- CFileFinder ------------------------------------------------------------
+
+// What a file attribute filter skips: 1 folders, 2 files.
+static BOOL SkipFindData(int filter, const WIN32_FIND_DATAA *data)
+{
+	BOOL folder = (data->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+	return (filter == 1 && folder) || (filter == 2 && !folder);
+}
+
+// 0x000132DF (inlined in the constructor; this in esi)
+// Quirk: the folder starts as "*C:\*".
+static void InitFileFinder(CFileFinder *finder)
+{
+	finder->m_nFilter = 0;
+	finder->m_hFind = INVALID_HANDLE_VALUE;
+	finder->m_strPattern = "*";
+	finder->m_strDir = "*C:\\*";
+	memset(finder->m_findData, 0, sizeof(finder->m_findData));
+	finder->m_pDir = NULL;
+	finder->m_unknown180 = 0;
+}
+
+// 0x0001331C
+CFileFinder::CFileFinder()
+{
+	InitFileFinder(this);
+}
+
+// 0x00013564
+CFileFinder::~CFileFinder()
+{
+	Close();
+}
+
+// 0x0001352D
+void CFileFinder::Close()
+{
+	CDirectory *dir = (CDirectory *)m_pDir;
+	if (m_hFind != INVALID_HANDLE_VALUE && dir != NULL)
+		dir->FindClose(m_hFind);
+	m_hFind = INVALID_HANDLE_VALUE;
+	if (dir != NULL)
+		delete dir;
+	m_pDir = NULL;
+}
+
+// 0x00013338
+// An empty folder or pattern keeps the previous one.
+const char *CFileFinder::FindFirst(const char *dir, const char *pattern)
+{
+	WIN32_FIND_DATAA *data = (WIN32_FIND_DATAA *)m_findData;
+	memset(m_findData, 0, sizeof(m_findData));
+	Close();
+	if (dir != NULL && *dir != 0 && StrCmpNoCase(m_strDir, dir) != 0)
+		m_strDir = dir;
+	if (StrRight(m_strDir, 1) != "\\")
+		m_strDir += "\\";
+	if (pattern != NULL && *pattern != 0)
+		m_strPattern = pattern;
+	if (m_strPattern.size() == 0)
+		m_strPattern = "*";
+
+	CDirectory *directory = CreateDirObject(m_strDir.c_str());
+	m_pDir = directory;
+	if (directory == NULL || !directory->DirectoryExists(m_strDir.c_str()))
+		return NULL;
+	std::string search = m_strDir + m_strPattern;
+	m_hFind = directory->FindFirst(search.c_str(), data);
+	if (m_hFind == INVALID_HANDLE_VALUE)
+		return NULL;
+	if (SkipFindData(m_nFilter, data))
+		return FindNext();
+	return data->cFileName;
+}
+
+// 0x000134C3 (this in esi)
+// Without an open search it starts one with the last folder and "*".
+const char *CFileFinder::FindNext()
+{
+	WIN32_FIND_DATAA *data = (WIN32_FIND_DATAA *)m_findData;
+	do
+	{
+		memset(m_findData, 0, sizeof(m_findData));
+		if (m_hFind == INVALID_HANDLE_VALUE)
+			return FindFirst(NULL, "*");
+		CDirectory *directory = (CDirectory *)m_pDir;
+		if (directory == NULL || !directory->FindNext(m_hFind, data))
+		{
+			Close();
+			return NULL;
+		}
+	} while (SkipFindData(m_nFilter, data));
+	return data->cFileName;
 }

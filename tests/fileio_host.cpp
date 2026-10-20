@@ -134,6 +134,8 @@ public:
 	BOOL FindClose(HANDLE find) { return CloseHandle(find); }
 	HANDLE FindFirst(const char *pattern, WIN32_FIND_DATAA *data) { return FindFirstFileA(pattern, data); }
 	BOOL FindNext(HANDLE find, WIN32_FIND_DATAA *data) { return FindNextFileA(find, data); }
+	BOOL DirectoryExists(const char *path) { return PathExists(path, TRUE); }
+	BOOL FileExists(const char *path) { return PathExists(path, FALSE); }
 };
 
 IFile *CreateFileObject(const char *)

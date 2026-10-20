@@ -84,6 +84,31 @@ int main()
 	Base64Decode("eGJv\r\n eA==", spaced);
 	if (spaced != "xbox")
 		s_failures++;
+	// CFileFinder over a small folder: files only, then a pattern.
+	CreateDirectoryTree("build\\finder\\sub");
+	WriteTextFile("build\\finder\\a.txt", "a", FALSE);
+	WriteTextFile("build\\finder\\b.log", "b", FALSE);
+	{
+		CFileFinder finder;
+		finder.m_nFilter = 1;
+		int files = 0, folders = 0;
+		for (const char *name = finder.FindFirst("build\\finder", "*"); name != NULL; name = finder.FindNext())
+		{
+			if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
+				continue;
+			if (finder.GetAttributes() & FILE_ATTRIBUTE_DIRECTORY)
+				folders++;
+			else
+				files++;
+		}
+		if (files != 2 || folders != 0)
+			printf("FAIL CFileFinder files: %d files, %d folders\n", files, folders), s_failures++;
+		const char *txt = finder.FindFirst("build\\finder", "*.txt");
+		if (txt == NULL || strcmp(txt, "a.txt") != 0 || finder.FindNext() != NULL)
+			printf("FAIL CFileFinder pattern: %s dir=%s\n", txt ? txt : "NULL", finder.m_strDir.c_str()), s_failures++;
+		if (finder.FindFirst("build\\no_such_folder", "*") != NULL)
+			printf("FAIL CFileFinder missing folder\n"), s_failures++;
+	}
 	printf(s_failures == 0 ? "fileutil_test passed\n" : "fileutil_test failed\n");
 	return s_failures != 0;
 }

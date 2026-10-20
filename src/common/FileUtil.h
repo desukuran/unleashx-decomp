@@ -33,7 +33,7 @@ BOOL WriteTextFile(const char *path, const char *text, BOOL unicode);   // 0x000
 BOOL WriteUnicodeTextFile(const char *path, const wchar_t *text);    // 0x000A5A6C
 
 // Walks the matches of a pattern in a folder, through the virtual file
-// layer (so it works on any drive type). TODO: decompile
+// layer (so it works on any drive type).
 class CFileFinder
 {
 public:
@@ -42,7 +42,7 @@ public:
 	// The first match's name, or NULL. The folder gets a trailing
 	// backslash; an empty pattern means "*".
 	const char *FindFirst(const char *dir, const char *pattern);   // 0x00013338
-	const char *FindNext();                               // 0x000134C3
+	const char *FindNext();                               // 0x000134C3 (this in esi)
 	void Close();                                         // 0x0001352D (this in eax)
 	// The current match (the find data, read directly by the callers).
 	const char *GetName() const { return (const char *)m_findData + 0x2C; }
@@ -52,7 +52,7 @@ public:
 	std::string m_strPattern;                             // +0x004
 	std::string m_strDir;                                 // +0x020
 	BYTE m_findData[0x140];                               // +0x03C WIN32_FIND_DATA (the name at +0x068)
-	int m_nFilter;                                        // +0x17C 1 skips folders, 2 skips files. TODO: verify
+	int m_nFilter;                                        // +0x17C 1 skips folders, 2 skips files
 	int m_unknown180;                                     // +0x180
 	void *m_pDir;                                         // +0x184 the drive's directory object
 };

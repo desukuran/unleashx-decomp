@@ -65,3 +65,26 @@ CDirectory *CreateDirObject(const char *path)
 	}
 	return NULL;
 }
+
+// 0x0002FB84 (path in edi)
+BOOL PathExists(const char *path, BOOL directory)
+{
+	if (path == NULL)
+		return FALSE;
+	DWORD attributes = GetFileAttributesA(path);
+	if (attributes != INVALID_FILE_ATTRIBUTES && ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0) == (directory != FALSE))
+		return TRUE;
+	if (directory && strlen(path) < 4)
+	{
+		// A drive root: the drive mounted with media.
+		SDriveInfo *info = GetDriveInfo(path[0]);
+		if (info != NULL && info->mounted && info->hasMedia)
+			return TRUE;
+	}
+	CDirectory *dir = CreateDirObject(path);
+	if (dir == NULL)
+		return FALSE;
+	BOOL exists = directory ? dir->DirectoryExists(path) : dir->FileExists(path);
+	delete dir;
+	return exists;
+}
