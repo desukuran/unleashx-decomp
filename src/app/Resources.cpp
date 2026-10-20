@@ -18,8 +18,11 @@
 #include "UnleashX.h"
 
 // The MEDIA_FILE section: a zip of the media files. iMedia.dat in the
-// media folder records the size of the one that was unpacked.
+// media folder records the size of the one that was unpacked. The size is
+// the release's, unless the build passes that of its own assets/media.zip.
+#ifndef MEDIA_FILE_SIZE
 #define MEDIA_FILE_SIZE 0x5A21F
+#endif
 
 // A bitmap font is taken as missing when its line is under 5 pixels.
 static const float MIN_FONT_HEIGHT = 5.0f;

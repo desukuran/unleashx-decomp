@@ -6,7 +6,9 @@
 
 #include "../common/XboxKernel.h"
 
+#ifndef REG_DWORD
 #define REG_DWORD 4
+#endif
 
 // The flags in the EEPROM are the XC_VIDEO_FLAGS_* shifted into the high word.
 #define EEPROM_VIDEO_WIDESCREEN (XC_VIDEO_FLAGS_WIDESCREEN << 16)

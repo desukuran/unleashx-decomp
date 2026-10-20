@@ -40,25 +40,45 @@ build/%: tests/%.cpp $(LIBS) $(STUBS) $(HEADERS)
 	@mkdir -p build
 	$(CXX) $(CXXFLAGS) -o $@ $< $(LIBS) $(STUBS) -pthread
 
+# The ISO 9660 reader from the Xbox build, on a generated disc image.
+build/iso9660_test: tests/iso9660_test.cpp xbox/Iso9660.cpp $(HEADERS)
+	@mkdir -p build
+	$(CXX) $(CXXFLAGS) -o $@ tests/iso9660_test.cpp xbox/Iso9660.cpp src/common/PlatformHost.cpp -pthread
+
+build/testdisc.iso:
+	rm -rf build/testdisc && mkdir -p build/testdisc/Folder
+	printf 'Hello, ISO!\n' > build/testdisc/README.TXT
+	python3 -c "open('build/testdisc/Folder/Big.bin','wb').write(bytes(i & 0xFF for i in range(5000)))"
+	xorriso -as mkisofs -quiet -J -V TESTDISC -o $@ build/testdisc
+
+# The tests that read the release's Default.xbe are skipped without it.
+RELEASE_XBE ?= UnleashX_0_39_0528A/Default.xbe
+HAVE_RELEASE := $(wildcard $(RELEASE_XBE))
+
 test: $(TESTS)
-	build/xml_roundtrip UnleashX_0_39_0528A/Config.xml > /dev/null
-	build/xml_roundtrip UnleashX_0_39_0528A/English.xml > /dev/null
+	build/xml_roundtrip assets/disc/Config.xml > /dev/null
+	build/xml_roundtrip assets/disc/English.xml > /dev/null
 	rm -rf build/testroot && mkdir -p build/testroot/E/dash
-	cp UnleashX_0_39_0528A/Config.xml build/testroot/E/dash/config.xml
+	cp assets/disc/Config.xml build/testroot/E/dash/config.xml
 	UNLEASHX_ROOT=build/testroot build/config_test
+	rm -rf build/skin && python3 -c "import zipfile; zipfile.ZipFile('assets/disc/Skins/MetallicAtmosphere/MetallicAtmosphere.zip').extractall('build/skin')"
 	build/skin_test build/skin
-	build/language_test UnleashX_0_39_0528A/French.xml
+	build/language_test assets/disc/French.xml
 	build/skintext_test
-	build/xbe_test
+	$(if $(HAVE_RELEASE),build/xbe_test $(RELEASE_XBE),@echo "(xbe_test skipped: no $(RELEASE_XBE))")
 	build/fileutil_test
 	build/xip_test
 	rm -rf build/testroot/Y && mkdir -p build/testroot/Y
 	UNLEASHX_ROOT=build/testroot build/http_test
+ifneq ($(HAVE_RELEASE),)
 	rm -rf build/testroot/E/Games && mkdir -p build/testroot/E/Games/A build/testroot/E/Games/B
-	cp UnleashX_0_39_0528A/Default.xbe build/testroot/E/Games/A/default.xbe
-	cp UnleashX_0_39_0528A/Default.xbe build/testroot/E/Games/B/default.xbe
+	cp $(RELEASE_XBE) build/testroot/E/Games/A/default.xbe
+	cp $(RELEASE_XBE) build/testroot/E/Games/B/default.xbe
 	touch build/testroot/E/Games/B/icon.png
 	UNLEASHX_ROOT=build/testroot build/menuscan_test > build/menuscan.log || (cat build/menuscan.log; false)
+else
+	@echo "(menuscan_test skipped: no $(RELEASE_XBE))"
+endif
 	mkdir -p build/testroot/E/ftp && printf 'Hello, Xbox!' > build/testroot/E/ftp/hello.txt
 	UNLEASHX_ROOT=build/testroot build/ftp_test > build/ftp.log 2>&1 || (cat build/ftp.log; false)
 	rm -rf build/testroot/E/client build/testroot/E/ftp/tree build/testroot/E/ftp/made
@@ -67,7 +87,9 @@ test: $(TESTS)
 	UNLEASHX_ROOT=build/testroot build/soundtrackdb_test
 	build/newsfeed_test
 	build/fonttable_test
-	build/xbepatch_test
+	$(if $(HAVE_RELEASE),build/xbepatch_test,@echo "(xbepatch_test skipped: no $(RELEASE_XBE))")
+	@if command -v xorriso >/dev/null; then $(MAKE) --no-print-directory build/iso9660_test build/testdisc.iso && \
+		build/iso9660_test build/testdisc.iso; else echo "(iso9660_test skipped: no xorriso)"; fi
 	@echo ok
 
 .PHONY: all test check

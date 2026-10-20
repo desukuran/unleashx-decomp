@@ -13,7 +13,9 @@
 #define FILE_FLAG_NO_BUFFERING 0x20000000
 #define FILE_FLAG_OVERLAPPED 0x40000000
 #endif
+#ifndef ERROR_IO_PENDING
 #define ERROR_IO_PENDING 997
+#endif
 
 // 0x00092B01
 HRESULT XBUtil_LoadFile(const char *path, void **data, DWORD *size)

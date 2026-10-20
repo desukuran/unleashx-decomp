@@ -13,3 +13,6 @@ tools/dl/
 
 # Microsoft XDK headers for local reference only (never commit)
 reference/
+
+# The XDK (yours; see BUILDING.md)
+xdk

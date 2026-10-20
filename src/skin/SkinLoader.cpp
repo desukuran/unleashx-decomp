@@ -25,7 +25,11 @@ static const struct
 	{"RedShapes - By Kthulu", "RedShapes.xml"},
 };
 
-#define INT_SKINS_SIZE 0x2CC5   // size of the INT_SKINS section
+// The size of the INT_SKINS zip (the release's, unless the build passes the
+// size of its own assets/internal_skins.zip).
+#ifndef INT_SKINS_SIZE
+#define INT_SKINS_SIZE 0x2CC5
+#endif
 
 // 0x000F8E27
 int GetInternalSkinCount()

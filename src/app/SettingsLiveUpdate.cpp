@@ -31,7 +31,9 @@ std::string g_strUpdateMD5;
 // The install thread while it runs, else -1. 0x0026CDBC
 static HANDLE s_hInstallThread = (HANDLE)-1;
 
+#ifndef STILL_ACTIVE
 #define STILL_ACTIVE 0x103
+#endif
 
 // 0x000C1C87
 CLiveUpdate::CLiveUpdate()

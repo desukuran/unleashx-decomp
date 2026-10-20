@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UnleashX>
+	<Settings>
+		<MSDashBoard>C:\Xboxdash.xbe</MSDashBoard>
+		<Password MaxTries="3"></Password>
+		<!-- Network Enable="Yes/No" Type="Static/DHCP" -->
+		<!-- Default Enable="Yes" Type="static" 
+			IP		= 192.168.0.100
+			Subnet	= 255.255.255.0
+		-->
+		<Network Enable="Yes" Type="DHCP">
+			<IP>192.168.0.100</IP>
+			<Subnet>255.255.255.0</Subnet>
+			<Gateway>192.168.0.1</Gateway>
+			<DNS1>192.168.0.1</DNS1>
+			<DNS2>192.168.0.7</DNS2>
+		</Network>
+		<!-- FTP Enable="Yes/No" -->
+		<!-- Default Enable="Yes"
+			User		= xbox
+			Password	= xbox
+			Port		= 21
+			MaxUsers	= 2
+			AllowAnon	= No		
+		-->
+		<FTP Enable="Yes">
+			<User>xbox</User>
+			<Password>xbox</Password>
+			<Port>21</Port>
+			<MaxUsers>2</MaxUsers>
+			<AllowAnon>No</AllowAnon>
+			<Greeting>Welcome to XBOX FTP Server</Greeting>
+		</FTP>
+		<Newsfeed Enable="False" Interval="30">
+			<URL>www.xbox-scene.com/xbox1data/xbox-scene.xml</URL>
+			<URL>www.xbins.org/xbins.xml</URL>
+		</Newsfeed>
+		<!-- User Preference	-->
+		<Preference>
+			<Games AutoLaunch="Yes" />
+			<DVD AutoLaunch="Yes">F:\Apps\DVDX2\default.xbe</DVD>
+			<AudioCD AutoLaunch="Yes">C:\xboxdash.xbe</AudioCD>
+			<Data AutoLaunch="Yes"></Data>
+			<!-- Volume: 0-100	-->
+			<SNTP Synchronize="No">216.244.192.3</SNTP>
+			<!-- Speed: 1-5 and anything in between, i.e. 1.5	-->
+			<FanSpeed>1</FanSpeed>
+			<ScreenSaver Wait="60">
+				<Text>UnleashX V0.39</Text>
+			</ScreenSaver>
+			<AutoTurnOff>0</AutoTurnOff>
+			<EnableDriveF>True</EnableDriveF>
+			<EnableDriveG>False</EnableDriveG>
+		</Preference>
+	</Settings>
+	<Menu>
+		<Item Action="LaunchDVD" >Launch DVD</Item>
+		<List Text="Games" Sort="On" Auto="On">
+			<Path>E:\Games</Path>
+			<Path>F:\Games</Path>
+			<Path>G:\Games</Path>
+			<Path>E:\HDDLoader</Path>
+			<Path>F:\HDDLoader</Path>
+		</List>
+		<List Text="Applications" Sort="On" Auto="On">
+			<Path>E:\Apps</Path>
+			<Path>F:\Apps</Path>
+			<Item Action="TextEditor" >Text Editor</Item>
+		</List>
+		<List Text="System" Sort="Off" Auto="On" >
+			<Item Action="Settings" >Settings</Item>
+			<Item Action="SavesManager">Game Saves Manager</Item>
+			<List Text="Misc" Sort="Off" Auto="On">
+				<Item Action="FTPStop">Stop FTP</Item>
+				<Item Action="FTPStart">Start FTP</Item>
+				<Item Action="FTPReset">Reset FTP</Item>
+				<Item Action="NETReset">Restart Network</Item>
+				<Item Action="TrayClose">Close DVD Tray</Item>
+				<Item Action="TrayOpen">Open DVD Tray</Item>
+				<Item Action="CopyDVD">Copy Game Disc</Item>
+			</List>
+			<List Text="Format Menu" Sort="Off" Auto="On" Password="Xbox">
+				<Item Action="Format"  Arg1="X" >Format X Drive</Item>
+				<Item Action="Format"  Arg1="Y" >Format Y Drive</Item>
+				<Item Action="Format"  Arg1="Z" >Format Z Drive</Item>
+				<List Text="Format F Drive" Sort="Off" Batch="True">
+					<Item Action="AskUser" Arg1="Format">Are you sure you want to format Drive F?</Item>
+					<Item Action="MessageBox" Arg1="Format">Press OK to proceed with the format operation.</Item>
+					<Item Action="Format" Arg1="F" >Format F Drive</Item>
+				</List>
+				<List Text="Format G Drive" Sort="Off" Batch="True">
+					<Item Action="AskUser" Arg1="Format">Are you sure you want to format Drive G?</Item>
+					<Item Action="MessageBox" Arg1="Format">Press OK to proceed with the format operation.</Item>
+					<Item Action="Format" Arg1="G" >Format G Drive</Item>
+				</List>
+				<List Text="Format E Drive" Sort="Off" Batch="True">
+					<Item Action="AskUser" Arg1="Format">Are you sure you want to format Drive E?</Item>
+					<Item Action="MessageBox" Arg1="Format">Press OK to proceed with the format operation.</Item>
+					<Item Action="Format" Arg1="E" >Format E Drive</Item>
+				</List>
+			</List>
+			<Item Action="Skins">Skins</Item>
+		</List>
+		<Item Action="FileManager" >File Explorer</Item>
+		<Item Action="C:\xboxdash.xbe">MS Dashboard</Item>
+		<Item Action="Restart" >Reboot</Item> 
+		<Item Action="Shutdown" >Shutdown</Item>
+	</Menu>
+</UnleashX>
