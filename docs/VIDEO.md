@@ -12,6 +12,10 @@ How videos play (`CWMVideoPlayer`, `src/media/WMVideoPlayer.cpp`).
 | Screen saver video | full screen, looping; sound only with ScreenSaverBGM and no music playing |
 | File manager (a `.wmv` or `.xmv` file) | modal: the hardware overlay, full screen at first |
 
+Videos are opened by the kernel (`FileExists`, then the decoders open the
+path themselves), so videos on USB drives (P: to S:) and on plain ISO 9660
+data discs say "File does not exists." (as in the original).
+
 Only `.wmv` and `.xmv` files are accepted, and the whole path must be at
 least 8 characters long. WMV files go through the XDK WMV sample's player
 (`CWmvSamplePlayer`, `src/xdk/WmvPlayer.cpp`, on WMVDEC; the build needs an XDK

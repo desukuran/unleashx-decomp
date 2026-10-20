@@ -8,8 +8,9 @@ It reads the file with `std::ifstream`, that is through the kernel's file
 systems, not UnleashX's own virtual file layer. So a text file on a plain
 ISO 9660 data disc (CD-R/DVD-R that isn't an Xbox disc), which the file
 manager lists through the bundled ISO 9660 reader, opens empty: the kernel
-can't read that disc. Files on the hard disk and Xbox-format discs open
-normally. (Quirk of the original, kept.)
+can't read that disc. The same goes for USB drives (P: to S:), which only
+UnleashX's FAT32 driver can read. Files on the hard disk and Xbox-format
+discs open normally. (Quirk of the original, kept.)
 
 ## Window
 
