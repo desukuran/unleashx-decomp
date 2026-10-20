@@ -186,6 +186,11 @@ How UnleashX works, written from the decompiled code:
   [thirdparty/README.md](thirdparty/README.md).
 * **Microsoft:** this project isn't affiliated with Microsoft. The XDK is
   theirs; it's needed to build but isn't distributed here.
-* **Licences:** builds link libmad (GPL v2 or later) and fat_io_lib (GPL v3),
-  so a distributed `default.xbe` falls under the GPL v3. unRAR's licence
-  forbids using its code to make a RAR-compatible archiver.
+* **Licence:** the project's own code (`src/`, `xbox/`, `tests/`, `tools/`,
+  the build files and the docs) is released under the
+  [GNU GPL v3](LICENSE).
+  * `assets/` is the UnleashX team's work.
+  * `thirdparty/` keeps each library's own licence. libmad is GPL v2 or
+    later, and fat_io_lib is GPL v3; a built `default.xbe` links both, so it
+    falls under the GPL v3. unRAR's licence forbids using its code to make a
+    RAR-compatible archiver.
