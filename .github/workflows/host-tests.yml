@@ -1,5 +1,6 @@
 # The host build and tests (no XDK needed): syntax checks of the Xbox-only
-# files and the test programs.
+# files and the test programs (xorriso and dosfstools/fdisk make the ISO 9660
+# and FAT32 test images).
 name: host tests
 on: [push, pull_request]
 jobs:
@@ -7,6 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get install -y xorriso
+      - run: sudo apt-get update && sudo apt-get install -y xorriso dosfstools fdisk
       - run: make check
       - run: make test
