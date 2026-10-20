@@ -36,6 +36,7 @@ extern "C"
 #define MAX_VOLUMES 4
 // Device reads go through an aligned buffer this big (in sectors).
 #define BOUNCE_SECTORS 128
+#define BLOCK_SECTORS 8   // the device's 4 KB
 
 CFat32Volume *g_fat32Volumes[MAX_VOLUMES];   // 0x002776F4
 
@@ -55,6 +56,7 @@ struct SVolumeState
 	struct fatfs fs;
 	int index;
 	SPartition partition;
+	BOOL freeKnown;   // m_ullFreeBytes is up to date (nothing written since)
 };
 
 // An open file or folder: UnleashX's FAT32_FILE, then ours.
@@ -112,27 +114,45 @@ struct SSelect
 	~SSelect() { Unlock(); }
 };
 
+BOOL SeekBlock(DWORD sector)
+{
+	ULONGLONG offset = (ULONGLONG)sector * SECTOR_SIZE;
+	LONG high = (LONG)(offset >> 32);
+	return SetFilePointer(s_hDevice, (LONG)(DWORD)offset, &high, FILE_BEGIN) != (DWORD)-1 || GetLastError() == 0;
+}
+
+// The device only takes 4 KB-aligned I/O (as UnleashX's driver did it,
+// DiskReadSectors 0x0006C5F0: whole blocks of 8 sectors, a write reading the
+// block first when it changes only part of it).
 BOOL DeviceIo(DWORD sector, BYTE *buffer, DWORD count, BOOL write)
 {
 	while (count != 0)
 	{
-		DWORD n = count < BOUNCE_SECTORS ? count : BOUNCE_SECTORS;
-		ULONGLONG offset = (ULONGLONG)sector * SECTOR_SIZE;
-		LONG high = (LONG)(offset >> 32);
-		if (SetFilePointer(s_hDevice, (LONG)(DWORD)offset, &high, FILE_BEGIN) == (DWORD)-1 && GetLastError() != 0)
-			return FALSE;
+		DWORD first = sector & ~(BLOCK_SECTORS - 1);
+		DWORD skip = sector - first;
+		DWORD blocks = (skip + count + BLOCK_SECTORS - 1) / BLOCK_SECTORS;
+		if (blocks > BOUNCE_SECTORS / BLOCK_SECTORS)
+			blocks = BOUNCE_SECTORS / BLOCK_SECTORS;
+		DWORD bytes = blocks * BLOCK_SECTORS * SECTOR_SIZE;
+		DWORD n = blocks * BLOCK_SECTORS - skip;
+		if (n > count)
+			n = count;
 		DWORD done = 0;
+		BOOL partial = skip != 0 || (skip + n) % BLOCK_SECTORS != 0;
+		if (!write || partial)
+		{
+			if (!SeekBlock(first) || !ReadFile(s_hDevice, s_pBounce, bytes, &done, NULL) || done != bytes)
+				return FALSE;
+		}
 		if (write)
 		{
-			memcpy(s_pBounce, buffer, n * SECTOR_SIZE);
-			if (!WriteFile(s_hDevice, s_pBounce, n * SECTOR_SIZE, &done, NULL) || done != n * SECTOR_SIZE)
+			memcpy(s_pBounce + skip * SECTOR_SIZE, buffer, n * SECTOR_SIZE);
+			if (!SeekBlock(first) || !WriteFile(s_hDevice, s_pBounce, bytes, &done, NULL) || done != bytes)
 				return FALSE;
 		}
 		else
 		{
-			if (!ReadFile(s_hDevice, s_pBounce, n * SECTOR_SIZE, &done, NULL) || done != n * SECTOR_SIZE)
-				return FALSE;
-			memcpy(buffer, s_pBounce, n * SECTOR_SIZE);
+			memcpy(buffer, s_pBounce + skip * SECTOR_SIZE, n * SECTOR_SIZE);
 		}
 		sector += n;
 		buffer += n * SECTOR_SIZE;
@@ -462,11 +482,16 @@ const char *Fat32GetVolumeLabel(CFat32Volume *volume)
 	return volume->m_szLabel;
 }
 
+// Counted again only after a change: it reads the whole FAT, and the drive
+// list asks for it every 30 s (and the FTP greeting on every login).
 ULONGLONG Fat32GetFreeBytes(CFat32Volume *volume)
 {
 	SSelect select(volume);
+	if (s_pCurrent->freeKnown)
+		return volume->m_ullFreeBytes;
 	struct fatfs *fs = &s_pCurrent->fs;
 	volume->m_ullFreeBytes = (ULONGLONG)fatfs_count_free_clusters(fs) * fs->sectors_per_cluster * SECTOR_SIZE;
+	s_pCurrent->freeKnown = TRUE;
 	return volume->m_ullFreeBytes;
 }
 
@@ -478,6 +503,8 @@ FAT32_FILE *Fat32Open(CFat32Io *io, const char *path, const char *mode)
 	SSelect select(volume);
 	std::string libPath = LibPath(path);
 	FL_FILE *file = (FL_FILE *)fl_fopen(libPath.c_str(), mode);
+	if (file != NULL && (strchr(mode, 'w') != NULL || strchr(mode, 'a') != NULL))
+		s_pCurrent->freeKnown = FALSE;   // (truncated, or about to grow)
 	if (file != NULL)
 		return &NewOpenFile(volume, file, 0)->pub;
 	// A folder opens too (for reading), as with UnleashX's driver.
@@ -509,6 +536,7 @@ int Fat32Write(FAT32_FILE *handle, CFat32Io *, const void *data, int size)
 	if (size == 0)
 		size = (int)strlen((const char *)data);
 	SSelect select(file->volume);
+	s_pCurrent->freeKnown = FALSE;
 	int written = fl_fwrite(data, 1, size, file->file);
 	Sync(file);
 	return written;
@@ -539,6 +567,7 @@ int Fat32Seek(FAT32_FILE *handle, CFat32Io *, long offset, int origin)
 int Fat32Remove(CFat32Io *io, const char *path)
 {
 	SSelect select((CFat32Volume *)io);
+	s_pCurrent->freeKnown = FALSE;
 	return fl_remove(LibPath(path).c_str());
 }
 
@@ -547,6 +576,7 @@ FAT32_FILE *Fat32CreateDirectory(CFat32Io *io, const char *path, int, int, int)
 	CFat32Volume *volume = (CFat32Volume *)io;
 	SSelect select(volume);
 	std::string libPath = LibPath(path);
+	s_pCurrent->freeKnown = FALSE;
 	if (!fl_createdirectory(libPath.c_str()))
 		return NULL;
 	DWORD cluster = FolderCluster(libPath);
@@ -647,6 +677,7 @@ BOOL Fat32RemoveDirectory(CFat32Volume *volume, const char *path)
 	fl_closedir(&dir);
 	if (!empty)
 		return FALSE;
+	s_pCurrent->freeKnown = FALSE;
 
 	std::string parent, name;
 	SplitPath(libPath, parent, name);

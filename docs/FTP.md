@@ -157,6 +157,11 @@ Avalaunch's fast upload of a whole folder tree:
 
 ## Quirks
 
+* Files on USB drives (P: to S:) can't be downloaded (`RETR`) or uploaded
+  by the client: both read with `ReadNext(0)`, which means "a whole buffer"
+  for the other drives but reads 0 bytes from the FAT32 driver, so the
+  transfer stops at once with 426. Listings and file manager copies work.
+  (0x000B70E3 and 0x000815E4; kept.)
 Behaviour the original has, kept in the decompiled code:
 
 * The discovery answer contains the FTP password in plain text.
