@@ -1,7 +1,6 @@
 // The XDK samples' xmvhelper CXMVPlayer as UnleashX modified it (sound on or
-// off, looping, the music volume), and the WMV sample's player, which this
-// build can't link (the WMV decoder library isn't in the XDK copy used), so
-// .wmv files fail to open. Xbox only. See media/WMVideoPlayer.h.
+// off, looping, the music volume). The WMV player is in WmvPlayer.cpp. Xbox
+// only. See media/WMVideoPlayer.h.
 #include "../media/WMVideoPlayer.h"
 
 #include <stdarg.h>
@@ -268,16 +267,3 @@ void CXMVPlayer::SetLoop(BOOL loop)
 	if (!m_bLoop && m_pXMVDecoder != NULL)
 		XMVDecoder_TerminateLoop((XMVDecoder *)m_pXMVDecoder);
 }
-
-// ---- the WMV player (not linkable here) ----
-
-CWmvSamplePlayer::CWmvSamplePlayer() { memset(this, 0, sizeof(*this)); m_nLoops = -1; }
-CWmvSamplePlayer::~CWmvSamplePlayer() {}
-void CWmvSamplePlayer::Initialize(IDirectSound *) {}
-void CWmvSamplePlayer::Destroy() {}
-HRESULT CWmvSamplePlayer::OpenFile(const char *, DWORD) { return E_NOTIMPL; }
-void CWmvSamplePlayer::CloseFile() {}
-HRESULT CWmvSamplePlayer::GetVideoInfo(SWmvVideoInfo *info) { memset(info, 0, sizeof(*info)); return E_FAIL; }
-HRESULT CWmvSamplePlayer::DecodeNext() { return 1; }
-BOOL CWmvSamplePlayer::IsFrameDue() { return FALSE; }
-HRESULT CWmvSamplePlayer::CopyFrame(IDirect3DTexture8 *) { return E_FAIL; }

@@ -81,6 +81,19 @@ ALL_OBJS := $(OBJS) $(SUPPORT_OBJS) $(TP_OBJS)
 LIBS := xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib xacteng.lib xmv.lib xnet.lib \
 	xboxkrnl.lib xkbd.lib libcmt.lib libcpmt.lib
 
+# Optional: the WMV decoder (wmvxmo.h and wmvdec.lib) for .wmv videos. It only
+# came with XDK 4xxx releases (UnleashX linked 4627's); WMVDEC= points at such
+# an XDK or at a folder with the two files (default ./xdk-wmv). Without it
+# .wmv files don't open; .xmv still plays.
+WMVDEC ?= xdk-wmv
+wmv_dirs = $(1) $(1)/$(2) $(1)/xbox/$(2) $(1)/Xbox/$(2)
+WMV_HEADER := $(firstword $(wildcard $(addsuffix /wmvxmo.h,$(call wmv_dirs,$(WMVDEC),include))))
+WMV_LIB := $(firstword $(wildcard $(addsuffix /wmvdec.lib,$(call wmv_dirs,$(WMVDEC),lib))))
+ifneq ($(and $(WMV_HEADER),$(WMV_LIB)),)
+WMV_FLAGS := /DUX_WMVDEC /I$(patsubst %/,%,$(dir $(WMV_HEADER)))
+LIBS += $(WMV_LIB)
+endif
+
 # ---- targets ----
 
 all: $(OUT)/default.xbe
@@ -98,6 +111,7 @@ info:
 	@echo "  cl:       $(or $(CL_EXE),(not found))"
 	@echo "  link:     $(or $(LINK_EXE),(not found))"
 	@echo "  imagebld: $(or $(IMAGEBLD_EXE),(not found))"
+	@echo "WMV:        $(if $(WMV_FLAGS),$(WMV_LIB),(no wmvdec.lib/wmvxmo.h at '$(WMVDEC)': .wmv won't play))"
 	@echo "Wine:       $(or $(WINE),(not used))"
 	@echo "Host:       $(HOST_OS), $(HOSTCC), $(PYTHON)"
 
@@ -118,6 +132,12 @@ $(ALL_OBJS): | check-xdk
 $(OBJ)/%.obj: src/%.cpp $(HEADERS)
 	$(call compile,$(CFLAGS))
 $(OBJ)/app/Resources.obj $(OBJ)/skin/SkinLoader.obj: $(MEDIA_ZIP) $(SKINS_ZIP)
+# The WMV player builds with or without the decoder; recompile when that changes.
+WMV_STAMP := $(OBJ)/wmvdec.stamp
+$(WMV_STAMP): FORCE
+	@mkdir -p $(dir $@); echo "$(WMV_FLAGS) $(WMV_LIB)" | cmp -s - $@ || echo "$(WMV_FLAGS) $(WMV_LIB)" > $@
+$(OBJ)/xdk/WmvPlayer.obj: $(WMV_STAMP)
+$(OBJ)/xdk/WmvPlayer.obj: CFLAGS += $(WMV_FLAGS)
 
 $(OBJ)/xbox/%.obj: xbox/%.cpp $(HEADERS)
 	$(call compile,$(CFLAGS))
@@ -188,4 +208,5 @@ xiso: $(OUT)/UnleashX.iso
 clean:
 	rm -rf $(OUT)
 
-.PHONY: all check-xdk info objs xiso clean
+.PHONY: all check-xdk info objs xiso clean FORCE
+FORCE:

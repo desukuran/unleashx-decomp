@@ -13,6 +13,14 @@ the [README](README.md)).
   `xbox\lib`) or a copy of that folder anywhere, or a flat copy of `bin`,
   `include` and `lib`. Only its compiler (`bin\vc71`), `imagebld`, headers
   and libraries are used.
+* **Optional, for `.wmv` videos:** the WMV decoder, `wmvdec.lib` and
+  `wmvxmo.h`. They only came with XDK 4xxx releases (UnleashX linked 4627's;
+  4361's works), not with 5933. Point `WMVDEC=` at such an XDK or at a
+  folder holding the two files; by default `./xdk-wmv` is used. Without it
+  the build works, but `.wmv` files don't open (`.xmv` still plays).
+  `make -f Makefile.xbox info` says whether it was found. (The VS2003
+  project doesn't pick it up; add `UX_WMVDEC`, the header folder and the
+  library by hand.)
 * **Python 3**, for the last step (rescrambling the XBE for retail
   kernels, `tools/xbe.py retail`).
 * On **Linux or macOS**: GNU make, Wine (to run the XDK's tools) and a C

@@ -45,11 +45,13 @@ hard disk, and DHCP networking. The rest (game saves, FTP, music, the
 viewers, ...) is all there but hasn't been exercised on the rebuilt XBE
 yet; reports welcome.
 
+WMV videos play when the build finds the WMV decoder from an XDK 4xxx
+(see BUILDING.md); XMV always plays.
+
 Not in the build:
 
 * **USB storage**: UnleashX's FAT32 driver isn't rebuilt yet; USB drives
   don't show up.
-* **WMV videos**: the WMV decoder wasn't part of the XDK. XMV videos play.
 * **EEPROM decryption** is taken from the kernel, which has already done it
   (same results for the serial number, MAC, region and hard disk key).
 

@@ -20,18 +20,23 @@ struct IDirect3DSurface8;
 struct IDirectSound;
 struct SGamepadState;
 
-// What the WMV decoder reports. 0x14 bytes.
+// What the WMV decoder reports (WMVVIDEOINFO). 0x14 bytes.
 struct SWmvVideoInfo
 {
 	DWORD width;           // +0x00
 	DWORD height;          // +0x04
-	DWORD unknown08;       // +0x08
-	DWORD unknown0C;       // +0x0C
+	DWORD bitsPerPixel;    // +0x08 of the decoded frames
+	float framesPerSecond; // +0x0C
 	DWORD bitRate;         // +0x10 bits/s
 };
 
-// The XDK WMV playback sample's player (WMVDEC). Library code. 0x180
-// bytes.
+// The WMV player of the XDK's WMV sample (WMVCutScene) as UnleashX linked it,
+// on the WMV decoder library (WMVDEC, from an XDK 4xxx; this one is 1.0.4627).
+// Reconstructed in src/xdk/WmvPlayer.cpp. The decoder fills a texture that
+// stays locked; the audio goes to a DirectSound stream in 64 packets of 8 KB.
+// 0x180 bytes.
+#define WMV_AUDIO_PACKETS 0x40
+#define WMV_AUDIO_PACKET_SIZE 0x2000
 class CWmvSamplePlayer
 {
 public:
@@ -41,24 +46,47 @@ public:
 	// directSound in eax)
 	void Initialize(IDirectSound *directSound);           // 0x0009B819
 	void Destroy();                                       // 0x0009B840 (this in eax)
-	// format: the frame texture's D3DFORMAT.
+	// format: the frame texture's D3DFORMAT. Decodes the first frame.
 	HRESULT OpenFile(const char *path, DWORD format);     // 0x0009B8D6 (this on the stack)
-	void CloseFile();                                     // 0x0009B7C2
+	HRESULT CloseFile();                                  // 0x0009B7C2 (this in esi)
 	// (this in eax, info in edx)
 	HRESULT GetVideoInfo(SWmvVideoInfo *info);            // 0x0009B564
-	// Decodes the next frame; 1 at the end of the file. (this in esi)
+	// Decodes up to the next frame, feeding the audio stream. 0 while the
+	// decoder waits for data (E_PENDING), 1 at the end or on an error, and
+	// E_FAIL without a file (which the caller doesn't take as the end).
+	// (this in esi)
 	HRESULT DecodeNext();                                 // 0x0009B589
 	// TRUE when the decoded frame is due. (this in esi)
 	BOOL IsFrameDue();                                    // 0x0009B737
-	// Copies the decoded frame into texture. (this in ebx)
+	// Copies the decoded frame into texture; the first copy starts the clock
+	// and the sound. (this in ebx)
 	HRESULT CopyFrame(IDirect3DTexture8 *texture);        // 0x0009B86D
+	// The player's own texture with the latest frame. Nothing calls it.
+	// (this in eax)
+	IDirect3DTexture8 *GetTexture();                      // 0x0009BAEC
 
-	BYTE m_unknown00[4];                   // +0x000
-	int m_nLoops;                          // +0x004 -1: loop
-	bool m_bAudio;                         // +0x008
-	bool m_bHasAudio;                      // +0x009
-	BYTE m_unknown0A[0x16E];
-	BOOL m_bFrameReady;                    // +0x178
+	int m_nLoop;                           // +0x000 loops played
+	int m_nLoops;                          // +0x004 -1: loop forever
+	bool m_bAudio;                         // +0x008 play the sound
+	bool m_bHasAudio;                      // +0x009 the file has a sound track
+	void *m_pDecoder;                      // +0x00C IWMVDecoder
+	SWmvVideoInfo m_videoInfo;             // +0x010
+	BYTE m_waveFormat[0x14];               // +0x024 WAVEFORMATEX (nChannels at +0x26)
+	LONGLONG m_llDuration;                 // +0x038 play duration less the preroll
+	LONGLONG m_llStartTime;                // +0x040 DirectSound time of the first frame
+	BOOL m_bRestartClock;                  // +0x048 the next CopyFrame restarts the clock
+	DWORD m_unknown4C;                     // +0x04C
+	IDirect3DTexture8 *m_pDecodeTexture;   // +0x050 decoded into (kept locked)
+	DWORD m_unknown54;                     // +0x054
+	LONGLONG m_llFrameTime;                // +0x058 the decoded frame's time stamp
+	BYTE *m_pFrameBits;                    // +0x060 m_pDecodeTexture's bits
+	DWORD m_unknown64;                     // +0x064
+	IDirectSound *m_pDirectSound;          // +0x068
+	void *m_pStream;                       // +0x06C IDirectSoundStream (NULL without sound)
+	DWORD m_packetStatus[WMV_AUDIO_PACKETS];   // +0x070 XMEDIAPACKET_STATUS_*
+	BYTE *m_pAudioBuffer;                  // +0x170 the packets' data (512 KB)
+	IDirect3DTexture8 *m_pTexture;         // +0x174 GetTexture's copy
+	BOOL m_bFrameReady;                    // +0x178 a decoded frame waits for CopyFrame
 	CAppSettings *m_pSettings;             // +0x17C
 };
 
