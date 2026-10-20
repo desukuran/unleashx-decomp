@@ -9,11 +9,13 @@ guest sees the host at, so no data ports need forwarding.
   xemu_ftp.py ls  [dir]              list a folder (/E, /D/Folder, ...)
   xemu_ftp.py get <remote> <local>   download
   xemu_ftp.py put <local> <remote>   upload
+  xemu_ftp.py putdir <local> <remote>  upload a folder's contents into remote
   xemu_ftp.py cmd <command...>       send a raw command (SITE ..., MKD ...)
 
 --port N picks another host port; the login is xbox/xbox (Config.xml).
 """
 import ftplib
+import os
 import socket
 import sys
 
@@ -26,12 +28,27 @@ class XemuFTP(ftplib.FTP):
         return listener
 
 
+def put_tree(ftp, local, remote):
+    """Uploads the folder local into remote (which must exist)."""
+    for root, dirs, files in os.walk(local):
+        rel = os.path.relpath(root, local)
+        target = remote if rel == "." else remote + "/" + rel.replace(os.sep, "/")
+        try:
+            ftp.sendcmd("MKD " + target)   # (says so when it already exists)
+        except ftplib.error_perm:
+            pass
+        for name in sorted(files):
+            with open(os.path.join(root, name), "rb") as source:
+                ftp.storbinary("STOR %s/%s" % (target, name), source)
+            print(target + "/" + name)
+
+
 def main(argv):
     port = 2121
     if len(argv) > 2 and argv[1] == "--port":
         port = int(argv[2])
         argv = argv[:1] + argv[3:]
-    if len(argv) < 2 or argv[1] not in ("ls", "get", "put", "cmd"):
+    if len(argv) < 2 or argv[1] not in ("ls", "get", "put", "putdir", "cmd"):
         print(__doc__.strip())
         return 2
     ftp = XemuFTP()
@@ -49,6 +66,8 @@ def main(argv):
     elif op == "put":
         with open(args[0], "rb") as source:
             print(ftp.storbinary("STOR " + args[1], source))
+    elif op == "putdir":
+        put_tree(ftp, args[0], args[1].rstrip("/"))
     else:
         print(ftp.sendcmd(" ".join(args)))
     ftp.quit()

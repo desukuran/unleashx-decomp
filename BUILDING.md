@@ -100,6 +100,17 @@ active mode with the address the guest sees the host at (10.0.2.2), so the
 data ports need no forwarding; a normal client in passive mode would need the
 whole `MinPASVPort`..`MaxPASVPort` range forwarded.
 
+To try the game saves manager without real game data,
+`python3 tools/make_test_save.py out` writes a made-up game with three saves
+in the Xbox's format (`UDATA`/`TDATA`, meta files, DXT1 pictures), and
+`python3 tools/xemu_ftp.py putdir out /E` copies it to the hard disk.
+
+To boot UnleashX as the dashboard with no disc, upload `default.xbe` as
+`C:\xboxdash.xbe`, with `Config.xml`, the language files and `Skins` from
+`assets/disc/` next to it, then eject the disc from xemu's Machine menu and
+reset. (Ejecting through the monitor removes the image without telling the
+SMC, so UnleashX keeps reporting a disc of unknown type.)
+
 **A modded console**: run `default.xbe` from the hard disk (FTP it to, say,
 `E:\Apps\UnleashX\` with the XML files and `Skins` from `assets/disc/`), or
 burn the disc image. As a dashboard, it replaces your current one the usual
