@@ -57,7 +57,9 @@ LIBRARIES = [
     # Attribution only (no source to match).
     ('fat32', 'the FAT32 USB driver (src/thirdparty/Fat32.h)', [], [(0x6A400, 0x6E184)], [], ('Fat32',)),
     ('xdksample', 'the XDK samples framework (XBApp, XBFont, XBMesh, XBMemUnit, XBStorageDevice, XBSound, '
-                  'XBUtil, XBInput)', [], [(0x93000, 0x9A000)], [],
+                  'XBUtil, XBInput); the XDK\'s Samples/Common/Src, a later version than the one linked in '
+                  '(in reference/Samples)',
+     ['../Samples/Common/Src/xb*.cpp', '../Samples/Common/Include/xb*.h'], [(0x93000, 0x9A000)], [],
      ('CXBApplicationEx::', 'CXBMesh::', 'CXBMemUnit::', 'CXBStorageDevice::', 'CXBFont::', 'CSound::',
       'XBUtil_', 'XBInput_', 'CXBPackedResource::', 'CXBStopWatch::')),
 ]

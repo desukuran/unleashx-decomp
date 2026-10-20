@@ -435,7 +435,7 @@ void CSongListControl::UpdatePlayingTime(UINT index)
 		return;
 	s_dwNextUpdate = GetTickCount() + 2000;
 	DWORD length;
-	g_pMusicManager->GetSongInfo(NULL, NULL, &length);
+	g_pMusicManager->GetCurrentInfo(NULL, NULL, &length);
 	if (length == SONG_LENGTH_UNKNOWN)
 		return;
 	// Quirk: index is the song's index, used as the line number.

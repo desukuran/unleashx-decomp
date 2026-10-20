@@ -96,7 +96,7 @@ public:
 	int GetState() const { return m_nState; }                // 0x00105FCE (this in eax) MusicState
 	// The playing stream's format, NULL when stopped. (this in eax)
 	SSongFormat *GetSongFormat();                            // 0x00105FD5
-	float GetSongPosition();                                 // 0x00106017 (this in eax) seconds
+	float GetPlaybackPosition();                                 // 0x00106017 (this in eax) seconds
 	// The soundtracks after the CD and Media Player. (this in eax)
 	UINT GetUserSoundtrackCount();                           // 0x00105FEC
 	// The user soundtrack index (after the CD and Media Player), NULL past
@@ -111,7 +111,7 @@ public:
 	// Names of the soundtrack and song and the song length (ms); any can be
 	// NULL. Quirk: until the length is known the call only asks the player
 	// (and updates Info.xml) without filling them in. (this in eax)
-	HRESULT GetSongInfo(wchar_t *soundtrack, wchar_t *song, DWORD *length);   // 0x00106FA9
+	HRESULT GetCurrentInfo(wchar_t *soundtrack, wchar_t *song, DWORD *length);   // 0x00106FA9
 	// Renames a music-folder soundtrack (saved in Info.xml). (this in edi,
 	// index in ecx)
 	BOOL SetSoundtrackTitle(UINT index, const char *title);  // 0x00106EF1

@@ -144,7 +144,7 @@ UINT CMusicManager::GetUserSoundtrackCount()
 }
 
 // 0x00106017
-float CMusicManager::GetSongPosition()
+float CMusicManager::GetPlaybackPosition()
 {
 	if (m_pPlayer != NULL)
 		return m_pPlayer->GetPosition();
@@ -481,7 +481,7 @@ BOOL CMusicManager::SetSoundtrackTitle(UINT index, const char *title)
 }
 
 // 0x00106FA9
-HRESULT CMusicManager::GetSongInfo(wchar_t *soundtrack, wchar_t *song, DWORD *length)
+HRESULT CMusicManager::GetCurrentInfo(wchar_t *soundtrack, wchar_t *song, DWORD *length)
 {
 	if (m_pPlayer == NULL)
 		return E_FAIL;
@@ -606,7 +606,7 @@ HRESULT CMusicManager::PlaySong(UINT index, BOOL shuffled)
 		memset(m_szSong, 0, sizeof(m_szSong));
 		if (hr >= 0)
 		{
-			GetSongInfo(NULL, NULL, NULL);
+			GetCurrentInfo(NULL, NULL, NULL);
 			m_bNewSoundtrack = FALSE;
 			m_dwNextCheck = GetTickCount() + 2000;
 			if (m_nSoundtrack == SOUNDTRACK_MEDIA_PLAYER)
@@ -1006,7 +1006,7 @@ unsigned CMusicManager::Run()
 	m_pPlayer->Process();
 	BOOL stopped = FALSE;
 	Sleep(100);
-	GetSongInfo(NULL, NULL, NULL);
+	GetCurrentInfo(NULL, NULL, NULL);
 	while (!m_bTerminate && !stopped && WaitForSingleObject(m_hWakeEvent, 40) != WAIT_OBJECT_0)
 	{
 		switch (GetState())

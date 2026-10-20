@@ -39,9 +39,9 @@ void XKEEPROM::GetHDKeyString(char *key, DWORD *length) { strcpy(key, "000000000
 
 // MusicManager.h
 CMusicManager *g_pMusicManager = NULL;
-HRESULT CMusicManager::GetSongInfo(wchar_t *, wchar_t *, DWORD *) { return E_FAIL; }
+HRESULT CMusicManager::GetCurrentInfo(wchar_t *, wchar_t *, DWORD *) { return E_FAIL; }
 SSongFormat *CMusicManager::GetSongFormat() { return NULL; }
-float CMusicManager::GetSongPosition() { return 0.0f; }
+float CMusicManager::GetPlaybackPosition() { return 0.0f; }
 
 // FileOps.h
 void ZipFiles(const char *source, const char *zipFile, int) { printf("[stub] ZipFiles(%s, %s)\n", source, zipFile); }

@@ -34,8 +34,11 @@ struct XBGAMEPAD : public SGamepadState
 	BOOL bLastAnalogButtons[8];        // +0x28
 	WORD wPressedButtons;              // +0x48
 	BOOL bPressedAnalogButtons[8];     // +0x4C
-	int nAction;                       // +0x6C 1-14: an action to report (see CGamepadInput::GetAction). TODO: verify (who sets it)
-	BYTE unknown70[0xD4 - 0x70];
+	// A cooked event (the samples' XBGAMEPAD_EVENT): 1 START, 2 BACK, 3-8 A B
+	// X Y BLACK WHITE, 9-12 the d-pad, 13-14 the triggers. Reported as
+	// actions by CGamepadInput::GetAction.
+	int nAction;                       // +0x6C
+	BYTE unknown70[0xD4 - 0x70];       // +0x70 Rumble, Feedback, caps
 	HANDLE hDevice;                    // +0xD4 NULL = no gamepad in the port
 	BOOL bInserted;                    // +0xD8
 	BOOL bRemoved;                     // +0xDC
@@ -78,7 +81,7 @@ void XBInput_RefreshDeviceList(XBGAMEPAD *gamepads);              // 0x00098943 
 void XBInput_GetInput(XBGAMEPAD *gamepads);                       // 0x00098B11
 HRESULT XBInput_CreateIR_Remotes(SIRRemote **remotes);            // 0x0009888E
 void XBInput_GetIR_RemoteInput(SIRRemote *remotes, float time);   // 0x000986B9
-HRESULT XBInput_CreateKeyboard(SKeyboardState **keyboards);       // 0x000985AA (the debug keyboard queue)
+HRESULT XBInput_InitDebugKeyboard(SKeyboardState **keyboards);    // 0x000985AA (the samples' DebugKeyboard)
 HRESULT XBInput_GetKeyboardInput(SKeystroke *keystroke);          // 0x00098478
 
 // A USB mouse on a controller port (the debug mouse). 0x30 bytes.
@@ -99,7 +102,9 @@ struct SMouseState
 	DWORD dwLastTime;                  // +0x2C
 };
 extern SMouseState g_mice[4];                     // 0x00272170
-// Reads the mice; the ports with new data as bits. (Library code.)
+// Reads the mice; the ports with new data as bits. The XDK's DebugMouse
+// sample (Input/DebugMouse/mouse.cpp) extended with the connected flag,
+// insert/remove tracking and the 180 ms double click. (Library code.)
 DWORD XBInput_GetMouseInput();                    // 0x000972F6
 // Whether a mouse is plugged in (as of the last read).
 BOOL XBInput_IsMouseConnected();                  // 0x000972F0

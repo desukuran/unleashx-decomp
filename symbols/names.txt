@@ -486,9 +486,9 @@
 00091ae6 XKEEPROM::Decrypt
 # music
 0027622c g_pMusicManager
-00106fa9 CMusicManager::GetSongInfo
+00106fa9 CMusicManager::GetCurrentInfo
 00105fd5 CMusicManager::GetSongFormat
-00106017 CMusicManager::GetSongPosition
+00106017 CMusicManager::GetPlaybackPosition
 # newsfeed
 00021409 CNewsfeed::GetUrl
 001381b3 CNewsfeed::GetContent
@@ -2454,7 +2454,7 @@
 00098b11 XBInput_GetInput
 0009888e XBInput_CreateIR_Remotes
 000986b9 XBInput_GetIR_RemoteInput
-000985aa XBInput_CreateKeyboard
+000985aa XBInput_InitDebugKeyboard
 00098478 XBInput_GetKeyboardInput
 # leftovers with callers
 # (the HDD password from XboxHDKey and the drive's model and serial numbers; LockHdd/UnlockHdd)
@@ -2470,7 +2470,7 @@
 # multibyte strrchr (lead-byte table). TODO: verify
 00072e3e MbsFindLastChar
 # XMV: the shared open (textures, audio)
-0008f34c CXMVPlayer::OpenCommon
+0008f34c CXMVPlayer::FinishOpeningFile
 # COptionMenu / CDropDown (src/ui/OptionMenu.cpp, DropDown.cpp)
 000ae9ad COptionMenu::Create
 000ae6f1 COptionMenu::ProcessInput
@@ -2579,3 +2579,49 @@
 000972f6 XBInput_GetMouseInput
 000972f0 XBInput_IsMouseConnected
 000fd323 CSkin::CSkin
+# XDK samples Common framework, matched by hand against reference/Samples/Common/Src
+000930b9 XBUtil_DebugPrint
+00093333 XBUtil_GetCubeMapViewMatrix
+000934ad XBUtil_CreatePixelShader
+00093533 XBUtil_CreateVertexShader
+000935e3 XBUtil_CreateTexture
+00093623 XBUtil_InitLight
+000936af XBUtil_EvaluateCatmullRom
+000938dc XBUtil_EvaluateHermite
+00093a92 XBUtil_DumpSurface
+00093ba0 XBUtil_CreateNormalizationCubeMap
+00093dd8 XBUtil_RenderSpline
+00093f1d XBUtil_GetSplinePoint
+00094375 CXBStorageDevice::FindNextSaveGame
+00094384 CXBStorageDevice::FindFirstSaveGame
+000943db CXBStorageDevice::IsValid
+000944cd CXBStorageDevice::GetSavedGameCount
+0009451c CXBStorageDevice::GetSize
+000946a5 CWaveFile::Close
+000946b6 CWaveFile::Close_thunk
+000946bb CRiffChunk::ReadData
+00094715 CRiffChunk::Open
+000947ad CRiffChunk::Initialize
+000947c0 CRiffChunk::CRiffChunk
+00094acd CXBSound::Create_format
+00094b5a CWaveFile::GetLoopRegion
+00094c18 CWaveFile::GetFormat
+00094c64 CWaveFile::Open
+00094d71 CWaveFile::CWaveFile
+00094d9f XBSound_DrawLevelMeters
+00094fe2 CWaveFile::GetLoopRegionBytes
+000950ad CWaveFile::ReadSample
+000950e0 XBSound_DrawLevelMeters_dsound
+0009726f CXBPackedResource::GetData
+000972c7 XBResource_SizeOf
+0009748a XBInput_InitDebugMouse
+00097560 UnionBox
+00097890 CXBMesh::ComputeMeshBoundingBox
+00097914 CXBMesh::ComputeFrameBoundingBox
+00097a22 CXBMesh::ComputeBoundingBox
+00097aaf CXBMesh::ComputeMeshRadius
+00097b20 CXBMesh::ComputeFrameRadius
+00097be8 CXBMesh::ComputeRadius
+00097c6c CXBMesh::WriteToXBG
+00099391 CXBFont::CreateTexture
+000995c7 CXBFont::CreateShaders

@@ -147,7 +147,7 @@ void CAudioGUI::DrawButton(IDirect3DTexture8 *texture, UINT id, float x, float y
 			g_pd3dDevice->SetTexture(0, NULL);
 			return;
 		}
-		float position = g_pMusicManager->GetSongPosition() / (float)format->duration;
+		float position = g_pMusicManager->GetPlaybackPosition() / (float)format->duration;
 		if (position > 1.0f)
 			position = 1.0f;
 		DrawMapBar(x, y, width, height, 0.75f, 0.875f, position, direction);

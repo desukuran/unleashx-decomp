@@ -403,7 +403,7 @@ static BOOL UpdateSongTexts()
 	wchar_t text[101];
 	wchar_t song[100];
 	memset(song, 0, sizeof(song));
-	g_pMusicManager->GetSongInfo(text, song, NULL);
+	g_pMusicManager->GetCurrentInfo(text, song, NULL);
 	SetText(TEXT_SOUNDTRACK, text);
 	SetText(TEXT_SONGNAME, song);
 	swprintf(text, 101, L"%ls - %ls", s_textCache[TEXT_SOUNDTRACK].c_str(), s_textCache[TEXT_SONGNAME].c_str());
@@ -872,7 +872,7 @@ const wchar_t *GetSkinTextValue(int source)
 		if (g_pMusicManager == NULL)
 			return L"";
 		{
-			float position = g_pMusicManager->GetSongPosition();
+			float position = g_pMusicManager->GetPlaybackPosition();
 			if (position == 0.0f)
 				text[0] = 0;
 			else
