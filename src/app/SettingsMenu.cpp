@@ -72,7 +72,7 @@ HRESULT CSettingsMenu::Init(CXBFont *font)
 		{
 			m_pFont = font;
 			std::string file = g_pSettings->m_strDataPath;
-			StrReplaceAll(file, "E:\\UDATA\\", "U:\\");
+			StrReplaceAll(file, "U:\\", "E:\\UDATA\\");
 			file.append("CtlPanel.xpr");
 			if (FAILED(m_resource.Create(file.c_str(), 0, NULL)))
 			{

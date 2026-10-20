@@ -670,9 +670,9 @@ void CSkin::ParseImages(CXmlElement *parent, const char *tag, std::vector<SSkinI
 			memset(&info, 0, sizeof(info));
 			if (!LoadTextureFromFile(source.c_str(), g_pd3dDevice, &texture, width, height, &info))
 			{
-				// Kept as a file name; U:\ is the dashboard's UDATA folder.
+				// Kept as a file name, with U:\ spelled out as the full path.
 				texture = NULL;
-				StrReplaceAll(source, "E:\\UDATA\\9e115330\\", "U:\\");
+				StrReplaceAll(source, "U:\\", "E:\\UDATA\\9e115330\\");
 			}
 			else if (info.width != 0)
 			{
@@ -1209,7 +1209,7 @@ BOOL CSkin::Parse(CXmlDocument *doc)
 	if (element != NULL)
 	{
 		if (GetSkinFile(this, element->FindFirstChild("BackGround"), m_strFileManagerBackground))
-			StrReplaceAll(m_strFileManagerBackground, "E:\\UDATA\\9e115330\\", "U:\\");
+			StrReplaceAll(m_strFileManagerBackground, "U:\\", "E:\\UDATA\\9e115330\\");
 		if (IsFalseString(element->GetAttribute("SafeBorder").c_str()))
 			m_bFileManagerSafeBorder = FALSE;
 		m_bFileManagerDrawBorder = IsTrueString(element->GetAttribute("DrawBorder").c_str());
@@ -1240,7 +1240,7 @@ BOOL CSkin::Parse(CXmlDocument *doc)
 				value = ResolveFile(value.c_str());
 				std::string &target = EndsWithVideo(value) ? m_strLoadingPreview : m_strLoadingBackground;
 				target = ResolveFile(value.c_str());
-				StrReplaceAll(target, "E:\\UDATA\\9e115330\\", "U:\\");
+				StrReplaceAll(target, "U:\\", "E:\\UDATA\\9e115330\\");
 			}
 		}
 	}
