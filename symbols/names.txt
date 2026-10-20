@@ -2228,7 +2228,7 @@
 000d8ad8 CWMAPlayer::UpdateSongInfo
 000d85b8 XactCallback
 00278d54 s_dwPlayListSong
-00092b01 LoadFileToMemory
+00092b01 XBUtil_LoadFile
 0002db07 IXACTSoundBank_Play HRESULT f(void *bank, DWORD cueIndex, void *source, void **cue, DWORD flags@eax)
 0006e184 CAudioDecoder::CAudioDecoder
 0006ed7c CAudioDecoder::~CAudioDecoder
@@ -2625,3 +2625,15 @@
 00097c6c CXBMesh::WriteToXBG
 00099391 CXBFont::CreateTexture
 000995c7 CXBFont::CreateShaders
+# XDK samples xmvhelper (Video/XMVCompare/xmvhelper.cpp): its packet callbacks and the unused packet opener
+0008efe1 XMVHelper_ReleasePreviousMemoryPacket
+0008f000 XMVHelper_GetNextMemoryPacket
+0008f060 XMVHelper_ReleasePreviousPacket
+0008f0e2 XMVHelper_GetNextPacket
+0008f593 CXMVPlayer::OpenFileForPackets
+00092c38 XBUtil_DeclaratorFromFVF
+00092d53 XBUtil_SwizzleTexture3D
+00092dbe XBUtil_SwizzleTexture2D
+00092e21 XBUtil_UnswizzleTexture3D
+00092e8c XBUtil_UnswizzleTexture2D
+00092f34 XBUtil_Timer

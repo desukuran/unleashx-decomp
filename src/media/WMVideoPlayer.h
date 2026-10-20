@@ -62,8 +62,13 @@ public:
 	CAppSettings *m_pSettings;             // +0x17C
 };
 
-// The XDK samples' xmvhelper CXMVPlayer (the XMV decoder). Library code.
-// 0x98 bytes. TODO: verify the method names
+// The XDK samples' xmvhelper CXMVPlayer (Video/XMVCompare/xmvhelper.cpp),
+// modified by UnleashX: the first 0x10 bytes are its additions (settings,
+// the audio stream kept for the music volume, the audio and loop switches;
+// a finished movie restarts when looping), and the device argument and
+// member are gone. Library code otherwise. 0x98 bytes. Its packet callbacks
+// are named XMVHelper_* in names.txt; OpenFileForPackets (0x0008F593) is
+// linked in but unused.
 class CXMVPlayer
 {
 public:
@@ -78,16 +83,28 @@ public:
 	// (this in eax, loop in cl)
 	void SetLoop(BOOL loop);                              // 0x00031B85
 
-	BYTE m_unknown00[8];                   // +0x00
-	BOOL m_bHasAudio;                      // +0x08
-	bool m_bAudio;                         // +0x0C
-	bool m_bLoop;                          // +0x0D
-	BYTE m_unknown0E[6];
+	CAppSettings *m_pSettings;             // +0x00 (UnleashX)
+	void *m_pAudioStream;                  // +0x04 IDirectSoundStream: audio stream 0, for its volume (UnleashX)
+	BOOL m_bHasAudio;                      // +0x08 the file has audio streams (UnleashX)
+	bool m_bAudio;                         // +0x0C play the audio (UnleashX)
+	bool m_bLoop;                          // +0x0D (UnleashX)
+	void *m_pXMVDecoder;                   // +0x10 XMVDecoder
+	// XMVVIDEO_DESC
 	DWORD m_dwWidth;                       // +0x14
 	DWORD m_dwHeight;                      // +0x18
-	BYTE m_unknown1C[0x38];
+	DWORD m_dwFramesPerSecond;             // +0x1C
+	DWORD m_dwAudioStreamCount;            // +0x20
+	BYTE m_AudioDesc[0x14];                // +0x24 XMVAUDIO_DESC
+	IDirect3DTexture8 *m_pTextures[2];     // +0x38
+	DWORD m_nDecodeTextureIndex;           // +0x40
+	IDirect3DTexture8 *m_pShowingTexture;  // +0x44
+	IDirect3DTexture8 *m_pDecodingTexture; // +0x48
+	IDirect3DTexture8 *m_pSubmittedTexture;   // +0x4C
+	int m_dwCurrentFrame;                  // +0x50 -1 before the first
 	BOOL m_bPlaying;                       // +0x54
-	BYTE m_unknown58[0x40];
+	BOOL m_bOverlaysEnabled;               // +0x58
+	BYTE m_loadContext[0x38];              // +0x5C LOAD_CONTEXT (file handle +0x6C, memory buffer +0x84)
+	BYTE *m_physicalBuffer;                // +0x94
 };
 
 // A video. Modal (the file manager's viewer: in a window with its name and

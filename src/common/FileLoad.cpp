@@ -1,4 +1,6 @@
-// LoadFileToMemory (Xbox only: unbuffered, overlapped reads). See
+// XBUtil_LoadFile, the XDK samples' whole-file loader (XBUtil.cpp; Xbox
+// only: unbuffered, overlapped reads). Library code, but kept as source
+// since the WMA player and CXMVPlayer::OpenMovieFromMemory use it. See
 // FileUtil.h.
 #include "FileUtil.h"
 
@@ -14,7 +16,7 @@
 #define ERROR_IO_PENDING 997
 
 // 0x00092B01
-HRESULT LoadFileToMemory(const char *path, void **data, DWORD *size)
+HRESULT XBUtil_LoadFile(const char *path, void **data, DWORD *size)
 {
 	if (path == NULL || data == NULL)
 		return E_INVALIDARG;

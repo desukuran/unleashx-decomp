@@ -95,7 +95,7 @@ HRESULT CWMAPlayer::Init(const char *path)
 	if (FAILED(XACTEngineCreate(&params, &m_pEngine)))
 		return E_FAIL;
 	DWORD size;
-	if (FAILED(LoadFileToMemory(path, &m_pSoundBankData, &size)))
+	if (FAILED(XBUtil_LoadFile(path, &m_pSoundBankData, &size)))
 		return E_FAIL;
 	if (FAILED(IXACTEngine_CreateSoundBank(m_pEngine, m_pSoundBankData, size, &m_pSoundBank)) ||
 	    FAILED(IXACTSoundBank_GetSoundCueIndexFromFriendlyName(m_pSoundBank, "Cue1", &m_dwCueIndex)))

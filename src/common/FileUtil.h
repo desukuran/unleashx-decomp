@@ -14,10 +14,10 @@ std::string ReadTextFile(const char *path);                         // 0x000A374
 // read as ReadTextFile does. Quirk: a file under 2 bytes reads as "".
 // (The XDK's TitleMeta.xbx and SaveMeta.xbx.)
 std::string ReadMetaFile(const char *path);                         // 0x000A446C
-// A whole file in memory (FileLoad.cpp; malloc'd, the size rounded up to 2 KB; size
+// A whole file in memory: the XDK samples' XBUtil_LoadFile (FileLoad.cpp; malloc'd, the size rounded up to 2 KB; size
 // gets the bytes read). An HRESULT, or the Win32 error code on a failed
 // read.
-HRESULT LoadFileToMemory(const char *path, void **data, DWORD *size);   // 0x00092B01
+HRESULT XBUtil_LoadFile(const char *path, void **data, DWORD *size);   // 0x00092B01
 HRESULT GetDriveDevicePath(char drive, std::string &devicePath);    // 0x000A3D25
 std::string GetXbePath();                                           // 0x000A3934
 

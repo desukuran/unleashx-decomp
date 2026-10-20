@@ -15,8 +15,13 @@ How videos play (`CWMVideoPlayer`, `src/media/WMVideoPlayer.cpp`).
 Only `.wmv` and `.xmv` files are accepted, and the whole path must be at
 least 8 characters long. WMV files go through the XDK WMV sample's player
 (WMVDEC), decoded into two textures that take turns. XMV files go through
-the XDK samples' `CXMVPlayer` (xmvhelper). Both are library code and aren't
-reconstructed. The frames are YUY2 and drawn with YUV enabled.
+the XDK samples' `CXMVPlayer` (xmvhelper, as in the XMVCompare sample).
+Both are library code and aren't reconstructed. UnleashX changed
+`CXMVPlayer` a little: it can switch the movie's sound off, keeps the first
+audio stream's DirectSound stream (with 5.1 on, a mono or stereo one is
+set to the music volume with 0x4B0 headroom; the 5.1 speaker mix bins are
+looked up for this but never passed to the decoder),
+loops by resetting the decoder at the end, and has no device argument. The frames are YUY2 and drawn with YUV enabled.
 
 ## The file manager's viewer
 

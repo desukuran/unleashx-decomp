@@ -657,8 +657,19 @@
 0006de03 fat32_sub_0006de03
 0006dede fat32_sub_0006dede
 #
-# xdksample: the XDK samples framework (XBApp, XBFont, XBMesh, XBMemUnit, XBStorageDevice, XBSound, XBUtil, XBInput); the XDK's Samples/Common/Src, a later version than the one linked in (in reference/Samples)
+# xdksample: the XDK samples framework (XBApp, XBFont, XBMesh, XBMemUnit, XBStorageDevice, XBSound, XBUtil, XBInput, xmvhelper); the XDK's Samples/Common/Src, a later version than the one linked in (in reference/Samples)
 0003201e xdksample_sub_0003201e
+0008efe1 XMVHelper_ReleasePreviousMemoryPacket
+0008f000 XMVHelper_GetNextMemoryPacket
+0008f060 XMVHelper_ReleasePreviousPacket
+0008f0e2 XMVHelper_GetNextPacket
+0008f34c CXMVPlayer::FinishOpeningFile
+00092c38 XBUtil_DeclaratorFromFVF
+00092d53 XBUtil_SwizzleTexture3D
+00092dbe XBUtil_SwizzleTexture2D
+00092e21 XBUtil_UnswizzleTexture3D
+00092e8c XBUtil_UnswizzleTexture2D
+00092f34 XBUtil_Timer
 00093025 XBUtil_FindMediaFile
 000930b9 XBUtil_DebugPrint
 00093333 XBUtil_GetCubeMapViewMatrix
