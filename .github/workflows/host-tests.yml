@@ -1,0 +1,12 @@
+# The host build and tests (no XDK needed): syntax checks of the Xbox-only
+# files and the test programs.
+name: host tests
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y xorriso
+      - run: make check
+      - run: make test

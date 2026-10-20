@@ -1,5 +1,5 @@
-# Host build of the portable modules, for syntax checks and tests.
-# (The real target is an Xbox XBE built with the XDK; not set up yet.)
+# Host build of the portable modules, for syntax checks and tests. The
+# Xbox build is Makefile.xbox (or "make xbox XDK=..." / "make xiso XDK=...").
 CXX ?= g++
 # The original deletes some polymorphic objects through classes without a
 # virtual destructor (CXBFont, CMusicManager); that's kept on purpose.
@@ -92,4 +92,10 @@ endif
 		build/iso9660_test build/testdisc.iso; else echo "(iso9660_test skipped: no xorriso)"; fi
 	@echo ok
 
-.PHONY: all test check
+# The Xbox build lives in Makefile.xbox; these pass XDK= and the rest on.
+xbox:
+	$(MAKE) -f Makefile.xbox all
+xiso:
+	$(MAKE) -f Makefile.xbox xiso
+
+.PHONY: all test check xbox xiso

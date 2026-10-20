@@ -7,7 +7,8 @@ the [README](README.md)).
 ## What you need
 
 * **The Xbox XDK**, build 5933 (the one UnleashX was built with; nearby 5xxx
-  builds should work too). It isn't included. Either an installed one
+  builds should work too: the XDK 5788 headers and libraries also build
+  cleanly). It isn't included. Either an installed one
   (`C:\Program Files\Microsoft Xbox SDK`, with `xbox\bin`, `xbox\include`,
   `xbox\lib`) or a copy of that folder anywhere, or a flat copy of `bin`,
   `include` and `lib`. Only its compiler (`bin\vc71`), `imagebld`, headers
@@ -28,8 +29,12 @@ make -f Makefile.xbox XDK=/path/to/xdk info     # check what it found
 make -f Makefile.xbox XDK=/path/to/xdk -j4 xiso
 ```
 
+(`make xiso XDK=...` and `make xbox XDK=...` from the main Makefile do the
+same.)
+
 Instead of `XDK=` you can set the `XDK` environment variable, or put the
-XDK (or a symlink to it) at `./xdk`.
+XDK (or a symlink to it) at `./xdk`; do that if its path has spaces,
+which make can't handle.
 
 Outputs, in `build/xbox/`:
 
@@ -56,8 +61,14 @@ rerun that after adding or removing files, or changing the zips in
 `assets/`.
 
 **GNU make**: from an MSYS2 or Git Bash shell, the same command as above
-runs the XDK's tools directly (no Wine):
-`make -f Makefile.xbox XDK="/c/Program Files/Microsoft Xbox SDK" -j4 xiso`.
+runs the XDK's tools directly (no Wine). Make can't handle spaces in paths,
+so link the XDK into the repository first (a junction, from `cmd`):
+
+```bat
+mklink /J xdk "C:\Program Files\Microsoft Xbox SDK"
+```
+
+and then just `make -f Makefile.xbox -j4 xiso`.
 
 ## Running it
 
