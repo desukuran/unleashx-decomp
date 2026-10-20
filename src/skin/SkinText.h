@@ -35,3 +35,12 @@ const wchar_t *GetNewsText();                      // 0x00114655
 // Set once the news ticker has started (the network thread starts
 // downloading feeds then).
 extern BOOL g_bNewsStarted;                        // 0x00276244
+
+// Unused (nothing makes one): its constructor and destructor empty the
+// text cache; the destructor also frees the news text. (SkinText.cpp)
+class CInfoCenter
+{
+public:
+	CInfoCenter();             // 0x0011468E (this in esi)
+	virtual ~CInfoCenter();    // 0x00114664 (deleting 0x00021474)
+};

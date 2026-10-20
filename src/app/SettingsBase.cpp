@@ -137,7 +137,7 @@ BOOL CSettingsBase::IsOpen()
 	return !m_bClosed;
 }
 
-// 0x000204C8
+// 0x000204C8 (also 0x0002341A, a copy with index in eax and this in edi)
 void CSettingsBase::SetItemEnabled(int index, BOOL enabled)
 {
 	if (!m_items[index].m_bHeader)

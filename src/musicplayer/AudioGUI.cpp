@@ -403,7 +403,7 @@ void CAudioGUI::ShowBrowser(BOOL files)
 {
 	if (m_pBrowser == NULL)
 	{
-		m_pBrowser = new CFileBrowser;
+		m_pBrowser = new CFileBrowser(TRUE);
 		if (m_pBrowser != NULL)
 			m_pBrowser->Create(m_pFont, NULL);
 		if (m_pBrowser == NULL)

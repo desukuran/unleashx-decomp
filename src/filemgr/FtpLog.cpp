@@ -112,7 +112,7 @@ HRESULT CFTPLog::Init(CXBFont *font)
 	return hr;
 }
 
-// 0x001216B6
+// 0x001216B6 (the vtable slot points at a thunk, 0x0001E736)
 void CFTPLog::Add(const char *text, int type)
 {
 	if (text == NULL)

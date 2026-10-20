@@ -426,6 +426,23 @@ void CSkin::ParseTexts(CXmlElement *parent, const char *tag, std::vector<SSkinTe
 	}
 }
 
+// 0x0002667F (shape in eax)
+static SSkinShape MakeSkinShape(int type, int left, int top, int width, int height, DWORD borderColor,
+                                DWORD backColor, int unknown18, int direction)
+{
+	SSkinShape shape;
+	shape.type = type;
+	shape.direction = direction;
+	shape.unknown18 = unknown18;
+	shape.borderColor = borderColor;
+	shape.backColor = backColor;
+	shape.top = top;
+	shape.left = left;
+	shape.height = height;
+	shape.width = width;
+	return shape;
+}
+
 // 0x000FC526
 // <Shape Type="box|roundedbox|triangle|meter|volume|progress|play|..." Direction
 //        Left Top Width Height BackColor BorderColor zIndex/>
@@ -549,8 +566,7 @@ void CSkin::ParseShapes(CXmlElement *parent, const char *tag, std::vector<SSkinS
 			}
 		}
 
-		SSkinShape shape = { shapeType, direction, left, top, width, height, 1, borderColor, backColor };
-		shapes.push_back(shape);
+		shapes.push_back(MakeSkinShape(shapeType, left, top, width, height, borderColor, backColor, 1, direction));
 		if (order != NULL)
 		{
 			SSkinDrawItem item = { zIndex, (int)shapes.size() - 1, 1 };

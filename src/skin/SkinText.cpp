@@ -1080,3 +1080,20 @@ const wchar_t *GetInfoText(int source)
 	swprintf(line, 150, label, GetSkinTextValue(source));
 	return line;
 }
+
+// 0x0011468E
+CInfoCenter::CInfoCenter()
+{
+	s_textCache.clear();
+}
+
+// 0x00114664
+CInfoCenter::~CInfoCenter()
+{
+	s_textCache.clear();
+	if (s_pszNewsText != NULL)
+	{
+		operator delete(s_pszNewsText);
+		s_pszNewsText = NULL;
+	}
+}

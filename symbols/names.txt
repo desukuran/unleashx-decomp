@@ -428,10 +428,10 @@
 00277830 s_textCache
 0027783c s_pTextSettings
 002761f0 s_pszNewsText
-000214d7 TextCache_At
-00021573 TextCache_Find
-0002154f TextCache_Clear
-00022bd1 TextCache_Init
+000214d7 std::map<int,std::wstring>::operator[]
+00021573 std::map<int,std::wstring>::find
+0002154f std::map<int,std::wstring>::clear
+00022bd1 std::map<int,std::wstring>::map
 00021490 std::wstring::clear
 000190bb std::wstring::assign_cstr
 000a1a7f FormatNumberW
@@ -905,11 +905,11 @@
 000124ad std::wstring::ctor_copy std_wstring * f(std_wstring *self@esi, std_wstring *other)
 000203d8 CSettingItem::CSettingItem CSettingItem * f(CSettingItem *this@edi, std_wstring label, std_wstring value, int type, BOOL header, BOOL enabled, BOOL visible, int value2, BOOL password)
 0002057e std::wstring::ctor_wcstr std_wstring * f(std_wstring *self@esi, wchar_t *s)
-000205d3 SettingItems::push_back void f(std_vector *self@eax, CSettingItem *item)
+000205d3 std::vector<CSettingItem>::push_back
 0002053c CSettingItem::~CSettingItem void f(CSettingItem *this@esi)
 000204e7 CSettingItem::CSettingItem_copy void f(CSettingItem *this@edi, CSettingItem *other@ebx)
-000205bd SettingItems::size int f(std_vector *self@eax)
-000206c9 SettingItems::clear void f(std_vector *self@esi)
+000205bd std::vector<CSettingItem>::size
+000206c9 std::vector<CSettingItem>::clear
 00020499 CSettingsBase::SetTitle void f(CSettingsBase *this@edx, wchar_t *title)
 0002ddfc CSettingsBase::IsSelectedSelectable BOOL f(CSettingsBase *this@eax)
 000204bf CSettingsBase::IsOpen
@@ -2003,7 +2003,7 @@
 0010b6f2 CMenuItemEditor::InstallDownload
 0010be83 CMenuItemEditor::InstallThread
 0010bea5 CMenuItemEditor::Render
-0002341a CSettingsBase::SetItemEnabledAt
+0002341a CSettingsBase::SetItemEnabled_copy
 0026c728 g_hItemInstallThread
 00278d04 g_bItemInstalling
 # menu drawing (src/ui/MenuRender.cpp)
@@ -2466,7 +2466,7 @@
 # first packet slot (of 0x40) that isn't E_PENDING. TODO: verify
 0009b53e CWmvSamplePlayer::FindReadyPacket
 # the view rectangle: saved once from the first viewer, then scaled to the screen
-001184f3 CImageViewer::InitViewRect
+001184f3 CImageViewer::Show
 # multibyte strrchr (lead-byte table). TODO: verify
 00072e3e MbsFindLastChar
 # XMV: the shared open (textures, audio)
@@ -2541,3 +2541,5 @@
 00130b63 CDDACopy::Render
 00130b66 CDDACopy::ProcessInput
 00130b6b CDDACopy::IsOpen
+0011468e CInfoCenter::CInfoCenter
+00020d23 std::sort<SGameEntry*>

@@ -436,3 +436,20 @@ BOOL CImageViewer::Render()
 	                  XBFONT_CENTER_Y | XBFONT_TRUNCATED, m_fWidth - 20.0f);
 	return S_OK;
 }
+
+// 0x001184F3 (this on the stack)
+// Quirk: the area is the first viewer's, unscaled, kept from its first
+// Show; every Show scales that again.
+void CImageViewer::Show()
+{
+	static float s_fY = m_fY;               // 0x00278F80
+	static float s_fX = m_fX;               // 0x00278F7C
+	static float s_fWidth = m_fWidth;       // 0x00278F78
+	static float s_fHeight = m_fHeight;     // 0x00278F74
+	m_fY = s_fY;
+	m_fX = s_fX;
+	m_fWidth = s_fWidth;
+	m_fHeight = s_fHeight;
+	ScaleToScreen(&m_fX, &m_fWidth, &m_fY, &m_fHeight, TRUE);
+	m_bOpen = TRUE;
+}

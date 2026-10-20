@@ -77,6 +77,14 @@ CFileBrowser::CFileBrowser()
 	Reset();
 }
 
+// 0x001279FC (this in eax)
+// The music player's (flag 1): the flag is kept at +0x17C and not read.
+CFileBrowser::CFileBrowser(BOOL flag)
+{
+	Reset();
+	m_unknown17C = flag;
+}
+
 // 0x00127013 (this in edi)
 CFileBrowser::~CFileBrowser()
 {

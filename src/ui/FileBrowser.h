@@ -40,6 +40,7 @@ class CFileBrowser
 {
 public:
 	CFileBrowser();                                       // 0x00127A32 (this in eax)
+	explicit CFileBrowser(BOOL flag);                     // 0x001279FC (this in eax)
 	~CFileBrowser();                                      // 0x00127013 (this in edi)
 	// font: the list's (and the default caption font). Lists the drives
 	// and shows it. E_FAIL without a font; nothing the second time.
@@ -92,7 +93,7 @@ public:
 	BOOL m_bNewFolderItem;                // +0x120 list "[New Folder]"
 	BOOL m_bFolderResult;                 // +0x124 START can pick a folder
 	wchar_t m_szTitle[41];                // +0x128
-	int m_unknown17C;                     // +0x17C
+	BOOL m_unknown17C;                    // +0x17C 1 from the music player's constructor, never read
 
 private:
 	void Reset();                                         // 0x001267B6 (this in esi)

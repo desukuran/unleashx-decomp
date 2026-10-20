@@ -590,3 +590,11 @@ HRESULT CMessageBox::Render()
 	}
 	return S_OK;
 }
+
+// 0x000AF902 (this in esi)
+int CMessageBox::GetChosenButton()
+{
+	if (!m_bCancelled && m_buttons.size() != 0)
+		return m_nSelected;
+	return -1;
+}

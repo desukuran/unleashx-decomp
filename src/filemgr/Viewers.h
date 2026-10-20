@@ -33,7 +33,9 @@ public:
 	virtual BOOL IsOpen() { return m_bOpen; }             // 2 (0x00021387)
 	virtual BOOL Render();                                // 3 (0x001186F3)
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 4 (0x001194AE)
-	virtual void Show() { m_bOpen = TRUE; }               // 5 (0x0002138E)
+	// Opens it over the first viewer's area, scaled. (The slot is a thunk,
+	// 0x0002138E.)
+	virtual void Show();                                  // 5 (0x001184F3)
 	// (path in eax, this on the stack)
 	BOOL Open(const char *path);                          // 0x0011935E
 

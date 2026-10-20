@@ -30,10 +30,7 @@ public:
 	std::string GetUrl(int index);                         // 0x00021409
 	// The downloaded RSS text of the feed with that URL, "" if not (yet) there.
 	std::string GetContent(const char *url);               // 0x001381B3 (result in esi)
-	int GetCount() const                                   // 0x000214C1 (this in eax)
-	{
-		return (int)m_feeds.size();
-	}
+	int GetCount() const { return (int)m_feeds.size(); }   // 0x000214C1 (this in eax)
 
 private:
 	// The feed with that URL (any case), or NULL.
