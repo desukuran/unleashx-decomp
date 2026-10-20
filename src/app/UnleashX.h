@@ -85,8 +85,11 @@ public:
 	class CSkinEvent : public CSkinEventSink
 	{
 	public:
+		virtual void WaitForVerticalBlank();          // slot 1, 0x000E040C
 		virtual void OnSkinLoaded();                  // slot 2, 0x000E5824
 		virtual void DrawImage(int source, int left, int top, int width, int height, float opacity);   // slot 3, 0x000E1838
+		virtual void OnPreviewSoundStart();           // slot 4, 0x000E0538
+		virtual void OnPreviewSoundEnd();             // slot 5, 0x000EA055
 
 		CUnleashX *m_pApp;                            // +0x04
 	};
@@ -207,10 +210,6 @@ BOOL RunBootShortcut(int action);                   // 0x000E87BD
 // Draws the screen the previous program left (captured at startup).
 // Texture.cpp
 void DrawSavedScreen(IDirect3DTexture8 *texture, DWORD width, DWORD height, float alpha);   // 0x0009AEB8
-// Copies what the previous program left on screen into a new 640x480 texture.
-// The picture the previous program (or the boot animation) left on the
-// screen, as a 640x480 texture. (device isn't used.) Texture.cpp
-HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 *device);   // 0x0009F23D
 // Called by the kernel for each thread created/ended. See Startup.cpp.
 void __stdcall ThreadNotifyRoutine(BOOL create);    // 0x000DFF8C
 

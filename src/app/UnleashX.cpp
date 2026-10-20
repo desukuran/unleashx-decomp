@@ -303,6 +303,37 @@ void CUnleashX::CSkinEvent::DrawImage(int source, int left, int top, int width, 
 	DrawTexture(texture, x, y, w, h, opacity, NULL, 0.0f, NULL);
 }
 
+// 0x000E040C
+void CUnleashX::CSkinEvent::WaitForVerticalBlank()
+{
+	g_pd3dDevice->BlockUntilVerticalBlank();
+}
+
+// 0x000E0538
+// The preview's sound replaces the music and the background sound.
+void CUnleashX::CSkinEvent::OnPreviewSoundStart()
+{
+	if (g_pMusicManager != NULL && g_pMusicManager->IsPlaying())
+		g_pMusicManager->Pause();
+	if (g_pApp != NULL)
+		g_pApp->PlayBackgroundSound(FALSE);
+}
+
+// 0x000EA055
+// The music resumes (the background sound only with soundtracks off), or
+// without music the background sound comes back.
+void CUnleashX::CSkinEvent::OnPreviewSoundEnd()
+{
+	if (m_pApp->m_bStartMusic && g_pMusicManager != NULL)
+	{
+		g_pApp->PlayBackgroundSound(g_pSettings->m_audio.m_nSoundTrackMode == 0);
+		g_pMusicManager->Resume();
+		return;
+	}
+	if (g_pApp != NULL)
+		g_pApp->PlayBackgroundSound(TRUE);
+}
+
 // 0x000E5824
 // Applies the skin's <Menu> settings to the menu.
 void CUnleashX::CSkinEvent::OnSkinLoaded()

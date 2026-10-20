@@ -223,7 +223,7 @@ HRESULT CSkin::PollLoad(BOOL *busy)
 		{
 			m_dwPreviewTick = 0;
 			if (m_pEventSink != NULL)
-				m_pEventSink->OnPreviewTimer();
+				m_pEventSink->OnPreviewSoundEnd();
 		}
 		// (Quirk: the busy flag is passed as the input action, so while
 		// loading it reads as A, which would stop a video that doesn't loop.)

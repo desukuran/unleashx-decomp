@@ -2530,3 +2530,7 @@
 0024c150 s_szMasterPassword
 0026d114 s_patchReplace
 0026d124 s_patchFind
+# CUnleashX::CSkinEvent (the skin's callbacks)
+000e040c CUnleashX::CSkinEvent::WaitForVerticalBlank
+000e0538 CUnleashX::CSkinEvent::OnPreviewSoundStart
+000ea055 CUnleashX::CSkinEvent::OnPreviewSoundEnd

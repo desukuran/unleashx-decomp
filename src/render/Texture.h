@@ -38,6 +38,9 @@ void ReleaseTexture(IDirect3DTexture8 *&texture);   // inlined everywhere in the
 // height was cached yet). Either pointer may be NULL. The original takes
 // width in esi and height in edi.
 void GetDisplaySize(float *width, float *height, BOOL refresh);    // 0x0009F14B
+// The picture the previous program (or the boot animation) left on the
+// screen, as a new 640x480 texture. (device isn't used.)
+HRESULT CaptureSavedScreen(IDirect3DTexture8 **texture, IDirect3DDevice8 *device);   // 0x0009F23D
 // A 640x480 copy of the front or back buffer into *texture (released
 // first). (texture in eax)
 HRESULT CaptureBackBuffer(IDirect3DTexture8 **texture, BOOL backBuffer);   // 0x0009F19C

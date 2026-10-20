@@ -206,13 +206,16 @@ class CSkinEventSink
 {
 public:
 	virtual void Unknown0();                 // slot 0
-	virtual void Unknown1();                 // slot 1
+	// Before a skin change. (CSkinEvent: D3DDevice_BlockUntilVerticalBlank)
+	virtual void WaitForVerticalBlank();     // slot 1
 	virtual void OnSkinLoaded();             // slot 2 (+0x08)
 	// An <Image> without a picture of its own: source 1 the highlighted
 	// item's icon, 2 the preview video, 3 the album art.
 	virtual void DrawImage(int source, int left, int top, int width, int height, float opacity);   // slot 3
-	virtual void Unknown4();                 // slot 4
-	virtual void OnPreviewTimer();           // slot 5 (+0x14)
+	// A preview video with sound started: the music pauses.
+	virtual void OnPreviewSoundStart();      // slot 4 (+0x10)
+	// The preview stopped (a moment ago): the music goes on.
+	virtual void OnPreviewSoundEnd();        // slot 5 (+0x14)
 };
 
 // size 0x6BC
@@ -234,17 +237,22 @@ public:
 	// Whether a preview video is playing (keeps the background sound off).
 	BOOL IsPreviewPlaying() const;                    // 0x000F9145
 	// The preview video between its area and full screen. (this in ecx)
-	void TogglePreviewFullScreen();                   // 0x000F90E6 TODO: decompile
+	void TogglePreviewFullScreen();                   // 0x000F90E6 (SkinPreview.cpp)
 	// Pauses or resumes the preview video (and its sound). (playing in eax,
 	// this in ecx)
-	void SetPreviewPlaying(BOOL playing);             // 0x000FFDAA TODO: decompile
+	void SetPreviewPlaying(BOOL playing);             // 0x000FFDAA
 	// Plays file in the <Menu><Preview> area (NULL or "" stops it).
-	void PlayPreview(const char *file);               // 0x000FD563 TODO: decompile
+	// (this in esi, file in ebx)
+	void PlayPreview(const char *file);               // 0x000FD563
 	void BeginLoad(const char *path);                 // 0x00101743
 	// Switches skins: stops the videos, keeps a picture of the screen for
 	// the loading screen and starts BeginLoad (NULL = the default skin).
 	// (this in eax)
-	void ChangeSkin(const char *path);                // 0x001017DE TODO: decompile
+	void ChangeSkin(const char *path);                // 0x001017DE
+	// Copies of the loading screen's video and background names. (this in
+	// eax)
+	std::string GetLoadingPreview() const { return m_strLoadingPreview; }        // 0x000F997B
+	std::string GetLoadingBackgroundName() const { return m_strLoadingBackground; }   // 0x000F9991
 	// Copies the skin's UXSplash next to the dashboard's data
 	// (E:\UDATA\...\Splash.jpg), for the next boot. (this in eax)
 	BOOL SaveSplashForBoot();                         // 0x000F9D63
@@ -306,7 +314,7 @@ public:
 	BOOL m_bOwnMenuFont;                // +0x2F4 m_pMenuFont was created here
 	BOOL m_bOwnInfoFont;                // +0x2F8
 	BOOL m_bPreviewPlaying;             // +0x2FC
-	int m_unknown300;                   // +0x300
+	BOOL m_bPreviewToggled;             // +0x300 flipped by TogglePreviewFullScreen; the video gets SetFullScreen(!this)
 	SSkinRect m_rcMenu;                 // +0x304 <Main><Menu><Position>
 	int m_nBorderWidth;                 // +0x314 <BorderColor Width=...> 2..9
 	DWORD m_dwBorderColor;              // +0x318
