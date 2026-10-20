@@ -16,3 +16,7 @@ reference/
 # The XDK (yours; see BUILDING.md)
 /xdk
 /xdk-wmv
+
+# Local assistant notes
+CLAUDE.md
+.claude/
