@@ -1635,3 +1635,40 @@ HRESULT CFTPConnection::BoostReceiveUnbuffered()
 		Reply(226, "Ending Boost Mode. Transfer Complete.");
 	return hr;
 }
+
+// An unused writer for one 1 MB buffer (left from an earlier boost mode).
+struct SBufferedWrite
+{
+	BYTE *buffer;      // +0x00
+	DWORD size;        // +0x04 the bytes to write
+	HANDLE file;       // +0x08
+	DWORD error;       // +0x0C the last write's
+	BOOL idle;         // +0x10 waiting for the next buffer
+	BOOL stop;         // +0x14
+	HANDLE event;      // +0x18 set when the buffer is full (or to stop)
+};
+
+// 0x000B3B9D (write in esi; nothing starts it, so it isn't static here)
+DWORD FtpBufferedWriterThread(SBufferedWrite *write);
+DWORD FtpBufferedWriterThread(SBufferedWrite *write)
+{
+	if (write == NULL)
+		return 1;
+	for (;;)
+	{
+		write->idle = TRUE;
+		WaitForSingleObject(write->event, INFINITE);
+		if (write->stop)
+			return 0;
+		DWORD written = 0;
+		write->idle = FALSE;
+		if (!WriteFile(write->file, write->buffer, write->size, &written, NULL))
+		{
+			write->idle = TRUE;
+			write->error = GetLastError();
+			return write->error;
+		}
+		memset(write->buffer, 0, kBoostBufferSize);
+		write->error = 0;
+	}
+}

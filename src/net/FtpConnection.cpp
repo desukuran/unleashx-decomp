@@ -699,7 +699,7 @@ HRESULT CFTPConnection::Close()
 		closesocket(m_ctrlSocket);
 	}
 	// releases the server's reference, which deletes this
-	m_pServer->RemoveConnection(m_hThread, FALSE);
+	m_pServer->RemoveConnectionAndRelease(m_hThread);
 	return S_OK;
 }
 
@@ -1074,7 +1074,16 @@ void CFTPConnection::CmdMkd(std::string arg)
 	}
 }
 
-// 0x000B59FA
+// 0x000B59FA (also 0x000B6C86, an unused copy that takes the argument by copy)
+// 0x000B496C (this in eax)
+void CFTPConnection::SiteTitleImage()
+{
+	if (m_strTitleImageDir.size() != 0)
+		Reply(200, "OK");
+	else
+		Reply(550, "Creation of Title Images failed.");
+}
+
 void CFTPConnection::CmdNoop(std::string)
 {
 	Reply(200, "OK.");
@@ -1430,10 +1439,7 @@ void CFTPConnection::CmdSite(std::string arg)
 	// images.
 	if (arg.compare("TITLEIMAGE") == 0)
 	{
-		if (m_strTitleImageDir.size() != 0)
-			Reply(200, "OK");
-		else
-			Reply(550, "Creation of Title Images failed.");
+		SiteTitleImage();
 		return;
 	}
 

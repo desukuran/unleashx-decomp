@@ -562,8 +562,7 @@ unsigned CFTPServer::ListenThreadProc()
 					if (m_pEvents != NULL)
 						m_pEvents->OnStatChanged(FTPSTAT_TOTAL_CONNECTIONS, m_dwTotalConnections);
 					m_nCurrentUsers++;
-					if (connection->m_hThread != (HANDLE)-1)
-						ResumeThread(connection->m_hThread);
+					connection->Resume();
 				}
 			}
 			Sleep(500);

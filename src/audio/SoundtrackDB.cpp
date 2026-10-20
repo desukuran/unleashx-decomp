@@ -638,3 +638,54 @@ BOOL DeleteSong(DWORD soundtrackId, UINT index)
 	SetFileAttributesA(path, FILE_ATTRIBUTE_NORMAL);
 	return DeleteFileA(path);
 }
+
+// --- CFileDescription (unused) ----------------------------------------------
+
+// 0x000BBF8C
+CFileDescription::CFileDescription()
+{
+	m_strName = "";
+	m_bFlag4 = 0;
+	m_bFlag5 = 0;
+	m_strText = "";
+}
+
+// 0x000BBF07
+CFileDescription::CFileDescription(const std::string &name, const std::string &text, BYTE flag4, BYTE flag5)
+{
+	m_strName.assign(name, 0, std::string::npos);
+	m_bFlag4 = flag4;
+	m_strText.assign(text, 0, std::string::npos);
+	m_bFlag5 = flag5;
+}
+
+// 0x000BBF56
+CFileDescription::CFileDescription(const CFileDescription &other)
+{
+	*this = other;
+}
+
+// 0x000BBEB1
+CFileDescription::~CFileDescription()
+{
+}
+
+// 0x000BBED4
+CFileDescription &CFileDescription::operator=(const CFileDescription &other)
+{
+	if (&other != this)
+	{
+		m_bFlag4 = other.m_bFlag4;
+		m_strName.assign(other.m_strName, 0, std::string::npos);
+		m_strText.assign(other.m_strText, 0, std::string::npos);
+		m_bFlag5 = other.m_bFlag5;
+	}
+	return *this;
+}
+
+// 0x000BBF78
+void CFileDescription::Set(const char *s)
+{
+	m_strName = s;
+	m_strText = s;
+}

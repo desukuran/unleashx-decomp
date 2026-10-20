@@ -115,6 +115,10 @@ public:
 	void CmdExec(std::string arg);                           // 0x000B5A20
 	void CmdMkd(std::string arg);                            // 0x000B51C7 also XMKD
 	void CmdNoop(std::string arg);                           // 0x000B59FA
+	// SITE TITLEIMAGE. (this in eax)
+	void SiteTitleImage();                                   // 0x000B496C
+	// Resumes the connection's thread (unless it has none). (this in eax)
+	void Resume() { if (m_hThread != (HANDLE)-1) ResumeThread(m_hThread); }   // 0x000B3ADF
 	void CmdPwd(std::string arg);                            // 0x000B5C09 also XPWD
 	void CmdRest(std::string arg);                           // 0x000B5720
 	void CmdRmd(std::string arg);                            // 0x000B52D5 also XRMD
@@ -231,6 +235,8 @@ public:
 	BOOL AddConnection(CFTPConnection *connection);          // 0x0002F9A7
 	// Removes the connection whose thread is thread; releases it unless keep.
 	CFTPConnection *RemoveConnection(HANDLE thread, BOOL keep);   // 0x0002F9CC
+	// A connection thread ending: RemoveConnection(thread, FALSE).
+	void RemoveConnectionAndRelease(HANDLE thread) { RemoveConnection(thread, FALSE); }   // 0x000B45A0
 
 	void AddStat(int stat, DWORD amount);                    // 0x0002FA15
 	void NotifyLogin(const char *user, const char *ip);      // 0x0002FAAC

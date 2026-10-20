@@ -15,6 +15,8 @@
 // for an unknown soundtrack or song.
 #pragma once
 
+#include <string>
+
 #include "../common/Platform.h"
 
 #define SOUNDTRACK_MUSIC_DIR "E:\\TDATA\\fffe0000\\music\\"
@@ -90,3 +92,23 @@ BOOL RenameSong(DWORD soundtrackId, UINT index, const wchar_t *name);   // 0x000
 BOOL SwapSongs(DWORD soundtrackId, UINT first, UINT second);          // 0x000BC1C9
 // Removes a song, moving the later ones up, and deletes its file.
 BOOL DeleteSong(DWORD soundtrackId, UINT index);                      // 0x000BC434
+
+// Unused (nothing makes one; its code sits between ftpparse and the ST.DB
+// writers): a name and a text with two flag bytes. vtable 0x002589DC.
+// (SoundtrackDB.cpp; this in esi) TODO: verify what it describes
+class CFileDescription
+{
+public:
+	CFileDescription();                                   // 0x000BBF8C
+	CFileDescription(const std::string &name, const std::string &text, BYTE flag4, BYTE flag5);   // 0x000BBF07
+	CFileDescription(const CFileDescription &other);      // 0x000BBF56 (this in eax, other in edi)
+	virtual ~CFileDescription();                          // 0x000BBEB1 (deleting 0x0002F8E3)
+	CFileDescription &operator=(const CFileDescription &other);   // 0x000BBED4 (other in edi)
+	// Both strings to s.
+	void Set(const char *s);                              // 0x000BBF78
+
+	BYTE m_bFlag4;                 // +0x04
+	BYTE m_bFlag5;                 // +0x05
+	std::string m_strName;         // +0x08
+	std::string m_strText;         // +0x24
+};

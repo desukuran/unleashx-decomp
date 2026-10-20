@@ -767,7 +767,7 @@
 000b3a51 FtpSendAll HRESULT __stdcall f(CFTPConnection *connection, int socket, int length, char *data@ecx)
 000b3adf CFTPConnection::ResumeThread
 000b3af1 CFTPConnection::SetClientAddress
-000b3b9d FtpBufferedWriterThread_unused
+000b3b9d FtpBufferedWriterThread
 000b3c00 CFTPConnection::SetTransferActive
 000b3c5d CFTPServer::Stop
 000b3cf5 CFTPConnection::~CFTPConnection
