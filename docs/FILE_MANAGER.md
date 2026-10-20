@@ -283,6 +283,16 @@ and the client's own messages. The d-pad scrolls. The menu has **Close**,
 * A target path on the FTP side that doesn't start with `/` is replaced by
   `/`.
 
+### USB drives
+
+On a USB drive (P: to S:) copying works both ways and files open in the
+viewers that read through the file layer (pictures, music), but Delete and
+New folder don't: they call the kernel's `DeleteFileA`/`RemoveDirectoryA`
+(0x0012A006) and `CreateDirectoryTree` (0x00127E8E), which can't see those
+drives, and report an error. The text editor and the video player have the
+same limit (see TEXT_EDITOR.md, VIDEO.md); FTP transfers too (FTP.md). As in
+the original.
+
 ## Context menu
 
 Entries that don't apply are greyed out.
