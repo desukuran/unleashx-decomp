@@ -93,10 +93,16 @@ value), and Check Update / Check WIP Update (the WIP line only with
 `<server>Version.xml` (see [NETWORK.md](NETWORK.md)); if a newer build is
 listed it offers to download `UXUpdate2.bin` (`UXUWIP2.dat` for WIP),
 trying the `<URL>` mirrors in Version.xml after a 404. The download is a RAR
-archive with its signature blanked out: UnleashX restores it, unpacks the
-files next to itself (`default.xbe` becomes `UXUpdate.xbe`) with a built-in
-password, and after "Update successfully downloaded" launches
-`UXUpdate.xbe` to finish. B cancels a check or download.
+archive (RAR 2.9/RAR4 format) with its signature blanked out: UnleashX
+restores it and unpacks the whole archive next to itself with a built-in
+password, under the archived names. It succeeds when `UXUpdate.xbe` is
+there afterwards (for a `default.xbe` entry it checks for `UXUpdate.xbe`
+instead, but doesn't rename the file), so the package holds
+`UXUpdate.xbe`. Folders are skipped by their attributes, so a package made
+on Unix (permission bits in the attribute field) can look empty. After
+"Update successfully downloaded" it launches `UXUpdate.xbe`, which moves
+itself over the installed XBE (keeping it as `.bak`). B cancels a check or
+download. (Tested in xemu with a package served from the host.)
 
 ## Network Settings
 
