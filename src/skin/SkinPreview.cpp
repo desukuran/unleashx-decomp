@@ -15,8 +15,8 @@ void CSkin::TogglePreviewFullScreen()
 {
 	if (m_pPreviewVideo == NULL)
 		return;
-	m_bPreviewToggled = !m_bPreviewToggled;
-	m_pPreviewVideo->SetFullScreen(!m_bPreviewToggled);
+	m_bPreviewInArea = !m_bPreviewInArea;
+	m_pPreviewVideo->SetFullScreen(!m_bPreviewInArea);
 }
 
 // 0x000FFDAA (playing in eax, this in ecx)

@@ -14,16 +14,58 @@ CSkin g_skin;                 // 0x00277968
 BOOL g_bSkinGameIcon;         // 0x00277E70
 static int g_nSkinUnknown;    // 0x00276244
 
-// TODO: decompile the real constructor (a static initializer); this only
-// gives the members a defined state.
+// 0x000FD323 (this in esi; run by g_skin's static initializer)
 CSkin::CSkin()
-	: m_bZipped(FALSE), m_pFonts(NULL), m_pSettings(NULL), m_pEventSink(NULL), m_pBackground(NULL),
-	  m_pOrbTexture(NULL), m_pCellwall(NULL), m_pBackgroundVideo(NULL), m_pPreviewVideo(NULL), m_pMenuFont(NULL),
-	  m_pInfoFont(NULL), m_bOwnMenuFont(FALSE), m_bOwnInfoFont(FALSE), m_pMusicPlayerBackground(NULL),
-	  m_pPlayListBackground(NULL), m_pButtonMap(NULL), m_pDialogBackground(NULL), m_pLoadingTexture(NULL),
-	  m_bLoading(FALSE), m_hLoadThread(NULL), m_bChanged(FALSE), m_bLoaded(FALSE), m_pFileManagerBackground(NULL),
-	  m_pLoadingBackground(NULL)
 {
+	m_pLoadingTexture = NULL;
+	m_bLoading = FALSE;
+	m_bChanged = FALSE;
+	m_hLoadThread = NULL;
+	m_dwLoadingFadeEnd = 0;
+	m_strLoadFile.clear();
+	m_bGlobe = TRUE;
+	m_bOrb = TRUE;
+	m_bFog = TRUE;
+	m_pBackgroundVideo = NULL;
+	m_pBackground = NULL;
+	m_pOrbTexture = NULL;
+	m_pCellwall = NULL;
+	m_pFileManagerBackground = NULL;
+	m_pLoadingBackground = NULL;
+	m_bLoadingShowInfo = TRUE;
+	m_pPreviewVideo = NULL;
+	m_pMenuFont = NULL;
+	m_pInfoFont = NULL;
+	m_bOwnMenuFont = FALSE;
+	m_bOwnInfoFont = FALSE;
+	m_pEventSink = NULL;
+	m_bColorScheme = FALSE;
+	m_strSkinName = "[Default]";
+	m_bZipped = FALSE;
+	m_strPreviewFile = "";
+	m_bPreviewPlaying = TRUE;
+	m_bPreviewInArea = TRUE;
+	m_strIntroMovie.clear();
+	m_bRotate = FALSE;
+	m_bFixed = FALSE;
+	m_bSmooth = TRUE;
+	m_bShowIcon = TRUE;
+	m_bShowArrows = TRUE;
+	m_rcMenu.top = 75;
+	m_rcMenu.left = 340;
+	m_rcMenu.width = 270;
+	m_rcMenu.height = 330;
+	m_unknown004 = 0;
+	m_fMenuFontScaleX = 1.0f;
+	m_fMenuFontScaleY = 1.0f;
+	m_dwPreviewTick = 0;
+	m_bLoaded = TRUE;
+	m_strTempDir.clear();
+	// The music player's textures, areas and button indexes (0x90 bytes).
+	memset(&m_pMusicPlayerBackground, 0, 0x90);
+	m_pFonts = NULL;
+	m_bSortByZIndex = FALSE;
+	m_pSettings = CAppSettings::GetInstance();
 }
 
 // 0x000F9852

@@ -2561,3 +2561,21 @@
 0007fac1 DashResolveAgainst
 00032894 DashCreateFile
 0007f36f DashStrCopyNWide
+# CXBApplicationEx::Run's pointer state (src/app/XBAppRun.cpp)
+0027213c g_bPointerEvent
+00272140 g_nPointerPort
+00272144 g_bPointerActive
+00272148 g_bPointerClicked
+0027214c g_bPointerSecondButton
+00272150 g_bPointerThirdButton
+00272154 g_bPointerWheelUp
+00272158 g_bPointerWheelDown
+0027215c g_nPointerX
+00272160 g_nPointerY
+00272164 g_bPointerMoved
+00272168 g_bPointerDoubleClick
+0027216c g_dwPointerMoveTime
+00272170 g_mice
+000972f6 XBInput_GetMouseInput
+000972f0 XBInput_IsMouseConnected
+000fd323 CSkin::CSkin

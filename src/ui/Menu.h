@@ -128,7 +128,8 @@ public:
 	void StartScroll(int direction);
 	void FinishMove(CSound *sound);
 	int ItemUnderPointer();
-	BOOL PointerInItem(unsigned index);               // TODO: decompile (the item rectangle test inlined in 0x001123B9)
+	// The pointer over the item's on-screen rectangle. (Menu.cpp)
+	BOOL PointerInItem(unsigned index);
 	void DrawDeleteProgress();
 	void AddItem(CXmlElement *element, BOOL noSort);  // 0x00110772
 	void FindItemIcon(CXmlElement *item);             // 0x001100F6
@@ -243,13 +244,14 @@ extern CXmlElement *g_pPendingBatchElement;          // 0x00278CFC
 extern int g_nMessageResult;                         // 0x00278CF8
 extern float g_fFrameRate;                           // 0x0027764C TODO: verify
 
-// The pointer (USB mouse / IR) state. TODO: decompile
-extern BOOL g_bPointerActive;                        // 0x00272144
-extern BOOL g_bPointerClicked;                       // 0x00272148
-extern BOOL g_bPointerMoved;                         // 0x00272164
-extern BOOL g_bPointerEvent;                         // 0x0027213C set by CXBApplicationEx::Run
-extern BOOL g_bPointerDoubleClick;                   // 0x00272168 TODO: verify
-extern BOOL g_bPointerSecondButton;                  // 0x0027214C TODO: verify (opens menus)
+// The pointer (USB mouse) state, set every frame by CXBApplicationEx::Run
+// (src/app/XBAppRun.cpp).
+extern BOOL g_bPointerActive;                        // 0x00272144 a mouse is plugged in
+extern BOOL g_bPointerClicked;                       // 0x00272148 left button
+extern BOOL g_bPointerMoved;                         // 0x00272164 the frame after a move
+extern BOOL g_bPointerEvent;                         // 0x0027213C new mouse data this frame
+extern BOOL g_bPointerDoubleClick;                   // 0x00272168 the same buttons again within 180 ms
+extern BOOL g_bPointerSecondButton;                  // 0x0027214C right button (opens menus)
 extern int g_nPointerX;                              // 0x0027215C
 extern int g_nPointerY;                              // 0x00272160
 // x, y, width, height

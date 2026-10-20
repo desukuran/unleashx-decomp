@@ -6,6 +6,10 @@
 #include "../common/Platform.h"
 
 #ifndef XINPUT_GAMEPAD_START
+#define XINPUT_GAMEPAD_DPAD_UP 0x0001
+#define XINPUT_GAMEPAD_DPAD_DOWN 0x0002
+#define XINPUT_GAMEPAD_DPAD_LEFT 0x0004
+#define XINPUT_GAMEPAD_DPAD_RIGHT 0x0008
 #define XINPUT_GAMEPAD_START 0x0010
 #define XINPUT_GAMEPAD_BACK 0x0020
 #endif
@@ -76,3 +80,26 @@ HRESULT XBInput_CreateIR_Remotes(SIRRemote **remotes);            // 0x0009888E
 void XBInput_GetIR_RemoteInput(SIRRemote *remotes, float time);   // 0x000986B9
 HRESULT XBInput_CreateKeyboard(SKeyboardState **keyboards);       // 0x000985AA (the debug keyboard queue)
 HRESULT XBInput_GetKeyboardInput(SKeystroke *keystroke);          // 0x00098478
+
+// A USB mouse on a controller port (the debug mouse). 0x30 bytes.
+struct SMouseState
+{
+	DWORD dwPacketNumber;              // +0x00 XINPUT_STATE
+	BYTE bButtons;                     // +0x04 1 left, 2 right, 4 middle
+	signed char cMickeysX;             // +0x05
+	signed char cMickeysY;             // +0x06
+	signed char cWheel;                // +0x07
+	BYTE unknown08[0x10];
+	HANDLE hDevice;                    // +0x18
+	BOOL bInserted;                    // +0x1C
+	BOOL bRemoved;                     // +0x20
+	BYTE unknown24[4];
+	BYTE bClickButtons;                // +0x28 the buttons again within 180 ms (a double click), else 0
+	BYTE unknown29[3];
+	DWORD dwLastTime;                  // +0x2C
+};
+extern SMouseState g_mice[4];                     // 0x00272170
+// Reads the mice; the ports with new data as bits. (Library code.)
+DWORD XBInput_GetMouseInput();                    // 0x000972F6
+// Whether a mouse is plugged in (as of the last read).
+BOOL XBInput_IsMouseConnected();                  // 0x000972F0

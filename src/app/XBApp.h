@@ -69,7 +69,7 @@ public:
 	SIRRemote *m_pIRRemotes;                  // +0x188 the four ports (g_irRemotes)
 	SIRRemote m_defaultIR;                    // +0x18C the remote in use
 	SKeystroke *m_pKeystroke;                 // +0x210 the debug keyboard's last key
-	DWORD m_unknown214;                       // +0x214
+	SMouseState *m_pMice;                     // +0x214 the four ports (g_mice)
 	DWORD m_dwScreenWidth;                    // +0x218 640, 720, 1280, 1920
 	DWORD m_dwScreenHeight;                   // +0x21C 480, 576, 720, 1080
 };
@@ -174,7 +174,7 @@ class CXBMesh
 public:
 	CXBMesh();                                // 0x00097536
 	// Loads an .xbg file; its textures come from resource (if given).
-	// (this on the stack, fileName in eax) TODO: decompile
+	// (this on the stack, fileName in eax; library code)
 	HRESULT Create(const char *fileName, CXBPackedResource *resource);   // 0x00097F4B
 	// Draws the frames; flags XBMESH_* (0x30: no materials or textures, the
 	// caller sets them). (this in ecx)

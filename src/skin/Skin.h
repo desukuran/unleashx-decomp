@@ -222,7 +222,7 @@ public:
 class CSkin
 {
 public:
-	CSkin();                                          // TODO: find the constructor
+	CSkin();                                          // 0x000FD323 (this in esi)
 	~CSkin();                                         // 0x000F9852
 
 	void SetDefaults();                               // 0x000F9166
@@ -314,7 +314,7 @@ public:
 	BOOL m_bOwnMenuFont;                // +0x2F4 m_pMenuFont was created here
 	BOOL m_bOwnInfoFont;                // +0x2F8
 	BOOL m_bPreviewPlaying;             // +0x2FC
-	BOOL m_bPreviewToggled;             // +0x300 flipped by TogglePreviewFullScreen; the video gets SetFullScreen(!this)
+	BOOL m_bPreviewInArea;              // +0x300 TRUE: the preview in its area; FALSE: full screen (TogglePreviewFullScreen)
 	SSkinRect m_rcMenu;                 // +0x304 <Main><Menu><Position>
 	int m_nBorderWidth;                 // +0x314 <BorderColor Width=...> 2..9
 	DWORD m_dwBorderColor;              // +0x318

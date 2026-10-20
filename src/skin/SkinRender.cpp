@@ -135,7 +135,7 @@ static BOOL DrawSkinImage(CSkin *skin, SSkinImage &image)
 	if (image.source == 0 || skin->m_pEventSink == NULL || (image.source == 2 && !skin->m_bPreviewPlaying))
 		return FALSE;
 	skin->m_pEventSink->DrawImage(image.source, image.left, image.top, image.width, image.height, image.opacity);
-	return !skin->m_bPreviewToggled && image.source == 2 && skin->m_pPreviewVideo->IsOpen();
+	return !skin->m_bPreviewInArea && image.source == 2 && skin->m_pPreviewVideo->IsOpen();
 }
 
 // (inlined in both paths)

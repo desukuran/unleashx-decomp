@@ -1,5 +1,5 @@
 // The game folder scan: <List Path="..."> lists are filled with the XBEs
-// found under the path, cached in items.xml. TODO: decompile
+// found under the path, cached in items.xml. (MenuScan.cpp)
 #pragma once
 
 #include "../common/Platform.h"

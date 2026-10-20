@@ -1254,6 +1254,12 @@ void CMenu::FinishMove(CSound *sound)
 	}
 }
 
+// (Inlined in ProcessInput, 0x001123B9.)
+BOOL CMenu::PointerInItem(unsigned index)
+{
+	return PointInRect(m_items[index]->m_rcHit, g_nPointerX, g_nPointerY);
+}
+
 // The visible item under the pointer, or -1.
 int CMenu::ItemUnderPointer()
 {

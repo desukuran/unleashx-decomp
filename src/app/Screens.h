@@ -1,5 +1,5 @@
 // The full-screen tools CUnleashX switches to (CUnleashX::SetMode). Only the
-// interface the app code uses so far; all TODO: decompile.
+// declarations; each is implemented in its own file (see the comments).
 #pragma once
 
 #include "../thirdparty/IoSupport.h"
