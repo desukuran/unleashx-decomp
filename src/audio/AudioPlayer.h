@@ -316,5 +316,5 @@ private:
 	HRESULT UpdateSongInfo(wchar_t *title, DWORD *length);   // 0x000D8AD8
 };
 
-// Unused: CDDACopy (vtable 0x0024A93C, a CAppFrame listing the CD's
-// tracks; 0x00130B63-0x00130C6F) has no constructor left.
+// Unused: CDDACopy, a CAppFrame listing the CD's tracks (no constructor
+// left), is in src/musicplayer/TrackOptions.h.

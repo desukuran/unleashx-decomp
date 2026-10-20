@@ -2536,3 +2536,8 @@
 000ea055 CUnleashX::CSkinEvent::OnPreviewSoundEnd
 0026b950 s_queryCode
 0026b990 s_queryPatch
+00130c6f CDDACopy::Init
+00130b6f CDDACopy::Show
+00130b63 CDDACopy::Render
+00130b66 CDDACopy::ProcessInput
+00130b6b CDDACopy::IsOpen

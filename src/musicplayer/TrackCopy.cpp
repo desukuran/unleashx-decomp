@@ -2,11 +2,13 @@
 // the CD ripping it was meant to do. See TrackOptions.h.
 #include "TrackOptions.h"
 
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <cwchar>
 
 #include "../audio/AudioPlayer.h"
+#include "../audio/CdAudio.h"
 #include "../audio/SoundtrackDB.h"
 #include "../common/StrUtil.h"
 #include "../common/XboxKernel.h"
@@ -719,4 +721,63 @@ BOOL EncodeTrackToWma(short peak)
 	}
 	delete[] work;
 	return ok;
+}
+
+// --- CDDACopy ---------------------------------------------------------------
+
+// 0x00130C30
+CDDACopy::~CDDACopy()
+{
+}
+
+// 0x00130C6F
+// (The original returns an HRESULT from this BOOL slot: S_OK or E_FAIL.)
+BOOL CDDACopy::Init(CXBFontEx *font)
+{
+	if (g_cdToc.hDevice == INVALID_HANDLE_VALUE)
+	{
+		m_pFont = NULL;
+	}
+	else
+	{
+		m_pFont = font;
+		m_tracks.clear();
+		UINT count = g_cdToc.hDevice != INVALID_HANDLE_VALUE ? (UINT)g_cdToc.nTracks : 0;
+		for (UINT i = 0; i < count; i++)
+		{
+			DWORD minutes, seconds;
+			CdTocGetTrackLength(&g_cdToc, (int)i, &minutes, &seconds, NULL);
+			wchar_t text[130];
+			SPlayerTrack track;
+			swprintf(text, 130, L"%u. Track %u", i + 1, i + 1);
+			track.name = text;
+			swprintf(text, 130, L"%02d:%02d", (int)minutes, (int)seconds);
+			track.time = text;
+			track.unknown38 = i;
+			m_tracks.push_back(track);
+		}
+	}
+	return (BOOL)(m_pFont != NULL ? S_OK : E_FAIL);
+}
+
+// 0x00130B6F
+void CDDACopy::Show()
+{
+	if (m_pFont == NULL)
+	{
+		m_bOpen = FALSE;
+		return;
+	}
+	m_fWidth = 350.0f;
+	m_fX = 145.0f;
+	m_fY = 40.0f;
+	m_fHeight = 400.0f;
+	m_fPadding = 10.0f;
+	m_bOpen = TRUE;
+	m_fScaleY = 1.0f;
+	m_fScaleX = 1.0f;
+	ScaleToScreen(&m_fX, &m_fScaleX, &m_fY, &m_fScaleY, FALSE);
+	m_fWidth = (float)ceil(m_fWidth * m_fScaleX);
+	m_fHeight = (float)ceil(m_fScaleY * m_fHeight);
+	m_fPadding = (float)ceil(m_fScaleY * m_fPadding);
 }

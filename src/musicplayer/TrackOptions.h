@@ -18,6 +18,7 @@
 #include "../app/Screens.h"
 #include "../common/Platform.h"
 #include "../ui/MenuDialogs.h"
+#include "../musicplayer/AudioGUI.h"
 #include "SongList.h"
 
 class CAudioCDOption;
@@ -233,6 +234,35 @@ enum CopyError
 	COPY_DB_ERROR = 2,         // the song couldn't be added to ST.DB
 	COPY_NO_DISC = 3,          // no CD (the TOC isn't open)
 	COPY_BAD_TRACK = 4,        // an empty track, or a read error
+};
+
+// An unused CD copy screen: a CAppFrame that lists the audio CD's tracks
+// ("1. Track 1", "03:45") and draws nothing; no constructor is left.
+// (TrackCopy.cpp; vtable 0x0024A93C)
+class CDDACopy : public CAppFrame
+{
+public:
+	virtual ~CDDACopy();                                  // 0x00130C30 (this in edi; deleting 0x00012491)
+	// Lists the tracks; E_FAIL (and no font) without a CD's table of
+	// contents.
+	virtual BOOL Init(CXBFontEx *font);                   // 1, 0x00130C6F
+	virtual BOOL IsOpen() { return m_bOpen; }             // 2, 0x00130B6B
+	virtual BOOL Render() { return FALSE; }               // 3, 0x00130B63
+	virtual HRESULT ProcessInput(int * /*action*/, SGamepadState ** /*pad*/) { return S_OK; }   // 4, 0x00130B66
+	// Opens it (with a font) at 145, 40, 350 x 400, scaled.
+	virtual void Show();                                  // 5, 0x00130B6F
+
+	std::vector<SPlayerTrack> m_tracks;    // +0x04
+	BOOL m_bOpen;                          // +0x14
+	CXBFontEx *m_pFont;                    // +0x18
+	BYTE m_unknown1C[0x10];                // +0x1C
+	float m_fX;                            // +0x2C
+	float m_fY;                            // +0x30
+	float m_fWidth;                        // +0x34
+	float m_fHeight;                       // +0x38
+	float m_fPadding;                      // +0x3C 10
+	float m_fScaleX;                       // +0x40
+	float m_fScaleY;                       // +0x44
 };
 
 // A CAppFrame with a COptionMenu: only its destructor and vtable are left
