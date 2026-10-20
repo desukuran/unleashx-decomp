@@ -33,7 +33,7 @@ REF = os.path.join(ROOT, 'reference/thirdparty')
 # functions already named elsewhere)
 # Libraries whose ranges hold nothing but their own code: every hand-named
 # function there (that src/ doesn't implement) is theirs, whatever its name.
-OWNS_RANGES = ('unrar', 'xdksample')
+OWNS_RANGES = ('unrar', 'xdksample', 'fat32', 'xzip', 'xunzip', 'xkutils', 'iso9660')
 
 LIBRARIES = [
     ('unrar', 'XBMC\'s UnrarXLib (unrar 3.x with the urarlib_* entry points); xbmc4xbox: lib/UnrarXLib '
@@ -49,9 +49,9 @@ LIBRARIES = [
       (0x8EAE0, 'UnzipItem')], ('TUnzip::',)),
     ('xzip', 'Hans Dietrich\'s XZip (Lucian Wischik\'s zip, Info-ZIP deflate); github.com/ValveSoftware/'
              'source-sdk-2013: src/public/XZip.cpp',
-     ['zip_utils/XZip.cpp'], [(0x87A00, 0x8B300)], [(0x88BB1, 'CreateZipZ')], ('TZip::', 'ZipAdd', 'CloseZipZ')),
+     ['zip_utils/XZip.cpp'], [(0x3211C, 0x32152), (0x87A00, 0x8B300)], [(0x88BB1, 'CreateZipZ')], ('TZip::', 'ZipAdd', 'CloseZipZ')),
     ('xkutils', 'Team Assembly\'s XKUtils; xbmc4xbox: xbmc/platform/xbox/XK*',
-     ['xbmc4xbox/xbmc/platform/xbox/XK*.cpp', 'xbmc4xbox/xbmc/platform/xbox/XK*.h'], [(0x8F900, 0x93000)], [],
+     ['xbmc4xbox/xbmc/platform/xbox/XK*.cpp', 'xbmc4xbox/xbmc/platform/xbox/XK*.h'], [(0x8F900, 0x92B01)], [],
      ('XKUtils', 'XKEEPROM', 'XKHDD', 'XKRC4', 'XKCRC', 'XKSHA1', 'XKGeneral')),
     ('iso9660', 'XBMC\'s iso9660 reader and CIoSupport; xbmc4xbox: xbmc/filesystem/iso9660.*, '
                 'xbmc/platform/xbox/storage/IoSupport.cpp',
@@ -59,7 +59,12 @@ LIBRARIES = [
       'xbmc4xbox/xbmc/platform/xbox/storage/IoSupport.cpp'], [(0xB1000, 0xB3500)], [],
      ('iso9660::', 'CIoSupport::', 'MD5')),
     # Attribution only (no source to match).
-    ('fat32', 'the FAT32 USB driver (src/thirdparty/Fat32.h)', [], [(0x6A400, 0x6E184)], [], ('Fat32',)),
+    ('fat32', 'the FAT32 USB driver (src/thirdparty/Fat32.h): an early version of Rob Riglar\'s FAT File IO '
+              'Library, adapted to several volumes; github.com/ultraembedded/fat_io_lib (v2.6.11, later)',
+     ['fat_io_lib/src/*.c', 'fat_io_lib/src/*.h'], [(0x33C3C, 0x34074), (0x6A400, 0x6E184)],
+     [(0x6AF11, 'fatfs_lfn_generate_tail'), (0x6C3D1, 'fl_fopen'), (0x6BAAE, 'fl_fread'), (0x6BE2C, 'fl_fwrite'),
+      (0x6BF08, 'fl_fclose'), (0x6B789, 'fl_fseek'), (0x6BFE9, 'fl_remove'), (0x6C0E8, 'fl_createdirectory')],
+     ('Fat32', 'fatfs_', 'fl_')),
     ('xdksample', 'the XDK samples framework (XBApp, XBFont, XBMesh, XBMemUnit, XBStorageDevice, XBSound, '
                   'XBUtil, XBInput, xmvhelper); the XDK\'s Samples/Common/Src, a later version than the one linked in '
                   '(in reference/Samples)',

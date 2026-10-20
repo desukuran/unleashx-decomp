@@ -1,7 +1,10 @@
 // The FAT32 driver for USB drives (P: to S:) linked into UnleashX
 // (0x0006A400-0x0006E300). Library code: only the calls the virtual file
-// layer makes are declared, with their register arguments. The names are
-// reconstructed. TODO: identify the library
+// layer makes are declared, with their register arguments. It's an early
+// version of Rob Riglar's FAT File IO Library (fat_io_lib, GPL), which
+// UnleashX extended to four volumes with a sector cache and per-folder
+// directory caches; the internals are named after fat_io_lib's functions in
+// symbols/names.txt. These wrapper names are reconstructed.
 #pragma once
 
 #include "../common/Platform.h"
