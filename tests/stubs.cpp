@@ -20,7 +20,7 @@ int GetFanSpeed() { return 0; }
 XBGAMEPAD g_Gamepads[4];
 SIRRemote g_irRemotes[4];
 SKeyboardState g_keyboards[4];
-void UpdateGamepads(CXBApplicationEx *) {}
+void XBInput_GetInput(XBGAMEPAD *) {}
 CSoundEffects::CSoundEffects() : m_pSettings(NULL), m_bDisabled(FALSE), m_bQuiet(FALSE) {}
 CSoundEffects::~CSoundEffects() {}
 void CSoundEffects::SetQuiet(BOOL quiet) { m_bQuiet = quiet; }

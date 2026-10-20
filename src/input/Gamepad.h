@@ -95,5 +95,6 @@ private:
 
 extern CGamepadInput g_gamepadInput;                 // 0x00278280
 
-// Merges the four controllers into the application's combined gamepad state.
-void UpdateGamepads(CXBApplicationEx *app);          // 0x000E020F TODO: decompile
+// Reads the four controllers and merges them into the application's
+// combined gamepad and remote state. (app in esi)
+void UpdateGamepads(CXBApplicationEx *app);          // 0x000E020F

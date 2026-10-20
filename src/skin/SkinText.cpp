@@ -966,3 +966,110 @@ const wchar_t *GetNewsText()
 		return L"";
 	return s_pszNewsText;
 }
+
+// The label of a source's line on the system info screen; NULL for the
+// sources shown as their bare value.
+static const wchar_t *GetInfoLabel(int source)
+{
+	switch (source)
+	{
+	case TEXT_HOMEPATH:
+	case TEXT_LAUNCHPATH: return L"Path: %ls";
+	case TEXT_TIME: return L"Time: %ls";
+	case TEXT_APPVERSION: return L"UnleashX Version: %ls";
+	case TEXT_BIOSVERSION:
+	case TEXT_BIOSNAME: return L"BIOS: %ls";
+	case TEXT_NICKNAME: return L"Nickname: %ls";
+	case TEXT_MBTEMPF:
+	case TEXT_MBTEMPC: return L"M/B: %ls";
+	case TEXT_CPUTEMPF:
+	case TEXT_CPUTEMPC: return L"CPU: %ls";
+	case TEXT_DATE:
+	case TEXT_DATETIME: return L"Date: %ls";
+	case TEXT_MAC: return L"MAC: %ls";
+	case TEXT_VERSION: return L"Xbox %ls";
+	case TEXT_HDDKEY: return L"HDD Key: %ls";
+	case TEXT_HDDMODEL: return L"HDD Model: %ls";
+	case TEXT_HDDSERIAL: return L"HDD Serial No.: %ls";
+	case TEXT_HDDSTATUS: return L"HDD Status: %ls";
+	case TEXT_DVDMODEL: return L"DVD Model: %ls";
+	case TEXT_DVDSERIAL: return L"DVD Serial: %ls";
+	case TEXT_HDTEMP:
+	case TEXT_HDTEMPC:
+	case TEXT_HDTEMPF: return L"HDD Temp: %ls";
+	case TEXT_SERIALNUM: return L"Serial No.: %ls";
+	// Quirk: the MB sizes get the same labels as the plain ones.
+	case TEXT_C_TOTAL:
+	case TEXT_C_TOTALMB: return L"C: %ls";
+	case TEXT_E_TOTAL:
+	case TEXT_E_TOTALMB: return L"E: %ls";
+	case TEXT_F_TOTAL:
+	case TEXT_F_TOTALMB: return L"F: %ls";
+	case TEXT_G_TOTAL:
+	case TEXT_G_TOTALMB: return L"G: %ls";
+	// (Free space and free percentage share a label too.)
+	case TEXT_C_FREE:
+	case TEXT_C_FREEMB:
+	case TEXT_C_PFREE: return L"C: %ls free";
+	case TEXT_E_FREE:
+	case TEXT_E_FREEMB:
+	case TEXT_E_PFREE: return L"E: %ls free";
+	case TEXT_F_FREE:
+	case TEXT_F_FREEMB:
+	case TEXT_F_PFREE: return L"F: %ls free";
+	case TEXT_G_FREE:
+	case TEXT_G_FREEMB:
+	case TEXT_G_PFREE: return L"G: %ls free";
+	case TEXT_BIOSMD5: return L"BIOS MD5: %ls";
+	case TEXT_TRAY: return L"Tray: %ls";
+	case TEXT_DVDTYPE: return L"DVD: %ls";
+	case TEXT_NUMCLIENT: return L"Users: %ls";
+	case TEXT_GATEWAY: return L"Gateway: %ls";
+	// Quirk: both DNS servers are labelled "Subnet".
+	case TEXT_SUBNET:
+	case TEXT_DNS1:
+	case TEXT_DNS2: return L"Subnet: %ls";
+	case TEXT_FANSPEED: return L"Fan: %ls";
+	case TEXT_THREAD: return L"Threads: %ls";
+	}
+	return NULL;
+}
+
+// 0x00117FB9 (source in edx)
+// Quirk: the original formats into its own stack buffer and returns that;
+// the caller copies it right away. A static buffer stands in here.
+const wchar_t *GetInfoText(int source)
+{
+	static wchar_t line[150];
+	if (source > 0x59)
+		return L"";
+	memset(line, 0, sizeof(line));
+	switch (source)
+	{
+	case 0x13:
+	case 0x19:
+	case 0x1D:
+	case 0x46:
+	case 0x47:
+		// Unused IDs: an empty line.
+		return line;
+	case TEXT_IP:
+	{
+		const wchar_t *format = IsStaticAddress() ? L"IP: %ls Static" : IsDhcpAddress() ? L"IP: %ls DHCP" : L"IP: %ls";
+		swprintf(line, 150, format, GetSkinTextValue(TEXT_IP));
+		return line;
+	}
+	// The temperatures in the configured unit.
+	case TEXT_MBTEMP:
+		source = s_pSettings->m_prefs.m_bUseFahrenheit ? TEXT_MBTEMPF : TEXT_MBTEMPC;
+		break;
+	case TEXT_CPUTEMP:
+		source = s_pSettings->m_prefs.m_bUseFahrenheit ? TEXT_CPUTEMPF : TEXT_CPUTEMPC;
+		break;
+	}
+	const wchar_t *label = GetInfoLabel(source);
+	if (label == NULL)
+		return GetSkinTextValue(source);
+	swprintf(line, 150, label, GetSkinTextValue(source));
+	return line;
+}

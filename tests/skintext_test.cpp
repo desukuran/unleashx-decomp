@@ -75,6 +75,31 @@ int main()
 	if (FormatIPAddress(0x0500A8C0) != "192.168.0.5")
 		failures++;
 
+	// System info lines.
+	struct
+	{
+		int source;
+		const wchar_t *expected;
+	} lines[] = {
+		{TEXT_APPVERSION, L"UnleashX Version: 0.39.0528A"},
+		{TEXT_HOMEPATH, L"Path: e:\\dash\\"},
+		{TEXT_CPUTEMP, L"CPU: 40.00 C"},
+		{TEXT_C_FREEMB, L"C: 0 free"},
+		{TEXT_DNS1, L"Subnet: "},
+		{TEXT_LINKSTATUS, L"No Link"},
+		{0x13, L""},
+		{0x5A, L""},
+	};
+	for (size_t i = 0; i < sizeof(lines) / sizeof(lines[0]); i++)
+	{
+		const wchar_t *value = GetInfoText(lines[i].source);
+		if (wcscmp(value, lines[i].expected) != 0)
+		{
+			printf("FAIL GetInfoText 0x%02X: '%ls', expected '%ls'\n", lines[i].source, value, lines[i].expected);
+			failures++;
+		}
+	}
+
 	InvalidateSkinText(TEXT_APPVERSION);
 	if (wcscmp(GetSkinTextValue(TEXT_APPVERSION), L"0.39.0528A") != 0)
 		failures++;

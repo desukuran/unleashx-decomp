@@ -141,6 +141,12 @@ only report again after three repeats. The remote's arrows, SELECT and BACK
 also act on the gamepad state (so screens that read the stick see them).
 Without gamepad or remote input, the debug keyboard is read (see MENU.md).
 
+`UpdateGamepads` (the sample framework's per-frame merge, also called by the loops that run outside the main loop) reads all four ports into `m_defaultGamepad`:
+* **Buttons:** OR'ed across the ports.
+* **Sticks:** added up, ignoring values inside the 24% dead zone. The sums wrap as shorts and aren't clamped.
+* **Action:** the last port's pending action wins.
+* **Remote:** `m_defaultIR` comes from the last port with a receiver.
+
 The action goes to the first of these that is open:
 
 1. a message box (it takes all input);

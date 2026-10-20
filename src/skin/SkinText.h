@@ -27,7 +27,8 @@ const wchar_t *GetSkinTextValue(int source);       // 0x001146ED
 // Forgets the cached value so it's read again.
 void InvalidateSkinText(int source);               // 0x001146A3
 // One line of the system info screen, e.g. "IP: 192.168.0.5 DHCP".
-const wchar_t *GetInfoText(int source);            // 0x00117FB9 TODO: decompile
+// (source in edx)
+const wchar_t *GetInfoText(int source);            // 0x00117FB9
 // All headlines of the current feed (<Newsfeed Continuous>), or "".
 const wchar_t *GetNewsText();                      // 0x00114655
 

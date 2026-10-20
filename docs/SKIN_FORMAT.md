@@ -156,7 +156,7 @@ Keywords are case-insensitive; the `$Token$` forms are written exactly like this
 | `c_freemb` ... `g_freemb` | `$C_FreeMB$`... | free space in MB |
 | `c_totalmb` ... `g_totalmb` | `$C_TotalMB$`... | total space in MB |
 | `c_pfree` ... `g_pfree` | `$C_PFree$`... | percent free |
-| `cputemp`, `mbtemp`, `hdtemp` | `$CPUTemp$`, `$MBTemp$`, `$HDTemp$` | temperature (presumably in the `UseFahrenheit` unit) |
+| `cputemp`, `mbtemp`, `hdtemp` | `$CPUTemp$`, `$MBTemp$`, `$HDTemp$` | temperature (`cputemp`/`mbtemp` follow `UseFahrenheit` in a labelled text) |
 | `cputempc`/`f`, `mbtempc`/`f`, `hdtempc`/`f` | `$CPUTempC$`... | temperature in °C / °F |
 | `fanspeed` | `$FanSpeed$` | |
 | `freememory`, `totalmemory` | `$FreeMemory$`, `$TotalMemory$` | RAM |
@@ -173,6 +173,12 @@ Keywords are case-insensitive; the `$Token$` forms are written exactly like this
 | `songname`, `songtime`, `songlength`, `songbitrate`, `songfrequency`, `songchannel`, `songtrack`, `soundtrack` | `$SongName$`... | music player |
 
 The numeric IDs are in `enum SkinTextSource` (`src/skin/Skin.h`).
+
+A text with a source but no format string shows a labelled line (`GetInfoText`, `src/skin/SkinText.cpp`). For example `ip` shows "IP: 192.168.0.5 DHCP", `cputemp` shows "CPU: 40.00 C" (or °F with `UseFahrenheit`), and `c_free` shows "C: ... free".
+* **Unlabelled sources:** DVD title, link status, song fields, newsfeed, memory and a few others show their bare value.
+* **Quirks:**
+  * DNS 1 and 2 are labelled "Subnet:".
+  * The MB and percent sizes share the plain sizes' labels.
 
 ### `<Shape>` (in `<Main>`) / `<Element>` (in `<MusicPlayer>`)
 

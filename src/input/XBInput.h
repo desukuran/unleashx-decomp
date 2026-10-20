@@ -39,11 +39,14 @@ struct XBGAMEPAD : public SGamepadState
 // An IR remote (the DVD playback kit). 0x84 bytes.
 struct SIRRemote
 {
-	BYTE unknown00[0x0A];
+	BYTE unknown00;                    // +0x00 (copied into the merged state)
+	BYTE unknown01[7];
+	WORD unknown08;                    // +0x08 (copied into the merged state)
 	WORD wKeyCode;                     // +0x0A the button held, 0 = none
 	BYTE unknown0C[0x28 - 0x0C];
 	HANDLE hDevice;                    // +0x28 NULL = no receiver in the port
-	BYTE unknown2C[0x84 - 0x2C];
+	BYTE unknown2C[0x80 - 0x2C];
+	DWORD dwPort;                      // +0x80 the merged state: which port it came from
 };
 struct SKeyboardState
 {

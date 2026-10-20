@@ -3,6 +3,9 @@
 #include "Gamepad.h"
 
 #include <cmath>
+#include <cstring>
+
+#include "../app/XBApp.h"
 
 // The ports last used (-1 = none yet).
 static int s_nGamepadPort = -1;   // 0x0026CC00
@@ -341,4 +344,66 @@ int CGamepadInput::GetAction()
 		return INPUT_RTHUMB;
 	}
 	return GetRemoteAction();
+}
+
+// Thumbstick values inside this are ignored when the pads are merged (the
+// XDK samples' 24% dead zone).
+#define THUMB_DEADZONE 7864
+
+static void AddThumb(short *total, short value)
+{
+	if (value > THUMB_DEADZONE || value < -THUMB_DEADZONE)
+		*total = (short)(*total + value);
+}
+
+// 0x000E020F (app in esi)
+// Reads the controllers and merges them: buttons OR'ed, sticks added
+// (outside the dead zone; quirk: the sums wrap as shorts and the -1..1
+// values aren't clamped), the last pad's action; the remote is the last
+// port with a receiver.
+void UpdateGamepads(CXBApplicationEx *app)
+{
+	XBInput_GetInput(app->m_pGamepads);
+	memset(&app->m_defaultGamepad, 0, sizeof(app->m_defaultGamepad));
+	memset(&app->m_defaultIR, 0, sizeof(app->m_defaultIR));
+	short thumbLX = 0, thumbLY = 0, thumbRX = 0, thumbRY = 0;
+	XBGAMEPAD &merged = app->m_defaultGamepad;
+	for (DWORD port = 0; port < 4; port++)
+	{
+		const XBGAMEPAD &pad = app->m_pGamepads[port];
+		if (pad.hDevice != NULL)
+		{
+			AddThumb(&thumbLX, pad.sThumbLX);
+			AddThumb(&thumbLY, pad.sThumbLY);
+			AddThumb(&thumbRX, pad.sThumbRX);
+			AddThumb(&thumbRY, pad.sThumbRY);
+			merged.fX1 += pad.fX1;
+			merged.fY1 += pad.fY1;
+			merged.fX2 += pad.fX2;
+			merged.fY2 += pad.fY2;
+			merged.wButtons |= pad.wButtons;
+			merged.wPressedButtons |= pad.wPressedButtons;
+			merged.wLastButtons |= pad.wLastButtons;
+			if (pad.nAction != 0)
+				merged.nAction = pad.nAction;
+			for (int i = 0; i < 8; i++)
+			{
+				merged.bAnalogButtons[i] |= pad.bAnalogButtons[i];
+				merged.bPressedAnalogButtons[i] |= pad.bPressedAnalogButtons[i];
+				merged.bLastAnalogButtons[i] |= pad.bLastAnalogButtons[i];
+			}
+		}
+		const SIRRemote &remote = app->m_pIRRemotes[port];
+		if (remote.hDevice != NULL)
+		{
+			app->m_defaultIR.unknown00 = remote.unknown00;
+			app->m_defaultIR.wKeyCode = remote.wKeyCode;
+			app->m_defaultIR.unknown08 = remote.unknown08;
+			app->m_defaultIR.dwPort = port;
+		}
+	}
+	merged.sThumbLX = thumbLX;
+	merged.sThumbLY = thumbLY;
+	merged.sThumbRX = thumbRX;
+	merged.sThumbRY = thumbRY;
 }

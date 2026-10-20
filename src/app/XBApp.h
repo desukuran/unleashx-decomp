@@ -63,9 +63,10 @@ public:
 	BOOL m_bPaused;                           // +0x068
 	float m_fFPS;                             // +0x06C
 	wchar_t m_strFrameRate[20];               // +0x070
-	BYTE m_unknown098[0x10];                  // +0x098
+	BYTE m_unknown098[0x0C];                  // +0x098
+	XBGAMEPAD *m_pGamepads;                   // +0x0A4 the four ports (g_Gamepads)
 	XBGAMEPAD m_defaultGamepad;               // +0x0A8 all four gamepads merged (UpdateGamepads)
-	DWORD m_unknown188;                       // +0x188
+	SIRRemote *m_pIRRemotes;                  // +0x188 the four ports (g_irRemotes)
 	SIRRemote m_defaultIR;                    // +0x18C the remote in use
 	SKeystroke *m_pKeystroke;                 // +0x210 the debug keyboard's last key
 	DWORD m_unknown214;                       // +0x214
