@@ -167,7 +167,9 @@ The streaming classes (`CAudioBuf`, `CAudioPump`, `CFilePump`,
 packets, each with a notification event. A thread refills a packet with
 the next data as soon as the play cursor passes it. When the data runs
 out, the rest of the packet is filled with silence and the pump stops
-after the last full packet has played. `CWMAPump` is never used.
+after the last full packet has played. `CWMAPump` is never used. WMA files
+play through XACT (`CWMAPlayer`); the XDK's WMAStream sample
+(`CWMAFileStream`) isn't linked in.
 
 With 5.1 enabled, the players are given the speaker mix bins. The WAV,
 CD and MP3 buffers then switch to a 6-channel format; the WMA player
