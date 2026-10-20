@@ -31,11 +31,15 @@ REF = os.path.join(ROOT, 'reference/thirdparty')
 
 # name: (description, source globs under reference/thirdparty, ranges, alias seeds, name prefixes of its
 # functions already named elsewhere)
+# Libraries whose ranges hold nothing but their own code: every hand-named
+# function there (that src/ doesn't implement) is theirs, whatever its name.
+OWNS_RANGES = ('unrar', 'xdksample')
+
 LIBRARIES = [
     ('unrar', 'XBMC\'s UnrarXLib (unrar 3.x with the urarlib_* entry points); xbmc4xbox: lib/UnrarXLib '
               '(github.com/antonic901/xbmc4xbox-redux)',
      ['xbmc4xbox/lib/UnrarXLib/*.cpp', 'xbmc4xbox/lib/UnrarXLib/*.hpp'],
-     [(0x6F900, 0x7F000), (0x136600, 0x139A00)], [],
+     [(0x32936, 0x33C04), (0x6F900, 0x7F000), (0x136600, 0x139A00), (0x13D3A7, 0x13D5CF)], [],
      ('urarlib_', 'CmdExtract::', 'Archive::', 'File::', 'FindFile::', 'CommandData::', 'ErrorHandler::',
       'ScanTree::', 'Unpack::', 'ComprDataIO::', 'RawRead::', 'StringList::', 'Array::')),
     ('xunzip', 'Hans Dietrich\'s XUnzip (Lucian Wischik\'s unzip, zlib inflate); XUnzip.cpp as shipped in '
@@ -213,7 +217,8 @@ def main():
             named = sorted(a for a, (l, n) in lib_names.items() if l == lib)
             # Hand-named functions of the library (names.txt wins anyway); listed so
             # tools/progress.py counts them as library code, unless src/ has them.
-            hand = sorted(a for a in curated if a not in lib_names and a not in done and library_of(a) == lib)
+            hand = sorted(a for a in curated if a not in lib_names and a not in done and
+                          (library_of(a) == lib or (lib in OWNS_RANGES and any(lo <= a < hi for lo, hi in ranges))))
             subs = sorted(a for a, l in labels.items() if l == lib)
             f.write('#\n# %s: %s\n' % (lib, desc))
             for a in sorted(named + subs + hand):

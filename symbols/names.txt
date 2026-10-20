@@ -3027,3 +3027,4 @@
 001386bf CmdExtract::CmdExtract
 001386ff CmdExtract::UnstoreFile
 0013d3a7 MergeArchive
+0007a8e9 File::FileLength
