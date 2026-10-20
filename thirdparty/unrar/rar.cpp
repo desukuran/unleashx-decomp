@@ -392,7 +392,9 @@ int urarlib_list(char *rarfile, ArchiveList_struct **ppList, char *libpassword, 
               pCurr->item.FileTime = pArc->NewLhd.FileTime;
               pCurr->item.UnpVer = pArc->NewLhd.UnpVer;
               pCurr->item.Method = pArc->NewLhd.Method;
-              pCurr->item.FileAttr = pArc->NewLhd.FileAttr;
+              // UnleashX build: folders as FILE_ATTRIBUTE_DIRECTORY, like the copy
+              // UnleashX linked (0x00078787); files keep their raw attributes.
+              pCurr->item.FileAttr = pArc->IsArcDir() ? 0x10 : pArc->NewLhd.FileAttr;
               pCurr->item.iOffset = iOffset;
               pCurr->next = NULL;
               pPrev = pCurr;

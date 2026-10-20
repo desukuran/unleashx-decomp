@@ -11,7 +11,7 @@ present the interfaces UnleashX's code expects (declared in
 | `libmad/` | Underbit's MPEG audio decoder (MP3 playback) | 0.15.1b | GPL v2 or later (`COPYING`) | none; the `msvc++` `config.h` and `mad.h` are used |
 | `ftpparse/` | D. J. Bernstein's FTP `LIST` parser (the FTP client) | 20001223 | "Commercial use is fine, if you let me know what programs you're using this in." (see the header) | none |
 | `zip_utils/` | Lucian Wischik's zip/unzip, repackaged Info-ZIP/zlib code (zip and skin archives, the built-in media) | 2005 | zlib/Info-ZIP style, free use (see the files' headers) | a stray line removed from the top of `zip.cpp` |
-| `unrar/` | XBMC's UnrarXLib: Eugene Roshal's unRAR 3.51 with the `urarlib_*` interface (RAR archives) | unRAR 3.51 | unRAR license (`license.txt`): free to use for extracting; **may not be used to develop a RAR (WinRAR) compatible archiver** | `shim/` replaces the few XBMC classes it used (`XFILE::CFile`, `CUtil`, `URIUtils`, `CEvent`) with Win32 ones |
+| `unrar/` | XBMC's UnrarXLib: Eugene Roshal's unRAR 3.51 with the `urarlib_*` interface (RAR archives) | unRAR 3.51 | unRAR license (`license.txt`): free to use for extracting; **may not be used to develop a RAR (WinRAR) compatible archiver** | `shim/` replaces the few XBMC classes it used (`XFILE::CFile`, `CUtil`, `URIUtils`, `CEvent`) with Win32 ones; `urarlib_list` reports folders as `FILE_ATTRIBUTE_DIRECTORY`, as UnleashX's copy did |
 | `extract-xiso/` | XboxDev's extract-xiso (makes the disc image; a host tool, not linked in) | 2.7.1, commit in `VERSION` | its own permissive license (`LICENSE.TXT`) | none |
 
 Not from here:
