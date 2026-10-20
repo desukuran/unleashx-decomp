@@ -55,7 +55,9 @@ its prefix, which takes a little longer.
 Release configuration. The XDK's Visual Studio integration provides the Xbox
 platform, compiler and libraries; the project's post-build step runs
 imagebld with UnleashX's sections and then `tools\xbe.py retail` (if Python
-is on the path). The output is in `build\vs2003\`. The project is generated
+is on the path). The output is `build\vs2003\default.xbe` (the
+`UnleashX.xbe` the IDE's own image step makes next to it lacks UnleashX's
+resources). The project is generated
 from the same file lists as the Makefile by `python tools/gen_vcproj.py`;
 rerun that after adding or removing files, or changing the zips in
 `assets/`.
