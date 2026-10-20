@@ -71,6 +71,12 @@ relative paths, so its zips look flat here even though extracting them
 recreates the folders. (Checked against the original: the listing thread
 cuts each name at its last `/`, 0x000157A8.)
 
+Password-protected zips can't be extracted: the XUnzip UnleashX linked has
+no decryption, so their entries fail. The error box then shows "Error
+Code: n" from `GetLastError()` on the drawing thread, not the extraction
+thread, so the number (often 3) means nothing. (Same in this build: the
+vendored zip_utils could decrypt, but UnleashX never passes a password.)
+
 | Button | Effect |
 |---|---|
 | Up/Down, LT/RT, left stick | Move. |
