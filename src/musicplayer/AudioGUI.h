@@ -63,6 +63,8 @@ public:
 	virtual BOOL Init(CXBFontEx *font);                   // 0x00134283
 	virtual BOOL IsOpen() { return m_bOpen; }             // 0x00130DD5
 	virtual BOOL Render();                                // 0x00134853
+	// An older built-in window, unused (this in ebx; AudioGUIRender.cpp).
+	void RenderBuiltIn();                                 // 0x00135089
 	virtual HRESULT ProcessInput(int *action, SGamepadState **pad);   // 0x00135A99
 	// Opens the screen: the buttons' states and the built-in layout.
 	virtual void Show();                                  // 0x00133A5D

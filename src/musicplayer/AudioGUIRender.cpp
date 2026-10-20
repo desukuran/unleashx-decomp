@@ -12,10 +12,8 @@
 //   row 6     the progress bar: track (left half), fill (right half)
 //   row 7     the volume bar, the same way
 //
-// Unused: 0x00135089, an older built-in player window drawn from the
-// layout Show computes (a bevel box with the soundtrack and song names,
-// "%s - %s" scrolling, the state icons, the format texts and a level
-// meter). Nothing calls it; it isn't reconstructed here. TODO: decompile
+// Unused: RenderBuiltIn (0x00135089), an older built-in player window drawn
+// from the layout Show computes. Nothing calls it.
 #include "AudioGUI.h"
 
 #include <cmath>
@@ -393,4 +391,131 @@ BOOL CAudioGUI::Render()
 	else if (m_bBrowserOpen)
 		m_pBrowser->Render();
 	return FALSE;
+}
+
+// --- The unused built-in player window --------------------------------------
+
+#define BUILTIN_TEXT 0xFFF2F2F2
+#define BUILTIN_BORDER 0xFF000080
+
+// A textured screen vertex (D3DFVF_XYZRHW | D3DFVF_TEX1).
+struct SBuiltInVertex
+{
+	float x, y, z, rhw;
+	float u, v;
+};
+
+// The scrolling "<soundtrack> - <song>" line, shared by all windows.
+static float s_fBuiltInScroll;           // 0x00270F8C
+static DWORD s_dwBuiltInScrollTime;      // 0x0027A424 (set 2 s ahead on the first call)
+static BOOL s_bBuiltInScrollInit;        // 0x0027A428
+
+// 0x00135089 (this in ebx; nothing calls it)
+// The keyboard texture as the panel, a bevel box with the time, the stop /
+// play / pause icons (the current one lit), the format texts, a box with
+// the soundtrack and song scrolling through it, and the level meter's
+// background (no meter).
+void CAudioGUI::RenderBuiltIn()
+{
+	float left = m_fX - 0.5f;
+	float top = m_fY - 0.5f;
+	float right = m_fWidth + m_fX - 0.5f;
+	float bottom = m_fHeight + m_fY - 0.5f;
+	SBuiltInVertex v[4] = {
+		{left, top, 1.0f, 1.0f, 0.1f, 0.1f},
+		{right, top, 1.0f, 1.0f, 0.9f, 0.1f},
+		{right, bottom, 1.0f, 1.0f, 0.9f, 0.9f},
+		{left, bottom, 1.0f, 1.0f, 0.1f, 0.9f},
+	};
+	g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_TEX1);
+	g_pd3dDevice->SetTexture(0, m_pKeyboardTexture);
+	// (The original writes these into D3D's texture stage state cache.)
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TFACTOR);
+	g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
+	g_pd3dDevice->SetRenderState(D3DRS_TEXTUREFACTOR, 0xFFFFFFFF);
+	g_pd3dDevice->DrawVerticesUP(D3DPT_POLYGON, 4, v, sizeof(SBuiltInVertex));
+
+	float margin = m_fScaleY * 5.0f;
+	float innerWidth = m_fWidth - margin * 2.0f;
+	DrawBevelBox(margin + m_fX, m_fY + margin, innerWidth, m_fInfoHeight, BUILTIN_BORDER, 0xFF3B5A92, 0.95f, 2);
+	m_pFont->SetScaleFactors(m_fTitleScale, m_fTitleScale);
+	m_pFont->DrawText(m_fTitleX, m_fTitleY, BUILTIN_TEXT, GetSkinTextValue(TEXT_SONGTIME), 0, 0.0f);
+
+	// The state icons, one under the other: stop, play, pause.
+	float iconGap = (m_pFont->m_fScaleFactorY * m_pFont->m_fFontHeight - m_fMargin * 3.0f) * 0.5f;
+	int state = g_pMusicManager->GetState();
+	if (state == MUSIC_STOPPED || state == MUSIC_PAUSED || state == MUSIC_PLAYING)
+	{
+		float x = margin * 3.0f + m_fX;
+		float y = m_fTitleY;
+		float stopAlpha = state == MUSIC_STOPPED ? 1.0f : 0.1f;
+		float playAlpha = state == MUSIC_PLAYING ? 1.0f : 0.1f;
+		float pauseAlpha = state == MUSIC_PAUSED ? 1.0f : 0.1f;
+		DrawRect(x, y, m_fMargin, m_fMargin, 0, BUILTIN_TEXT, stopAlpha, 1);
+		y = m_fMargin + iconGap + y;
+		DrawTriangle(x, y, m_fMargin, m_fMargin, 4, 0, BUILTIN_TEXT, playAlpha);
+		y = m_fMargin + iconGap + y;
+		// (Paused draws the bars 0.3 wide at 0 and 0.7; otherwise 0.3 wide at
+		// 0 and 0.7 too, through float constants instead of doubles.)
+		DrawRect(x, y, m_fMargin * 0.3f, m_fMargin, 0, BUILTIN_TEXT, pauseAlpha, 1);
+		DrawRect(m_fMargin * 0.7f + x, y, m_fMargin * 0.3f, m_fMargin, 0, BUILTIN_TEXT, pauseAlpha, 1);
+	}
+
+	// The format: bit rate, sample rate / length, channels.
+	if (m_szChannels[0] != 0)
+	{
+		float scale = (float)floor((m_fSmallScale + 0.24f) * 4.0f) * 0.25f;
+		m_pFont->SetScaleFactors(scale, scale);
+		float rowHeight = (float)ceil(m_pFont->m_fScaleFactorY * m_pFont->m_fFontHeight) + 2.0f;
+		float column = (m_fMeterX - m_fTimeX) * 0.5f;
+		m_pFont->DrawText(m_fTimeX, m_fTimeY, BUILTIN_TEXT, m_szBitRate, 0, 0.0f);
+		m_pFont->DrawText(m_fTimeX + column, m_fTimeY, BUILTIN_TEXT, m_szSampleRate, 0, 0.0f);
+		m_pFont->DrawText(m_fTimeX, m_fTimeY + rowHeight, BUILTIN_TEXT, m_szLength, 0, 0.0f);
+		m_pFont->DrawText(m_fTimeX + column, m_fTimeY + rowHeight, BUILTIN_TEXT, m_szChannels, 0, 0.0f);
+	}
+
+	// The soundtrack and song, scrolling one pixel per scroll step inside
+	// the box.
+	m_pFont->SetScaleFactors(m_fInfoScale, m_fInfoScale);
+	float boxHeight = m_fScaleY * 30.0f;
+	DrawBevelBox(m_fStateX, m_fStateY, innerWidth, boxHeight, 0, BUILTIN_BORDER, 0.8f, 1);
+	wchar_t line[250];
+	swprintf(line, 250, L"%ls - %ls", GetSkinTextValue(TEXT_SOUNDTRACK), GetSkinTextValue(TEXT_SONGNAME));
+	if (!s_bBuiltInScrollInit)
+	{
+		s_bBuiltInScrollInit = TRUE;
+		s_dwBuiltInScrollTime = GetTickCount() + 2000;
+	}
+	DWORD now = GetTickCount();
+	BOOL step = FALSE;
+	if (s_dwBuiltInScrollTime < now)
+	{
+		s_dwBuiltInScrollTime = m_pSettings->m_nScrollSpeed + now;
+		step = TRUE;
+	}
+	float textX = m_fStateX + margin;
+	float textY = margin + m_fStateY;
+	float screenWidth = 640.0f, screenHeight = 480.0f;
+	GetDisplaySize(&screenWidth, &screenHeight, FALSE);
+	D3DRECT clip;
+	clip.x1 = (long)textX;
+	clip.y1 = (long)textY;
+	clip.x2 = (long)(innerWidth + textX > screenWidth ? screenWidth : innerWidth + textX);
+	clip.y2 = (long)(boxHeight + textY > screenHeight ? screenHeight : boxHeight + textY);
+	g_pd3dDevice->SetScissors(1, FALSE, &clip);
+	float textWidth = m_pFont->GetTextWidth(line);
+	if (step)
+	{
+		// Past the left edge: start again from the right.
+		if ((float)clip.x1 > textWidth + textX - s_fBuiltInScroll)
+			s_fBuiltInScroll = 0.0f - innerWidth;
+		else
+			s_fBuiltInScroll += 1.0f;
+	}
+	m_pFont->DrawText(textX - s_fBuiltInScroll, margin + m_fStateY, BUILTIN_TEXT, line, 0, 0.0f);
+	g_pd3dDevice->SetScissors(0, FALSE, NULL);
+
+	DrawRect(m_fMeterX, m_fMeterY, m_fMeterWidth, m_fMeterHeight, 0, BUILTIN_BORDER, 0.4f, 1);
 }

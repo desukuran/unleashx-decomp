@@ -1971,7 +1971,7 @@
 00132308 DrawLevelMeter
 001325b6 DrawStateIcon
 00132781 DrawPanelTexture2
-00135089 CAudioGUI::RenderBuiltIn_unused
+00135089 CAudioGUI::RenderBuiltIn
 00269bc8 g_nPlayerSoundtrack
 00277710 g_playerTracks
 0027a41c s_dwPlayerScrollTick
