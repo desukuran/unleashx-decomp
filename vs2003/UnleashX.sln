@@ -1,0 +1,18 @@
+﻿Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UnleashX", "UnleashX.vcproj", "{8E4C2A1B-5D3F-4C7E-9A21-0B5E7A3D9C10}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{8E4C2A1B-5D3F-4C7E-9A21-0B5E7A3D9C10}.Release.ActiveCfg = Release|Xbox
+		{8E4C2A1B-5D3F-4C7E-9A21-0B5E7A3D9C10}.Release.Build.0 = Release|Xbox
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
