@@ -15,6 +15,7 @@
 #include "../net/FtpServer.h"
 #include "../net/Network.h"
 #include "../settings/AppSettings.h"
+#include "../system/XSettings.h"
 #include "../system/Drives.h"
 #include "../system/FileOps.h"
 #include "../system/Storage.h"
@@ -29,9 +30,6 @@ BYTE g_bLaunching;                        // 0x00276236
 BYTE g_bShuttingDown;                     // 0x00276235
 DWORD g_dwShutdownDeadline;               // 0x00276238
 
-// Video standard switching (the EEPROM setting), used when launching games
-// of another region and by the VideoMode action.
-void SetVideoRegion(int standard, int mode);         // 0x000BCF48 TODO: decompile
 // Maps D: to the XBE's folder and starts it; returns only on failure.
 // Starts the network from the settings on a thread (unless one is running).
 

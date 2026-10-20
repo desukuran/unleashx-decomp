@@ -251,6 +251,8 @@ NTSTATUS __stdcall NtCreateFile(HANDLE *FileHandle, ULONG DesiredAccess, POBJECT
 NTSTATUS __stdcall IoCreateSymbolicLink(PSTRING SymbolicLinkName, PSTRING DeviceName);
 NTSTATUS __stdcall IoDeleteSymbolicLink(PSTRING SymbolicLinkName);
 void __stdcall RtlInitAnsiString(PANSI_STRING Destination, const char *Source);
+ULONG __stdcall MmQueryAddressProtect(void *VirtualAddress);
+void __stdcall MmSetAddressProtect(void *BaseAddress, ULONG NumberOfBytes, ULONG NewProtect);
 NTSTATUS __stdcall NtOpenFile(HANDLE *FileHandle, ULONG DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes,
                               PIO_STATUS_BLOCK IoStatusBlock, ULONG ShareAccess, ULONG OpenOptions);
 // The kernel's critical section (opaque here). 0x1C bytes.

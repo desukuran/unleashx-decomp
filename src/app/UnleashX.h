@@ -42,7 +42,7 @@ public:
 	// The orb's vertex buffer. (this in esi)
 	HRESULT CreateOrbBuffer();                        // 0x000E0411
 	// Fills m_globePath (a slow sway). (this in ecx)
-	void BuildGlobePath();                            // 0x000DFF17 TODO: decompile
+	void BuildGlobePath();                            // 0x000DFF17
 	// The startup splash (or the previous program's screen) at alpha, full
 	// screen. Inlined in the original.
 	void DrawSplash(float alpha, const D3DDISPLAYMODE &mode);
@@ -191,8 +191,8 @@ extern HANDLE g_hExitEvent;                  // 0x0027624C
 // The pointer's cursor, fading out (alpha). The original takes x in ecx and
 // y in eax. AppRender.cpp
 void DrawPointer(int x, int y, float alpha);         // 0x000E0950
-// A free screenshotN.bmp on Z:, Y: or X: (one with 1MB free), or "".
-// TODO: decompile
+// A free X:\Image_NNNN.bmp on Z:, Y: or X: (the first with 1 MB free),
+// or "". (AppRender.cpp)
 std::string GetScreenshotPath();                     // 0x000A3C39
 extern DWORD g_dwPointerMoveTime;            // 0x0027216C
 

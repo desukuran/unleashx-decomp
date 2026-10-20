@@ -2534,3 +2534,5 @@
 000e040c CUnleashX::CSkinEvent::WaitForVerticalBlank
 000e0538 CUnleashX::CSkinEvent::OnPreviewSoundStart
 000ea055 CUnleashX::CSkinEvent::OnPreviewSoundEnd
+0026b950 s_queryCode
+0026b990 s_queryPatch

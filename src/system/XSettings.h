@@ -32,3 +32,9 @@ HRESULT SetVideo1080i(BOOL enable);                 // 0x0008EEAE
 HRESULT SetVideoPAL60(BOOL enable);                 // 0x0008EDD9
 HRESULT SetAudioAC3(BOOL enable);                   // 0x0008EEF5
 HRESULT SetAudioDTS(BOOL enable);                   // 0x0008EF3C
+// Makes the kernel report another game region and video standard to the
+// next title (for launching games of other regions): patches
+// ExQueryNonVolatileSetting in memory. standard 1 NTSC-M, 2 NTSC-J, 3 PAL;
+// mode 1 NTSC-M, 2 NTSC-J, 3 PAL, 4 PAL-60; either 0 follows the other.
+// Nothing happens when the code isn't found.
+void SetVideoRegion(int standard, int mode);        // 0x000BCF48

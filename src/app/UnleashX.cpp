@@ -198,6 +198,39 @@ sound:
 	PlayBackgroundSound(play);
 }
 
+// 0x0002B81C (deleting 0x0002B8BB)
+CUnleashX::~CUnleashX()
+{
+	Cleanup();
+	// (Then the members: the meshes, the menu, the fonts, the resource.)
+}
+
+// 0x000DFF17
+// The globe's swaying (<Main Globe>): 512 heights that speed up over 128
+// steps, run evenly for 256 and slow down over 128.
+void CUnleashX::BuildGlobePath()
+{
+	const float accel = 1.5978967e-05f;    // 0x0025C8E0
+	const float speed = 0.0020453078f;     // 0x0025C8DC (128 * accel)
+	float height = 0.0f;
+	int i;
+	for (i = 0; i < 128; i++)
+	{
+		m_globePath[i] = height;
+		height = (float)i * accel + height;
+	}
+	for (i = 0; i < 256; i++)
+	{
+		m_globePath[128 + i] = height;
+		height += speed;
+	}
+	for (i = 128; i > 0; i--)
+	{
+		m_globePath[384 + 128 - i] = height;
+		height = (float)i * accel + height;
+	}
+}
+
 // 0x000E1B1E
 HRESULT CUnleashX::Cleanup()
 {

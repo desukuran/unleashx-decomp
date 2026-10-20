@@ -3,6 +3,7 @@
 // the pointer, and the file operation progress/errors over the menu.
 #include <cwchar>
 
+#include "../common/FileUtil.h"
 #include "../common/StrUtil.h"
 #include "../net/FtpServer.h"
 #include "../render/D3D.h"
@@ -11,6 +12,7 @@
 #include "../settings/AppSettings.h"
 #include "../skin/Skin.h"
 #include "../skin/SkinColors.h"
+#include "../system/Drives.h"
 #include "../system/FileOps.h"
 #include "../ui/Language.h"
 #include "../ui/Menu.h"
@@ -121,6 +123,31 @@ void CUnleashX::RenderFileOperation()
 	g_bOperationFailed = FALSE;
 	g_bFileOperationQueued = FALSE;
 	g_nFileOperationType = 6;
+}
+
+// 0x000A3C39
+// Quirk: once Image_0000 to Image_9998 all exist, Image_9998 is returned
+// (and overwritten).
+std::string GetScreenshotPath()
+{
+	static const char drives[] = {'Z', 'Y', 'X'};
+	char drive = 0;
+	for (int i = 0; i < 3 && drive == 0; i++)
+	{
+		SDriveInfo *info = GetDriveInfo(drives[i]);
+		if (info != NULL && info->freeBytes >= 0x100000)
+			drive = drives[i];
+	}
+	if (drive == 0)
+		return "";
+	std::string path;
+	for (int count = 1, index = 0;; index = count, count++)
+	{
+		StrFormat(path, "%c:\\Image_%04d.bmp", drive, index);
+		if (!FileExists(path.c_str()) || count > 9998)
+			break;
+	}
+	return path;
 }
 
 static void SetPointerVertex(SScreenVertex *v, float x, float y)
