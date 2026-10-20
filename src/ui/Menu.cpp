@@ -1799,7 +1799,8 @@ HRESULT CMenu::ProcessInput(int *action, SGamepadState **pad)
 		m_bWaitingForKeyboard = !done;
 		if (!done)
 			return S_OK;
-		if (!g_bKeyboardAccepted)
+		// (Nothing to check against: s_strPassword's length, 0x0027A5CC.)
+		if (s_strPassword.size() == 0)
 		{
 			if (m_bBatchRunning && g_virtualKeyboard.m_bCancelled != 0)
 				LeaveBatchSubList();
@@ -1853,7 +1854,7 @@ HRESULT CMenu::ProcessInput(int *action, SGamepadState **pad)
 		m_bWaitingForPassCode = !closed;
 		if (!closed)
 			return S_OK;
-		if (!g_bKeyboardAccepted)
+		if (s_strPassword.size() == 0)
 		{
 			m_bContextMenuShown = FALSE;
 			m_bDeletePending = FALSE;

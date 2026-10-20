@@ -176,7 +176,6 @@ private:
 };
 
 extern CVirtualKeyboard g_virtualKeyboard;               // 0x00278328
-extern BOOL g_bKeyboardAccepted;                         // 0x0027A5CC TODO: verify (also read for the passcode pad)
 
 // An argument that is "KBResult" becomes the keyboard's text (trimmed);
 // "$KBResult$" inside it is replaced by that text.

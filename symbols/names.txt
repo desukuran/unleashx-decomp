@@ -677,7 +677,6 @@
 00277618 g_ullOperationBytes
 00277138 g_szOperationFile
 000a6e7c CountFolder
-0027a5cc g_bKeyboardAccepted
 000d8404 CDropDown::CDropDown
 000d8169 CDropDown::AddItem
 000d80d2 CDropDown::Create
