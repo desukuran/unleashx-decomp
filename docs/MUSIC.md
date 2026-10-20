@@ -89,6 +89,15 @@ was playing (see `src/app/ScreenSaver.cpp`).
 
 ## The music player screen
 
+A skin without a `<MusicPlayer>` section gets a built-in layout of shapes
+and texts in the color scheme's `MM*` colors. Quirk: the colors are copied
+when the layout is built, and when UnleashX starts with the `[Default]`
+skin the color scheme isn't loaded yet, so that player is drawn with
+color 0: only the panel, the buttons (textures) and the level meter show.
+Skins with a `<ColorScheme>` load it first, so their player is complete.
+The level meter reads the audio chip's output levels; under xemu it
+stays at full scale.
+
 `src/musicplayer/` (`CAudioGUI`, mode 9). The skin's `<MusicPlayer>`
 section draws it (see `SKIN_FORMAT.md`). Its button shapes, state icons,
 level meter and bars are drawn by the player:

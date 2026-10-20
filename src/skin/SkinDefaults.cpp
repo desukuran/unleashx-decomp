@@ -87,6 +87,11 @@ void CSkin::SetDefaultMusicPlayerLayout()
 	CXBFont *font = NULL;
 	FindFont("InfoFont", &font);
 
+	// Quirk: the colors are copied now. At startup with the [Default] skin
+	// the color scheme isn't loaded yet (g_colorScheme is still zero; it's
+	// loaded after this), so every shape and text of this layout is
+	// transparent until another skin is chosen. Skins with a <ColorScheme>
+	// load it before getting here.
 	const SColorScheme &c = g_colorScheme;
 	const SSkinShape kShapes[] = {
 		// type, direction, left, top, width, height, unknown18, border, back
