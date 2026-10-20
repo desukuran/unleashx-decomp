@@ -24,6 +24,7 @@ DEFINES = '_XBOX;NDEBUG;WIN32;DEBUG_MOUSE'
 LIBS = ('xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib xacteng.lib xmv.lib xnet.lib '
         'xboxkrnl.lib xkbd.lib libcmt.lib libcpmt.lib')
 MAD_SRCS = 'bit decoder fixed frame huffman layer12 layer3 stream synth timer version'.split()
+FATIO_SRCS = 'fat_access fat_cache fat_filelib fat_format fat_misc fat_string fat_table fat_write'.split()
 IMAGEBLD_FLAGS = ('/NOLOGO /NOLIBWARN /STACK:0x40000 /INITFLAGS:0x1C /TESTID:0x9E115330 '
                   '&quot;/TESTNAME:UnleashX Xbox Launcher&quot; /TESTMEDIATYPES:0x800003FF '
                   '/TESTREGION:0x80000007 /TESTRATINGS:0xFFFFFFFF')
@@ -71,7 +72,10 @@ def main():
         entries += [file_entry(p) for p in hs]
         if entries:
             groups.append(('src\\' + sub, entries))
-    groups.append(('xbox', [file_entry(p) for p in sorted(glob.glob(os.path.join(ROOT, 'xbox', '*.cpp')))]))
+    fat_opts = [('AdditionalIncludeDirectories', '..\\xbox\\include'),
+                ('PreprocessorDefinitions', defines + ';FATFS_USE_CUSTOM_OPTS_FILE')]
+    groups.append(('xbox', [file_entry(p, fat_opts if os.path.basename(p) == 'Fat32.cpp' else ())
+                            for p in sorted(glob.glob(os.path.join(ROOT, 'xbox', '*.cpp')))]))
 
     # The third-party files keep their own flags, as in Makefile.xbox.
     tp = os.path.join(ROOT, 'thirdparty')
@@ -82,6 +86,9 @@ def main():
     mad = base[:1] + [('AdditionalIncludeDirectories', '..\\xbox\\include;..\\thirdparty\\libmad'),
                       ('PreprocessorDefinitions', '_XBOX;NDEBUG;WIN32;FPM_INTEL;HAVE_CONFIG_H;ASO_ZEROCHECK')]
     groups.append(('thirdparty\\libmad', [file_entry(os.path.join(tp, 'libmad', f + '.c'), mad) for f in MAD_SRCS]))
+    fat = base + [('PreprocessorDefinitions', '_XBOX;NDEBUG;WIN32;FATFS_USE_CUSTOM_OPTS_FILE')]
+    groups.append(('thirdparty\\fat_io_lib', [file_entry(os.path.join(tp, 'fat_io_lib', f + '.c'), fat)
+                                             for f in FATIO_SRCS]))
     rar = base[:1] + [('AdditionalIncludeDirectories', '..\\xbox\\include;..\\thirdparty\\unrar\\shim'),
                       ('PreprocessorDefinitions', '_XBOX;NDEBUG;WIN32;_LIB'),
                       ('ForcedIncludeFiles', 'unrar_xbox.h')]

@@ -61,7 +61,7 @@ OBJS := $(patsubst src/%.cpp,$(OBJ)/%.obj,$(SRCS))
 HEADERS := $(wildcard src/*/*.h)
 
 # xbox/: what links in place of the third-party libraries UnleashX had
-# (adapters onto thirdparty/, our own ISO 9660 reader, the FAT32 stand-in).
+# (adapters onto thirdparty/, our own ISO 9660 reader).
 SUPPORT_SRCS := $(sort $(wildcard xbox/*.cpp))
 SUPPORT_OBJS := $(patsubst xbox/%.cpp,$(OBJ)/xbox/%.obj,$(SUPPORT_SRCS))
 
@@ -73,7 +73,8 @@ MAD_SRCS := bit decoder fixed frame huffman layer12 layer3 stream synth timer ve
 RAR_SRCS := archive arcread cmddata consio crc crypt encname errhnd extinfo extract filcreat file filefn \
 	filestr find getbits global int64 isnt log match options pathfn rar rarvm rawread rdwrfn recvol resource \
 	rijndael rs savepos scantree sha1 strfn strlist system timefn ulinks unicode unpack volume
-TP_OBJS := $(OBJ)/tp/unzip.obj $(OBJ)/tp/zip.obj $(OBJ)/tp/ftpparse.obj \
+FATIO_SRCS := fat_access fat_cache fat_filelib fat_format fat_misc fat_string fat_table fat_write
+TP_OBJS := $(OBJ)/tp/unzip.obj $(OBJ)/tp/zip.obj $(OBJ)/tp/ftpparse.obj $(patsubst %,$(OBJ)/tp/fat_%.obj,$(FATIO_SRCS)) \
 	$(patsubst %,$(OBJ)/tp/mad_%.obj,$(MAD_SRCS)) $(patsubst %,$(OBJ)/tp/rar_%.obj,$(RAR_SRCS))
 
 ALL_OBJS := $(OBJS) $(SUPPORT_OBJS) $(TP_OBJS)
@@ -148,6 +149,9 @@ $(OBJ)/tp/zip.obj: $(TP)/zip_utils/zip.cpp
 	$(call compile_tp,)
 $(OBJ)/tp/ftpparse.obj: $(TP)/ftpparse/ftpparse.c
 	$(call compile_tp,)
+$(OBJ)/tp/fat_%.obj: $(TP)/fat_io_lib/%.c xbox/include/fat_custom.h
+	$(call compile_tp,/DFATFS_USE_CUSTOM_OPTS_FILE)
+$(OBJ)/xbox/Fat32.obj: CFLAGS += /DFATFS_USE_CUSTOM_OPTS_FILE /Ixbox/include
 $(OBJ)/tp/mad_%.obj: $(TP)/libmad/%.c
 	$(call compile_tp,/DFPM_INTEL /DHAVE_CONFIG_H /DASO_ZEROCHECK /I$(TP)/libmad)
 $(OBJ)/tp/rar_%.obj: $(TP)/unrar/%.cpp

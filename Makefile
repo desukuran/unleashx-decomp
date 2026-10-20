@@ -45,6 +45,25 @@ build/iso9660_test: tests/iso9660_test.cpp xbox/Iso9660.cpp $(HEADERS)
 	@mkdir -p build
 	$(CXX) $(CXXFLAGS) -o $@ tests/iso9660_test.cpp xbox/Iso9660.cpp src/common/PlatformHost.cpp -pthread
 
+FATIO := $(addprefix thirdparty/fat_io_lib/,fat_access.c fat_cache.c fat_filelib.c fat_format.c fat_misc.c \
+	fat_string.c fat_table.c fat_write.c)
+build/fat32_test: tests/fat32_test.cpp xbox/Fat32.cpp $(FATIO) $(HEADERS)
+	@mkdir -p build/fatio
+	for f in $(FATIO); do cc -O1 -g -w -DFATFS_USE_CUSTOM_OPTS_FILE -Ixbox/include -c $$f \
+		-o build/fatio/$$(basename $$f .c).o || exit 1; done
+	$(CXX) $(CXXFLAGS) -DFATFS_USE_CUSTOM_OPTS_FILE -Ixbox/include -o $@ tests/fat32_test.cpp xbox/Fat32.cpp \
+		src/common/PlatformHost.cpp build/fatio/*.o -pthread
+
+# Two FAT32 disks for fat32_test: one partitioned (two partitions), one not.
+build/fat32_parts.img build/fat32_floppy.img: tests/fat32_test.cpp
+	rm -f build/fat32_parts.img build/fat32_floppy.img
+	truncate -s 96M build/fat32_parts.img
+	printf 'start=2048, size=81920, type=c\nstart=83968, size=110592, type=c\n' | sfdisk -q build/fat32_parts.img
+	mkfs.fat -F 32 -n ONE --offset 2048 build/fat32_parts.img 40960 > /dev/null
+	mkfs.fat -F 32 -n TWO --offset 83968 build/fat32_parts.img 55296 > /dev/null
+	truncate -s 48M build/fat32_floppy.img
+	mkfs.fat -F 32 -n FLOPPY build/fat32_floppy.img > /dev/null
+
 build/testdisc.iso:
 	rm -rf build/testdisc && mkdir -p build/testdisc/Folder
 	printf 'Hello, ISO!\n' > build/testdisc/README.TXT
@@ -90,6 +109,13 @@ endif
 	$(if $(HAVE_RELEASE),build/xbepatch_test,@echo "(xbepatch_test skipped: no $(RELEASE_XBE))")
 	@if command -v xorriso >/dev/null; then $(MAKE) --no-print-directory build/iso9660_test build/testdisc.iso && \
 		build/iso9660_test build/testdisc.iso; else echo "(iso9660_test skipped: no xorriso)"; fi
+	@if command -v mkfs.fat >/dev/null && command -v sfdisk >/dev/null; then \
+		$(MAKE) --no-print-directory build/fat32_test && rm -f build/fat32_parts.img && \
+		$(MAKE) --no-print-directory build/fat32_parts.img && build/fat32_test build/fat32_parts.img build/fat32_floppy.img && \
+		dd if=build/fat32_parts.img of=build/fat32_p1.img bs=512 skip=2048 count=81920 status=none && \
+		dd if=build/fat32_parts.img of=build/fat32_p2.img bs=512 skip=83968 count=110592 status=none && \
+		fsck.fat -n build/fat32_p1.img > /dev/null && fsck.fat -n build/fat32_p2.img > /dev/null && \
+		fsck.fat -n build/fat32_floppy.img > /dev/null; else echo "(fat32_test skipped: no mkfs.fat/sfdisk)"; fi
 	@echo ok
 
 # The Xbox build lives in Makefile.xbox; these pass XDK= and the rest on.

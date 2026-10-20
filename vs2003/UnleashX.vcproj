@@ -843,6 +843,11 @@
 			<File RelativePath="..\src\ui\VirtualKeyboard.h"/>
 		</Filter>
 		<Filter Name="src\xdk">
+			<File RelativePath="..\src\xdk\WmvPlayer.cpp">
+				<FileConfiguration Name="Release|Xbox">
+					<Tool Name="VCCLCompilerTool" ObjectFile="$(IntDir)/src_xdk_WmvPlayer.obj"/>
+				</FileConfiguration>
+			</File>
 			<File RelativePath="..\src\xdk\XBApp.cpp">
 				<FileConfiguration Name="Release|Xbox">
 					<Tool Name="VCCLCompilerTool" ObjectFile="$(IntDir)/src_xdk_XBApp.obj"/>
@@ -899,9 +904,9 @@
 			<File RelativePath="..\src\xml\XmlUtil.h"/>
 		</Filter>
 		<Filter Name="xbox">
-			<File RelativePath="..\xbox\Fat32Stub.cpp">
+			<File RelativePath="..\xbox\Fat32.cpp">
 				<FileConfiguration Name="Release|Xbox">
-					<Tool Name="VCCLCompilerTool" ObjectFile="$(IntDir)/xbox_Fat32Stub.obj"/>
+					<Tool Name="VCCLCompilerTool" AdditionalIncludeDirectories="..\xbox\include" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;DEBUG_MOUSE;MEDIA_FILE_SIZE=369183;INT_SKINS_SIZE=11461;FATFS_USE_CUSTOM_OPTS_FILE" ObjectFile="$(IntDir)/xbox_Fat32.obj"/>
 				</FileConfiguration>
 			</File>
 			<File RelativePath="..\xbox\IoSupport.cpp">
@@ -1006,6 +1011,48 @@
 			<File RelativePath="..\thirdparty\libmad\version.c">
 				<FileConfiguration Name="Release|Xbox">
 					<Tool Name="VCCLCompilerTool" WarningLevel="0" AdditionalIncludeDirectories="..\xbox\include;..\thirdparty\libmad" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;FPM_INTEL;HAVE_CONFIG_H;ASO_ZEROCHECK" ObjectFile="$(IntDir)/thirdparty_libmad_version.obj"/>
+				</FileConfiguration>
+			</File>
+		</Filter>
+		<Filter Name="thirdparty\fat_io_lib">
+			<File RelativePath="..\thirdparty\fat_io_lib\fat_access.c">
+				<FileConfiguration Name="Release|Xbox">
+					<Tool Name="VCCLCompilerTool" WarningLevel="0" AdditionalIncludeDirectories="..\xbox\include" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;FATFS_USE_CUSTOM_OPTS_FILE" ObjectFile="$(IntDir)/thirdparty_fat_io_lib_fat_access.obj"/>
+				</FileConfiguration>
+			</File>
+			<File RelativePath="..\thirdparty\fat_io_lib\fat_cache.c">
+				<FileConfiguration Name="Release|Xbox">
+					<Tool Name="VCCLCompilerTool" WarningLevel="0" AdditionalIncludeDirectories="..\xbox\include" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;FATFS_USE_CUSTOM_OPTS_FILE" ObjectFile="$(IntDir)/thirdparty_fat_io_lib_fat_cache.obj"/>
+				</FileConfiguration>
+			</File>
+			<File RelativePath="..\thirdparty\fat_io_lib\fat_filelib.c">
+				<FileConfiguration Name="Release|Xbox">
+					<Tool Name="VCCLCompilerTool" WarningLevel="0" AdditionalIncludeDirectories="..\xbox\include" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;FATFS_USE_CUSTOM_OPTS_FILE" ObjectFile="$(IntDir)/thirdparty_fat_io_lib_fat_filelib.obj"/>
+				</FileConfiguration>
+			</File>
+			<File RelativePath="..\thirdparty\fat_io_lib\fat_format.c">
+				<FileConfiguration Name="Release|Xbox">
+					<Tool Name="VCCLCompilerTool" WarningLevel="0" AdditionalIncludeDirectories="..\xbox\include" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;FATFS_USE_CUSTOM_OPTS_FILE" ObjectFile="$(IntDir)/thirdparty_fat_io_lib_fat_format.obj"/>
+				</FileConfiguration>
+			</File>
+			<File RelativePath="..\thirdparty\fat_io_lib\fat_misc.c">
+				<FileConfiguration Name="Release|Xbox">
+					<Tool Name="VCCLCompilerTool" WarningLevel="0" AdditionalIncludeDirectories="..\xbox\include" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;FATFS_USE_CUSTOM_OPTS_FILE" ObjectFile="$(IntDir)/thirdparty_fat_io_lib_fat_misc.obj"/>
+				</FileConfiguration>
+			</File>
+			<File RelativePath="..\thirdparty\fat_io_lib\fat_string.c">
+				<FileConfiguration Name="Release|Xbox">
+					<Tool Name="VCCLCompilerTool" WarningLevel="0" AdditionalIncludeDirectories="..\xbox\include" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;FATFS_USE_CUSTOM_OPTS_FILE" ObjectFile="$(IntDir)/thirdparty_fat_io_lib_fat_string.obj"/>
+				</FileConfiguration>
+			</File>
+			<File RelativePath="..\thirdparty\fat_io_lib\fat_table.c">
+				<FileConfiguration Name="Release|Xbox">
+					<Tool Name="VCCLCompilerTool" WarningLevel="0" AdditionalIncludeDirectories="..\xbox\include" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;FATFS_USE_CUSTOM_OPTS_FILE" ObjectFile="$(IntDir)/thirdparty_fat_io_lib_fat_table.obj"/>
+				</FileConfiguration>
+			</File>
+			<File RelativePath="..\thirdparty\fat_io_lib\fat_write.c">
+				<FileConfiguration Name="Release|Xbox">
+					<Tool Name="VCCLCompilerTool" WarningLevel="0" AdditionalIncludeDirectories="..\xbox\include" PreprocessorDefinitions="_XBOX;NDEBUG;WIN32;FATFS_USE_CUSTOM_OPTS_FILE" ObjectFile="$(IntDir)/thirdparty_fat_io_lib_fat_write.obj"/>
 				</FileConfiguration>
 			</File>
 		</Filter>

@@ -50,8 +50,6 @@ WMV videos play when the build finds the WMV decoder from an XDK 4xxx
 
 Not in the build:
 
-* **USB storage**: UnleashX's FAT32 driver isn't rebuilt yet; USB drives
-  don't show up.
 * **EEPROM decryption** is taken from the kernel, which has already done it
   (same results for the serial number, MAC, region and hard disk key).
 
