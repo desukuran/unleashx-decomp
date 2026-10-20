@@ -113,6 +113,10 @@ To try the game saves manager without real game data,
 in the Xbox's format (`UDATA`/`TDATA`, meta files, DXT1 pictures), and
 `python3 tools/xemu_ftp.py putdir out /E` copies it to the hard disk.
 
+For the item editor's icon download, `tools/fake_xboxskins_proxy.py` runs an
+HTTP proxy on the host that adds icons to xbox-skins.net's answers; set
+UnleashX's proxy to `10.0.2.2:8888` (Control Panel > Network).
+
 To boot UnleashX as the dashboard with no disc, upload `default.xbe` as
 `C:\xboxdash.xbe`, with `Config.xml`, the language files and `Skins` from
 `assets/disc/` next to it, then eject the disc from xemu's Machine menu and

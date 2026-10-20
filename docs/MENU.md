@@ -283,7 +283,10 @@ entries have no `Thumb`, so icons always end with "Can't find downloadable
 content"; previews download. For an unknown title ID it answers 200 with
 an empty body instead of 404, which gives the same message instead of the
 request. (The menu scan re-reads the XBE's title ID when the game has no
-icon, so an `ID` edited into `items.xml` doesn't stick.)
+icon, so an `ID` edited into `items.xml` doesn't stick.) To try the icon path
+anyway, `tools/fake_xboxskins_proxy.py` is an HTTP proxy (set it as
+UnleashX's proxy) that adds `Thumb="1"` and serves a generated icon; with
+it the icon downloads and installs (tested in xemu).
 
 B cancels a download. `xboxskins.jpg` from the media folder is shown in the
 progress box.
