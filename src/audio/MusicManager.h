@@ -135,6 +135,8 @@ public:
 	HRESULT Play();                                          // 0x001083B0 (this in edi) start/resume
 	HRESULT Pause();                                         // 0x0010602C (this in esi) 1 if not playing
 	// Plays again if paused (not stopped, not paused by the user).
+	// Resumes paused playback. It hides Thread::Resume, so the thread's is
+	// called as Thread::Resume() in this class.
 	void Resume();                                           // 0x00108E69 (this in eax)
 	HRESULT Stop();                                          // 0x001061A5 (this in eax)
 	HRESULT PlayAudioCD();                                   // 0x001084E7 (this in eax)

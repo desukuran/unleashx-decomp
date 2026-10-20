@@ -93,7 +93,7 @@ CMusicManager::~CMusicManager()
 	Sleep(5);
 	if (m_soundtracks.size() != 0)
 	{
-		Resume();
+		Thread::Resume();
 		Sleep(5);
 		if (m_hWakeEvent != NULL)
 		{
@@ -250,7 +250,7 @@ HRESULT CMusicManager::Stop()
 	StopPlayer();
 	if (GetState() == MUSIC_STOPPED)
 		return 1;
-	Resume();
+	Thread::Resume();
 	Sleep(5);
 	if (m_hWakeEvent != NULL)
 		SetEvent(m_hWakeEvent);
@@ -627,7 +627,7 @@ HRESULT CMusicManager::PlaySong(UINT index, BOOL shuffled)
 	}
 	if (suspended)
 	{
-		Resume();
+		Thread::Resume();
 		Sleep(100);
 	}
 	m_bReady = TRUE;
@@ -1059,7 +1059,7 @@ HRESULT CMusicManager::Play()
 		Sleep(50);
 		m_bAdvance = TRUE;
 		m_dwNextCheck = GetTickCount() + 2500;
-		Resume();
+		Thread::Resume();
 		return S_OK;
 	}
 	HRESULT hr = E_FAIL;
@@ -1072,7 +1072,7 @@ HRESULT CMusicManager::Play()
 			hr = S_OK;
 			m_bReady = TRUE;
 			m_bSongActive = TRUE;
-			Resume();
+			Thread::Resume();
 		}
 		return hr;
 	}
@@ -1089,7 +1089,7 @@ HRESULT CMusicManager::Play()
 	Sleep(50);
 	if (m_hThread == NULL)
 		Start(0x10000, true);
-	Resume();
+	Thread::Resume();
 	m_nState = MUSIC_PLAYING;
 	m_bSongActive = TRUE;
 	m_bReady = TRUE;
