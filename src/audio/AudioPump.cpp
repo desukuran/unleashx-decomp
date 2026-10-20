@@ -1,4 +1,5 @@
 // The MS dashboard's audio streaming classes. See AudioPump.h.
+#include "DashUtil.h"
 #include "AudioPump.h"
 
 #include <cstring>
@@ -556,7 +557,7 @@ HRESULT CWMAPump::OpenFile(const char *path, HANDLE file, WAVEFORMATEX *format)
 	if (path == NULL)
 		m_hFile = file;
 	else
-		strncpy(name, path, 0x104);
+		DashStrCopyN(name, path, 0x104);
 	HRESULT hr = WmaCreateDecoder(name, file, FALSE, 0x40000, m_nPackets, 0, format, &m_pDecoder);
 	if (hr == S_OK)
 	{

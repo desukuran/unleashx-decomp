@@ -193,6 +193,9 @@ LONG __stdcall NtAllocateVirtualMemory(void **baseAddress, uintptr_t zeroBits, D
                                        DWORD allocationType, DWORD protect);
 LONG __stdcall NtFreeVirtualMemory(void **baseAddress, DWORD *regionSize, DWORD freeType);
 int _mbsicmp(const char *a, const char *b);
+unsigned char *_mbschr(const unsigned char *s, unsigned int c);
+unsigned char *_mbsrchr(const unsigned char *s, unsigned int c);
+int _mbsnbicmp(const unsigned char *a, const unsigned char *b, size_t count);
 int _stricmp(const char *a, const char *b);
 char *_strdup(const char *s);
 LONGLONG _atoi64(const char *s);

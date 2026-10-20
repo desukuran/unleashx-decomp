@@ -19,7 +19,7 @@ static void EncodeGroup(const unsigned char *in, int count, char *out)
 		out[3] = '=';
 }
 
-// 0x0001E977
+// 0x0001E977 (with the class's encoder, 0x0001EAE4, folded in)
 BOOL Base64Encode(const char *text, std::string &out)
 {
 	out.clear();
@@ -67,7 +67,7 @@ static void DecodeGroup(const unsigned char *v, std::string &out)
 	out.append(bytes, 3);
 }
 
-// 0x0001E9B4
+// 0x0001E9B4 (with the class's decoder, 0x0001E9F0, folded in)
 BOOL Base64Decode(const char *text, std::string &out)
 {
 	out.clear();

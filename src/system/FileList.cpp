@@ -91,7 +91,7 @@ static void CollectFolder(const char *path, std::vector<SFileListItem> *list, CD
 		list->clear();
 }
 
-// 0x000F5B4B
+// 0x000F5B4B (LTCG copies: 0x00084186, 0x000A6436, 0x0010A5C6, 0x001292EF)
 void CollectFiles(const char *path, std::vector<SFileListItem> *list)
 {
 	if (g_bCancelOperation)

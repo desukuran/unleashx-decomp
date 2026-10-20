@@ -160,10 +160,10 @@
 000394ff XGetAVPack DWORD __stdcall f(void)
 
 # ---- src/settings, src/common/FileUtil, src/xml/XmlUtil ----
-00031418 SAudioSettings::SAudioSettings
-00031488 SNetworkSettings::SNetworkSettings
-000314b3 SFTPSettings::SFTPSettings
-000314d6 SPreferences::SPreferences
+00031418 SAudioSettings::SAudioSettings_implicit
+00031488 SNetworkSettings::SNetworkSettings_implicit
+000314b3 SFTPSettings::SFTPSettings_implicit
+000314d6 SPreferences::SPreferences_implicit
 0009ddfc DirectoryExists BOOL __cdecl f(char *path)
 0009de34 FileExists BOOL __cdecl f(char *path)
 0009df6f StrUtf8ToWide void f(DWORD unused@ecx, DWORD size@edx, char *src, WORD *dst)
@@ -363,8 +363,8 @@
 000a956b FormatDrive HRESULT __cdecl f(char drive)
 0009de6c GetUtilityDriveDevice
 000315a5 std::vector<CXBMemUnit>::resize
-00018ff7 SXbeInfo::ctor
-0001901a SXbeInfo::dtor
+00018ff7 SXbeInfo::SXbeInfo_implicit
+0001901a SXbeInfo::~SXbeInfo_implicit
 000a608d ReadXbeInfo
 000a4d10 ExtractXbeTitleImage
 00038c16 GetVolumeInformationA
@@ -879,7 +879,7 @@
 00019113 StrFormatV
 000192d4 StrTrimRightChars
 0001efbd StrMakeUpper
-0013fc46 g_ftpServer_atexit
+0013fc46 dynamic_atexit_destructor_for_g_ftpServer
 002784f8 g_ftpServer
 0026c238 g_ftpEventReceiver
 
@@ -906,8 +906,8 @@
 000203d8 CSettingItem::CSettingItem CSettingItem * f(CSettingItem *this@edi, std_wstring label, std_wstring value, int type, BOOL header, BOOL enabled, BOOL visible, int value2, BOOL password)
 0002057e std::wstring::ctor_wcstr std_wstring * f(std_wstring *self@esi, wchar_t *s)
 000205d3 std::vector<CSettingItem>::push_back
-0002053c CSettingItem::~CSettingItem void f(CSettingItem *this@esi)
-000204e7 CSettingItem::CSettingItem_copy void f(CSettingItem *this@edi, CSettingItem *other@ebx)
+0002053c CSettingItem::~CSettingItem_implicit
+000204e7 CSettingItem::CSettingItem_copy_implicit
 000205bd std::vector<CSettingItem>::size
 000206c9 std::vector<CSettingItem>::clear
 00020499 CSettingsBase::SetTitle void f(CSettingsBase *this@edx, wchar_t *title)
@@ -981,7 +981,7 @@
 000c66e1 CSystemSetting::Render
 000c8367 CHDDSetting::Render
 000c9182 CVideoSetting::HandleInput
-000cb399 CAutoLaunch::Render
+000cb399 CAutoLaunch::Render_thunk
 000ccc88 CSystemSetting::Init
 000cec23 CNetworkSetting::HandleInput
 000cf410 CNetworkSetting::Init
@@ -1491,7 +1491,7 @@
 000d997a CInternetSession::SetExtraHeaders
 00023403 CInternetSession::GetCachePath
 00023373 CInternetSession::GetPercent
-0002daa5 CInternetSession::ResetReply
+0002daa5 CInternetSession::ReplyStrings_implicit
 000d94f8 ParseUrl
 000d93d1 UrlEncode
 00278478 g_md5
@@ -1870,11 +1870,11 @@
 0011f682 OpenFtpLog
 0001e5a9 SFTPSiteInfo::SFTPSiteInfo
 0001e60c SFTPSiteInfo::SFTPSiteInfo_values
-0001ee35 SFTPSiteInfo::SFTPSiteInfo_copy
-0001eed3 SFTPSiteInfo::~SFTPSiteInfo
+0001ee35 SFTPSiteInfo::SFTPSiteInfo_copy_implicit
+0001eed3 SFTPSiteInfo::~SFTPSiteInfo_implicit
 0001e4f0 SFtpQueueItem::SFtpQueueItem
-0001ef0e SFtpQueueItem::SFtpQueueItem_copy
-0001ee01 SFtpQueueItem::~SFtpQueueItem
+0001ef0e SFtpQueueItem::SFtpQueueItem_copy_implicit
+0001ee01 SFtpQueueItem::~SFtpQueueItem_implicit
 00277820 g_ftpQueue
 002761dc g_bFtpStartQueue
 00270fb4 g_pFtpUpArrow
@@ -2543,3 +2543,21 @@
 00130b6b CDDACopy::IsOpen
 0011468e CInfoCenter::CInfoCenter
 00020d23 std::sort<SGameEntry*>
+00033c20 CAudioDecoder::`scalar_deleting_destructor'
+00026522 CPassCode::`scalar_deleting_destructor'
+0001eef2 CFTPFileFolder::`scalar_deleting_destructor'
+0001ee19 CFTPServerList::`scalar_deleting_destructor'
+0001edc9 CFTPLog::`scalar_deleting_destructor'
+000dff11 CUnleashX::CMenuEvent::DefaultSlot2
+0002b65c CMenuEventSink::DefaultSlot2
+0002b659 CSkinEventSink::DrawImage
+000dd600 CVirtualKeyboard::RenderKeys_thunk
+000aebf4 XNetGetEthernetLinkStatus_thunk
+000954ca WSACleanup_thunk
+0007fbd5 IDirectSoundBuffer_SetNotificationPositions_thunk
+0013fc2a dynamic_atexit_destructor_for_g_newsfeed
+0007f9f9 DashCreateNumberedFolder
+0007fa6c DashSetCurrentPath
+0007fac1 DashResolveAgainst
+00032894 DashCreateFile
+0007f36f DashStrCopyNWide

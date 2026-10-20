@@ -1,4 +1,5 @@
 // Audio CDs: the TOC, raw CD-DA reads and XCDPlayer. See CdAudio.h.
+#include "DashUtil.h"
 #include "CdAudio.h"
 
 #include <cstring>
@@ -69,7 +70,7 @@ static HRESULT CdIoctl(SCdToc *toc, DWORD code, void *in, DWORD inSize, void *ou
 	return (HRESULT)error;
 }
 
-// 0x0007F496
+// 0x0007F496 (nTracks cleared through 0x0007F3C0)
 SCdToc::SCdToc()
 {
 	nTracks = 0;
@@ -83,7 +84,7 @@ SCdToc::~SCdToc()
 	nTracks = 0;
 }
 
-// 0x0007F46D
+// 0x0007F46D (nTracks cleared through 0x0007F3B6)
 void CdTocClose(SCdToc *toc)
 {
 	if (toc->hDevice != INVALID_HANDLE_VALUE)
@@ -146,10 +147,8 @@ static BOOL CdTocRead(SCdToc *toc)
 // 0x0007F5FB
 HRESULT CdTocOpen(SCdToc *toc)
 {
-	// (Through the dashboard's path helper, 0x00032894, which only maps a
-	// "file:" prefix and slashes.)
-	toc->hDevice = CreateFileA("CDROM0:", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-	                           NULL);
+	toc->hDevice = DashCreateFile("CDROM0:", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
+	                              NULL);
 	if (toc->hDevice == INVALID_HANDLE_VALUE)
 	{
 		DWORD error = GetLastError();

@@ -25,6 +25,16 @@ def library_functions():
             fields = line.split()
             if len(fields) == 2 and not line.startswith('#'):
                 found.add(int(fields[0], 16))
+    # Compiler-generated code named by hand: deleting destructors, the
+    # atexit destructors of globals, jump thunks and implicit constructors,
+    # destructors and copies (names ending in _implicit).
+    for line in open(os.path.join(ROOT, 'symbols/names.txt')).readlines() + \
+            open(os.path.join(ROOT, 'symbols/rtti.txt')).readlines():
+        fields = line.split()
+        if len(fields) >= 2 and not line.startswith('#') and (
+                'scalar_deleting_destructor' in fields[1] or fields[1].endswith(('_thunk', 'deleting_dtor', 'DeletingDtor', '_implicit'))
+                or fields[1].startswith(('dynamic_atexit_destructor', 'empty_atexit_stub'))):
+            found.add(int(fields[0], 16))
     # STL members named by hand.
     for line in open(os.path.join(ROOT, 'symbols/names.txt')):
         fields = line.split()
