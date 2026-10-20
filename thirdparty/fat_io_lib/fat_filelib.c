@@ -834,6 +834,26 @@ void* fl_fopen(const char *path, const char *mode)
     if (file)
         file->flags = flags;
 
+#if FATFS_INC_WRITE_SUPPORT
+    // UnleashX build: "w" empties a file that exists (FILE_ERASE wasn't acted
+    // on, so a shorter file kept the old length and tail), and a file without
+    // clusters (an empty one made elsewhere) gets one before it's written.
+    if (file && (flags & FILE_WRITE))
+    {
+        if ((flags & FILE_ERASE) && file->filelength != 0 && file->startcluster != 0)
+        {
+            uint32 next = fatfs_find_next_cluster(&_fs, file->startcluster);
+            if (next != FAT32_LAST_CLUSTER && next != 0)
+                fatfs_free_cluster_chain(&_fs, next);
+            fatfs_fat_set_cluster(&_fs, file->startcluster, FAT32_LAST_CLUSTER);
+            file->filelength = 0;
+            file->filelength_changed = 1;
+        }
+        if (file->startcluster == 0 && fatfs_allocate_free_space(&_fs, 1, &file->startcluster, 1))
+            file->filelength_changed = 1;
+    }
+#endif
+
     FL_UNLOCK(&_fs);
     return file;
 }
@@ -971,12 +991,22 @@ void fl_fclose(void *f)
         // Flush un-written data to file
         fl_fflush(f);
 
+        // UnleashX build: an empty file written here gives back the cluster
+        // it was created with (its entry then says cluster 0, see
+        // fatfs_update_file_length), or checkdisk reports a lost chain.
+        if ((file->flags & FILE_WRITE) && file->filelength == 0 && file->startcluster != 0)
+        {
+            fatfs_free_cluster_chain(&_fs, file->startcluster);
+            file->startcluster = 0;
+            file->filelength_changed = 1;
+        }
+
         // File size changed?
         if (file->filelength_changed)
         {
 #if FATFS_INC_WRITE_SUPPORT
             // Update filesize in directory
-            fatfs_update_file_length(&_fs, file->parentcluster, (char*)file->shortfilename, file->filelength);
+            fatfs_update_file_length(&_fs, file->parentcluster, (char*)file->shortfilename, file->filelength, file->startcluster);
 #endif
             file->filelength_changed = 0;
         }

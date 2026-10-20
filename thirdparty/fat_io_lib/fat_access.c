@@ -614,7 +614,7 @@ int fatfs_update_timestamps(struct fat_dir_entry *directoryEntry, int create, in
 // NOTE: shortname is XXXXXXXXYYY not XXXXXXXX.YYY
 //-------------------------------------------------------------
 #if FATFS_INC_WRITE_SUPPORT
-int fatfs_update_file_length(struct fatfs *fs, uint32 Cluster, char *shortname, uint32 fileLength)
+int fatfs_update_file_length(struct fatfs *fs, uint32 Cluster, char *shortname, uint32 fileLength, uint32 startCluster)
 {
     uint8 item=0;
     uint16 recordoffset = 0;
@@ -657,6 +657,10 @@ int fatfs_update_file_length(struct fatfs *fs, uint32 Cluster, char *shortname, 
                     if (strncmp((const char*)directoryEntry->Name, shortname, 11)==0)
                     {
                         directoryEntry->FileSize = FAT_HTONL(fileLength);
+                        // UnleashX build: and where it starts (fl_fopen may have
+                        // given it its first cluster, fl_fclose taken it away)
+                        directoryEntry->FstClusHI = FAT_HTONS((uint16)(startCluster >> 16));
+                        directoryEntry->FstClusLO = FAT_HTONS((uint16)(startCluster & 0xFFFF));
 
 #if FATFS_INC_TIME_DATE_SUPPORT
                         // Update access / modify time & date

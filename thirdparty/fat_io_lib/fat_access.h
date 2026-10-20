@@ -124,7 +124,7 @@ void    fatfs_show_details(struct fatfs *fs);
 uint32  fatfs_get_root_cluster(struct fatfs *fs);
 uint32  fatfs_get_file_entry(struct fatfs *fs, uint32 Cluster, char *nametofind, struct fat_dir_entry *sfEntry);
 int     fatfs_sfn_exists(struct fatfs *fs, uint32 Cluster, char *shortname);
-int     fatfs_update_file_length(struct fatfs *fs, uint32 Cluster, char *shortname, uint32 fileLength);
+int     fatfs_update_file_length(struct fatfs *fs, uint32 Cluster, char *shortname, uint32 fileLength, uint32 startCluster);
 int     fatfs_mark_file_deleted(struct fatfs *fs, uint32 Cluster, char *shortname);
 void    fatfs_list_directory_start(struct fatfs *fs, struct fs_dir_list_status *dirls, uint32 StartCluster);
 int     fatfs_list_directory_next(struct fatfs *fs, struct fs_dir_list_status *dirls, struct fs_dir_ent *entry);

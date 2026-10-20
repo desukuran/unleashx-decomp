@@ -128,6 +128,17 @@ static void Exercise(CFat32Volume *volume, const char *drive)
 	CHECK(Fat32RemoveDirectory(volume, (base + "Music\\Album One").c_str()));
 	CHECK(CountEntries(volume, (base + "Music\\*").c_str(), NULL, NULL) == 0);
 
+	// Empty files: a new one, and one rewritten as empty. fsck checks that
+	// neither keeps a cluster.
+	CHECK(WriteFileTo(volume, (base + "empty.txt").c_str(), ""));
+	CHECK(ReadFileFrom(volume, (base + "empty.txt").c_str()) == "");
+	CHECK(WriteFileTo(volume, (base + "emptied.txt").c_str(), "soon gone"));
+	CHECK(WriteFileTo(volume, (base + "emptied.txt").c_str(), ""));
+	CHECK(ReadFileFrom(volume, (base + "emptied.txt").c_str()) == "");
+	CHECK(WriteFileTo(volume, (base + "empty.txt").c_str(), "not empty now"));
+	CHECK(ReadFileFrom(volume, (base + "empty.txt").c_str()) == "not empty now");
+	CHECK(WriteFileTo(volume, (base + "empty.txt").c_str(), ""));
+
 	// Something left behind for fsck to look at.
 	CHECK(WriteFileTo(volume, (base + "Music\\kept.bin").c_str(), big.substr(0, 70000)));
 }
