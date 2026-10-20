@@ -144,7 +144,7 @@
 00021e1a IsTrueString BOOL f(char *s@esi)
 000213f2 CXmlElement::GetNextChild CXmlElement * f(CXmlElement *self@eax)
 000213de CXmlElement::GetValue std_string * f(CXmlElement *self@eax, std_string *out)
-0001f01a StrTrim std_string * f(std_string *self@eax)
+0001f01a StrTrim
 000117d0 std::string::ctor_copy2 std_string * __stdcall f(std_string *self, std_string *src)
 000117c0 std::string::ctor2 std_string * __stdcall f(std_string *self)
 001e14fe inet_addr DWORD __stdcall f(char *cp)
@@ -168,7 +168,7 @@
 0009de34 FileExists BOOL __cdecl f(char *path)
 0009df6f StrUtf8ToWide void f(DWORD unused@ecx, DWORD size@edx, char *src, WORD *dst)
 00020b69 StrFromWide std_string * f(WORD *s@eax, std_string *out)
-00020c7a StrFromWide2 std_string * __stdcall f(std_string *out)
+00020c7a StrFromWide_copy
 000a3745 ReadTextFile std_string * __cdecl f(std_string *out, char *path)
 000a3934 GetXbePath std_string * __cdecl f(std_string *out)
 000a3d25 GetDriveDevicePath HRESULT __cdecl f(char drive, std_string *devicePath)
@@ -185,9 +185,9 @@
 0002a8f9 AddChild BOOL f(CXmlElement *parent@eax, CXmlElement *child@ecx)
 0002aea9 AppendElement BOOL f(CXmlElement *parent@eax, CXmlElement *child@ecx, CXmlDocument *doc)
 0002abe1 SetAttributeText void __stdcall f(CXmlElement *element, char *text)
-0001c8ae StrConcat std_string * f(std_string *out, char *prefix, std_string *suffix@edi)
+0001c8ae std::operator+
 00012af5 StrReverseFind int __cdecl f(std_string *s, char *find, int pos)
-000194f2 StrFindStr int __cdecl f(std_string *s, char *find, int pos)
+000194f2 std::string::find
 
 # ---- src/system/Drives ----
 000aac8b MountDrive BOOL __cdecl f(char drive)
@@ -1034,7 +1034,7 @@
 0012af3f CFileBrowser::ProcessInput
 0001123b CFileBrowser::IsOpen
 000112d9 CFileBrowser::GetSelectedPath
-000202ee WStringToString
+000202ee StrFromWide_wstring
 000ca63b CQuickLaunch::Save
 000ca280 CLiveUpdate::Save
 000d5ef9 CLiveUpdate::InstallThread

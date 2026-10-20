@@ -32,6 +32,9 @@ BOOL WriteTextFile(const char *path, const char *text, BOOL unicode);   // 0x000
 // (path in eax)
 BOOL WriteUnicodeTextFile(const char *path, const wchar_t *text);    // 0x000A5A6C
 
+// A file's size in KB (unused; see FileUtil.cpp for its quirk).
+DWORD GetFileSizeKB(const char *path);                                  // 0x0009E11C
+
 // Walks the matches of a pattern in a folder, through the virtual file
 // layer (so it works on any drive type).
 class CFileFinder

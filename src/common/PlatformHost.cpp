@@ -335,6 +335,15 @@ DWORD SetFilePointer(HANDLE file, LONG distance, LONG *, DWORD moveMethod)
 	return (DWORD)ftell((FILE *)file);
 }
 
+BOOL GetFileSizeEx(HANDLE file, LARGE_INTEGER *size)
+{
+	struct stat st;
+	if (fstat(fileno((FILE *)file), &st) != 0)
+		return FALSE;
+	size->QuadPart = st.st_size;
+	return TRUE;
+}
+
 BOOL GetFileInformationByHandle(HANDLE file, BY_HANDLE_FILE_INFORMATION *info)
 {
 	struct stat st;

@@ -13,6 +13,9 @@ std::string StrRight(const std::string &s, int count);               // 0x000118
 std::string StrMid(const std::string &s, int start, int count);      // 0x00012A90
 std::string &StrTrimLeft(std::string &s);                            // 0x0001F029
 std::string &StrTrimRight(std::string &s);                           // 0x0001F096
+inline std::string &StrTrim(std::string &s) { return StrTrimRight(StrTrimLeft(s)); }   // 0x0001F01A
+// From start to the end.
+inline std::string StrMidFrom(const std::string &s, int start) { return StrMid(s, start, (int)s.size() - start); }   // 0x00012A74
 
 // Replaces every occurrence of find with replacement (NULL = ""), scanning
 // forward past each replacement. Returns the number of replacements.
@@ -22,10 +25,7 @@ int StrReplaceChar(std::string &s, char from, char to);                        /
 
 // Case-insensitive compare using the C++ locale's ctype<char>::tolower.
 int StrCmpNoCase(const char *a, const char *b);                               // 0x0001AA3C
-inline int StrCmpNoCase(const std::string &a, const char *b)                  // 0x0001918F
-{
-	return StrCmpNoCase(a.c_str(), b);
-}
+inline int StrCmpNoCase(const std::string &a, const char *b) { return StrCmpNoCase(a.c_str(), b); }   // 0x0001918F
 
 // sprintf into a std::string (tries buffers of 2K, 4K, ... 12K).
 std::string &StrFormat(std::string &out, const char *fmt, ...);              // 0x0001ADD6
@@ -72,6 +72,8 @@ void StrUtf8ToWide(const char *src, wchar_t *dst, unsigned int size);
 void StrWideToUtf8(const wchar_t *src, char *dst, unsigned int size);
 // Wide to narrow string.                                          (0x00020B69)
 std::string StrFromWide(const wchar_t *s);
+// The same for a std::wstring (the virtual keyboard's results).
+std::string StrFromWide(const std::wstring &s);
 
 // "0A1B..." to bytes; 1 if the length is odd (nothing written), else 0.
 // Pairs that aren't hex give 0 (or what strtoul makes of them). The

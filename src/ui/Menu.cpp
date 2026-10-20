@@ -33,6 +33,18 @@ CXmlDocument *g_pItemCache;                   // 0x002761F4
 // The default line height when the skin doesn't set one.
 static const int kDefaultItemHeight = 34;
 
+
+// 0x00011208 (rect in eax)
+// rect is x, y, width, height; edges included. (Compared unsigned: a
+// negative x or y is never inside.)
+BOOL PointInRect(const int *rect, int x, int y)
+{
+	const unsigned *r = (const unsigned *)rect;
+	if ((unsigned)x < r[0] || (unsigned)y < r[1] || (unsigned)x > r[2] + r[0] || (unsigned)y > r[3] + r[1])
+		return FALSE;
+	return TRUE;
+}
+
 // 0x00110B3B
 CMenu::CMenu() : m_md5(NULL, -1)
 {

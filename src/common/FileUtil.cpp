@@ -642,3 +642,28 @@ const char *CFileFinder::FindNext()
 	} while (SkipFindData(m_nFilter, data));
 	return data->cFileName;
 }
+
+// 0x0009E11C (unused)
+// A file's size in KB. Quirk: the high part of the result comes from the
+// path's length (a reused variable), not the size's high dword.
+DWORD GetFileSizeKB(const char *path)
+{
+	if (path == NULL)
+		return 0;
+	int length = (int)strlen(path);
+	if (length == 0)
+		return 0;
+	HANDLE file = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	if (file == INVALID_HANDLE_VALUE)
+		return 0;
+	LARGE_INTEGER size;
+	DWORD low = 0;
+	int high = 0;
+	if (GetFileSizeEx(file, &size))
+	{
+		high = length;
+		low = (DWORD)size.QuadPart;
+	}
+	CloseHandle(file);
+	return (low >> 10) | ((DWORD)high << 22);
+}

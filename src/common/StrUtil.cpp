@@ -359,7 +359,7 @@ void StrUtf8ToWide(const char *src, wchar_t *dst, unsigned int size)
 	dst[out] = 0;
 }
 
-// 0x00020B69
+// 0x00020B69 (also 0x00020C7A, a copy taking s in eax)
 // TODO: verify; the original narrows through the locale's codecvt facet.
 std::string StrFromWide(const wchar_t *s)
 {
@@ -369,6 +369,16 @@ std::string StrFromWide(const wchar_t *s)
 	for (; *s != 0; s++)
 		out += (char)*s;
 	return out;
+}
+
+// 0x000202EE (s in eax)
+// Through ATL's W2A in the original (the locale's code page, on the
+// stack).
+std::string StrFromWide(const std::wstring &s)
+{
+	if (s.size() == 0)
+		return std::string();
+	return StrFromWide(s.c_str());
 }
 
 // 0x0009DF2C

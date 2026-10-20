@@ -253,4 +253,5 @@ extern BOOL g_bPointerSecondButton;                  // 0x0027214C TODO: verify 
 extern int g_nPointerX;                              // 0x0027215C
 extern int g_nPointerY;                              // 0x00272160
 // x, y, width, height
+// (Menu.cpp; rect in eax)
 BOOL PointInRect(const int *rect, int x, int y);     // 0x00011208

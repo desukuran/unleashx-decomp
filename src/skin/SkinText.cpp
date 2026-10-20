@@ -339,6 +339,15 @@ static void UpdateHddStatusText()
 	SetText(TEXT_HDDSTATUS, text);
 }
 
+// 0x00021CED
+// 16 bytes as 32 lowercase hex digits (the compiler split this StrFormat
+// call out).
+static void FormatBytes16(std::string &out, const BYTE *b)
+{
+	StrFormat(out, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", b[0], b[1], b[2], b[3], b[4],
+	          b[5], b[6], b[7], b[8], b[9], b[10], b[11], b[12], b[13], b[14], b[15]);
+}
+
 static void UpdateHddKeyText()
 {
 	wchar_t text[101];
@@ -357,9 +366,7 @@ static void UpdateHddKeyText()
 	}
 	else
 	{
-		StrFormat(str, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", key[0], key[1],
-		          key[2], key[3], key[4], key[5], key[6], key[7], key[8], key[9], key[10], key[11], key[12],
-		          key[13], key[14], key[15]);
+		FormatBytes16(str, key);
 	}
 	swprintf(text, 101, L"%hs", str.c_str());
 	SetText(TEXT_HDDKEY, text);
