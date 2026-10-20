@@ -24,6 +24,7 @@
 #include "../musicplayer/AudioGUI.h"
 #include "SettingsPages.h"
 #include "UnleashX.h"
+#include "../mods/DemoScroller.h"
 
 // Over the menu: the progress of a running file operation, or the error of
 // a failed one (then the operation is forgotten).
@@ -276,6 +277,7 @@ HRESULT CUnleashX::Render()
 	{
 	case MODE_MENU:
 		m_menu.Render();
+		RenderDemoScroller(&m_fonts[1], m_fAppTime);   // MOD: see src/mods/DemoScroller.h
 		RenderFileOperation();
 		break;
 	case MODE_FILEMANAGER:
