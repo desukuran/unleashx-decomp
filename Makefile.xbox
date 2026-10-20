@@ -13,7 +13,7 @@ WINE := WINEDEBUG=-all wine
 CL := $(WINE) $(XDK)/bin/vc71/CL.Exe
 LINK := $(WINE) $(XDK)/bin/vc71/Link.Exe
 IMAGEBLD := $(WINE) ../../$(XDK)/bin/imagebld.exe
-EXTRACT_XISO ?= extract-xiso
+EXTRACT_XISO ?= tools/extract-xiso/build/extract-xiso
 
 OUT := build/xbox
 OBJ := $(OUT)/obj

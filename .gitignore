@@ -8,6 +8,7 @@ __pycache__/
 # Local tools (downloaded by tools/setup.sh)
 tools/ghidra_*_PUBLIC/
 tools/venv/
+tools/extract-xiso/
 tools/dl/
 
 # Microsoft XDK headers for local reference only (never commit)

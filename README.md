@@ -15,7 +15,10 @@ This is not a matching decomp. The aim is source that you can read, understand a
 | `symbols/stl.txt` | Generated names of the STL template instantiations (`std::vector<SFileItem>::push_back`, ...). Regenerate, don't edit |
 | `symbols/xdk.txt` | Generated XDK names and signatures from XbSymbolDatabase (overrides `xdklib.txt`) |
 | `symbols/names.txt` | Hand-curated names and signatures (overrides everything else) |
-| `tools/xbe.py` | XBE parser: header info, flat memory image, section extraction |
+| `tools/xbe.py` | XBE parser: header info, flat memory image, section extraction, retail rescrambling |
+| `src/xdk/` | UnleashX's copies of the XDK sample framework, for the Xbox build |
+| `xbox/` | Xbox build support: third-party adapters and stand-ins (see Building the XBE) |
+| `Makefile.xbox` | The Xbox build (XDK 5933 under Wine) |
 | `tools/rtti.py` | MSVC RTTI recovery (classes, base classes, vtables) |
 | `tools/gen_rtti_symbols.py` | Generates `symbols/rtti.txt` |
 | `tools/libmatch.py` | Generates `symbols/xdklib.txt` from a local XDK's `lib/` folder |
@@ -44,6 +47,39 @@ Output in `build/export/`:
 - `decomp/<section>.c`: raw Ghidra decompiler output for every function
 
 To work interactively, open `build/ghidra/UnleashX.gpr` in the Ghidra GUI (`tools/ghidra_12.1.4_PUBLIC/ghidraRun`).
+
+## Building the XBE
+
+`Makefile.xbox` builds a runnable `Default.xbe` from `src/` with the XDK
+5933 toolchain (MSVC 7.1, `imagebld`) under Wine. Nothing from the XDK, the
+third-party sources or the release is committed; they're all local copies:
+
+- `reference/5933/`: the XDK (`bin/`, `include/`, `lib/`);
+- `reference/thirdparty/`: Lucian Wischik's `zip_utils` (unzip), Valve's
+  Source SDK 2013 `XZip.cpp`/`zip/XZip.h` (zip creation), libmad 0.15.1b,
+  D. J. Bernstein's `ftpparse.c`/`.h` and XBMC4Xbox (`XKSHA1.cpp`);
+- `UnleashX_0_39_0528A/`: the release, for the embedded resources
+  (`MEDIA_FILE`, `DEF_FONT`, `INT_SKINS` and the title images are copied
+  from its `Default.xbe`) and the XML files on the disc.
+
+```sh
+make -f Makefile.xbox -j4         # build/xbox/default.xbe (retail-scrambled)
+make -f Makefile.xbox xiso        # build/xbox/UnleashX.iso
+```
+
+`xiso` uses XboxDev's extract-xiso (`git clone` it into `tools/extract-xiso`
+and build it with CMake, or set `EXTRACT_XISO`). imagebld writes a debug
+XBE; `tools/xbe.py retail` rescrambles its entry point and kernel thunk with
+the retail keys. The image isn't signed, so it needs a modded BIOS (or xemu
+with one).
+
+`xbox/` holds what the build links in place of the third-party code that
+isn't part of the decomp: `CIoSupport` and the XKUtils EEPROM getters
+written from the binary, adapters onto the public zip sources, and
+stand-ins that fail cleanly for unrar (RAR archives), XBMC's iso9660 (DVD
+data discs in the file manager) and the FAT32 driver (USB storage). The WMV
+decoder (`wmvdec.lib`) wasn't part of the XDK, so WMV videos don't play
+(XMV ones do).
 
 ## Regenerating library symbols
 
