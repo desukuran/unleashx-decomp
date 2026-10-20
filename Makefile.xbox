@@ -1,0 +1,46 @@
+# Xbox build: the XDK 5933 toolchain (MSVC 7.1, imagebld) run under Wine.
+#
+#   make -f Makefile.xbox -j4          build/xbox/default.xbe
+#   make -f Makefile.xbox xiso         build/xbox/UnleashX.iso (needs extract-xiso)
+#
+# The XDK (reference/5933) and the third-party sources (reference/thirdparty)
+# are gitignored lookup copies; nothing from them is committed. The embedded
+# resources (MEDIA_FILE, DEF_FONT, INT_SKINS, the title images) come from the
+# release Default.xbe, also gitignored.
+
+XDK := reference/5933
+WINE := WINEDEBUG=-all wine
+CL := $(WINE) $(XDK)/bin/vc71/CL.Exe
+LINK := $(WINE) $(XDK)/bin/vc71/Link.Exe
+IMAGEBLD := $(WINE) $(XDK)/bin/imagebld.exe
+
+OUT := build/xbox
+OBJ := $(OUT)/obj
+
+CFLAGS := /nologo /c /O2 /GR /EHsc /MT /W3 /wd4996 /D_XBOX /DNDEBUG /DWIN32 \
+	/I$(XDK)/include /Isrc/xbox
+
+# Host-only glue and test helpers aren't part of the Xbox build.
+SRCS := $(filter-out src/common/PlatformHost.cpp src/net/XNetHost.cpp, $(sort $(wildcard src/*/*.cpp)))
+OBJS := $(patsubst src/%.cpp,$(OBJ)/%.obj,$(SRCS))
+
+LIBS := xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib xacteng.lib xmv.lib xnet.lib \
+	xboxkrnl.lib libcmt.lib libcpmt.lib
+
+all: $(OUT)/default.xbe
+
+$(OBJ)/%.obj: src/%.cpp
+	@mkdir -p $(dir $@)
+	@$(CL) $(CFLAGS) /Fo$@ $< > $@.log 2>&1; status=$$?; grep -E " (error|warning) " $@.log | head -20; \
+		if [ $$status -ne 0 ]; then rm -f $@; exit 1; fi
+
+objs: $(OBJS)
+
+$(OUT)/default.exe: $(OBJS)
+	$(LINK) /nologo /SUBSYSTEM:XBOX /FIXED:NO /DEBUG /INCREMENTAL:NO /OUT:$@ /MAP:$(OUT)/default.map \
+		/LIBPATH:$(XDK)/lib $(OBJS) $(LIBS)
+
+$(OUT)/default.xbe: $(OUT)/default.exe
+	$(IMAGEBLD) /nologo /TITLEID:0x9E115330 /OUT:$@ $<
+
+.PHONY: all objs

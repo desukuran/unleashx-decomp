@@ -57,7 +57,7 @@ static HRESULT ComputeFrameBounds(XBMESH_FRAME *frame, float *center, float *rad
 	DWORD fvf = frame->dwFVF;
 	BYTE *data;
 	((IDirect3DVertexBuffer8 *)&frame->VB)->Lock(0, 0, &data, 0);
-	return D3DXComputeBoundingSphere(data, count, fvf, center, radius);
+	return D3DXComputeBoundingSphere(data, count, fvf, XDK_CAST(D3DXVECTOR3 *, center), radius);
 }
 
 // Scales a frame to the given radius (centred on the origin when center
@@ -179,7 +179,7 @@ BOOL CXMViewer::Open(const char *path)
 	}
 	m_strPath = path;
 	ReleaseModel();
-	D3DXMatrixIdentity(m_matWorld);
+	D3DXMatrixIdentity(XDK_CAST(D3DXMATRIX *, m_matWorld));
 	std::string message;
 
 	std::string extension = StrRight(m_strPath, 3);
@@ -306,7 +306,7 @@ BOOL CXMViewer::Render()
 	device->SetTexture(0, NULL);
 	device->SetTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_WRAP);
 	device->SetTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_WRAP);
-	device->SetTransform(D3DTS_WORLD, m_matWorld);
+	device->SetTransform(D3DTS_WORLD, XDK_CAST(const D3DMATRIX *, m_matWorld));
 	if (m_bXbg)
 	{
 		m_mesh.Render(0x20);
@@ -318,8 +318,8 @@ BOOL CXMViewer::Render()
 		// with the vertex count taken as a primitive count.
 		device->SetStreamSource(0, m_pVB, m_header.vertexSize);
 		device->SetIndices(m_pIB, 0);
-		device->DrawIndexedPrimitive(m_header.primitiveType, 0, 0, 0, m_header.primitiveCount);
-		device->DrawPrimitive(m_header.primitiveType, 0, m_header.vertexCount);
+		device->DrawIndexedPrimitive(XDK_CAST(D3DPRIMITIVETYPE, m_header.primitiveType), 0, 0, 0, m_header.primitiveCount);
+		device->DrawPrimitive(XDK_CAST(D3DPRIMITIVETYPE, m_header.primitiveType), 0, m_header.vertexCount);
 	}
 	return S_OK;
 }

@@ -90,7 +90,7 @@ HRESULT CWMAPlayer::Init(const char *path)
 	params.dwMax3DHwVoices = 0x20;
 	params.dwMaxConcurrentStreams = 0x10;
 	params.dwMaxNotifications = 0;
-	m_fileIo.ReadFileCallback = XactReadFile;
+	m_fileIo.ReadFileCallback = XDK_CAST(XACT_READFILE_CALLBACK, XactReadFile);
 	XACTEngineSetFileIOCallbacks(&m_fileIo);
 	if (FAILED(XACTEngineCreate(&params, &m_pEngine)))
 		return E_FAIL;
@@ -103,7 +103,7 @@ HRESULT CWMAPlayer::Init(const char *path)
 	// The cue's notifications.
 	XACT_NOTIFICATION_DESCRIPTION desc;
 	memset(&desc, 0, sizeof(desc));
-	desc.pSoundBank = m_pSoundBank;
+	desc.u.pSoundBank = m_pSoundBank;
 	desc.dwSoundCueIndex = m_dwCueIndex;
 	desc.wType = eXACTNotification_Start;
 	desc.wFlags = XACT_FLAG_NOTIFICATION_PERSIST | XACT_FLAG_NOTIFICATION_USE_SOUNDCUE_INDEX;
@@ -377,7 +377,7 @@ HRESULT CWMAPlayer::Process()
 	XACT_NOTIFICATION notification;
 	while (IXACTEngine_GetNotification(m_pEngine, NULL, &notification) == S_OK)
 	{
-		if (notification.Header.dwSoundCueIndex != m_dwCueIndex || notification.Header.pSoundBank != m_pSoundBank)
+		if (notification.Header.dwSoundCueIndex != m_dwCueIndex || notification.Header.u.pSoundBank != m_pSoundBank)
 			continue;
 		if (notification.Header.wType == eXACTNotification_Start)
 		{

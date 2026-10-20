@@ -485,7 +485,7 @@ BOOL CDirHDD::CopyFile(const char *source, const char *destination, BOOL failIfE
 BOOL CDirHDD::CopyFileEx(const char *source, const char *destination, CopyProgressRoutine progress, void *data,
                          BOOL *cancel, DWORD flags)
 {
-	if (CopyFileExA(source, destination, (void *)progress, data, cancel, flags))
+	if (CopyFileExA(source, destination, XDK_CAST(CopyProgressRoutine, (void *)progress), data, cancel, flags))
 		return TRUE;
 
 	// Win32 refused (another drive type): copy it by hand, 256 KB at a time.
@@ -586,7 +586,7 @@ BOOL CDirHDD::MoveFileEx(const char *source, const char *destination, DWORD flag
 BOOL CDirHDD::MoveFileWithProgress(const char *source, const char *destination, CopyProgressRoutine progress,
                                    void *data, DWORD flags)
 {
-	BOOL ok = MoveFileWithProgressA(source, destination, (void *)progress, data, flags);
+	BOOL ok = MoveFileWithProgressA(source, destination, XDK_CAST(CopyProgressRoutine, (void *)progress), data, flags);
 	if (!ok && CopyFileEx(source, destination, progress, data, NULL, flags))
 		ok = DeleteFile(source);
 	return ok;

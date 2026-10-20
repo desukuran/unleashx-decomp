@@ -282,8 +282,8 @@ HRESULT CXboxInfo::Init(CXBFont *font)
 	AddLine(m_lines, L"Serial Number", GetSkinTextValue(TEXT_SERIALNUM));
 	AddLine(m_lines, L"HDD Key", GetSkinTextValue(TEXT_HDDKEY));
 	AddLine(m_lines, L"Kernel Version", GetSkinTextValue(TEXT_KERNELVERSION));
-	swprintf(text, 100, L"Flags: %d\tGPU Rev.: %d\tMCP Rev.: %d", XboxHardwareInfo->Flags,
-	         XboxHardwareInfo->GpuRevision, XboxHardwareInfo->McpRevision);
+	swprintf(text, 100, L"Flags: %d\tGPU Rev.: %d\tMCP Rev.: %d", XboxHardwareInfo.Flags,
+	         XboxHardwareInfo.GpuRevision, XboxHardwareInfo.McpRevision);
 	AddLine(m_lines, L"Hardware Info", text);
 
 	// The values below are filled in by ProcessInput.

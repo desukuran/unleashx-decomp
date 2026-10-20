@@ -90,26 +90,12 @@ DWORD XGetParentalControlSetting();              // 0x0003955C
 // The console's game region: 1 North America, 2 Japan, 4 rest of the world.
 DWORD XGetGameRegion();                          // 0x00039507
 
-// The kernel's XboxHardwareInfo export.
-struct XBOX_HARDWARE_INFO
-{
-	ULONG Flags;
-	BYTE GpuRevision;
-	BYTE McpRevision;
-	BYTE reserved[2];
-};
-extern XBOX_HARDWARE_INFO *XboxHardwareInfo;     // import thunk 0x00235730
 BOOL XSetNicknameW(const wchar_t *nickname, BOOL preserveCase);
 BOOL SystemTimeToFileTime(const SYSTEMTIME *systemTime, FILETIME *fileTime);
 BOOL LocalFileTimeToFileTime(const FILETIME *localFileTime, FILETIME *fileTime);
 void GetSystemTime(SYSTEMTIME *systemTime);
 void GetLocalTime(SYSTEMTIME *systemTime);
 DWORD XLaunchNewImageA(LPCSTR imagePath, PLAUNCH_DATA launchData);
-// Internal XAPI (not in the XDK headers): writes the title info for the
-// next boot (D: as dDrivePath, then launchPath), then quick-reboots with
-// HalReturnToFirmware(ReturnFirmwareQuickReboot). TODO: verify the name
-DWORD XWriteTitleInfoAndRebootA(LPCSTR launchPath, LPCSTR dDrivePath, DWORD launchDataType, DWORD titleId,
-                                PLAUNCH_DATA launchData);   // 0x000397F9
 
 // threads, events, memory and the file cache
 #define STILL_ACTIVE 0x103
@@ -189,9 +175,6 @@ BOOL MoveFileExA(LPCSTR existingFileName, LPCSTR newFileName, DWORD flags);
 BOOL MoveFileWithProgressA(LPCSTR existingFileName, LPCSTR newFileName, void *progress, void *data, DWORD flags);
 BOOL CopyFileExA(LPCSTR existingFileName, LPCSTR newFileName, void *progress, void *data, BOOL *cancel,
                  DWORD flags);
-LONG __stdcall NtAllocateVirtualMemory(void **baseAddress, uintptr_t zeroBits, DWORD *regionSize,
-                                       DWORD allocationType, DWORD protect);
-LONG __stdcall NtFreeVirtualMemory(void **baseAddress, DWORD *regionSize, DWORD freeType);
 int _mbsicmp(const char *a, const char *b);
 unsigned char *_mbschr(const unsigned char *s, unsigned int c);
 unsigned char *_mbsrchr(const unsigned char *s, unsigned int c);
@@ -216,6 +199,12 @@ struct EXCEPTION_POINTERS
 };
 typedef LONG(__stdcall *LPTOP_LEVEL_EXCEPTION_FILTER)(EXCEPTION_POINTERS *exception);
 LPTOP_LEVEL_EXCEPTION_FILTER SetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER filter);
+#endif
+
+#ifdef _XBOX
+#define KRNLAPI __declspec(dllimport)
+#else
+#define KRNLAPI
 #endif
 
 extern "C" {
@@ -245,19 +234,20 @@ typedef struct _OBJECT_ATTRIBUTES
 
 #define OBJ_CASE_INSENSITIVE 0x00000040
 
-NTSTATUS __stdcall NtOpenSymbolicLinkObject(PHANDLE LinkHandle, POBJECT_ATTRIBUTES ObjectAttributes);
-NTSTATUS __stdcall NtQuerySymbolicLinkObject(HANDLE LinkHandle, PSTRING LinkTarget, PULONG ReturnedLength);
-NTSTATUS __stdcall NtClose(HANDLE Handle);
-NTSTATUS __stdcall NtCreateFile(HANDLE *FileHandle, ULONG DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes,
+KRNLAPI NTSTATUS __stdcall NtOpenSymbolicLinkObject(PHANDLE LinkHandle, POBJECT_ATTRIBUTES ObjectAttributes);
+KRNLAPI NTSTATUS __stdcall NtQuerySymbolicLinkObject(HANDLE LinkHandle, PSTRING LinkTarget, PULONG ReturnedLength);
+KRNLAPI NTSTATUS __stdcall NtClose(HANDLE Handle);
+KRNLAPI NTSTATUS __stdcall NtCreateFile(HANDLE *FileHandle, ULONG DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes,
                                 PIO_STATUS_BLOCK IoStatusBlock, LARGE_INTEGER *AllocationSize, ULONG FileAttributes,
                                 ULONG ShareAccess, ULONG CreateDisposition, ULONG CreateOptions);
-NTSTATUS __stdcall IoCreateSymbolicLink(PSTRING SymbolicLinkName, PSTRING DeviceName);
-NTSTATUS __stdcall IoDeleteSymbolicLink(PSTRING SymbolicLinkName);
-void __stdcall RtlInitAnsiString(PANSI_STRING Destination, const char *Source);
-ULONG __stdcall MmQueryAddressProtect(void *VirtualAddress);
-void __stdcall MmSetAddressProtect(void *BaseAddress, ULONG NumberOfBytes, ULONG NewProtect);
-NTSTATUS __stdcall NtOpenFile(HANDLE *FileHandle, ULONG DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes,
+KRNLAPI NTSTATUS __stdcall IoCreateSymbolicLink(PSTRING SymbolicLinkName, PSTRING DeviceName);
+KRNLAPI NTSTATUS __stdcall IoDeleteSymbolicLink(PSTRING SymbolicLinkName);
+KRNLAPI void __stdcall RtlInitAnsiString(PANSI_STRING Destination, const char *Source);
+KRNLAPI ULONG __stdcall MmQueryAddressProtect(void *VirtualAddress);
+KRNLAPI void __stdcall MmSetAddressProtect(void *BaseAddress, ULONG NumberOfBytes, ULONG NewProtect);
+KRNLAPI NTSTATUS __stdcall NtOpenFile(HANDLE *FileHandle, ULONG DesiredAccess, POBJECT_ATTRIBUTES ObjectAttributes,
                               PIO_STATUS_BLOCK IoStatusBlock, ULONG ShareAccess, ULONG OpenOptions);
+#ifndef _XBOX
 // The kernel's critical section (opaque here). 0x1C bytes.
 typedef struct _RTL_CRITICAL_SECTION
 {
@@ -266,10 +256,11 @@ typedef struct _RTL_CRITICAL_SECTION
 void __stdcall RtlInitializeCriticalSection(RTL_CRITICAL_SECTION *section);
 void __stdcall RtlEnterCriticalSection(RTL_CRITICAL_SECTION *section);
 void __stdcall RtlLeaveCriticalSection(RTL_CRITICAL_SECTION *section);
+#endif
 
-extern PANSI_STRING XeImageFileName;
-extern STRING HalDiskSerialNumber;
-extern STRING HalDiskModelNumber;
+extern KRNLAPI PANSI_STRING XeImageFileName;
+extern KRNLAPI STRING HalDiskSerialNumber;
+extern KRNLAPI STRING HalDiskModelNumber;
 typedef struct _XBOX_KRNL_VERSION
 {
 	USHORT Major;
@@ -277,15 +268,28 @@ typedef struct _XBOX_KRNL_VERSION
 	USHORT Build;
 	USHORT Qfe;
 } XBOX_KRNL_VERSION;
-extern XBOX_KRNL_VERSION XboxKrnlVersion;
-extern BYTE XboxHDKey[16];
-void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime);
-NTSTATUS __stdcall HalReadSMBusValue(UCHAR address, UCHAR command, BOOLEAN readWord, ULONG *value);
-NTSTATUS __stdcall HalWriteSMBusValue(UCHAR address, UCHAR command, BOOLEAN writeWord, ULONG value);
-NTSTATUS __stdcall NtSetSystemTime(LARGE_INTEGER *newTime, LARGE_INTEGER *previousTime);
-NTSTATUS __stdcall ExQueryNonVolatileSetting(ULONG valueIndex, ULONG *type, void *value, ULONG valueLength,
+extern KRNLAPI XBOX_KRNL_VERSION XboxKrnlVersion;
+// The kernel's XboxHardwareInfo export (the original reads it through the
+// import thunk at 0x00235730).
+typedef struct _XBOX_HARDWARE_INFO
+{
+	ULONG Flags;
+	BYTE GpuRevision;
+	BYTE McpRevision;
+	BYTE reserved[2];
+} XBOX_HARDWARE_INFO;
+extern KRNLAPI XBOX_HARDWARE_INFO XboxHardwareInfo;
+KRNLAPI LONG __stdcall NtAllocateVirtualMemory(void **baseAddress, ULONG zeroBits, DWORD *regionSize,
+                                               DWORD allocationType, DWORD protect);
+KRNLAPI LONG __stdcall NtFreeVirtualMemory(void **baseAddress, DWORD *regionSize, DWORD freeType);
+extern KRNLAPI BYTE XboxHDKey[16];
+KRNLAPI void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime);
+KRNLAPI NTSTATUS __stdcall HalReadSMBusValue(UCHAR address, UCHAR command, BOOLEAN readWord, ULONG *value);
+KRNLAPI NTSTATUS __stdcall HalWriteSMBusValue(UCHAR address, UCHAR command, BOOLEAN writeWord, ULONG value);
+KRNLAPI NTSTATUS __stdcall NtSetSystemTime(LARGE_INTEGER *newTime, LARGE_INTEGER *previousTime);
+KRNLAPI NTSTATUS __stdcall ExQueryNonVolatileSetting(ULONG valueIndex, ULONG *type, void *value, ULONG valueLength,
                                             ULONG *resultLength);
-NTSTATUS __stdcall ExSaveNonVolatileSetting(ULONG valueIndex, ULONG type, void *value, ULONG valueLength);
+KRNLAPI NTSTATUS __stdcall ExSaveNonVolatileSetting(ULONG valueIndex, ULONG type, void *value, ULONG valueLength);
 typedef enum _FIRMWARE_REENTRY
 {
 	ReturnFirmwareHalt,
@@ -295,7 +299,7 @@ typedef enum _FIRMWARE_REENTRY
 	ReturnFirmwareFatal,
 	ReturnFirmwareAll
 } FIRMWARE_REENTRY;
-void __stdcall HalReturnToFirmware(FIRMWARE_REENTRY routine);
+KRNLAPI void __stdcall HalReturnToFirmware(FIRMWARE_REENTRY routine);
 
 }
 
@@ -321,6 +325,12 @@ typedef struct _ATA_PASS_THROUGH
 
 #define IOCTL_IDE_PASS_THROUGH 0x0004D028
 
+#ifndef FILE_OPEN
+#define FILE_OPEN 0x00000001
+#endif
+#ifndef FILE_SYNCHRONOUS_IO_NONALERT
+#define FILE_SYNCHRONOUS_IO_NONALERT 0x00000020
+#endif
 #ifndef _XBOX
 #ifndef GENERIC_READ
 #define GENERIC_READ 0x80000000
@@ -330,8 +340,6 @@ typedef struct _ATA_PASS_THROUGH
 #define FILE_SHARE_READ 0x00000001
 #define FILE_SHARE_WRITE 0x00000002
 #endif
-#define FILE_OPEN 0x00000001
-#define FILE_SYNCHRONOUS_IO_NONALERT 0x00000020
 BOOL DeviceIoControl(HANDLE device, DWORD code, void *in, DWORD inSize, void *out, DWORD outSize, DWORD *returned,
                      void *overlapped);
 #endif
@@ -347,15 +355,24 @@ DWORD XUnmountMU(DWORD port, DWORD slot);
 #define MAX_MUNAME 32
 DWORD XMUNameFromDriveLetter(char drive, wchar_t *name, UINT nameLength);
 BOOL XFormatUtilityDrive();
-#define FILE_NON_DIRECTORY_FILE 0x00000040
-#define FILE_NO_INTERMEDIATE_BUFFERING 0x00000008
-#define FILE_SYNCHRONOUS_IO_ALERT 0x00000010
 #define FILE_READ_ATTRIBUTES 0x0080
 #define GENERIC_ALL 0x10000000
 #define FILE_SHARE_DELETE 0x00000004
+#endif
+#ifndef FILE_NON_DIRECTORY_FILE
+#define FILE_NON_DIRECTORY_FILE 0x00000040
+#define FILE_NO_INTERMEDIATE_BUFFERING 0x00000008
+#define FILE_SYNCHRONOUS_IO_ALERT 0x00000010
+#endif
+#ifndef FSCTL_DISMOUNT_VOLUME
 #define FSCTL_DISMOUNT_VOLUME 0x00090020
 #endif
 // Internal XAPI (not in the XDK headers).
+extern "C" {
+// Writes the title info for the next boot (D: as dDrivePath, then
+// launchPath), then quick-reboots with HalReturnToFirmware(ReturnFirmwareQuickReboot).
+DWORD __stdcall XWriteTitleInfoAndRebootA(LPCSTR launchPath, LPCSTR dDrivePath, DWORD launchDataType, DWORD titleId,
+                                          PLAUNCH_DATA launchData);   // 0x000397F9
 // XMountMU without the title's own folder: the whole unit as a drive.
 DWORD __stdcall XMountMURootA(DWORD port, DWORD slot, char *drive);
 // The memory unit (or other mass storage) in a port/slot as a kernel device;
@@ -363,12 +380,15 @@ DWORD __stdcall XMountMURootA(DWORD port, DWORD slot, char *drive);
 NTSTATUS __stdcall MU_CreateDeviceObject(DWORD port, DWORD slot, PANSI_STRING name);   // 0x0022E581
 void __stdcall MU_CloseDeviceObject(DWORD port, DWORD slot);                            // 0x0022E514
 BOOL __stdcall XapiFormatFATVolume(PANSI_STRING volume);                                 // 0x00039B64
+}
 // IOCTL_CDROM_CHECK_VERIFY: is there a readable disc.
 #define IOCTL_CDROM_CHECK_VERIFY 0x00024800
 #define ERROR_UNRECOGNIZED_MEDIA 1785
 
+#ifndef _XBOX
 // XAPI
 BOOL GetDiskFreeSpaceExA(const char *root, ULONGLONG *freeAvailable, ULONGLONG *total, ULONGLONG *totalFree);
 BOOL GetVolumeInformationA(const char *root, char *volumeName, DWORD volumeNameSize, DWORD *serial,
                            DWORD *maxComponentLength, DWORD *flags, char *fileSystemName, DWORD fileSystemNameSize);
 DWORD XMountUtilityDrive(BOOL formatClean);
+#endif

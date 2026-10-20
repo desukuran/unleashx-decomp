@@ -368,7 +368,7 @@ HRESULT CGameManager::Render()
 		float sx = m_fScaleX;
 		float sy = m_fScaleY;
 		DimScreen(0.7f);
-		g_pd3dDevice->SetTransform(D3DTS_WORLD, m_world);
+		g_pd3dDevice->SetTransform(D3DTS_WORLD, XDK_CAST(const D3DMATRIX *, m_world));
 		float listX = m_fX + 80.0f;
 		float y = m_fY;
 		float bottom = y + m_fHeight;

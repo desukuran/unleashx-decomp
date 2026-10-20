@@ -37,10 +37,10 @@ public:
 // The device from startup; NULL without sound.
 extern IDirectSound *g_pDirectSound;      // 0x00276224
 
+#ifndef _XBOX
 // DirectSound (XDK).
 HRESULT DirectSoundOverrideSpeakerConfig(DWORD config);
 HRESULT DirectSoundUseLightHRTF();
-#ifndef _XBOX
 // The output meters (XDK).
 struct DSOUTPUTLEVELS
 {

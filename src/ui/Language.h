@@ -4,6 +4,7 @@
 // A literal "\n" in a language file means a line break.
 #pragma once
 
+#include "../common/Platform.h"
 #include "StringIds.h"
 
 class CXmlDocument;

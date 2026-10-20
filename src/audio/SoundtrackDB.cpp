@@ -56,7 +56,7 @@ static void CopyName(STDBCHAR *to, const wchar_t *from)
 		to[i] = 0;
 }
 
-static void CopyName(STDBCHAR *to, const STDBCHAR *from)
+static void CopyStoredName(STDBCHAR *to, const STDBCHAR *from)
 {
 	memcpy(to, from, SOUNDTRACK_NAME_LENGTH * sizeof(STDBCHAR));
 }
@@ -486,13 +486,13 @@ static void SwapSongEntries(SSongGroup *a, UINT placeA, SSongGroup *b, UINT plac
 	DWORD id = a->songIds[placeA];
 	DWORD time = a->songTimeMs[placeA];
 	STDBCHAR name[SOUNDTRACK_NAME_LENGTH];
-	CopyName(name, a->songNames[placeA]);
+	CopyStoredName(name, a->songNames[placeA]);
 	a->songIds[placeA] = b->songIds[placeB];
 	a->songTimeMs[placeA] = b->songTimeMs[placeB];
-	CopyName(a->songNames[placeA], b->songNames[placeB]);
+	CopyStoredName(a->songNames[placeA], b->songNames[placeB]);
 	b->songIds[placeB] = id;
 	b->songTimeMs[placeB] = time;
-	CopyName(b->songNames[placeB], name);
+	CopyStoredName(b->songNames[placeB], name);
 }
 
 // 0x000BC1C9
@@ -603,7 +603,7 @@ BOOL DeleteSong(DWORD soundtrackId, UINT index)
 		if (!read)
 			continue;
 		group.songIds[SOUNDTRACK_GROUP_SONGS - 1] = following.songIds[0];
-		CopyName(group.songNames[SOUNDTRACK_GROUP_SONGS - 1], following.songNames[0]);
+		CopyStoredName(group.songNames[SOUNDTRACK_GROUP_SONGS - 1], following.songNames[0]);
 		group.songTimeMs[SOUNDTRACK_GROUP_SONGS - 1] = following.songTimeMs[0];
 		memcpy(&s_sector.group, &group, sizeof(group));
 		Seek(GroupOffset(soundtrack.songGroups[groupIndex]));

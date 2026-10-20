@@ -62,8 +62,8 @@ static void SetOrbVertex(SOrbVertex *vertex, float x, float y, float z, float u,
 	vertex->u = u;
 	vertex->v = v;
 	float transformed[4];
-	D3DXVec3Transform(transformed, &vertex->nx, transform);
-	float scale = 1.37f / D3DXVec4Length(transformed);
+	D3DXVec3Transform(XDK_CAST(D3DXVECTOR4 *, transformed), XDK_CAST(const D3DXVECTOR3 *, &vertex->nx), XDK_CAST(const D3DXMATRIX *, transform));
+	float scale = 1.37f / D3DXVec4Length(XDK_CAST(const D3DXVECTOR4 *, transformed));
 	vertex->envU = transformed[0] * scale + 0.5f;
 	vertex->envV = 0.5f - transformed[1] * scale;
 }
@@ -80,9 +80,9 @@ void CUnleashX::InitOrb()
 	s_fOrbYaw = 0.25840735f;
 	s_fOrbPitch = 0.0f;
 	float rotation[16];
-	D3DXMatrixRotationYawPitchRoll(rotation, 0.25840735f, 0.0f, 0.0f);
+	D3DXMatrixRotationYawPitchRoll(XDK_CAST(D3DXMATRIX *, rotation), 0.25840735f, 0.0f, 0.0f);
 	float transform[16];
-	D3DXMatrixMultiply(transform, rotation, m_viewMatrix);
+	D3DXMatrixMultiply(XDK_CAST(D3DXMATRIX *, transform), XDK_CAST(const D3DXMATRIX *, rotation), XDK_CAST(const D3DXMATRIX *, m_viewMatrix));
 
 	BYTE *data = NULL;
 	m_pOrbVB->Lock(0, 0, &data, 0);
@@ -217,16 +217,16 @@ HRESULT CUnleashX::RenderBackground()
 		device->SetTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
 		device->SetTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
 		device->SetRenderState(D3DRS_EDGEANTIALIAS, TRUE);
-		device->SetTransform(D3DTS_WORLD, m_globeMatrix);
+		device->SetTransform(D3DTS_WORLD, XDK_CAST(const D3DMATRIX *, m_globeMatrix));
 		m_outerSphereMesh.Render(0x30);
 		device->SetRenderState(D3DRS_EDGEANTIALIAS, FALSE);
 
 		// Back to the plain view, with linear fog from 5 to 100.
-		D3DXMatrixIdentity(m_worldMatrix);
+		D3DXMatrixIdentity(XDK_CAST(D3DXMATRIX *, m_worldMatrix));
 		device->SetVertexShader(FVF_MESH);
-		device->SetTransform(D3DTS_WORLD, m_worldMatrix);
-		device->SetTransform(D3DTS_VIEW, m_viewMatrix);
-		device->SetTransform(D3DTS_PROJECTION, m_projMatrix);
+		device->SetTransform(D3DTS_WORLD, XDK_CAST(const D3DMATRIX *, m_worldMatrix));
+		device->SetTransform(D3DTS_VIEW, XDK_CAST(const D3DMATRIX *, m_viewMatrix));
+		device->SetTransform(D3DTS_PROJECTION, XDK_CAST(const D3DMATRIX *, m_projMatrix));
 		device->SetRenderState(D3DRS_AMBIENT, g_colorScheme.AMBIENT_SKYCOLOR);
 		device->SetRenderState(D3DRS_FOGENABLE, g_skin.m_bFog);
 		device->SetRenderState(D3DRS_FOGCOLOR, g_colorScheme.AMBIENT_FOGCOLOR);
@@ -253,9 +253,9 @@ HRESULT CUnleashX::RenderBackground()
 
 	// TODO: what the shader constants (registers 20 and 24) are for.
 	float transposed[16];
-	D3DXMatrixTranspose(transposed, (const float *)m_unknown980);
+	D3DXMatrixTranspose(XDK_CAST(D3DXMATRIX *, transposed), XDK_CAST(const D3DXMATRIX *, (const float *)m_unknown980));
 	device->SetVertexShaderConstant(0x74 - 96, transposed, 4);
-	D3DXMatrixTranspose(transposed, m_projMatrix);
+	D3DXMatrixTranspose(XDK_CAST(D3DXMATRIX *, transposed), XDK_CAST(const D3DXMATRIX *, m_projMatrix));
 	device->SetVertexShaderConstant(0x78 - 96, transposed, 4);
 
 	if (g_skin.m_bOrb)
@@ -284,14 +284,14 @@ HRESULT CUnleashX::RenderBackground()
 		// (The original leaves the rest of the matrix uninitialized.)
 		float texture[16] = {0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -0.5f, 0.0f, 0.0f,
 		                     0.0f, 0.0f, 0.0f, 0.0f, 0.5f, 0.5f, 0.0f, 0.0f};
-		device->SetTransform(D3DTS_TEXTURE0, texture);
+		device->SetTransform(D3DTS_TEXTURE0, XDK_CAST(const D3DMATRIX *, texture));
 		device->SetTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
 		device->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, D3DTSS_TCI_CAMERASPACENORMAL);
 		float world[16];
-		D3DXMatrixIdentity(world);
+		D3DXMatrixIdentity(XDK_CAST(D3DXMATRIX *, world));
 		UpdateOrbSpin(m_menu.m_nSelected);
 		BuildWorldMatrix(world, s_fOrbX, s_fOrbY, 38.0f, s_fAspect * 0.36f, 0.38f, 0.38f, 0.0f, 0.18f, s_fOrbAngle);
-		device->SetTransform(D3DTS_WORLD, world);
+		device->SetTransform(D3DTS_WORLD, XDK_CAST(const D3DMATRIX *, world));
 		device->SetVertexShader(FVF_MESH);
 		m_crossHairMesh.Render(0x30);
 		device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
@@ -339,9 +339,9 @@ HRESULT CUnleashX::RenderBackground()
 		device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 		device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 		device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-		D3DXMatrixIdentity(world);
+		D3DXMatrixIdentity(XDK_CAST(D3DXMATRIX *, world));
 		BuildWorldMatrix(world, s_fOrbX, s_fOrbY, 40.0f, s_fAspect * 9.0f, 9.0f, 9.0f, 0.0f, 0.0f, 0.01f);
-		device->SetTransform(D3DTS_WORLD, world);
+		device->SetTransform(D3DTS_WORLD, XDK_CAST(const D3DMATRIX *, world));
 		device->SetStreamSource(0, m_pOrbVB, sizeof(SOrbVertex));
 		device->DrawVertices(D3DPT_TRIANGLESTRIP, 0, m_nOrbVertices);
 	}

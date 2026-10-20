@@ -5,6 +5,26 @@
 
 #ifdef _XBOX
 #include <xtl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <process.h>
+#include <mbstring.h>
+#include <conio.h>
+#include <math.h>
+#ifndef XCREATESAVEGAME_NOCOPY
+#define XCREATESAVEGAME_NOCOPY 1
+#endif
+#ifndef INVALID_FILE_ATTRIBUTES
+#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#endif
+// The XDK's multibyte functions take unsigned char.
+inline int _mbsicmp(const char *a, const char *b) { return _mbsicmp((const unsigned char *)a, (const unsigned char *)b); }
+inline int _mbsicmp(const unsigned char *a, const char *b) { return _mbsicmp(a, (const unsigned char *)b); }
+inline int _mbsicmp(const char *a, const unsigned char *b) { return _mbsicmp((const unsigned char *)a, b); }
+// MSVC 7.1 has only the underscored names.
+#define vsnprintf _vsnprintf
+#define snprintf _snprintf
 #else
 #include <arpa/inet.h>  // inet_addr, INADDR_NONE (XNet on the Xbox)
 #include <cstddef>
@@ -234,4 +254,12 @@ FILE *HostFopen(const char *path, const char *mode);
 #define BIOS_FLASH_BASE ((const void *)0xFF000000)
 #else
 #define BIOS_FLASH_BASE ((const void *)0)
+#endif
+
+// A cast that only the XDK's stricter types need (the structures match the
+// XDK's layouts); nothing on other hosts.
+#ifdef _XBOX
+#define XDK_CAST(type, expr) ((type)(expr))
+#else
+#define XDK_CAST(type, expr) (expr)
 #endif

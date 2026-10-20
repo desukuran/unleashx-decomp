@@ -745,7 +745,7 @@ void CUnleashX::UpdateScreenSaver(int *action)
 			if (g_pSettings->m_video.m_bFastRefresh)
 			{
 				// Back to no vsync (the screen saver ran with it).
-				g_pd3dDevice->Reset(&m_d3dpp);
+				g_pd3dDevice->Reset(XDK_CAST(D3DPRESENT_PARAMETERS *, &m_d3dpp));
 				g_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0xFF000000,
 				                    1.0f, 0);
 				g_pd3dDevice->Swap(0);
@@ -799,7 +799,7 @@ void CUnleashX::UpdateScreenSaver(int *action)
 					// The screen saver runs with vsync.
 					SPresentParameters params = *g_pPresentParams;
 					params.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
-					g_pd3dDevice->Reset(&params);
+					g_pd3dDevice->Reset(XDK_CAST(D3DPRESENT_PARAMETERS *, &params));
 				}
 				if (prefs.m_nLEDScreenSaver != LED_DEFAULT)
 					SetLedPattern(prefs.m_nLEDScreenSaver, FALSE);

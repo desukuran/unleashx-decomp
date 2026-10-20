@@ -103,7 +103,7 @@ void GetDiskSpace(char drive, ULONGLONG *total, ULONGLONG *free, ULONGLONG *used
 	strcat(root, ":\\");
 
 	ULONGLONG freeAvailable, totalBytes, totalFree;
-	if (!GetDiskFreeSpaceExA(root, &freeAvailable, &totalBytes, &totalFree))
+	if (!GetDiskFreeSpaceExA(root, XDK_CAST(PULARGE_INTEGER, &freeAvailable), XDK_CAST(PULARGE_INTEGER, &totalBytes), XDK_CAST(PULARGE_INTEGER, &totalFree)))
 		return;
 	if (unit == 0)
 		unit = 1;

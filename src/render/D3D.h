@@ -340,11 +340,6 @@ float D3DXVec4Length(const float *v);
 UINT D3DXGetFVFVertexSize(DWORD fvf);                                                       // 0x00154515
 HRESULT D3DXComputeBoundingSphere(const void *vertices, DWORD numVertices, DWORD fvf, float *center,
                                   float *radius);                                           // 0x001543F5                                                       // 0x0002A76A
-// XDK sample framework: where the XBUtil loaders look for media ("D:\\Media\\").
-extern char g_strMediaPath[];                                                              // 0x0026BC78
-void XBUtil_SetMediaPath(const char *path);   // 0x000930A7 (path in eax)
-// XDK sample framework: diffuse and ambient set to the color. (material in edx)
-void XBUtil_InitMaterial(D3DMATERIAL8 *material, float r, float g, float b, float a);       // 0x00092EEF
 HRESULT XGWriteSurfaceOrTextureToXPR(void *resource, const char *path, BOOL writeSurfaceAsTexture);   // 0x0003E84B
 // Writes a surface as a .bmp file (XGraphics).
 HRESULT XGWriteSurfaceToFile(IDirect3DSurface8 *surface, const char *path);   // 0x0016FD40
@@ -356,11 +351,33 @@ HRESULT D3DXCreateTextureFromFileExA(IDirect3DDevice8 *device, const char *file,
 
 // XPR file header (XPR0/XPR1): the resource headers follow, the data starts
 // at headerSize.
+#ifndef _XBOX
 struct XPR_HEADER
 {
 	DWORD dwMagic;        // 'XPR0' or 'XPR1'
 	DWORD dwTotalSize;
 	DWORD dwHeaderSize;
 };
+#endif
 #define XPR0_MAGIC 0x30525058
 #define XPR1_MAGIC 0x31525058
+
+
+// XDK sample framework: where the XBUtil loaders look for media ("D:\\Media\\").
+extern char g_strMediaPath[];                                                              // 0x0026BC78
+void XBUtil_SetMediaPath(const char *path);   // 0x000930A7 (path in eax)
+// XDK sample framework: diffuse and ambient set to the color. (material in edx)
+void XBUtil_InitMaterial(D3DMATERIAL8 *material, float r, float g, float b, float a);       // 0x00092EEF
+
+#ifdef _XBOX
+#include <xgraphics.h>
+// Not in the XDK headers.
+extern "C" __declspec(dllimport) IDirect3DSurface8 *__stdcall AvGetSavedDataAddress();
+namespace D3D { namespace PixelJar {
+void __stdcall Get2DSurfaceDesc(D3DPixelContainer *container, UINT level, D3DSURFACE_DESC *desc);
+} }
+inline void Get2DSurfaceDesc(D3DResource *resource, DWORD level, D3DSURFACE_DESC *desc)
+{
+	D3D::PixelJar::Get2DSurfaceDesc((D3DPixelContainer *)resource, level, desc);
+}
+#endif

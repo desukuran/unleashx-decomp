@@ -92,7 +92,7 @@ BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *device, IDirect3DTe
 				// 1: its own size.
 				HRESULT hr = D3DXCreateTextureFromFileInMemoryEx(g_pd3dDevice, data, read, D3DX_DEFAULT, D3DX_DEFAULT, 1, 0,
 				                                                 image.format, 1, D3DX_DEFAULT, D3DX_FILTER_NONE, 0,
-				                                                 &image, NULL, texture);
+				                                                 XDK_CAST(D3DXIMAGE_INFO *, &image), NULL, texture);
 				if (hr != S_OK)
 				{
 					// 2: no bigger than the display mode.
@@ -105,7 +105,7 @@ BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *device, IDirect3DTe
 					}
 					FitInside(width, height, mode.Width, mode.Height);
 					hr = D3DXCreateTextureFromFileInMemoryEx(g_pd3dDevice, data, read, width, height, 1, 0, image.format, 1,
-					                                         D3DX_DEFAULT, D3DX_FILTER_NONE, 0, &image, NULL, texture);
+					                                         D3DX_DEFAULT, D3DX_FILTER_NONE, 0, XDK_CAST(D3DXIMAGE_INFO *, &image), NULL, texture);
 					if (hr != S_OK)
 					{
 						// 3: 16-bit, no bigger than the TV (720 wide for
@@ -118,7 +118,7 @@ BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *device, IDirect3DTe
 						image.format = D3DFMT_A4R4G4B4;
 						hr = D3DXCreateTextureFromFileInMemoryEx(g_pd3dDevice, data, read, width, height, 1, 0,
 						                                         D3DFMT_A4R4G4B4, 1, D3DX_DEFAULT, D3DX_FILTER_NONE, 0,
-						                                         &image, NULL, texture);
+						                                         XDK_CAST(D3DXIMAGE_INFO *, &image), NULL, texture);
 						if (hr != S_OK)
 						{
 							if (XGIsSwizzledFormat(image.format))
@@ -132,7 +132,7 @@ BOOL LoadTextureFromFile(const char *path, IDirect3DDevice8 *device, IDirect3DTe
 							if (hr == S_OK)
 							{
 								hr = D3DXLoadSurfaceFromFileInMemory(surface, NULL, NULL, data, read, NULL, D3DX_DEFAULT, 0,
-								                                     &image);
+								                                     XDK_CAST(D3DXIMAGE_INFO *, &image));
 								if (hr == S_OK &&
 								    SUCCEEDED(D3DXCreateTexture(g_pd3dDevice, width, height, 1, 0, image.format, 0, texture)))
 								{

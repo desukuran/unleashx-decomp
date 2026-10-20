@@ -685,7 +685,7 @@ BOOL CNotePad::Render()
 	}
 
 	// The cursor, an I-beam, on for 3/4 of every second.
-	if (fmod(m_cursorTimer.GetElapsedSeconds(), 1.0) < 0.75)
+	if (fmod((double)m_cursorTimer.GetElapsedSeconds(), 1.0) < 0.75)
 	{
 		float cursorX = x;
 		float offset = 0.0f;

@@ -623,7 +623,7 @@ static unsigned __stdcall MoveThread(void *)
 		ShowOperationFile(from);
 		ShowOperationTarget(to);
 		g_ullFileDone = 0;
-		if (!MoveFileWithProgressA(from.c_str(), to.c_str(), (void *)OperationProgress, NULL, flags))
+		if (!MoveFileWithProgressA(from.c_str(), to.c_str(), XDK_CAST(LPPROGRESS_ROUTINE, (void *)OperationProgress), NULL, flags))
 		{
 			g_ullOperationDone -= g_ullFileDone;
 			g_dwOperationError = GetLastError();

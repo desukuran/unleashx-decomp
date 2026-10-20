@@ -605,16 +605,16 @@ void DrawShadeFullScreen(IDirect3DTexture8 *texture, float alpha)
 void BuildWorldMatrix(float *matrix, float x, float y, float z, float scaleX, float scaleY, float scaleZ,
                       float rotationX, float rotationY, float rotationZ)
 {
-	D3DXMatrixTranslation(matrix, x, y, z);
+	D3DXMatrixTranslation(XDK_CAST(D3DXMATRIX *, matrix), x, y, z);
 	float rotation[16];
-	D3DXMatrixIdentity(rotation);
+	D3DXMatrixIdentity(XDK_CAST(D3DXMATRIX *, rotation));
 	float scale[16];
-	D3DXMatrixScaling(scale, scaleX, scaleY, scaleZ);
-	D3DXMatrixMultiply(matrix, scale, matrix);
+	D3DXMatrixScaling(XDK_CAST(D3DXMATRIX *, scale), scaleX, scaleY, scaleZ);
+	D3DXMatrixMultiply(XDK_CAST(D3DXMATRIX *, matrix), XDK_CAST(const D3DXMATRIX *, scale), XDK_CAST(const D3DXMATRIX *, matrix));
 	if (rotationX != 0.0f || rotationY != 0.0f || rotationZ != 0.0f)
 	{
-		D3DXMatrixRotationYawPitchRoll(rotation, rotationY, rotationX, rotationZ);
-		D3DXMatrixMultiply(matrix, rotation, matrix);
+		D3DXMatrixRotationYawPitchRoll(XDK_CAST(D3DXMATRIX *, rotation), rotationY, rotationX, rotationZ);
+		D3DXMatrixMultiply(XDK_CAST(D3DXMATRIX *, matrix), XDK_CAST(const D3DXMATRIX *, rotation), XDK_CAST(const D3DXMATRIX *, matrix));
 	}
 }
 

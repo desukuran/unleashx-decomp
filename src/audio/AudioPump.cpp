@@ -558,7 +558,7 @@ HRESULT CWMAPump::OpenFile(const char *path, HANDLE file, WAVEFORMATEX *format)
 		m_hFile = file;
 	else
 		DashStrCopyN(name, path, 0x104);
-	HRESULT hr = WmaCreateDecoder(name, file, FALSE, 0x40000, m_nPackets, 0, format, &m_pDecoder);
+	HRESULT hr = WmaCreateDecoder(name, file, FALSE, 0x40000, m_nPackets, 0, format, XDK_CAST(XFileMediaObject **, &m_pDecoder));
 	if (hr == S_OK)
 	{
 		hr = Create(4, 0, format, 0x10000, 1);

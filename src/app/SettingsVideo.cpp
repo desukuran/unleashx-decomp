@@ -193,7 +193,7 @@ void CVideoSetting::TestVideoMode()
 	    params.FullScreen_PresentationInterval == g_pPresentParams->FullScreen_PresentationInterval)
 		return;
 
-	if (SUCCEEDED(g_pd3dDevice->Reset(&params)))
+	if (SUCCEEDED(g_pd3dDevice->Reset(XDK_CAST(D3DPRESENT_PARAMETERS *, &params))))
 	{
 		D3DVIEWPORT8 viewport = { 0, 0, params.BackBufferWidth, params.BackBufferHeight, 0.0f, 1.0f };
 		g_pd3dDevice->SetViewport(&viewport);
@@ -231,7 +231,7 @@ void CVideoSetting::TestVideoMode()
 		}
 		m_pFont->SetScaleFactors(g_pSettings->m_fFontScale, g_pSettings->m_fFontScale);
 	}
-	g_pd3dDevice->Reset(g_pPresentParams);
+	g_pd3dDevice->Reset(XDK_CAST(D3DPRESENT_PARAMETERS *, g_pPresentParams));
 }
 
 // 0x000C9182
@@ -696,7 +696,7 @@ BOOL CVideoSetting::Save()
 					else
 						resetDevice = FALSE;   // Quirk: so a color change alone isn't applied
 					if (resetDevice)
-						g_pd3dDevice->Reset(g_pPresentParams);
+						g_pd3dDevice->Reset(XDK_CAST(D3DPRESENT_PARAMETERS *, g_pPresentParams));
 				}
 				ShowSavedMessage();
 			}

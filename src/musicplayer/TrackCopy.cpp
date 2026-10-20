@@ -470,7 +470,7 @@ BOOL CTrackCopy::CopySong(UINT index, const wchar_t *name, DWORD length)
 			if (!SetFilePointerEx(file, size, NULL, FILE_BEGIN) || !SetEndOfFile(file))
 				m_nError = COPY_FILE_ERROR;
 			ULONGLONG freeBytes;
-			if (!GetDiskFreeSpaceExA("X:\\", &freeBytes, NULL, NULL) || freeBytes < (ULONGLONG)size.QuadPart)
+			if (!GetDiskFreeSpaceExA("X:\\", XDK_CAST(PULARGE_INTEGER, &freeBytes), NULL, NULL) || freeBytes < (ULONGLONG)size.QuadPart)
 				m_nError = COPY_FILE_ERROR;
 			SetFilePointer(file, 0, NULL, FILE_BEGIN);
 			short peak = -32767;

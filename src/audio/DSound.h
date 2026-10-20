@@ -8,6 +8,11 @@
 #ifdef _XBOX
 #include <dsound.h>
 #include <xact.h>
+// The WMA decoder object under the names the recovered code uses.
+typedef XFileMediaObject IXMediaObject;
+#define IXMediaObject_Release(p) XFileMediaObject_Release(p)
+#define IXMediaObject_Process(p, a, b) XFileMediaObject_Process(p, a, b)
+#define IXMediaObject_Discontinuity(p) XFileMediaObject_Discontinuity(p)
 #else
 struct IDirectSound;
 struct IDirectSoundBuffer
@@ -161,7 +166,11 @@ struct XACT_NOTIFICATION_DESCRIPTION
 {
 	WORD wType;
 	WORD wFlags;
-	IXACTSoundBank *pSoundBank;
+	union
+	{
+		IXACTSoundBank *pSoundBank;
+		void *pWaveBank;
+	} u;
 	DWORD dwSoundCueIndex;
 	IXACTSoundCue *pSoundCue;
 	void *pvContext;

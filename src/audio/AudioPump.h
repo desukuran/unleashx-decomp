@@ -134,7 +134,9 @@ public:
 	DWORD m_dwFilePacketSize;              // +0x68
 };
 
+#ifndef _XBOX
 struct IXMediaObject;
+#endif
 
 // A WMA file or soundtrack song through the XDK's WMA decoder. Nothing
 // makes one (the WMA player uses XACT). 0x68 bytes.

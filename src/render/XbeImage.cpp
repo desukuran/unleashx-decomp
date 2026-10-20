@@ -164,7 +164,7 @@ BOOL LoadXbeIcon(const char *xbePath, IDirect3DTexture8 **texture)
 					if (ReadFile(file, dds, section.rawSize, &count, NULL) && g_pd3dDevice != NULL &&
 					    D3DXCreateTextureFromFileInMemoryEx(g_pd3dDevice, dds, section.rawSize, D3DX_DEFAULT,
 					                                        D3DX_DEFAULT, 0, 0, (D3DFORMAT)D3DX_DEFAULT, 1,
-					                                        D3DX_DEFAULT, 1, 0, &info, NULL, texture) == S_OK)
+					                                        D3DX_DEFAULT, 1, 0, XDK_CAST(D3DXIMAGE_INFO *, &info), NULL, texture) == S_OK)
 						result = TRUE;
 					free(dds);
 				}
@@ -292,7 +292,7 @@ BOOL ExtractXbeTitleImage(const char *xbePath, const char *outFile)
 							SImageInfo info;
 							if (g_pd3dDevice == NULL ||
 							    D3DXCreateTextureFromFileExA(g_pd3dDevice, outFile, D3DX_DEFAULT, D3DX_DEFAULT, 0, 0,
-							                                 (D3DFORMAT)D3DX_DEFAULT, 1, D3DX_DEFAULT, 1, 0, &info,
+							                                 (D3DFORMAT)D3DX_DEFAULT, 1, D3DX_DEFAULT, 1, 0, XDK_CAST(D3DXIMAGE_INFO *, &info),
 							                                 NULL, &check) == S_OK)
 							{
 								result = TRUE;

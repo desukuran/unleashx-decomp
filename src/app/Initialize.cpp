@@ -43,8 +43,10 @@ void XRegisterThreadNotifyRoutine(SThreadNotification *notification, BOOL regist
 // is skipped.
 static const int ACTION_HANDLED_AT_BOOT = 0x30;
 
+#ifndef _XBOX
 BOOL GetExitCodeThread(HANDLE thread, DWORD *exitCode);
 DWORD ResumeThread(HANDLE thread);
+#endif
 
 // The device's default states for the 3D background.
 static void SetDefaultRenderStates()
@@ -92,13 +94,13 @@ HRESULT CUnleashX::Initialize()
 	// The 3D background: world, view (from 2 in front, slightly above),
 	// a white material.
 	SetIdentity(m_worldMatrix);
-	g_pd3dDevice->SetTransform(D3DTS_WORLD, m_worldMatrix);
+	g_pd3dDevice->SetTransform(D3DTS_WORLD, XDK_CAST(const D3DMATRIX *, m_worldMatrix));
 	SetIdentity(m_viewMatrix);
 	float eye[3] = {0.0f, 0.01f, -2.0f};
 	float at[3] = {0.0f, 0.1f, 0.0f};
 	float up[3] = {0.0f, 1.0f, 0.0f};
-	D3DXMatrixLookAtLH(m_viewMatrix, eye, at, up);
-	g_pd3dDevice->SetTransform(D3DTS_VIEW, m_viewMatrix);
+	D3DXMatrixLookAtLH(XDK_CAST(D3DXMATRIX *, m_viewMatrix), XDK_CAST(const D3DXVECTOR3 *, eye), XDK_CAST(const D3DXVECTOR3 *, at), XDK_CAST(const D3DXVECTOR3 *, up));
+	g_pd3dDevice->SetTransform(D3DTS_VIEW, XDK_CAST(const D3DMATRIX *, m_viewMatrix));
 	D3DMATERIAL8 material;
 	XBUtil_InitMaterial(&material, 1.0f, 1.0f, 1.0f, 1.0f);
 	g_pd3dDevice->SetMaterial(&material);
@@ -462,8 +464,8 @@ HRESULT CUnleashX::Initialize()
 		m_d3dpp.BackBufferFormat = D3DFMT_LIN_X1R5G5B5;
 		reset = TRUE;
 	}
-	D3DXMatrixPerspectiveFovLH(m_projMatrix, 1.1423974f, 4.0f / 3.0f, 1.0f, 200.0f);
-	g_pd3dDevice->SetTransform(D3DTS_PROJECTION, m_projMatrix);
+	D3DXMatrixPerspectiveFovLH(XDK_CAST(D3DXMATRIX *, m_projMatrix), 1.1423974f, 4.0f / 3.0f, 1.0f, 200.0f);
+	g_pd3dDevice->SetTransform(D3DTS_PROJECTION, XDK_CAST(const D3DMATRIX *, m_projMatrix));
 
 	// Sound: 5.1 if the Xbox is on stereo, the HRTF and the effects image
 	// (dsstdfx.bin in the data folder, or one level up).
@@ -696,10 +698,10 @@ HRESULT CUnleashX::Initialize()
 	// The globe's starting transform, and an ambient light.
 	float rotation[16];
 	SetIdentity(rotation);
-	D3DXMatrixRotationYawPitchRoll(rotation, 3.1415927f, 1.5707964f, 0.0f);
+	D3DXMatrixRotationYawPitchRoll(XDK_CAST(D3DXMATRIX *, rotation), 3.1415927f, 1.5707964f, 0.0f);
 	SetIdentity(m_globeMatrix);
 	BuildWorldMatrix(m_globeMatrix, 0.0f, 0.0f, 48.0f, 1.0f, 1.0f, 1.0f, 1.5707964f, 3.1415927f, 0.0f);
-	g_pd3dDevice->SetTransform(D3DTS_WORLD, m_globeMatrix);
+	g_pd3dDevice->SetTransform(D3DTS_WORLD, XDK_CAST(const D3DMATRIX *, m_globeMatrix));
 	g_pd3dDevice->SetRenderState(D3DRS_AMBIENT, 0xFF000000);
 
 	// Started by the Live Update installer (launch data with its path):
@@ -760,7 +762,7 @@ HRESULT CUnleashX::Initialize()
 			m_d3dpp.BackBufferHeight = m_dwScreenHeight;
 			try
 			{
-				g_pd3dDevice->Reset(&m_d3dpp);
+				g_pd3dDevice->Reset(XDK_CAST(D3DPRESENT_PARAMETERS *, &m_d3dpp));
 			}
 			catch (...)
 			{
