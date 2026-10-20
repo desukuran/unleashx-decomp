@@ -39,7 +39,7 @@ Everything else is in this repository: UnleashX's media and skins, the
 third-party sources and the disc tool.
 
 ```sh
-git clone <this repo> && cd unleashx
+git clone https://github.com/desukuran/unleashx-decomp.git && cd unleashx-decomp
 make -f Makefile.xbox XDK=/path/to/xdk -j4 xiso   # Linux/macOS: also needs Wine, make, a C compiler, Python 3
 ```
 
