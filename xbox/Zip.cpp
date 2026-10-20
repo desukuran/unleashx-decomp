@@ -1,16 +1,17 @@
-// The zip libraries for the Xbox build: Lucian Wischik's unzip and Valve's
-// XZip (zip creation), compiled from reference/thirdparty/zip_utils (see
-// Makefile.xbox), behind the interface UnleashX was linked against (XUnzip
-// and XZip with the ZIP_HANDLE/ZIP_FILENAME/ZIP_MEMORY flags,
-// src/thirdparty/XZip.h).
+// UnleashX's zip interface (src/thirdparty/XZip.h: XUnzip/XZip with the
+// ZIP_HANDLE/ZIP_FILENAME/ZIP_MEMORY flags) on Lucian Wischik's zip_utils
+// (thirdparty/zip_utils), which keep that flag interface internally.
+// GetZipItem, FindZipItem, IsZipHandleU and CloseZipZ come straight from
+// unzip.cpp and zip.cpp.
 #include "../src/thirdparty/XZip.h"
 
 // unzip.cpp
 HZIP OpenZipInternal(void *z, unsigned int len, DWORD flags, const char *password);
 ZRESULT UnzipItemInternal(HZIP hz, int index, void *dst, unsigned int len, DWORD flags);
 ZRESULT CloseZipU(HZIP hz);
-// XZip.cpp
-HZIP CreateZipZ(void *z, unsigned int len, DWORD flags);
+// zip.cpp
+HZIP CreateZipInternal(void *z, unsigned int len, DWORD flags, const char *password);
+ZRESULT ZipAddInternal(HZIP hz, const char *dstzn, void *src, unsigned int len, DWORD flags);
 
 HZIP OpenZip(void *z, unsigned int len, DWORD flags)
 {
@@ -29,5 +30,10 @@ ZRESULT CloseZip(HZIP hz)
 
 HZIP CreateZip(void *z, unsigned int len, DWORD flags)
 {
-	return CreateZipZ(z, len, flags);
+	return CreateZipInternal(z, len, flags, NULL);
+}
+
+ZRESULT ZipAdd(HZIP hz, const char *dstName, void *src, unsigned int len, DWORD flags)
+{
+	return ZipAddInternal(hz, dstName, src, len, flags);
 }

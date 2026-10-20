@@ -1,27 +1,16 @@
 // The third-party sources include <windows.h>; on the Xbox that's <xtl.h>,
-// plus the few Win32 calls XAPI doesn't have.
+// plus the few Win32 calls XAPI doesn't have that zip_utils uses.
 #pragma once
 #include <xtl.h>
 
-// Everything the zip code opens is a seekable file.
-#define FILE_TYPE_DISK 1
-static DWORD GetFileType(HANDLE)
+// zip.cpp seeds its encryption salt with this; there are no windows.
+static void *GetDesktopWindow()
 {
-	return FILE_TYPE_DISK;
+	return 0;
 }
 
-static BOOL FileTimeToDosDateTime(const FILETIME *fileTime, WORD *dosDate, WORD *dosTime)
-{
-	SYSTEMTIME st;
-	if (!FileTimeToSystemTime(fileTime, &st))
-		return FALSE;
-	*dosDate = (WORD)(((st.wYear - 1980) << 9) | (st.wMonth << 5) | st.wDay);
-	*dosTime = (WORD)((st.wHour << 11) | (st.wMinute << 5) | (st.wSecond / 2));
-	return TRUE;
-}
-
-// No file mappings: zipping into memory fails (ZR_NOALLOC); UnleashX zips
-// to files.
+// No file mappings: zipping into memory fails (ZR_NOALLOC). UnleashX only
+// zips to files.
 #define FILE_MAP_ALL_ACCESS 0xF001F
 static HANDLE CreateFileMapping(HANDLE, void *, DWORD, DWORD, DWORD, const char *)
 {

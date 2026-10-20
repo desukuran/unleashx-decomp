@@ -31,15 +31,25 @@ BOOL SetLedPattern(int, BOOL) { return FALSE; }
 
 // XBApp.h: CXBStopWatch (XDK sample framework)
 #include <chrono>
-static double HostSeconds()
+// Microsecond ticks on the host (QueryPerformanceCounter on the Xbox).
+static LONGLONG HostTicks()
 {
-	return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count();
+	return std::chrono::duration_cast<std::chrono::microseconds>(
+		std::chrono::steady_clock::now().time_since_epoch()).count();
 }
-CXBStopWatch::CXBStopWatch() { Reset(); }
-// m_state: the start time, then a running flag.
-void CXBStopWatch::Start() { *(double *)m_state = HostSeconds(); m_state[8] = 1; }
-void CXBStopWatch::Stop() { m_state[8] = 0; }
-void CXBStopWatch::Reset() { m_fSecsPerTick = 0; *(double *)m_state = HostSeconds(); m_state[8] = 0; }
-BOOL CXBStopWatch::IsRunning() const { return m_state[8] != 0; }
-float CXBStopWatch::GetElapsedSeconds() { return (float)(HostSeconds() - *(double *)m_state); }
+CXBStopWatch::CXBStopWatch() : m_fSecsPerTick(1e-6f), m_nStartTick(0), m_nElapsedTicks(0), m_bRunning(FALSE) {}
+void CXBStopWatch::Start() { m_nElapsedTicks = 0; m_nStartTick = HostTicks(); m_bRunning = TRUE; }
+void CXBStopWatch::Stop()
+{
+	if (m_bRunning)
+		m_nElapsedTicks += HostTicks() - m_nStartTick;
+	m_bRunning = FALSE;
+}
+void CXBStopWatch::Reset() { m_nElapsedTicks = 0; m_nStartTick = HostTicks(); }
+BOOL CXBStopWatch::IsRunning() const { return m_bRunning; }
+float CXBStopWatch::GetElapsedSeconds()
+{
+	LONGLONG ticks = m_nElapsedTicks + (m_bRunning ? HostTicks() - m_nStartTick : 0);
+	return (float)ticks * m_fSecsPerTick;
+}
 float CXBStopWatch::GetElapsedMilliseconds() { return GetElapsedSeconds() * 1000.0f; }
