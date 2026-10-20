@@ -61,7 +61,8 @@ LIBRARIES = [
                   '(in reference/Samples)',
      ['../Samples/Common/Src/xb*.cpp', '../Samples/Common/Include/xb*.h'], [(0x93000, 0x9A000)], [],
      ('CXBApplicationEx::', 'CXBMesh::', 'CXBMemUnit::', 'CXBStorageDevice::', 'CXBFont::', 'CSound::',
-      'XBUtil_', 'XBInput_', 'CXBPackedResource::', 'CXBStopWatch::')),
+      'XBUtil_', 'XBInput_', 'CXBPackedResource::', 'CXBStopWatch::', 'CWaveFile::', 'CRiffChunk::',
+      'XBSound_', 'XBResource_')),
 ]
 
 APP_RANGES = [(0x11000, 0x34000), (0x6A400, 0x13FD38)]
@@ -209,10 +210,14 @@ def main():
         f.write('# <library>_sub_<address> labels for the rest of each library\'s code.\n')
         for lib, desc, globs, ranges, aliases, prefixes in LIBRARIES:
             named = sorted(a for a, (l, n) in lib_names.items() if l == lib)
+            # Hand-named functions of the library (names.txt wins anyway); listed so
+            # tools/progress.py counts them as library code, unless src/ has them.
+            hand = sorted(a for a in curated if a not in lib_names and a not in done and library_of(a) == lib)
             subs = sorted(a for a, l in labels.items() if l == lib)
             f.write('#\n# %s: %s\n' % (lib, desc))
-            for a in sorted(named + subs):
-                f.write('%08x %s\n' % (a, lib_names[a][1] if a in lib_names else '%s_sub_%08x' % (lib, a)))
+            for a in sorted(named + subs + hand):
+                f.write('%08x %s\n' % (a, lib_names[a][1] if a in lib_names else
+                                       curated[a] if a in curated else '%s_sub_%08x' % (lib, a)))
     for r in reports:
         print(r, file=sys.stderr)
     by_lib = {}

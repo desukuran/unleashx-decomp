@@ -7,6 +7,11 @@
 // refills a packet with Read() when the play cursor passes it. The
 // subclasses supply Read(): a WAV file's data, a WMA decoder, or raw CD
 // audio.
+//
+// This is not the XDK's WMAStream sample (CWMAFileStream: the WMA decoder
+// feeding a DirectSoundStream, pumped by the caller's Process()); that isn't
+// linked in. CWMAPump is the binary's only WmaCreateDecoder caller, and
+// UnleashX's own WMA playback goes through XACT (CWMAPlayer).
 #pragma once
 
 #include "../common/Platform.h"

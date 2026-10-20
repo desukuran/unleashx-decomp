@@ -253,6 +253,7 @@
 0007980f unrar_sub_0007980f
 00079821 unrar_sub_00079821
 0007983e FindFile::Win32Find
+00079a0a FindFile::FastFind
 00079a5e unrar_sub_00079a5e
 00079b0e unrar_sub_00079b0e
 00079b3c ReadTextFile
@@ -283,6 +284,7 @@
 0007a803 unrar_sub_0007a803
 0007a850 unrar_sub_0007a850
 0007a8a9 unrar_sub_0007a8a9
+0007a8d0 File::WOpen
 0007a8e9 File::FileLength
 0007a921 unrar_sub_0007a921
 0007a926 unrar_sub_0007a926
@@ -301,6 +303,7 @@
 0007b072 Unpack::Unpack
 0007b095 unrar_sub_0007b095
 0007b288 unrar_sub_0007b288
+0007b2b3 ErrorHandler::SetErrorCode
 0007b2e9 unrar_sub_0007b2e9
 0007b2ee unrar_sub_0007b2ee
 0007b2f4 unrar_sub_0007b2f4
@@ -331,6 +334,7 @@
 0007bf30 Array::Push
 0007bf52 CommandData::CheckWinSize
 0007bfbb CommandData::IsSwitch
+0007bfd5 CommandData::GetArcName
 0007c036 unrar_sub_0007c036
 0007c0d4 unrar_sub_0007c0d4
 0007c199 unrar_sub_0007c199
@@ -351,12 +355,14 @@
 0007d51c unrar_sub_0007d51c
 0007d59e unrar_sub_0007d59e
 0007d5cd unrar_sub_0007d5cd
+0007d82a Archive::ReadHeader
 0007e2e9 unrar_sub_0007e2e9
 0007e32f unrar_sub_0007e32f
 0007e37d unrar_sub_0007e37d
 0007e52f unrar_sub_0007e52f
 0007e57e unrar_sub_0007e57e
 0007e6f5 unrar_sub_0007e6f5
+0007e759 Archive::IsArchive
 0007ea5f unrar_sub_0007ea5f
 0007ea8f unrar_sub_0007ea8f
 0007eaac unrar_sub_0007eaac
@@ -384,9 +390,13 @@
 001374fa unrar_sub_001374fa
 001374ff unrar_sub_001374ff
 00137641 unrar_sub_00137641
+00138625 CmdExtract::ExtractArchiveInit
 0013869d unrar_sub_0013869d
 001386bf unrar_sub_001386bf
 001386ff unrar_sub_001386ff
+0013877d CmdExtract::ExtractCurrentFile
+00139674 CmdExtract::ExtractArchive
+0013980d CmdExtract::DoExtract
 0013d3a7 unrar_sub_0013d3a7
 #
 # xunzip: Hans Dietrich's XUnzip (Lucian Wischik's unzip, zlib inflate); XUnzip.cpp as shipped in Valve's SDK (github.com/alliedmodders/hl2sdk, episode1: public/XUnzip.cpp)
@@ -515,6 +525,8 @@
 00090182 xkutils_sub_00090182
 0009018d xkutils_sub_0009018d
 0009022a xkutils_sub_0009022a
+00090a01 XKHDD::CleanATAData
+00090cdf XKHDD::GenerateHDDPwd
 000910b3 xkutils_sub_000910b3
 0009114a xkutils_sub_0009114a
 00091158 xkutils_sub_00091158
@@ -523,6 +535,7 @@
 00091684 xkutils_sub_00091684
 0009173c xkutils_sub_0009173c
 0009178f xkutils_sub_0009178f
+00091863 XKEEPROM::XKEEPROM
 00091887 xkutils_sub_00091887
 0009189c xkutils_sub_0009189c
 000918cf xkutils_sub_000918cf
@@ -546,6 +559,7 @@
 000b11b9 iso9660_sub_000b11b9
 000b11d2 iso9660_sub_000b11d2
 000b120b iso9660_sub_000b120b
+000b1240 MD5Transform
 000b1caf iso9660_sub_000b1caf
 000b1df8 iso9660::FindFolder
 000b1f38 iso9660_sub_000b1f38
@@ -646,6 +660,50 @@
 # xdksample: the XDK samples framework (XBApp, XBFont, XBMesh, XBMemUnit, XBStorageDevice, XBSound, XBUtil, XBInput); the XDK's Samples/Common/Src, a later version than the one linked in (in reference/Samples)
 0003201e xdksample_sub_0003201e
 00093025 XBUtil_FindMediaFile
+000930b9 XBUtil_DebugPrint
+00093333 XBUtil_GetCubeMapViewMatrix
+000934ad XBUtil_CreatePixelShader
+00093533 XBUtil_CreateVertexShader
+000935e3 XBUtil_CreateTexture
+00093623 XBUtil_InitLight
+000936af XBUtil_EvaluateCatmullRom
+000938dc XBUtil_EvaluateHermite
+00093a92 XBUtil_DumpSurface
+00093ba0 XBUtil_CreateNormalizationCubeMap
+00093dd8 XBUtil_RenderSpline
+00093f1d XBUtil_GetSplinePoint
 00094362 CXBStorageDevice::Cleanup
+00094375 CXBStorageDevice::FindNextSaveGame
+00094384 CXBStorageDevice::FindFirstSaveGame
+000943db CXBStorageDevice::IsValid
+000944cd CXBStorageDevice::GetSavedGameCount
+0009451c CXBStorageDevice::GetSize
 000945a4 CXBStopWatch::GetTicks
+000946a5 CWaveFile::Close
+000946b6 CWaveFile::Close_thunk
+000946bb CRiffChunk::ReadData
+00094715 CRiffChunk::Open
+000947ad CRiffChunk::Initialize
+000947c0 CRiffChunk::CRiffChunk
+00094b5a CWaveFile::GetLoopRegion
+00094c18 CWaveFile::GetFormat
+00094c64 CWaveFile::Open
+00094d71 CWaveFile::CWaveFile
+00094d9f XBSound_DrawLevelMeters
+00094fe2 CWaveFile::GetLoopRegionBytes
+000950ad CWaveFile::ReadSample
+000950e0 XBSound_DrawLevelMeters_dsound
 00097048 xdksample_sub_00097048
+0009726f CXBPackedResource::GetData
+000972c7 XBResource_SizeOf
+0009748a XBInput_InitDebugMouse
+00097890 CXBMesh::ComputeMeshBoundingBox
+00097914 CXBMesh::ComputeFrameBoundingBox
+00097a22 CXBMesh::ComputeBoundingBox
+00097aaf CXBMesh::ComputeMeshRadius
+00097b20 CXBMesh::ComputeFrameRadius
+00097be8 CXBMesh::ComputeRadius
+00097c6c CXBMesh::WriteToXBG
+00098180 CXBMemUnit::operator=
+00099391 CXBFont::CreateTexture
+000995c7 CXBFont::CreateShaders
