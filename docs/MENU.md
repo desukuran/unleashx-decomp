@@ -277,6 +277,14 @@ the XBE.
      cache.
    * The new path goes into the line, and the new preview starts playing.
 
+The site is back as an open-source replacement server (tested in xemu,
+2026): `<gdbase><xbg title=... video="-1" vidid="351"/></gdbase>`. Its
+entries have no `Thumb`, so icons always end with "Can't find downloadable
+content"; previews download. For an unknown title ID it answers 200 with
+an empty body instead of 404, which gives the same message instead of the
+request. (The menu scan re-reads the XBE's title ID when the game has no
+icon, so an `ID` edited into `items.xml` doesn't stick.)
+
 B cancels a download. `xboxskins.jpg` from the media folder is shown in the
 progress box.
 
