@@ -481,6 +481,8 @@
 00277840 g_eeprom
 00091863 XKEEPROM::XKEEPROM
 00091dc1 XKEEPROM::GetMACAddressString
+0009154c XKGeneral::BytesToHexStr_separator
+000915bf XKGeneral::BytesToHexStr
 00091dfd XKEEPROM::GetSerialNumberString
 00092007 XKEEPROM::GetHDKeyString
 00091ae6 XKEEPROM::Decrypt

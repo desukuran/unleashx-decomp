@@ -52,6 +52,6 @@ struct DSOUTPUTLEVELS
 	DWORD dwDigitalBackLeftRMS, dwDigitalBackRightRMS, dwDigitalLowFrequencyRMS;
 };
 HRESULT IDirectSound_GetOutputLevels(IDirectSound *sound, DSOUTPUTLEVELS *levels, BOOL resetPeakValues);   // 0x00193223
-#endif
 // Loads the effects image (dsstdfx.bin): 3 effects at index 4. TODO: verify the layout
 HRESULT XAudioDownloadEffectsImage(const char *file, const void *loc, DWORD flags, void **desc);   // 0x00193538
+#endif

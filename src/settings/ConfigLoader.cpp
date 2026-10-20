@@ -18,8 +18,6 @@
 CXmlDocument g_config;         // 0x00278160
 CXmlDocument g_defaultMenu;    // 0x00278040
 BOOL g_bConfigLoaded;          // 0x0026A610
-BOOL g_bColdBoot = TRUE;       // 0x00276208 TODO: verify initial value
-CUnleashX *g_pApp;             // 0x00276204
 
 static const char kEmptyConfig[] = "<UnleashX><Settings></Settings></UnleashX>";
 

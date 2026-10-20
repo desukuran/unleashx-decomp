@@ -16,6 +16,8 @@
 #include "../xml/XmlUtil.h"
 #include "MusicManager.h"
 
+CMusicManager *g_pMusicManager;   // 0x0027622C
+
 // Volume while muted (hundredths of a dB).
 static const float MUTED_VOLUME = -6400.0f;
 

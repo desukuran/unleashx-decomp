@@ -38,7 +38,9 @@ struct SThreadNotification
 	void(__stdcall *routine)(BOOL create);
 };
 static SThreadNotification s_threadNotify;          // 0x00270FA4
+#ifndef _XBOX
 void XRegisterThreadNotifyRoutine(SThreadNotification *notification, BOOL registerIt);
+#endif
 // BACK plus a trigger at boot: not a real action, so the BACK handling below
 // is skipped.
 static const int ACTION_HANDLED_AT_BOOT = 0x30;
@@ -105,7 +107,7 @@ HRESULT CUnleashX::Initialize()
 	XBUtil_InitMaterial(&material, 1.0f, 1.0f, 1.0f, 1.0f);
 	g_pd3dDevice->SetMaterial(&material);
 	s_threadNotify.routine = ThreadNotifyRoutine;
-	XRegisterThreadNotifyRoutine(&s_threadNotify, TRUE);
+	XRegisterThreadNotifyRoutine(XDK_CAST(PXTHREAD_NOTIFICATION, &s_threadNotify), TRUE);
 
 	// The drives: the one we run from (F: or G: turn those on), C:, and
 	// when run from DVD, E: and the Z: cache.
@@ -488,7 +490,7 @@ HRESULT CUnleashX::Initialize()
 		if (effects.size() != 0)
 		{
 			DWORD loc[2] = {3, 4};
-			XAudioDownloadEffectsImage(effects.c_str(), loc, 0, NULL);
+			XAudioDownloadEffectsImage(effects.c_str(), XDK_CAST(LPCDSEFFECTIMAGELOC, loc), 0, NULL);
 		}
 	}
 	m_bStartMusic = g_pDirectSound != NULL;

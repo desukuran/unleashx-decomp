@@ -39,6 +39,7 @@ enum
 	INPUT_OPERATION_DONE = 48,     // a file operation finished
 };
 
+float g_fFrameRate;                             // 0x0027764C
 static BOOL s_bDiscHandled;                      // 0x00278D40 the inserted disc was autostarted (or skipped)
 static BOOL s_bUpdateMessageShown;               // 0x00278D3C
 static DWORD s_dwNextMusicCheck;                 // 0x00278D38

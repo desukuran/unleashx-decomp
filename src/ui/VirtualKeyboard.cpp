@@ -22,6 +22,7 @@
 #include "../skin/SkinColors.h"
 
 CVirtualKeyboard g_virtualKeyboard;   // 0x00278328
+BOOL g_bKeyboardAccepted;             // 0x0027A5CC
 
 // The sample's English strings (index: see GetKeyboardString).
 static const wchar_t *const s_englishStrings[21] = {

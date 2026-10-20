@@ -21,8 +21,6 @@
 #include "../ui/StringIds.h"
 #include "VirtualKeyboard.h"
 
-CAppSettings *g_pFileSettings = NULL;
-
 #define NEW_FOLDER_ITEM "[New Folder]"
 
 // 0x00013C39 (name in edx, this in esi)

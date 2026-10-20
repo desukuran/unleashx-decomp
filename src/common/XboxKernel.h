@@ -286,6 +286,8 @@ extern KRNLAPI BYTE XboxHDKey[16];
 KRNLAPI void __stdcall KeQuerySystemTime(LARGE_INTEGER *currentTime);
 KRNLAPI NTSTATUS __stdcall HalReadSMBusValue(UCHAR address, UCHAR command, BOOLEAN readWord, ULONG *value);
 KRNLAPI NTSTATUS __stdcall HalWriteSMBusValue(UCHAR address, UCHAR command, BOOLEAN writeWord, ULONG value);
+KRNLAPI NTSTATUS __stdcall HalReadSMCTrayState(ULONG *state, ULONG *changeCount);
+KRNLAPI void __stdcall HalInitiateShutdown();
 KRNLAPI NTSTATUS __stdcall NtSetSystemTime(LARGE_INTEGER *newTime, LARGE_INTEGER *previousTime);
 KRNLAPI NTSTATUS __stdcall ExQueryNonVolatileSetting(ULONG valueIndex, ULONG *type, void *value, ULONG valueLength,
                                             ULONG *resultLength);
@@ -383,7 +385,9 @@ BOOL __stdcall XapiFormatFATVolume(PANSI_STRING volume);                        
 }
 // IOCTL_CDROM_CHECK_VERIFY: is there a readable disc.
 #define IOCTL_CDROM_CHECK_VERIFY 0x00024800
+#ifndef ERROR_UNRECOGNIZED_MEDIA
 #define ERROR_UNRECOGNIZED_MEDIA 1785
+#endif
 
 #ifndef _XBOX
 // XAPI

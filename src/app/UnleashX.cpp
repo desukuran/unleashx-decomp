@@ -38,10 +38,10 @@ DWORD g_dwGlobeSpinTime;                   // 0x00276220
 static BOOL s_bBackgroundSoundPlaying;     // 0x00278D48
 
 // The XDK framework's resource/font teardown and DirectSound shutdown.
-void CXBFontDestroy(CXBFontEx *font);      // 0x00098FFE CXBFont::Destroy
-void CXBPackedResourceDestroy(CXBPackedResource *resource);   // 0x00097104
-extern IDirect3DTexture8 *g_pTexture270FB0;   // 0x00270FB0
-extern IDirect3DTexture8 *g_pTexture270FB4;   // 0x00270FB4
+// Released at exit; nothing in the binary sets them.
+IDirect3DTexture8 *g_pTexture270FB0;       // 0x00270FB0
+IDirect3DTexture8 *g_pTexture270FB4;       // 0x00270FB4
+HANDLE g_hExitEvent;                       // 0x0027624C
 
 // 0x000E229C
 CUnleashX::CUnleashX()
@@ -280,10 +280,10 @@ HRESULT CUnleashX::Cleanup()
 	ReleaseTexture(m_pDashCellWall);
 	ReleaseTexture(m_pDashOrb);
 	for (int i = 0; i < 6; i++)
-		CXBFontDestroy(&m_fonts[i]);
+		m_fonts[i].Destroy();
 	ReleaseTexture(g_pTexture270FB4);
 	ReleaseTexture(g_pTexture270FB0);
-	CXBPackedResourceDestroy(&m_resource);
+	m_resource.Destroy();
 
 	if (m_hThread2248 != NULL && m_hThread2248 != INVALID_HANDLE_VALUE)
 		WaitForSingleObject(m_hThread2248, 200);

@@ -12,35 +12,101 @@ XDK := reference/5933
 WINE := WINEDEBUG=-all wine
 CL := $(WINE) $(XDK)/bin/vc71/CL.Exe
 LINK := $(WINE) $(XDK)/bin/vc71/Link.Exe
-IMAGEBLD := $(WINE) $(XDK)/bin/imagebld.exe
+IMAGEBLD := $(WINE) ../../$(XDK)/bin/imagebld.exe
+EXTRACT_XISO ?= extract-xiso
 
 OUT := build/xbox
 OBJ := $(OUT)/obj
 
-CFLAGS := /nologo /c /O2 /GR /EHsc /MT /W3 /wd4996 /D_XBOX /DNDEBUG /DWIN32 \
+CFLAGS := /nologo /c /O2 /GR /EHsc /MT /W3 /wd4996 /D_XBOX /DNDEBUG /DWIN32 /DDEBUG_MOUSE \
 	/I$(XDK)/include /Isrc/xbox
 
 # Host-only glue and test helpers aren't part of the Xbox build.
 SRCS := $(filter-out src/common/PlatformHost.cpp src/net/XNetHost.cpp, $(sort $(wildcard src/*/*.cpp)))
 OBJS := $(patsubst src/%.cpp,$(OBJ)/%.obj,$(SRCS))
 
+# Build support (xbox/): small parts of the third-party libraries written
+# from the binary, adapters onto the public sources, and stand-ins.
+SUPPORT_SRCS := $(sort $(wildcard xbox/*.cpp))
+SUPPORT_OBJS := $(patsubst xbox/%.cpp,$(OBJ)/xbox/%.obj,$(SUPPORT_SRCS))
+
+# Third-party sources (gitignored, see README.md for where they come from).
+TP := reference/thirdparty
+TPFLAGS := /nologo /c /O2 /EHsc /MT /W0 /D_XBOX /DNDEBUG /DWIN32 /I$(XDK)/include /Ixbox/include
+MAD_SRCS := bit decoder fixed frame huffman layer12 layer3 stream synth timer version
+TP_OBJS := $(OBJ)/tp/unzip.obj $(OBJ)/tp/XZip.obj $(OBJ)/tp/ftpparse.obj $(OBJ)/tp/XKSHA1.obj \
+	$(patsubst %,$(OBJ)/tp/mad_%.obj,$(MAD_SRCS))
+
+ALL_OBJS := $(OBJS) $(SUPPORT_OBJS) $(TP_OBJS)
+
 LIBS := xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib xacteng.lib xmv.lib xnet.lib \
-	xboxkrnl.lib libcmt.lib libcpmt.lib
+	xboxkrnl.lib xkbd.lib libcmt.lib libcpmt.lib
 
 all: $(OUT)/default.xbe
 
-$(OBJ)/%.obj: src/%.cpp
+HEADERS := $(wildcard src/*/*.h)
+
+$(OBJ)/%.obj: src/%.cpp $(HEADERS)
 	@mkdir -p $(dir $@)
 	@$(CL) $(CFLAGS) /Fo$@ $< > $@.log 2>&1; status=$$?; grep -E " (error|warning) " $@.log | head -20; \
 		if [ $$status -ne 0 ]; then rm -f $@; exit 1; fi
 
-objs: $(OBJS)
+$(OBJ)/xbox/%.obj: xbox/%.cpp $(HEADERS)
+	@mkdir -p $(dir $@)
+	@$(CL) $(CFLAGS) /Fo$@ $< > $@.log 2>&1; status=$$?; grep -E " (error|warning) " $@.log | head -20; \
+		if [ $$status -ne 0 ]; then rm -f $@; exit 1; fi
 
-$(OUT)/default.exe: $(OBJS)
+# The third-party objects; their warnings are left in the logs.
+define tp_compile
+	@mkdir -p $(dir $@)
+	@$(CL) $(TPFLAGS) $(1) /Fo$@ $< > $@.log 2>&1; status=$$?; grep -E " error " $@.log | head -20; \
+		if [ $$status -ne 0 ]; then rm -f $@; exit 1; fi
+endef
+
+$(OBJ)/tp/unzip.obj: $(TP)/zip_utils/unzip.cpp
+	$(call tp_compile,)
+$(OBJ)/tp/XZip.obj: $(TP)/valve/src/public/XZip.cpp
+	$(call tp_compile,/DXZIP_NOT_THREAD_SAFE /I$(TP)/valve/src/public)
+$(OBJ)/tp/ftpparse.obj: $(TP)/ftpparse/ftpparse.c
+	$(call tp_compile,)
+$(OBJ)/tp/XKSHA1.obj: $(TP)/xbmc4xbox/xbmc/platform/xbox/XKSHA1.cpp
+	$(call tp_compile,/DXKSHA1=XbmcSHA1)
+$(OBJ)/tp/mad_%.obj: $(TP)/libmad-0.15.1b/%.c
+	$(call tp_compile,/DFPM_INTEL /DHAVE_CONFIG_H /DASO_ZEROCHECK /I$(TP)/libmad-0.15.1b/msvc++)
+
+objs: $(ALL_OBJS)
+
+$(OUT)/default.exe: $(ALL_OBJS)
 	$(LINK) /nologo /SUBSYSTEM:XBOX /FIXED:NO /DEBUG /INCREMENTAL:NO /OUT:$@ /MAP:$(OUT)/default.map \
-		/LIBPATH:$(XDK)/lib $(OBJS) $(LIBS)
+		/LIBPATH:$(XDK)/lib $(ALL_OBJS) $(LIBS)
 
-$(OUT)/default.xbe: $(OUT)/default.exe
-	$(IMAGEBLD) /nologo /TITLEID:0x9E115330 /OUT:$@ $<
+# The embedded resources come from the release XBE.
+RELEASE := UnleashX_0_39_0528A/Default.xbe
+SECTIONS := $(OUT)/sections
+$(SECTIONS)/MEDIA_FILE.bin: $(RELEASE)
+	python3 -I tools/xbe.py extract $< $(SECTIONS)
 
-.PHONY: all objs
+# The original's certificate and init flags (no hard disk setup or changes,
+# 64 MB on a devkit), then the retail scrambling keys so a retail kernel
+# (or xemu) accepts it.
+IMAGEBLD_FLAGS := /NOLOGO /NOLIBWARN /STACK:0x40000 /INITFLAGS:0x1C /TESTID:0x9E115330 \
+	"/TESTNAME:UnleashX Xbox Launcher" /TESTMEDIATYPES:0x800003FF /TESTREGION:0x80000007 /TESTRATINGS:0xFFFFFFFF \
+	/TITLEIMAGE:sections/XTIMAGE.bin /DEFAULTSAVEIMAGE:sections/XSIMAGE.bin \
+	/INSERTFILE:sections/MEDIA_FILE.bin,MEDIA_FILE,RN /INSERTFILE:sections/DEF_FONT.bin,DEF_FONT,RN \
+	/INSERTFILE:sections/INT_SKINS.bin,INT_SKINS,RN
+
+$(OUT)/default.xbe: $(OUT)/default.exe $(SECTIONS)/MEDIA_FILE.bin
+	cd $(OUT) && $(IMAGEBLD) $(IMAGEBLD_FLAGS) /IN:default.exe /OUT:debug.xbe
+	python3 -I tools/xbe.py retail $(OUT)/debug.xbe $@
+
+# A disc image: the XBE as default.xbe plus the release's XML files.
+XISO_DIR := $(OUT)/iso
+$(OUT)/UnleashX.iso: $(OUT)/default.xbe
+	rm -rf $(XISO_DIR) && mkdir -p $(XISO_DIR)
+	cp $< $(XISO_DIR)/default.xbe
+	cp UnleashX_0_39_0528A/*.xml $(XISO_DIR)/
+	$(EXTRACT_XISO) -c $(XISO_DIR) $@
+
+xiso: $(OUT)/UnleashX.iso
+
+.PHONY: all objs xiso

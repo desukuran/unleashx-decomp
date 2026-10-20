@@ -5,6 +5,9 @@
 #include "../thirdparty/Iso9660.h"
 #include "FileIO.h"
 
+// The device the iso9660 reader opened (see Iso9660.h).
+HANDLE g_hIso9660Device;   // 0x0027625C
+
 // ---- CFileISO9660 ----
 
 // 0x00080BB3 (this in eax)

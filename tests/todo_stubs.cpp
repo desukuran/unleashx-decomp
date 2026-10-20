@@ -32,6 +32,7 @@ BYTE GetHddTemperature() { return 0; }
 void GetSmartAttribute(unsigned, DWORD *, DWORD *, DWORD *) {}
 
 // XKUtils.h
+XKEEPROM::XKEEPROM() {}
 XKEEPROM g_eeprom;
 void XKEEPROM::GetMACAddressString(char *mac, DWORD *length) { strcpy(mac, "00-50-F2-00-00-01"); *length = 6; }
 void XKEEPROM::GetSerialNumberString(char *serial, DWORD *length) { strcpy(serial, "123456789012"); *length = 12; }

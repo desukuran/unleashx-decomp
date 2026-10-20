@@ -8,6 +8,7 @@
 #include "../app/XBApp.h"
 
 // The ports last used (-1 = none yet).
+CGamepadInput g_gamepadInput;     // 0x00278280
 static int s_nGamepadPort = -1;   // 0x0026CC00
 static int s_nRemotePort = -1;    // 0x0026C99C
 // Quick repeats so far; every sixth one waits again.

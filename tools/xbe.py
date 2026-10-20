@@ -5,6 +5,8 @@
   xbe.py flat    <xbe> <out.bin>       write a flat memory image (base = XBE base)
   xbe.py layout  <xbe> <out.txt>       write section/thunk layout for the Ghidra import script
   xbe.py extract <xbe> <outdir>        dump each section's raw bytes to <outdir>/<name>.bin
+  xbe.py retail  <xbe> <out.xbe>       rescramble a debug XBE's entry point and kernel thunk
+                                       with the retail keys (imagebld writes debug ones)
 """
 import os
 import struct
@@ -144,6 +146,11 @@ def main():
         os.makedirs(sys.argv[3], exist_ok=True)
         for s in x.sections:
             open(os.path.join(sys.argv[3], s.name.strip('$.') + '.bin'), 'wb').write(x.data[s.raw:s.raw + s.rsize])
+    elif cmd == 'retail':
+        d = bytearray(x.data)
+        struct.pack_into('<I', d, 0x128, x.entry ^ XOR_EP_RETAIL)
+        struct.pack_into('<I', d, 0x158, x.kernel_thunk ^ XOR_KT_RETAIL)
+        open(sys.argv[3], 'wb').write(d)
     else:
         sys.exit(__doc__)
 

@@ -205,17 +205,19 @@ struct SSkinRect
 class CSkinEventSink
 {
 public:
-	virtual void Unknown0();                 // slot 0
+	// The base's slots are empty (0x00013D20), DrawImage too.
+	virtual ~CSkinEventSink() {}             // slot 0 (0x0002C67C)
 	// Before a skin change. (CSkinEvent: D3DDevice_BlockUntilVerticalBlank)
-	virtual void WaitForVerticalBlank();     // slot 1
-	virtual void OnSkinLoaded();             // slot 2 (+0x08)
+	virtual void WaitForVerticalBlank() {}   // slot 1
+	virtual void OnSkinLoaded() {}           // slot 2 (+0x08)
 	// An <Image> without a picture of its own: source 1 the highlighted
 	// item's icon, 2 the preview video, 3 the album art.
-	virtual void DrawImage(int source, int left, int top, int width, int height, float opacity);   // slot 3
+	virtual void DrawImage(int /*source*/, int /*left*/, int /*top*/, int /*width*/, int /*height*/,
+	                       float /*opacity*/) {}   // slot 3 (0x0002B659)
 	// A preview video with sound started: the music pauses.
-	virtual void OnPreviewSoundStart();      // slot 4 (+0x10)
+	virtual void OnPreviewSoundStart() {}    // slot 4 (+0x10)
 	// The preview stopped (a moment ago): the music goes on.
-	virtual void OnPreviewSoundEnd();        // slot 5 (+0x14)
+	virtual void OnPreviewSoundEnd() {}      // slot 5 (+0x14)
 };
 
 // size 0x6BC

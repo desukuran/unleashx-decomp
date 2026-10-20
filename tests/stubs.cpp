@@ -10,7 +10,9 @@
 #include "../src/ui/Language.h"
 #include "../src/app/XBApp.h"
 
-CGamepadInput g_gamepadInput;
+// Main.cpp and UnleashX.cpp (not linked on the host).
+BOOL g_bColdBoot = TRUE;
+class CUnleashX *g_pApp;
 CSoundEffects g_soundEffects;
 
 void SetXboxSystemTime(SYSTEMTIME st, BOOL) { printf("[stub] SetXboxSystemTime(%d)\n", st.wYear); }

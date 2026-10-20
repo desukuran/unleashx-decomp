@@ -34,4 +34,4 @@ struct ftpparse
 
 // 1 if buf (len bytes, one line without its end) is a listing line. (fp in
 // edi)
-int ftpparse(struct ftpparse *fp, char *buf, int len);   // 0x000BB675
+extern "C" int ftpparse(struct ftpparse *fp, char *buf, int len);   // 0x000BB675

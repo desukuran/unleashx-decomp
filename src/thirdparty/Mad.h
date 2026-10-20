@@ -45,7 +45,7 @@ struct mad_timer_t
 	long seconds;
 	unsigned long fraction;
 };
-extern const mad_timer_t mad_timer_zero;   // 0x002373E0
+extern "C" const mad_timer_t mad_timer_zero;   // 0x002373E0
 
 // 0x2C bytes.
 struct mad_header
@@ -88,6 +88,7 @@ struct mad_synth
 	mad_pcm pcm;                      // +0x1004
 };
 
+extern "C" {
 void mad_stream_init(mad_stream *stream);                                  // 0x00059040
 void mad_stream_finish(mad_stream *stream);                                // 0x00059090
 void mad_stream_buffer(mad_stream *stream, const unsigned char *buffer, unsigned long length);   // 0x000590B0
@@ -101,3 +102,4 @@ void mad_timer_set(mad_timer_t *timer, unsigned long seconds, unsigned long nume
 void mad_timer_multiply(mad_timer_t *timer, signed long scalar);           // 0x00058DE0
 signed long mad_timer_count(mad_timer_t timer, int units);                 // 0x00058E90
 unsigned long mad_bit_read(mad_bitptr *bitptr, unsigned int len);          // 0x00059920
+}
