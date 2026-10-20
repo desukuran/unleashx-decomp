@@ -42,9 +42,10 @@ static void LoadDashboardTextures(CUnleashX *app, const char *folder)
 {
 	CFileFinder finder;
 	std::string dashDir;
-	// Quirk: without a match FindFirst gives NULL, which std::string can't
-	// take.
-	std::string path = finder.FindFirst("C:\\", "xboxdashdata*");
+	// Without a match FindFirst gives NULL; UnleashX's string assign
+	// (0x000110E1) takes that as empty.
+	const char *found = finder.FindFirst("C:\\", "xboxdashdata*");
+	std::string path = found != NULL ? found : "";
 	if (path.size() == 0)
 	{
 		if (finder.FindFirst("C:\\", "default.xip") != NULL)

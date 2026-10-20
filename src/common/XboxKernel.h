@@ -258,7 +258,7 @@ void __stdcall RtlEnterCriticalSection(RTL_CRITICAL_SECTION *section);
 void __stdcall RtlLeaveCriticalSection(RTL_CRITICAL_SECTION *section);
 #endif
 
-extern KRNLAPI PANSI_STRING XeImageFileName;
+extern KRNLAPI ANSI_STRING XeImageFileName;   // the string itself, not a pointer
 extern KRNLAPI STRING HalDiskSerialNumber;
 extern KRNLAPI STRING HalDiskModelNumber;
 typedef struct _XBOX_KRNL_VERSION

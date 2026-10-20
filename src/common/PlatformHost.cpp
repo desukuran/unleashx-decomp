@@ -674,7 +674,7 @@ DWORD XGetAVPack()
 #include "XboxKernel.h"
 
 extern "C" {
-PANSI_STRING XeImageFileName = NULL;
+ANSI_STRING XeImageFileName = {0, 1, (PCHAR)""};
 NTSTATUS __stdcall NtOpenSymbolicLinkObject(PHANDLE handle, POBJECT_ATTRIBUTES)
 {
 	*handle = NULL;

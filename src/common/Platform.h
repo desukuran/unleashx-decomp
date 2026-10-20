@@ -263,3 +263,13 @@ FILE *HostFopen(const char *path, const char *mode);
 #else
 #define XDK_CAST(type, expr) (expr)
 #endif
+
+// UX_TRACE(format, ...): a debug trace for emulator runs. On the Xbox it
+// appends to g_traceLog (xbox/Trace.cpp), a RAM buffer the host can read
+// over xemu's QMP monitor; on the host it does nothing.
+#ifdef _XBOX
+extern "C" void TraceLog(const char *format, ...);
+#define UX_TRACE TraceLog
+#else
+#define UX_TRACE (void)
+#endif

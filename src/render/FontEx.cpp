@@ -33,9 +33,10 @@ HRESULT CXBFontEx::CreateFromMemory(const void *data)
 {
 	if (FAILED(m_xpr.CreateFromMemory(data, 2, NULL)))
 		return E_FAIL;
-	// The font texture comes first, its glyph data after its header.
+	// The font texture comes first, its glyph data after its 0x14-byte
+	// header (a D3DTexture: the resource plus Format and Size).
 	IDirect3DTexture8 *texture = (IDirect3DTexture8 *)m_xpr.GetResource(0);
-	return Create(texture, m_xpr.m_pSysMemData + sizeof(D3DResource));
+	return Create(texture, m_xpr.m_pSysMemData + 0x14);
 }
 
 // 0x00137841

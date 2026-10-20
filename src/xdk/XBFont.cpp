@@ -95,7 +95,8 @@ static HRESULT CreateShaders()
 			D3DVSD_END()
 		};
 		static const char program[] =
-			"xvss.1.1\n"
+			"xvs.1.1\n"
+			"#pragma screenspace\n"
 			"mov oPos.xy, v0.xy\n"
 			"mov oT0.xy, v0.zw\n"
 			"mov oD0, v3\n";

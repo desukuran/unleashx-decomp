@@ -165,8 +165,7 @@ HRESULT GetDriveDevicePath(char drive, std::string &devicePath)
 std::string GetXbePath()
 {
 	std::string path;
-	if (XeImageFileName != NULL)
-		path = XeImageFileName->Buffer;
+	path = XeImageFileName.Buffer;
 	StrReplaceAll(path, ".Xbe", ".xbe");
 	StrReplaceAll(path, ".XBE", ".xbe");
 	int ext = StrFind(path, ".xbe");
