@@ -37,6 +37,9 @@ extern "C"
 // Device reads go through an aligned buffer this big (in sectors).
 #define BOUNCE_SECTORS 128
 #define BLOCK_SECTORS 8   // the device's 4 KB
+#define BLOCK_SIZE (BLOCK_SECTORS * SECTOR_SIZE)
+#define BOUNCE_BLOCKS (BOUNCE_SECTORS / BLOCK_SECTORS)
+#define CACHE_BLOCKS 128  // 512 KB
 
 CFat32Volume *g_fat32Volumes[MAX_VOLUMES];   // 0x002776F4
 
@@ -73,6 +76,16 @@ std::vector<SPartition> s_partitions;
 BYTE s_mbr[SECTOR_SIZE];
 BOOL s_bHasMbr;
 BYTE *s_pBounce;
+BYTE *s_pCacheData;
+struct SCacheBlock
+{
+	DWORD block;
+	DWORD lastUse;
+	bool valid;
+	bool dirty;
+};
+SCacheBlock s_cache[CACHE_BLOCKS];
+DWORD s_nUseClock;
 SVolumeState *s_pCurrent;   // the volume the disk callbacks read
 SOpenFile *s_pOpenFiles;
 
@@ -114,45 +127,141 @@ struct SSelect
 	~SSelect() { Unlock(); }
 };
 
-BOOL SeekBlock(DWORD sector)
+BOOL SeekBlock(DWORD block)
 {
-	ULONGLONG offset = (ULONGLONG)sector * SECTOR_SIZE;
+	ULONGLONG offset = (ULONGLONG)block * BLOCK_SIZE;
 	LONG high = (LONG)(offset >> 32);
 	return SetFilePointer(s_hDevice, (LONG)(DWORD)offset, &high, FILE_BEGIN) != (DWORD)-1 || GetLastError() == 0;
 }
 
-// The device only takes 4 KB-aligned I/O (as UnleashX's driver did it,
-// DiskReadSectors 0x0006C5F0: whole blocks of 8 sectors, a write reading the
-// block first when it changes only part of it).
+// Whole 4 KB blocks to or from the device; data must be aligned for the
+// device (the cache's own blocks, or the bounce buffer).
+BOOL RawIo(DWORD block, DWORD blocks, BYTE *data, BOOL write)
+{
+	DWORD bytes = blocks * BLOCK_SIZE, done = 0;
+	if (!SeekBlock(block))
+		return FALSE;
+	if (write)
+		return WriteFile(s_hDevice, data, bytes, &done, NULL) && done == bytes;
+	return ReadFile(s_hDevice, data, bytes, &done, NULL) && done == bytes;
+}
+
+// The block cache, write-back, like UnleashX's driver had (SectorCache,
+// 512 KB, flushed by SectorCache::Flush 0x0006CA12): the device only does
+// whole 4 KB blocks (DiskReadSectors 0x0006C5F0), and fat_io_lib writes a
+// sector at a time.
+int FindBlock(DWORD block)
+{
+	for (int i = 0; i < CACHE_BLOCKS; i++)
+		if (s_cache[i].valid && s_cache[i].block == block)
+			return i;
+	return -1;
+}
+
+BYTE *BlockData(int slot)
+{
+	return s_pCacheData + slot * BLOCK_SIZE;
+}
+
+// Writes the changed blocks back, in order, consecutive ones together.
+BOOL FlushCache()
+{
+	BOOL ok = TRUE;
+	for (;;)
+	{
+		int first = -1;
+		for (int i = 0; i < CACHE_BLOCKS; i++)
+			if (s_cache[i].valid && s_cache[i].dirty && (first < 0 || s_cache[i].block < s_cache[first].block))
+				first = i;
+		if (first < 0)
+			break;
+		DWORD block = s_cache[first].block, count = 0;
+		int slot;
+		while (count < BOUNCE_BLOCKS && (slot = FindBlock(block + count)) >= 0 && s_cache[slot].dirty)
+		{
+			memcpy(s_pBounce + count * BLOCK_SIZE, BlockData(slot), BLOCK_SIZE);
+			s_cache[slot].dirty = false;
+			count++;
+		}
+		if (!RawIo(block, count, s_pBounce, TRUE))
+			ok = FALSE;
+	}
+	return ok;
+}
+
+// A slot for another block: a free one, else the least recently used
+// (written back first).
+int TakeSlot()
+{
+	int best = 0;
+	for (int i = 0; i < CACHE_BLOCKS; i++)
+	{
+		if (!s_cache[i].valid)
+			return i;
+		if (s_cache[i].lastUse < s_cache[best].lastUse)
+			best = i;
+	}
+	if (s_cache[best].dirty && !RawIo(s_cache[best].block, 1, BlockData(best), TRUE))
+		return -1;
+	s_cache[best].valid = false;
+	s_cache[best].dirty = false;
+	return best;
+}
+
+void ClearCache()
+{
+	memset(s_cache, 0, sizeof(s_cache));
+}
+
 BOOL DeviceIo(DWORD sector, BYTE *buffer, DWORD count, BOOL write)
 {
 	while (count != 0)
 	{
-		DWORD first = sector & ~(BLOCK_SECTORS - 1);
-		DWORD skip = sector - first;
-		DWORD blocks = (skip + count + BLOCK_SECTORS - 1) / BLOCK_SECTORS;
-		if (blocks > BOUNCE_SECTORS / BLOCK_SECTORS)
-			blocks = BOUNCE_SECTORS / BLOCK_SECTORS;
-		DWORD bytes = blocks * BLOCK_SECTORS * SECTOR_SIZE;
-		DWORD n = blocks * BLOCK_SECTORS - skip;
-		if (n > count)
-			n = count;
-		DWORD done = 0;
-		BOOL partial = skip != 0 || (skip + n) % BLOCK_SECTORS != 0;
-		if (!write || partial)
+		DWORD block = sector / BLOCK_SECTORS, skip = sector % BLOCK_SECTORS;
+		DWORD n = BLOCK_SECTORS - skip < count ? BLOCK_SECTORS - skip : count;
+		int slot = FindBlock(block);
+		if (slot < 0)
 		{
-			if (!SeekBlock(first) || !ReadFile(s_hDevice, s_pBounce, bytes, &done, NULL) || done != bytes)
-				return FALSE;
+			if (write && n == BLOCK_SECTORS)
+			{
+				// All of it is new: no need to read it.
+				if ((slot = TakeSlot()) < 0)
+					return FALSE;
+			}
+			else
+			{
+				// Read it, and the following blocks this request needs that
+				// aren't cached, in one go.
+				DWORD blocks = (skip + count + BLOCK_SECTORS - 1) / BLOCK_SECTORS, run = 1;
+				while (run < blocks && run < BOUNCE_BLOCKS && FindBlock(block + run) < 0)
+					run++;
+				if (!RawIo(block, run, s_pBounce, FALSE))
+					return FALSE;
+				for (DWORD k = 0; k < run; k++)
+				{
+					int s = TakeSlot();
+					if (s < 0)
+						return FALSE;
+					memcpy(BlockData(s), s_pBounce + k * BLOCK_SIZE, BLOCK_SIZE);
+					s_cache[s].block = block + k;
+					s_cache[s].valid = true;
+					s_cache[s].dirty = false;
+					s_cache[s].lastUse = ++s_nUseClock;
+				}
+				slot = FindBlock(block);
+			}
+			s_cache[slot].block = block;
+			s_cache[slot].valid = true;
 		}
+		s_cache[slot].lastUse = ++s_nUseClock;
 		if (write)
 		{
-			memcpy(s_pBounce + skip * SECTOR_SIZE, buffer, n * SECTOR_SIZE);
-			if (!SeekBlock(first) || !WriteFile(s_hDevice, s_pBounce, bytes, &done, NULL) || done != bytes)
-				return FALSE;
+			memcpy(BlockData(slot) + skip * SECTOR_SIZE, buffer, n * SECTOR_SIZE);
+			s_cache[slot].dirty = true;
 		}
 		else
 		{
-			memcpy(buffer, s_pBounce + skip * SECTOR_SIZE, n * SECTOR_SIZE);
+			memcpy(buffer, BlockData(slot) + skip * SECTOR_SIZE, n * SECTOR_SIZE);
 		}
 		sector += n;
 		buffer += n * SECTOR_SIZE;
@@ -365,19 +474,29 @@ BOOL Fat32Init(HANDLE device)
 				g_fat32Volumes[i] = NULL;
 			}
 		}
+		if (s_hDevice != INVALID_HANDLE_VALUE)
+			FlushCache();
+		ClearCache();
 		s_hDevice = device;
 	}
 	if (s_pBounce == NULL)
 	{
 #ifdef _XBOX
 		s_pBounce = (BYTE *)VirtualAlloc(NULL, BOUNCE_SECTORS * SECTOR_SIZE, MEM_COMMIT, PAGE_READWRITE);
+		s_pCacheData = (BYTE *)VirtualAlloc(NULL, CACHE_BLOCKS * BLOCK_SIZE, MEM_COMMIT, PAGE_READWRITE);
 #else
 		s_pBounce = (BYTE *)malloc(BOUNCE_SECTORS * SECTOR_SIZE);
+		s_pCacheData = (BYTE *)malloc(CACHE_BLOCKS * BLOCK_SIZE);
 #endif
+	}
+	if (s_pBounce == NULL || s_pCacheData == NULL)
+	{
+		Unlock();
+		return FALSE;
 	}
 	FindPartitions();
 	Unlock();
-	return s_pBounce != NULL && s_partitions.size() != 0;
+	return s_partitions.size() != 0;
 }
 
 void Fat32Shutdown()
@@ -396,7 +515,11 @@ void Fat32Shutdown()
 	}
 	s_pCurrent = NULL;
 	if (s_hDevice != INVALID_HANDLE_VALUE)
+	{
+		FlushCache();   // (fails quietly if the device was pulled)
 		CloseHandle(s_hDevice);
+	}
+	ClearCache();
 	s_hDevice = INVALID_HANDLE_VALUE;
 	s_partitions.clear();
 	Unlock();
@@ -551,6 +674,7 @@ void Fat32Close(FAT32_FILE *handle, CFat32Io *)
 	if (file->file != NULL)
 		fl_fclose(file->file);
 	ForgetOpenFile(file);
+	FlushCache();
 }
 
 int Fat32Seek(FAT32_FILE *handle, CFat32Io *, long offset, int origin)
@@ -568,7 +692,9 @@ int Fat32Remove(CFat32Io *io, const char *path)
 {
 	SSelect select((CFat32Volume *)io);
 	s_pCurrent->freeKnown = FALSE;
-	return fl_remove(LibPath(path).c_str());
+	int result = fl_remove(LibPath(path).c_str());
+	FlushCache();
+	return result;
 }
 
 FAT32_FILE *Fat32CreateDirectory(CFat32Io *io, const char *path, int, int, int)
@@ -577,7 +703,9 @@ FAT32_FILE *Fat32CreateDirectory(CFat32Io *io, const char *path, int, int, int)
 	SSelect select(volume);
 	std::string libPath = LibPath(path);
 	s_pCurrent->freeKnown = FALSE;
-	if (!fl_createdirectory(libPath.c_str()))
+	BOOL created = fl_createdirectory(libPath.c_str());
+	FlushCache();
+	if (!created)
 		return NULL;
 	DWORD cluster = FolderCluster(libPath);
 	if (cluster == 0)
@@ -698,5 +826,6 @@ BOOL Fat32RemoveDirectory(CFat32Volume *volume, const char *path)
 	if (!fatfs_mark_file_deleted(fs, parentCluster, shortName))
 		return FALSE;
 	fatfs_fat_purge(fs);
+	FlushCache();
 	return TRUE;
 }
